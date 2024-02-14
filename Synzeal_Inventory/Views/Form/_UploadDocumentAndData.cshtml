@@ -1,0 +1,221 @@
+﻿@{
+    ViewBag.Title = "Upload Document And Data";
+    Layout = null;
+}
+@model  Synzeal_Inventory.Entity.SZ_QuotationDetail
+@{
+    string[] attchedlist = null;
+    if (!string.IsNullOrEmpty(Model.AttachedDataList))
+    {
+        attchedlist = Model.AttachedDataList.Split(',');
+    }
+}
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <form role="form" id="formuploaddoc">
+            <div class="box-body">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">COA Document : </label>
+                        <span><input type="file" class="form-control" id="coadocument" name="coadocument" /></span>
+                        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+                        <input type="hidden" id="delcoa" name="delcoa" value="false" />
+                        @if (!string.IsNullOrEmpty(Model.COAPath))
+                        {
+                            <div id="divdelcoa">
+                                <a href="@Model.COAPath">Download</a> <span> | </span> <a href="jaavscript:void(0)" style="color:red" onclick="delcoafn()">Delete</a>
+                            </div>
+                        }
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Analytical Data : </label>
+                        <span><input type="file" class="form-control" id="analyticaldata" name="analyticaldata" /></span>
+                        <input type="hidden" id="deldata" name="deldata" value="false" />
+                        @if (!string.IsNullOrEmpty(Model.AnalyticalData))
+                        {
+                            <div id="divdeldata">
+                                <a href="@Model.AnalyticalData">Download</a> <span> | </span> <a href="jaavscript:void(0)" style="color:red" onclick="deldatafn()">Delete</a>
+                            </div>
+                        }
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Attached Data List : </label>
+                        <br />
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="COA" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("COA") ? "checked='checked'" : "") : "" ) /> COA
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="HPLC" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("HPLC") ? "checked='checked'" : "") : "" ) /> HPLC
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="Mass" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("Mass") ? "checked='checked'" : "") : "" ) /> Mass
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="NMR" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("NMR") ? "checked='checked'" : "") : "" ) /> 1H NMR
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="IR" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("IR") ? "checked='checked'" : "") : "" ) /> IR
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="CMR" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("CMR") ? "checked='checked'" : "") : "" ) /> 13C NMR
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="DEPT" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("DEPT") ? "checked='checked'" : "") : "" ) /> DEPT
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="TGA" class="Checkbox" @(attchedlist != null ? (attchedlist.Contains("TGA") ? "checked='checked'" : "") : "" ) /> TGA
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="ROI" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("ROI") ? "checked='checked'" : "") : "") /> ROI
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="SER" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("SER") ? "checked='checked'" : "") : "" ) /> SER
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="qNMR" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("qNMR") ? "checked='checked'" : "") : "" ) /> qNMR
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="HRMS" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("HRMS") ? "checked='checked'" : "") : "" ) /> HRMS
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="Elemental" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("Elemental") ? "checked='checked'" : "") : "" ) /> Elemental
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="APCI Mass" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("APCI Mass") ? "checked='checked'" : "") : "" ) /> APCI Mass
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="GC" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("GC") ? "checked='checked'" : "") : "" ) /> GC
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="ELSD" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("ELSD") ? "checked='checked'" : "") : "" ) /> ELSD
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="ChiralChr" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("ChiralChr") ? "checked='checked'" : "") : "" ) /> Chiral Chr
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="2D NMR" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("2D NMR") ? "checked='checked'" : "") : "" ) /> 2D NMR
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="COSY" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("COSY") ? "checked='checked'" : "") : "" ) /> COSY
+                        </div>
+                        <div class="col-md-3">
+                            <input type="checkbox" name="attachedData" value="CHNS" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("CHNS") ? "checked='checked'" : "") : "" ) /> CHNS
+                        </div>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="attachedData" value="NMR Interpretaion" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("NMR Interpretaion") ? "checked='checked'" : "") : "" ) /> NMR Assign
+                        </div>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="attachedData" value="CMR Interpretaion" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("CMR Interpretaion") ? "checked='checked'" : "") : "" ) /> CMR Assign
+                        </div>
+                        <div class="col-md-4">
+                            <input type="checkbox" name="attachedData" value="Stability Data" class="Checkbox" @( attchedlist != null ? (attchedlist.Contains("Stability Data") ? "checked='checked'" : "") : "" ) /> Stability Data
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" style="text-align:right">
+                    <button type="button" onclick="uploaddocumentdata()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="clearfix"></div>
+<script>
+    $.fn.serializeObject = function () {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function () {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+    function uploaddocumentdata() {
+        $(".errorcls").each(function () {
+            $(this).removeClass('errorcls');
+        });
+
+        var errorCount = 0;
+        //    if ($("#EP").val() === "") {
+        //        $("#EP").addClass('errorcls');
+        //        errorCount += 1;
+        //    }
+        //     if ($("#USP").val() === "") {
+        //        $("#USP").addClass('errorcls');
+        //         errorCount += 1;
+        //     }
+        //    if ($("#IUPAC").val() === "") {
+        //         $("#IUPAC").addClass('errorcls');
+        //        errorCount += 1;
+        //   }
+        // if (errorCount !== 0) {
+        //       return false;
+        //   }
+
+        var address = ""; //$("#address").val()
+        var model = $("#formuploaddoc").serializeObject();
+
+        var formData = new FormData();
+        var file = document.getElementById("coadocument").files[0];
+        var analyticaldata = document.getElementById("analyticaldata").files[0];
+        formData.append("Id", $("#Id").val());
+        formData.append("coadocument", file);
+        formData.append("analyticaldata", analyticaldata);
+        formData.append("attachedData", $('.Checkbox:checked').map(function () { return this.value; }).get().join(','));
+        formData.append("delcoa", $("#delcoa").val());
+        formData.append("deldata", $("#deldata").val());
+        $.ajax({
+            type: "POST",
+            url: "/Form/UploadDocumentQuotedetails",
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            success: function (results) {
+                if(results === "Success")
+                {
+                    $("#myModal").modal('hide');
+                    $("#myModal").find(".modal-body").html("");
+                    toastr.success("Information Saved Successfully.");
+                }
+            }
+        });
+
+
+        //$.ajax({
+        //    type: "POST",
+        //    url: "/Form/UploadDocumentQuotedetails",
+        //    data: $("#formuploaddoc").serializeObject(),
+        //    success: function (results) {
+        //        if (!results.success) {
+        //            swal("Opps!", results.message, "error");
+        //            return false;
+        //        }
+        //        swal("Good job!", "Representative COA generated.", "success");
+        //        setTimeout(function () {
+        //            ReloadChildMaster();
+        //            $('#myModal').modal('hide');
+        //        }, 2000);
+
+        //    }
+        //});
+    }
+
+
+    function delcoafn() {
+        $('#delcoa').val('true');
+        $('#divdelcoa').hide();
+    }
+    function deldatafn() {
+        $('#deldata').val('true');
+        $('#divdeldata').hide();
+    }
+</script>

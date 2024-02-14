@@ -1,0 +1,114 @@
+﻿@{
+    ViewBag.Title = "Notification List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model IEnumerable<Synzeal_Inventory.Entity.SZ_SystemNotification>
+@{
+    bool isminiadmin = Synzeal_Inventory.Models.SessionCookieManagement.IsMiniAdmin;
+}
+
+<section class="content-header">
+    <h1>
+        Notification List
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+
+                <div id="home">
+
+                    <div class="box-body divQuote" style="overflow:scroll;">
+
+                        <table id="example1" class="table table-bordered table-striped" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Sent Username</th>
+                                    <th>URL</th>
+                                    <th>Message</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+
+    var alltbl = $('#example1').DataTable({
+        //"fixedHeader": {
+        //    header: true
+        //},
+        "searching": false,
+        "ordering": false,
+        "processing": true, // for show progress bar
+        "serverSide": true, // for process server side
+        "filter": true, // this is for disable filter (search box)
+        "orderMulti": false, // for disable multiple column at once
+        "pageLength": 25,
+        //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+        "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+        "ajax": {
+            "url": "../Form/LoadNotificationList",
+            "type": "POST",
+            "datatype": "json",
+            "data": function (d) {
+                
+            }
+        },
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            if (aData.IsView === false) {
+                $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+            }
+        },
+        "fnDrawCallback": function (oSettings) {
+            
+            setTimeout(function () {
+                alltbl.columns.adjust();
+            }, 2000);
+
+        },
+        "columnDefs":
+            [
+                
+            ],
+        "createdRow": function (row, data, dataIndex) {
+        },
+        "columns": [
+            { "data": "CreatedDateText", "autoWidth": true, "orderable": false },
+            { "data": "SentUsername", "autoWidth": true, "orderable": false },
+            { "data": "Message", "autoWidth": true, "orderable": false },
+            { "data": "URL", "autoWidth": true, "orderable": false },
+            { "data": "ActionRow", "autoWidth": true, "orderable": false },
+        ]
+    });
+
+
+    function MarkasRead(notificationId) {
+        $.ajax({
+            url: '/Form/MarkasRead?notificationId=' + notificationId,
+            data: {},
+            type: 'GET',
+            success: function (data) {
+                if (data.success) {
+                    toastr.success("Mark as read successfully.");
+                    $('#example1').DataTable().ajax.reload(null, false);
+                    LoadGetNotification();
+                }
+                else {
+                    toastr.error(data.message);
+                }
+            }
+        });
+    }
+</script>

@@ -1,0 +1,148 @@
+﻿@{
+    ViewBag.Title = "ScientistQueryModule";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int loop = 1;
+    int loopcnt = 1;
+}
+@model List<Synzeal_Inventory.Entity.SZ_QueryModule>
+<section class="content-header">
+    <h1>
+        Query Module
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#home" data-tabname="all">IN PROCESS</a></li>
+                    <li><a data-toggle="tab" href="#tabtobe" data-tabname="tobe">SOLVED</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="home" class="tab-pane fade in active">
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            <table class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+                                <thead>
+                                    <tr>
+                                        <th width="1%">
+                                            #
+                                        </th>
+                                        <th>
+                                            Query Date
+                                        </th>
+                                        <th>
+                                            Query #
+                                        </th>
+                                        <th>
+                                            Sub Status
+                                        </th>
+
+                                        <th>
+                                            Product Name
+                                        </th>
+                                        <th>
+                                            CAS #
+                                        </th>
+                                        <th>
+                                            CAT #
+                                        </th>
+                                        <th>
+                                            Qty
+                                        </th>
+                                        <th>
+                                            Batch #
+                                        </th>
+                                        <th>SynZeal Remarks</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var k in Model.Where(x => x.IsScientistResolved == false || x.IsScientistResolved == null).ToList())
+                                    {
+                                        <tr id="tr_@k.Id">
+                                            <td>@loop</td>
+                                            <td>@k.CreatedDate.Value.ToShortDateString()</td>
+                                            <td>@k.QueryNo</td>
+                                            <td>@k.SubStatus</td>
+                                            <td>@k.ProductName</td>
+                                            <td>@k.CASNo</td>
+                                            <td>@k.CATNo</td>
+                                            <td>@k.Qty</td>
+                                            <td>@k.BatchNo</td>
+                                            <td>@k.SynzealRemark</td>
+                                            <td><a href="/Form/QuerySolution/@k.Id">Action</a></td>
+                                        </tr>
+                                        loop += 1;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="tabtobe" class="tab-pane fade">
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            <table class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+                                <thead>
+                                    <tr>
+                                        <th width="1%">
+                                            #
+                                        </th>
+                                        <th>
+                                            Query Date
+                                        </th>
+                                        <th>
+                                            Query #
+                                        </th>
+                                        <th>
+                                            Sub Status
+                                        </th>
+
+                                        <th>
+                                            Product Name
+                                        </th>
+                                        <th>
+                                            CAS #
+                                        </th>
+                                        <th>
+                                            CAT #
+                                        </th>
+                                        <th>
+                                            Qty
+                                        </th>
+                                        <th>
+                                            Batch #
+                                        </th>
+                                        <th>SynZeal Remarks</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var k in Model.Where(x => x.IsScientistResolved == true).ToList())
+                                    {
+                                        <tr id="tr_@k.Id">
+                                            <td>@loop</td>
+                                            <td>@k.CreatedDate.Value.ToShortDateString()</td>
+                                            <td>@k.QueryNo</td>
+                                            <td>@k.SubStatus</td>
+                                            <td>@k.ProductName</td>
+                                            <td>@k.CASNo</td>
+                                            <td>@k.CATNo</td>
+                                            <td>@k.Qty</td>
+                                            <td>@k.BatchNo</td>
+                                            <td>@k.SynzealRemark</td>
+                                            <td><a href="/Form/QuerySolution/@k.Id">Action</a></td>
+                                        </tr>
+
+                                        loopcnt += 1;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>

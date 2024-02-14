@@ -1,0 +1,95 @@
+﻿@{
+    ViewBag.Title = "Conversion Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Conversion Report
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <form role="form">
+                    <div class="box-body">
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">Start Date</label>
+                            <input type="text" class="form-control" id="Startdate" name="Startdate" placeholder="Start date">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">End Date</label>
+                            <input type="text" class="form-control" id="Enddate" name="Enddate" placeholder="End date">
+                        </div>
+                        <div style="float: left;margin-top: 19px;">
+                            <div>
+                                <label for="inputPassword3" class="col-sm-10 control-label"></label>
+                                <div>
+                                    <button type="button" class="btn btn-primary" onclick="SearchConversationReport()">Search</button>
+
+                                    <button type="button" class="btn btn-primary" onclick="GeneratePOExcelReport()">Generate Excel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </form>
+
+                <div id="divresult"></div>
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    $('#Startdate').datepicker({
+        format: 'dd/mm/yyyy',
+        onSelect: function (dateText, inst) {
+        }
+    });
+    $('#Enddate').datepicker({
+        format: 'dd/mm/yyyy',
+        onSelect: function (dateText, inst) {
+        }
+    });
+
+    var date1 = new Date();
+    date1.setMonth(date1.getMonth() - 1);
+    $("#Startdate").datepicker().datepicker("setDate", date1);
+    $("#Enddate").datepicker().datepicker("setDate", new Date());
+
+    function GeneratePOReport() {
+        window.location.href = '/Form/PrintFollowupReportPDF?CreatedBy=' + $("#CreatedBy").val() + '&Startdate=' + $("#Startdate").val() + '&Enddate=' + $("#Enddate").val();
+    }
+
+    function GeneratePOExcelReport() {
+        window.location.href = '/Form/PrintNewCompanyReportExcel?Startdate=' + $("#Startdate").val() + '&Enddate=' + $("#Enddate").val();
+    }
+
+
+    function SearchConversationReport() {
+        $("#divresult").html('Loading...');
+        $.ajax({
+            url: '/Form/SearchConversationReport?Startdate=' + $("#Startdate").val() + '&Enddate=' + $("#Enddate").val(),
+            data: {},
+            async: true,
+            type: 'GET',
+            success: function (data) {
+                /*$('#tbldata').DataTable().clear().destroy();*/
+                var str = '<table id="tbldata" class="table table-responsive"><thead><tr><th>Company</th><th>Quoted Products</th><th>PO Received </th><th>% Conversion</th></tr></thead>';
+                $(data).each(function (i,v) {
+                    str += '<tr><td>' + v.CompanyName + '</td><td>' + v.QuotedProduct + '</td><td>' + v.POProduct + '</td><td>' + v.Conversion +'%</td></tr>';
+                });
+
+                str += "</table>";
+
+                $("#divresult").html(str);
+
+
+                $("#tbldata").DataTable();
+            }
+        });
+    }
+    </script>

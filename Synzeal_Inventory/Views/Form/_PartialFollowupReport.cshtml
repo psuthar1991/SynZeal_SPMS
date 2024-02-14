@@ -1,0 +1,195 @@
+﻿@model List<SZ_QuotationDetail>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+}
+@using Synzeal_Inventory.Entity;
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+@using Synzeal_Inventory.Models
+
+<div style="margin:2% 33%;float:left;box-shadow:0 0 3px #aaa; height:auto;color:gray;">
+    <table width="100%">
+        <tr>
+            <td valign="top">
+                <img src="http://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" width="200px" />
+            </td>
+            <td style="float:right">
+                <span style="font-size:11px;float:right;padding:10px; text-align:right;color:gray;line-height:18px;">
+                    <b style="color:#000">Syn</b><b style="color: #00659e;">Zeal</b><b style="color:#000"> Research Pvt Ltd</b><br />
+                    Plot No. F, Shree Ganesh Industrial Estate,<br />
+                    423/24/8, Mahagujarat Industrial Estate,<br />
+                    Sarkhej-Bavla Road , Moraiya , India-382213<br />
+                    <b>Email:-</b> standards@synzeal.com<br />
+                    <b>Phone:-</b> +91-757-500-2050<br />
+                    <br />
+                </span>
+            </td>
+        </tr>
+    </table>
+    <br />
+    <hrline />
+    <h3 style="text-align:center">Followup Report</h3>
+    @if (Model != null && Model.Count > 0)
+    {
+        int loop = 1;
+
+        <div style="padding:0px; float:left;padding-top:10px;">
+            <table width="100%" class="proinfo" cellpadding="4" cellspacing="3" border="1">
+                <thead>
+                    <tr style="font-size:10px">
+                        <th width="10%">
+                            <b>#</b>
+                        </th>
+                        <th>
+                            <b>Date</b>
+                        </th>
+                        <th>
+                            <b>Quote #</b>
+                        </th>
+                        <th>
+                            <b>Type</b>
+                        </th>
+                        <th>
+                            <b>Company Name</b>
+                        </th>
+                        <th><b>Email</b></th>
+                        <th><b>Subject</b></th>
+                        <th><b>Product Name</b></th>
+
+                        <th><b>CAT No</b></th>
+                        <th><b>CAS No</b></th>
+                        <th><b>Price 1</b></th>
+                        <th><b>Price 2</b></th>
+                        <th><b>Price 3</b></th>
+                        <th><b>Price 4</b></th>
+                        <th><b>Lead Time</b></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int srno = 1;
+                        List<int> quoteids = Model.Select(x => x.QuoteId).Distinct().ToList();
+
+                        foreach (var qid in quoteids)
+                        {
+                            int price1total = 0;
+                            int price2total = 0;
+                            int price3total = 0;
+                            int price4total = 0;
+                            var filteritem = Model.Where(x => x.QuoteId == qid).ToList();
+                            foreach (var item in filteritem)
+                            {
+                                List<string> pricedata = new List<string>();
+                                if (!string.IsNullOrEmpty(item.Price))
+                                {
+                                    pricedata = item.Price.Split(',').ToList();
+                                }
+
+                                <tr style="color:#000;">
+                                    <td style="font-size:9px;text-align:center;" width="10%">
+                                        @srno
+                                    </td>
+                                    <td style="font-size:9px;text-align:center;">
+                                        @item.CreatedDate.ToShortDateString()
+                                    </td>
+                                    <td style="font-size:9px;text-align:center;">
+                                        @item.SZ_Quotation.Ref
+                                    </td>
+                                    <td style="font-size:9px;">@item.SZ_Quotation.CountryType</td>
+                                    <td style="font-size:9px;">@Html.Raw(item.SZ_Quotation.CompanyName)</td>
+                                    <td style="font-size:9px;">@item.SZ_Quotation.EmailAddress</td>
+                                    <td style="font-size:9px;">@item.SZ_Quotation.ClientRef</td>
+                                    <td style="font-size:9px;">@item.ProductName</td>
+                                    <td style="font-size:9px;">@item.CATNo</td>
+                                    <td style="font-size:9px;">@item.CASNo</td>
+
+                                    <td style="font-size:9px;">
+                                        @if (pricedata != null && pricedata.Count > 0)
+                                        {
+                                            @pricedata[0]
+                                            var price1str = pricedata[0].GetPriceFromPriceString();
+                                            if (!string.IsNullOrEmpty(price1str))
+                                            {
+                                                price1total += Convert.ToInt32(price1str);
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-size:9px;">
+                                        @if (pricedata != null && pricedata.Count > 1)
+                                        {
+                                            @pricedata[1]
+                                            var price2str = pricedata[1].GetPriceFromPriceString();
+                                            if (!string.IsNullOrEmpty(price2str))
+                                            {
+                                                price2total += Convert.ToInt32(price2str);
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-size:9px;">
+                                        @if (pricedata != null && pricedata.Count > 2)
+                                        {
+                                            @pricedata[2]
+                                            var price3str = pricedata[2].GetPriceFromPriceString();
+                                            if (!string.IsNullOrEmpty(price3str))
+                                            {
+                                                price3total += Convert.ToInt32(price3str);
+                                            }
+                                        }
+                                    </td>
+                                    <td style="font-size:9px;">
+                                        @if (pricedata != null && pricedata.Count > 3)
+                                        {
+                                            @pricedata[3]
+                                            var price4str = pricedata[3].GetPriceFromPriceString();
+                                            if (!string.IsNullOrEmpty(price4str))
+                                            {
+                                                price4total += Convert.ToInt32(price4str);
+                                            }
+                                        }
+                                    </td>
+
+                                    <td style="font-size:9px;">@item.LeadTime</td>
+                                </tr>
+                                srno += 1;
+                            }
+                            <tr>
+                                <td colspan="10"></td>
+                                <td>@price1total</td>
+                                <td>@price2total</td>
+                                <td>@price3total</td>
+                                <td>@price4total</td>
+                                <td></td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        loop += 1;
+    }
+    else
+    {
+        <div style="text-align:center;padding-top:80px;">
+            NO DATA FOUND
+        </div>
+    }
+</div>

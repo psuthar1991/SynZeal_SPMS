@@ -1,0 +1,490 @@
+﻿@model Synzeal_Inventory.Entity.SZ_InvoiceData
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    var quoteData = db.SZ_Quotation.Where(x => x.Id == Model.QuoteId).FirstOrDefault();
+    var loop = 1;
+    decimal? finaltotal = 0;
+    int finalqty = 0;
+    string currency = "INR";
+    if (quoteData.CountryType == "Export")
+    {
+        currency = "USD";
+    }
+    if (!string.IsNullOrEmpty(quoteData.Currency))
+    {
+        currency = quoteData.Currency;
+    }
+}
+@using Newtonsoft.Json
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+
+<table width="100%">
+    <tr>
+        <td valign="middle" width="30%">
+            <img src="http://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" width="190px" />
+        </td>
+        <td style="float:left" width="40%">
+            <div style="font-size: 10px;float: left;padding: 10px;text-align: left;color: #000">
+                <b style="        color: #000;
+        font-size: 12px"> SYNZEAL RESEARCH PRIVATE LIMITED</b><br />
+                Plot No. F, Shree Ganesh Industrial Estate,<br />
+                423/24/8, Mahagujarat Industrial Estate,<br />
+                Sarkhej-Bavla Road , Moraiya , India-382213<br />
+                <b>Email:-</b> standards@synzeal.com<br />
+                <b>Phone:-</b> +91-757-500-2050<br />
+                <b>GSTIN of Supplier:-</b> 24AAVCS1383C1Z9<br />
+                <b>ARN NO:-</b> AD240322022415P
+            </div>
+        </td>
+        <td width="30%">
+            <div style="font-size:10px;padding:10px; text-align:center ;color:#000">
+                <b style="text-decoration:underline">Place of Supply Details</b> <br />
+                State Name: GUJARAT<br />
+                State Code: 24 <br />
+                District Code : Ahmedabad(438)
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <div style="width:100%; text-align:center;color:#000;">
+                <br />
+                <b>EXPORT INVOICE/PACKING LIST</b>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <div style="text-align:center;color:#000;font-size: 10px">
+                SUPPLY MEANT FOR EXPORT UNDER BOND WITHOUT PAYMENT OF INTEGRATED TAX
+            </div>
+        </td>
+    </tr>
+</table>
+<table width="100%" border="1" style=" border-collapse: collapse; ">
+    <tr>
+        <td valign="top" style="padding:5px;" width="50%">
+            <div style="font-size: 9px;float: left;text-align: left;color: #000">
+                <b style="text-decoration:underline">Recipient's details (Consignee)</b><br />
+                <b style="text-decoration:underline">BILL TO,</b><br />
+                @*<b>@Model.CompanyName </b><br />*@
+                @*<b>Kind Att: Areeya </b><br />*@
+                @if (!string.IsNullOrEmpty(Model.Add1))
+                {
+                    <b>@Model.Add1</b><br />
+                }
+                <b>
+                    @if (!string.IsNullOrEmpty(Model.Add2))
+                    {
+                        @Model.Add2<span>, </span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.City))
+                    {
+                        @Model.City<span>, </span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.State))
+                    {
+                        @Model.State<span>, </span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.PostCode))
+                    {
+                        @Model.PostCode<span>, </span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Country))
+                    {
+                        @Model.Country<span>, </span>
+                    }
+                </b><br />
+                <b>Tel: +@Model.Telno</b><br />
+                <b>E-Mail: @quoteData.EmailAddress</b>
+            </div>
+        </td>
+
+        <td valign="top" style="padding:5px;" width="50%">
+            <div style="font-size: 9px;float: left;text-align: left;color: #000">
+                <b>Invoice No.:- @Model.InvoiceNo</b> <br />
+                <b>
+                    Date of Invoice :- @if (Model.InvoiceDate != null)
+                    {
+                        @Model.InvoiceDate.ToShortDateString()
+                    }
+                </b> <br />
+                <b>Purchase Order No :- @Model.PONo</b> <br />
+                <b>
+                    Purchase Order Date :-  @if (Model.PODate != null)
+                    {
+                        @Model.PODate.ToShortDateString()
+                    }
+                </b> <br />
+                <b>FedEx AWB NO: - @Model.TrackingNo</b> <br />
+                <b>Country of Final Destination :- @Model.ShipCountry</b> <br />
+                <b>Country of Origin India</b> <br />
+                <b>Payment Terms:- @Model.TermsId</b>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding:5px;">
+            <span style="font-size: 9px;float: left;text-align: left;color: #000">
+                <b style="text-decoration:underline">SHIP TO,</b><br />
+                <b style="text-decoration:underline">Address of delivery,</b><br />
+                @*<b>@Model.CompanyName </b><br />*@
+                @if (!string.IsNullOrEmpty(Model.ShipAdd1))
+                {
+                    <b>@Model.ShipAdd1</b><br />
+                }
+                <b>
+                    @if (!string.IsNullOrEmpty(Model.ShipAdd2))
+                    {
+                        @Model.ShipAdd2<span>, </span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ShipCity))
+                    {
+                        @Model.ShipCity<span>, </span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ShipState))
+                    {
+                        @Model.ShipState<span>, </span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ShipPostCode))
+                    {
+                        @Model.ShipPostCode<span>, </span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ShipCountry))
+                    {
+                        @Model.ShipCountry<span>, </span>
+                    }
+                </b><br />
+                <b>Tel: +@Model.ShipTelno</b><br />
+                <b>E-Mail: @quoteData.EmailAddress</b>
+            </span>
+        </td>
+
+        <td valign="top" style="padding:5px;">
+            <span style="font-size: 9px;float: left;text-align: left;color: #000">
+                <b> Bank Details:- SynZeal Research Private Limited</b> <br />
+                <b>
+                    Bank Name:- Bank of Baroda, SG Highway Branch,
+                    Ahmedabad-380054, Gujarat, India
+                </b><br />
+                <b> Account No. : 30370200000920</b><br />
+                <b> SWIFT: BARBINBBSGH</b><br />
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding:5px;">
+            <span style="font-size: 9px;float: left;padding: 10px;text-align: left;color: #000">
+                <b>
+                    Final Destination: @Model.ShipCountry
+
+                </b><br />
+                <b>Carriage by Sea or Air Courier: @ViewBag.Courier</b>
+            </span>
+        </td>
+
+        <td valign="top" style="padding:5px;">
+            <span style="font-size: 9px;float: left;padding: 10px;text-align: left;color: #000">
+                <b>Place of receipt by pre-carriage - @Model.Type</b> <br />
+                <b>
+                    Port of Loading: AHMEDABAD - INDIA
+                </b>
+            </span>
+        </td>
+    </tr>
+</table>
+<table width="100%" border="1" style="    font-size: 9.5px;
+        color: #000;
+        border-collapse: collapse;
+        border: 1px solid gray;
+    ">
+    <tr>
+        <td valign="top" width="5%" style="text-align:center;padding:5px;">
+            1
+        </td>
+        <td valign="top" style="width: 40%;padding:5px;">
+            GSTN TYPE (On SLI & Invoice)
+        </td>
+        <td valign="top" style="width: 55%;padding:5px;">
+            GSN (In this Case ICE Holder Individual IEC No. 0814025277)
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" width="5%" style="text-align:center;padding:5px;">
+            2
+        </td>
+        <td valign="top" style="width: 40%;padding:5px;">
+            GSTN NO. (On SLI & Invoice)
+        </td>
+        <td valign="top" style="width: 55%;padding:5px;">
+            24AAVCS1383C1Z9
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" width="5%" style="text-align:center;padding:5px;">
+            3
+        </td>
+        <td valign="top" style="width:40%;padding:5px;">
+            END USE Code (On Invoice)
+        </td>
+        <td valign="top" style="width: 55%;padding:5px;">
+            GNX810 for Research & amp; Development (Note: - Other than Biomedical Research)
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" width="5%" style="text-align:center">
+            4
+        </td>
+        <td valign="top" style="width: 40%;padding:5px;">
+            IGST PAYMENT STATUS (On Invoice)
+        </td>
+        <td valign="top" style="width: 55%;padding:5px;">
+            Not Applicable
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" width="5%" style="text-align:center;padding:5px;">
+            5
+        </td>
+        <td valign="top" style="width: 40%;padding:5px;">
+            IF PAID: (A) TAX. AMT (B) IGST AMT (On Invoice)
+        </td>
+        <td valign="top" style="width: 55%;padding:5px;">
+            Not Applicable
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" width="5%" style="text-align:center;padding:5px;">
+            6
+        </td>
+        <td valign="top" style="width: 40%;padding:5px;">
+            IF DBK: - DECLARATION
+        </td>
+        <td valign="top" style="width: 55%;padding:5px;">
+            DB001 (On SLI)
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" width="5%" style="text-align:center;padding:5px;">
+            7
+        </td>
+        <td valign="top" style="width: 45%;padding:5px;">
+            Accessory Status:(Pls advise whether)
+        </td>
+        <td valign="top" style="width: 55%;padding:5px;">
+            NO ACCESSORY
+        </td>
+    </tr>
+</table>
+<table width="100%" border="1" style="font-size: 9px;color: #000;border-collapse: collapse;">
+    <thead>
+        <tr style="font-weight:bold">
+            <th width="5%" style="padding: 5px;text-align:center;">
+                No.
+            </th>
+            <th width="36%" style="padding: 5px;">
+                Description of goods (Reference standard/working standard/impurities)
+            </th>
+            <th width="10%" style="padding: 5px;">Batch No.</th>
+            @*<th width="8%" style="padding: 5px;">
+                    Analysis
+                    Date
+                </th>
+                <th width="8%" style="padding: 5px;">
+                    Re-Test Date
+                </th>*@
+            <th width="11%" style="padding: 5px;">
+                CAS No
+            </th>
+            <th width="11%" style="padding: 5px;">
+                CAT No
+            </th>
+            <th width="10%" style="padding: 5px;">
+                HSN
+            </th>
+            <th width="5%" style="padding: 5px;">
+                Unit / UQC (MG)
+            </th>
+            <th width="7%" style="padding: 5px;">
+                Rate (Per Unit/MG)
+            </th>
+            <th width="7%" style="padding: 5px;">
+                Total Value in @currency
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.SZ_InvoiceDetailsData)
+        {
+            <tr>
+                <td width="5%" style="padding: 5px;text-align:center;">
+                    @loop
+                </td>
+                <td width="36%" style="padding: 5px;">
+                    @item.ProductName
+                </td>
+                <td width="9%" style="padding: 5px;">
+                    @item.BatchNo
+                </td>
+                <td width="11%" style="padding: 5px;">
+                    @item.CASNo
+                </td>
+                <td width="11%" style="padding: 5px;">
+                    @item.CATNo
+                </td>
+                <td width="9%" style="padding: 5px;">
+                    @item.HSN
+                </td>
+                <td width="5%" style="padding: 5px;">
+                    @item.Qty
+                </td>
+                <td width="7%" style="padding: 5px;">
+                    @if (item.Rate.HasValue)
+                    {
+                        @item.Rate.Value.ToString("0.##")
+                    }
+                </td>
+                <td width="7%" style="padding: 5px;">
+                    @{
+                        finalqty += Convert.ToInt32(item.Qty);
+                        var total = item.Total;
+                        finaltotal += total;
+                    }
+                    @total
+                </td>
+            </tr>
+            loop += 1;
+        }
+        @if (Model.Type == "CPT")
+        {
+            <tr>
+                <td colspan="8" style="text-align:right;padding: 5px;">
+                    <b> Shipping Charges</b>
+                </td>
+                <td style="padding: 5px;">
+                    @{
+                        finaltotal += Model.ShippingCost;
+                        <span>@Model.ShippingCost</span>
+                    }
+                    @*@if (quoteData.CountryType == "Export")
+                        {
+                            finaltotal += Model.ShippingCost;
+                            <span>@Model.ShippingCost</span>
+                        }
+                        else
+                        {
+                            <span>0</span>
+                        }*@
+                </td>
+            </tr>
+        }
+        <tr>
+
+            <td colspan="8" style="text-align:right;padding: 5px;">
+                <b> Total</b>
+            </td>
+            <td style="padding: 5px;">@finaltotal</td>
+        </tr>
+        <tr>
+            <td colspan="3" style="padding: 5px;">
+                Total Invoice Value (In figures) @currency
+            </td>
+            <td colspan="6" style="text-align:left;padding: 5px;">
+                <b> @finaltotal</b>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="padding: 5px;">
+                Total Invoice Value (In words) @currency
+            </td>
+            <td colspan="6" style="text-align:left;padding: 5px;">
+                <b> Amount In Word: @Synzeal_Inventory.Models.NumberToWords.ConvertAmount(Convert.ToDouble(finaltotal))</b>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<table width="100%" style="border-collapse: collapse;">
+    <tr>
+        <td style="width:70%;font-size: 10px;color: #000;padding: 5px;">
+            <b>Gross Weight:- </b> @Model.GrossWeight
+        </td>
+        <td style="width:30%;font-size: 10px;color: #000;padding: 5px;">
+            <b>Net Weight:- </b>@finalqty MG
+        </td>
+    </tr>
+    @if (!string.IsNullOrEmpty(Model.Temperature))
+    {
+        <tr>
+            <td style="width:70%;font-size: 10px;color: #000;padding: 5px;">
+                <b>Temp:- </b>@Model.Temperature
+            </td>
+            <td style="width:30%;font-size: 10px;color: #000;padding: 5px;">
+                <b>Total pkgs:- </b>01
+            </td>
+        </tr>
+    }
+    <tr>
+        <td style="width:70%;font-size: 10px;color: #000;padding: 5px;">
+            <b>Standard Unit Quantity Code:- </b>Milligram (MG)
+        </td>
+        <td style="width:30%;font-size: 10px;color: #000;padding: 5px;">
+            @if (string.IsNullOrEmpty(Model.Temperature))
+            {
+                <b>Total pkgs:- </b><span>01</span>
+            }
+        </td>
+    </tr>
+    <tr>
+        <td style="width:70%;font-size: 10px;color: #000;padding: 5px;">
+            <b>Free Trade Agreement:- NCPTI</b>
+        </td>
+        <td style="width:30%;font-size: 10px;color: #000;padding: 5px;">
+        </td>
+    </tr>
+</table>
+<div style="width:100%;font-size: 10px;color: #000;padding: 5px;">
+    <b style="text-decoration:underline">Comments:-</b>  <br />
+    <p>
+        1. Reference standard/working standard/impurities for laboratory use only.
+    </p>
+    <p>
+        2. Not for drug, household or other use.
+    </p>
+    <p>
+        3. Non-hazardous for transport.
+    </p>
+    <p>
+        4. Small glass vial wrapped in mailer foam box.
+    </p>
+    <br />
+    <b>Declaration: We declare that this invoice shows the actual price of the goods described and all the particulars are true and correct</b>
+</div>
+<table width="100%">
+    <tr>
+        <td style="width:70%;font-size:10px;color: #000;padding: 5px;"></td>
+        <td style="width:30%;font-size: 10px;color: #000;padding: 5px;">
+            SynZeal Research Private Limited <br /> <br />
+            Authorized Signature
+        </td>
+    </tr>
+</table>
+

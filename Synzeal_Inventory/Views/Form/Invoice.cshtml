@@ -1,0 +1,1421 @@
+﻿@{
+    ViewBag.Title = "Invoice";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string classnameinternational = "";
+}
+
+@model List<SZ_QuotationModel>
+@using Synzeal_Inventory.Models
+
+<section class="content-header">
+    <h1>
+        Invoice List <a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="sendorderemail()">Send Email</a> <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="SaveAll()">Save All</a>  <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Printrecords()">Copy</a>  <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="queryGenerate()">Query</a>
+        <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="InvoiceGenerate()">Invoice</a>
+        <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Reminder()">Reminder</a>
+        <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Export()">Export</a>
+    </h1>
+</section>
+<style type="text/css">
+    #example1 input {
+        border: 0px;
+    }
+</style>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <ul class="nav nav-tabs">
+                    @if (!SessionCookieManagement.IsInternational)
+                    {
+                        <li class="active"><a data-toggle="tab" href="#home" data-tabname="domestic">DOMESTIC</a></li>
+                        <li><a data-toggle="tab" href="#tabexport" onclick="exporttab()" data-tabname="export">EXPORT</a></li>
+                    }
+                    else
+                    {
+                        <li class="active"><a data-toggle="tab" href="#tabexport" onclick="exporttab()" data-tabname="export">EXPORT</a></li>
+                    }
+                    <li><a data-toggle="tab" href="#tabsample" onclick="Sampletab()" data-tabname="sample">SAMPLE</a></li>
+                    <li><a data-toggle="tab" href="#tabinvoice" onclick="invoicetab()" data-tabname="invoice">GENERATED INVOICE</a></li>
+                    <li><a data-toggle="tab" href="#tabinvoicedocument" onclick="invoicedocumenttab()" data-tabname="invoicedocument">DOCUMENT</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    @if (!SessionCookieManagement.IsInternational)
+                    {
+                        <div id="home" class="tab-pane fade in active">
+                            <div class="col-md-2">
+                                <label>Company:</label>
+                                @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.listCompItems, new { @class = "form-control clsCompanyId" })
+                            </div>
+
+                            <div class="col-md-2">
+                                <label>Start Date: </label>
+                                <input type="text" id="fltstartdate" class="datepicker form-control" value="" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>End Date: </label>
+                                <input type="text" id="fltenddate" class="datepicker form-control" value="" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Controlled Substance: </label>
+                                <input type="checkbox" id="fltcontrolledsubstance" value="" />
+                            </div>
+                            <div class="col-md-1" style="margin-top:30px;">
+                                <label></label>
+                                <a href="javascript:void(0)"><i class="fa fa-recycle" onclick="$('#example1').DataTable().draw()"></i></a>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="box-body" style="overflow:scroll;" id="divInvoice">
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="selectallchk" /></th>
+                                            <th><input type="checkbox" id="selectprintallchk" /></th>
+                                            @*<th>Action</th>*@
+                                            <th>Invoice Date</th>
+                                            <th>PO No</th>
+                                            <th>Product Name</th>
+                                            <th>CAS No</th>
+                                            <th>CAT No</th>
+                                            <th>Qty (mg)</th>
+                                            <th>Batch No</th>
+                                            <th>COA</th>
+                                            <th>Company Name</th>
+                                            <th>Courier</th>
+                                            <th>Tracking No</th>
+                                            <th>Location</th>
+                                            <th>Reference Name</th>
+                                            <th>Purpose of dispatch</th>
+                                            <th>Delivery Date</th>
+                                            <th>Delivery Status</th>
+                                            <th>Data Pending</th>
+                                            <th>Data Remark</th>
+                                            <th>Pack Size</th>
+                                            <th>Invoice Remark</th>
+                                            <th>Invoice No</th>
+                                            <th>Payment Status</th>
+                                            <th>Download</th>
+                                            <th>COA</th>
+                                            <th>Analytical</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        classnameinternational = "in active";
+                    }
+                    
+                <div id="tabexport" class="tab-pane fade @classnameinternational">
+                    <div class="col-md-2">
+                        <label>Company:</label>
+                        @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.listCompItems, new { @class = "form-control clsCompanyId" })
+                    </div>
+                    <div class="col-md-2">
+                        <label>Start Date: </label>
+                        <input type="text" id="fltstartdate" class="datepicker form-control" value="" />
+                    </div>
+                    <div class="col-md-2">
+                        <label>End Date: </label>
+                        <input type="text" id="fltenddate" class="datepicker form-control" value="" />
+                    </div>
+                    <div class="col-md-2">
+                        <label>Controlled Substance: </label>
+                        <input type="checkbox" id="fltcontrolledsubstance" value="" />
+                    </div>
+                    <div class="col-md-1" style="margin-top:30px;">
+                        <label></label>
+                        <a href="javascript:void(0)"><i class="fa fa-recycle" onclick="$('#tblexport').DataTable().draw()"></i></a>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="box-body" style="overflow:scroll;" id="divInvoiceexport">
+                        <table id="tblexport" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectallchk" /></th>
+                                    <th><input type="checkbox" id="selectprintallchk" /></th>
+                                    @*<th>Action</th>*@
+                                    <th>Invoice Date</th>
+                                    <th>PO No</th>
+                                    <th>Product Name</th>
+                                    <th>CAS No</th>
+                                    <th>CAT No</th>
+                                    <th>Qty (mg)</th>
+                                    <th>Batch No</th>
+                                    <th>COA</th>
+                                    <th>Company Name</th>
+                                    <th>Courier</th>
+                                    <th>Tracking No</th>
+                                    <th>Location</th>
+                                    <th>Reference Name</th>
+                                    <th>Purpose of dispatch</th>
+                                    <th>Delivery Date</th>
+                                    <th>Delivery Status</th>
+                                    <th>Data Pending</th>
+                                    <th>Data Remark</th>
+                                    <th>Pack Size</th>
+                                    <th>Invoice Remark</th>
+                                    <th>Invoice No</th>
+                                    <th>Payment Status</th>
+                                    <th>Download</th>
+                                    <th>COA</th>
+                                    <th>Analytical</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                    <div id="tabsample" class="tab-pane fade">
+                        <div class="box-body" style="overflow:scroll;" id="divInvoice">
+                            <table id="tblsample" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectallchk" /></th>
+                                        <th><input type="checkbox" id="selectprintallchk" /></th>
+                                        @*<th>Action</th>*@
+                                        <th>Invoice Date</th>
+                                        <th>PO No</th>
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Qty (mg)</th>
+                                        <th>Batch No</th>
+                                        <th>COA</th>
+                                        <th>Company Name</th>
+                                        <th>Courier</th>
+                                        <th>Tracking No</th>
+                                        <th>Location</th>
+                                        <th>Reference Name</th>
+                                        <th>Purpose of dispatch</th>
+                                        <th>Delivery Date</th>
+                                        <th>Delivery Status</th>
+                                        <th>Data Pending</th>
+                                        <th>Data Remark</th>
+                                        <th>Pack Size</th>
+                                        <th>Invoice Remark</th>
+                                        <th>Invoice No</th>
+                                        <th>Payment Status</th>
+                                        <th>Download</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="tabinvoice" class="tab-pane fade">
+                        <div class="box-body" style="overflow:scroll;" id="divInvoice">
+                            <table id="tblinvoice" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice No</th>
+                                        <th>Invoice Date</th>
+                                        <th>Company Name</th>
+                                        <th>Country</th>
+                                        <th>Download</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="tabinvoicedocument" class="tab-pane fade">
+                        <div class="box-body" style="overflow:scroll;" id="divInvoice">
+
+                            <a href="javascript:void(0)" onclick="AddInvoiceDocument(0)" class="btn btn-primary">Add New</a>
+
+                            <table id="tblinvoicedocument" class="table table-bordered table-striped" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice No</th>
+                                        <th>Company Name</th>
+                                        <th>Download</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    $('#home').find('#fltstartdate').datepicker({
+        format: 'dd/mm/yyyy'
+    });
+    $('#home').find('#fltenddate').datepicker({
+        format: 'dd/mm/yyyy'
+    });
+    $('#tabexport').find('#fltstartdate').datepicker({
+        format: 'dd/mm/yyyy'
+    });
+    $('#tabexport').find('#fltenddate').datepicker({
+        format: 'dd/mm/yyyy'
+    });
+    function AddInvoiceDocument(id) {
+        $.ajax({
+            url: '/Form/AddInvoiceDocument?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1200px");
+            }
+        });
+    }
+    function InvoiceGenerate() {
+        var ids = [];
+        $('#tblexport').find('.clsSaverow').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+        $.ajax({
+            url: '/Form/GenerateInvoice',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1200px");
+            }
+        });
+    }
+
+    function queryGenerate() {
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'domestic') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'sample') {
+            tableId = 'tblsample';
+        }
+        else {
+            tableId = 'tblexport';
+        }
+        var ids = [];
+        var qtyerror = 0;
+        $('#' + tableId).find('.clsSaverow').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product.");
+            return false;
+        }
+        //if (ids.length > 1) {
+        //    toastr.error("Please select one product for generating query.");
+        //    return false;
+        //}
+        $.ajax({
+            url: '/Form/AddQuery?ids=' + ids.join(",") + '&sectionName=invoice',
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+            }
+        });
+    }
+
+
+    $('#example1').find('#selectallchk').change(function () {
+
+        if ($(this).is(':checked')) {
+            $('#example1').find('.clsSaverow').each(function () {
+                $(this).prop('checked', true);
+            });
+        }
+        else {
+            $('#example1').find('.clsSaverow').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    $('#example1').find('#selectprintallchk').change(function () {
+
+        if ($(this).is(':checked')) {
+            $('#example1').find('.clsMovePrint').each(function () {
+                $(this).prop('checked', true);
+            });
+        }
+        else {
+            $('#example1').find('.clsMovePrint').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    $('#tblexport').find('#selectallchk').change(function () {
+
+        if ($(this).is(':checked')) {
+            $('#tblexport').find('.clsSaverow').each(function () {
+                $(this).prop('checked', true);
+            });
+        }
+        else {
+            $('#tblexport').find('.clsSaverow').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    $('#tblexport').find('#selectprintallchk').change(function () {
+
+        if ($(this).is(':checked')) {
+            $('#tblexport').find('.clsMovePrint').each(function () {
+                $(this).prop('checked', true);
+            });
+        }
+        else {
+            $('#tblexport').find('.clsMovePrint').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+
+    $('#tblsample').find("#selectallchk").change(function () {
+
+        if ($(this).is(':checked')) {
+            $('#tblsample').find('.clsSaverow').each(function () {
+                $(this).prop('checked', true);
+            });
+        }
+        else {
+            $('#tblsample').find('.clsSaverow').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    $('#tblsample').find('#selectprintallchk').change(function () {
+
+        if ($(this).is(':checked')) {
+            $('#tblsample').find('.clsMovePrint').each(function () {
+                $(this).prop('checked', true);
+            });
+        }
+        else {
+            $('#tblsample').find('.clsMovePrint').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    $("#divInvoice").css('height', window.innerHeight - 200);
+    $("#divInvoiceexport").css('height', window.innerHeight - 200);
+
+
+
+    var domesticload = false;
+    function domestictab() {
+       
+        if (domesticload === false) {
+            var alltbl = $('#example1').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+
+                },
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+                    $('.datepickerinvoice').datepicker({
+                        format: 'dd/mm/yyyy',
+                        onSelect: function (dateText, inst) {
+                            $(this).parent('td').next('td').find('select').val('Delivered');
+                        }
+                    });
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadInvoiceData?countryType=Domestic",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.compName = $("#home").find(".clsCompanyId").val();
+                        d.fltcontrolledsubstance = $("#home").find("#fltcontrolledsubstance").is(":checked");
+                        d.fltstartdate = $("#home").find("#fltstartdate").val();
+                        d.fltenddate = $("#home").find("#fltenddate").val();
+                    }
+                },
+                "fnDrawCallback": function (settings) {
+                    $('.datepickerinvoice').datepicker({
+                        format: 'dd/mm/yyyy',
+                        onSelect: function (dateText, inst) {
+                            $(this).parent('td').next('td').find('select').val('Delivered');
+                        }
+                    });
+                    clsRowFunction();
+
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+                    var groupingCounts = [];
+                    var counter = 1;
+                    api.column(3, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+                            if (last !== undefined) {
+                                groupingCounts[last] = counter;
+                            }
+
+                            $(rows).eq(i).before(
+                                '<td class="group" id="groupid_' + group + '" data-groupname="' + group + '"  colspan="25" style="' + (rows[i].attributes["data-IsConversionReport"] != null && rows[i].attributes["data-IsConversionReport"].value == "true" ? "BACKGROUND-COLOR:#95647d;" : (rows[i].attributes["data-ispaymentexpired"].value === "true" ? "BACKGROUND-COLOR:#e25b5b;" : "BACKGROUND-COLOR:#3c8dbc;")) + 'font-weight:700;color:#fff;padding:10px;" >' + group + " | " + rows[i].attributes["data-company"].value + ' </td>'
+                            );
+
+                            last = group;
+                            counter = 1;
+                        } else {
+                            counter++;
+                        }
+
+                    });
+                    domesticload = true;
+                    alltbl.columns.adjust();
+                    groupingCounts[last] = counter;
+                    CountRows(groupingCounts, 'example1');
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsControlledSubstance) {
+                        $('td', nRow).css('color', 'red');
+                    }
+                },
+                "columnDefs":
+                    [
+                        { targets: 3, visible: false },
+                        { targets: 10, visible: false }
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-id', data.QuoteDetailsId);
+                    $(row).attr('data-courier', data.Courier);
+                    $(row).attr('data-deliverystatus', data.DeliveryStatus);
+                    $(row).attr('data-datapending', data.DataPending);
+                    $(row).attr('data-paymentstatus', data.PaymentStatus);
+                    if (data.PurposeDispatch === "--Select--") {
+                        $(row).attr('data-purposedispatch', '');
+                    }
+                    else {
+                        $(row).attr('data-purposedispatch', data.PurposeDispatch);
+                    }
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('data-company', data.CompanyName);
+                    $(row).attr('data-pono', data.PONo);
+                    $(row).attr('data-ProductCount', data.ProductCount);
+                    $(row).attr('data-ispaymentexpired', data.IsPaymentExpired);
+                    $(row).attr('data-IsConversionReport', data.IsConversionReport);
+                },
+                "columns": [
+                    { "data": "FirstRow", "autoWidth": true },
+                    { "data": "SecondRow", "autoWidth": true },
+                    //  { "data": "ThirdRow", "autoWidth": true },
+                    { "data": "InvoicedDate", "autoWidth": true },
+                    { "data": "PONo", "name": "PONumber", "autoWidth": true },
+                    { "data": "ProductName", "name": "ProductName", "autoWidth": true },
+                    { "data": "CASNo", "name": "CASNo", "width": "200px" },
+                    { "data": "CATNo", "name": "CATNo", "width": "200px" },
+                    { "data": "RequiredQty", "autoWidth": true, "orderable": false },
+                    { "data": "InvoiceBatchNo", "autoWidth": true, "orderable": false },
+                    { "data": "COARefNumber", "autoWidth": true, "orderable": false },
+                    { "data": "CompanyName", "width": "18%" },
+                    { "data": "CourierStr", "orderable": false, "autoWidth": true },
+                    { "data": "TrackingNoStr", "name": "CompanyName", "width": "6%" },
+                    { "data": "LocationStr", "name": "PONumber", "width": "6%" },
+                    { "data": "RefNameStr", "name": "Ref", "autoWidth": true },
+                    { "data": "PurposeDispatchStr", "orderable": false, "autoWidth": true },
+                    { "data": "DeliveryDateStr", "orderable": false, "autoWidth": true },
+                    { "data": "DeliveryStatusStr", "orderable": false, "autoWidth": true },
+                    { "data": "DataPendingStr", "orderable": false, "autoWidth": true },
+                    { "data": "Remark", "orderable": false, "autoWidth": true },
+                    { "data": "OrderRemark", "orderable": false, "autoWidth": true },
+                    { "data": "InvoiceRemarkStr", "name": "ProductName", "autoWidth": true },
+                    { "data": "InvoiceNoStr", "name": "Price", "autoWidth": true },
+                    { "data": "PaymentStatusStr", "orderable": false, "autoWidth": true },
+                    { "data": "InvoicePDF", "orderable": false, "autoWidth": true },
+                    { "data": "COAPath", "orderable": false, "autoWidth": true },
+                    { "data": "AnalyticalData", "orderable": false, "autoWidth": true },
+                ]
+
+            });
+        }
+    }
+
+    var exportload = false;
+    function exporttab() {
+        if (exportload === false) {
+            var exporttbl = $('#tblexport').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+
+                },
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+                    $('.datepickerinvoice').datepicker({
+                        format: 'dd/mm/yyyy',
+                        onSelect: function (dateText, inst) {
+                            $(this).parent('td').next('td').find('select').val('Delivered');
+                        }
+                    });
+                },
+                "ajax": {
+                    "url": "../Form/LoadInvoiceData?countryType=Export",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.compName = $("#tabexport").find(".clsCompanyId").val();
+                        d.fltcontrolledsubstance = $("#tabexport").find("#fltcontrolledsubstance").is(":checked");
+                        d.fltstartdate = $("#tabexport").find("#fltstartdate").val();
+                        d.fltenddate = $("#tabexport").find("#fltenddate").val();
+                    }
+                },
+                "fnDrawCallback": function (settings) {
+                    $('.datepickerinvoice').datepicker({
+                        format: 'dd/mm/yyyy',
+                        onSelect: function (dateText, inst) {
+                            $(this).parent('td').next('td').find('select').val('Delivered');
+                        }
+                    });
+                    clsRowFunction();
+
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+                    var groupingCounts = [];
+                    var counter = 1;
+                    api.column(3, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+                            if (last !== undefined) {
+                                groupingCounts[group] = counter;
+                            }
+
+                            //$(rows).eq(i).before(
+                            //    '<td class="group" id="groupid_' + group + '" data-groupname="' + group +'"  colspan="23" style="BACKGROUND-COLOR:#3c8dbc;font-weight:700;color:#fff;padding:10px;" >' + group + " | " + rows[i].attributes["data-company"].value + ' </td>'
+                            //);
+                            $(rows).eq(i).before(
+                                '<td class="group" id="groupid_' + group + '" data-groupname="' + group + '"  colspan="25" style="' + (rows[i].attributes["data-IsConversionReport"] != null && rows[i].attributes["data-IsConversionReport"].value == "true" ? "BACKGROUND-COLOR:#95647d;" : (rows[i].attributes["data-ispaymentexpired"].value === "true" ? "BACKGROUND-COLOR:#e25b5b;" : "BACKGROUND-COLOR:#3c8dbc;")) + 'font-weight:700;color:#fff;padding:10px;" >' + group + " | " + rows[i].attributes["data-company"].value + ' </td>'
+                            );
+
+                            last = group;
+                            counter = 1;
+                        } else {
+                            counter++;
+                        }
+
+                    });
+
+                    exporttbl.columns.adjust();
+                    exportload = true;
+                    groupingCounts[last] = counter;
+                    CountRows(groupingCounts, 'tblexport');
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsControlledSubstance) {
+                        $('td', nRow).css('color', 'red');
+                    }
+                },
+                "columnDefs":
+                    [
+                        { targets: 3, visible: false },
+                        { targets: 10, visible: false }
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-id', data.QuoteDetailsId);
+                    $(row).attr('data-courier', data.Courier);
+                    $(row).attr('data-deliverystatus', data.DeliveryStatus);
+                    $(row).attr('data-datapending', data.DataPending);
+                    $(row).attr('data-paymentstatus', data.PaymentStatus);
+                    if (data.PurposeDispatch === "--Select--") {
+                        $(row).attr('data-purposedispatch', '');
+                    }
+                    else {
+                        $(row).attr('data-purposedispatch', data.PurposeDispatch);
+                    }
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('data-company', data.CompanyName);
+                    $(row).attr('data-pono', data.PONo);
+                    $(row).attr('data-ProductCount', data.ProductCount);
+                    $(row).attr('data-ispaymentexpired', data.IsPaymentExpired);
+                    $(row).attr('data-IsConversionReport', data.IsConversionReport);
+                },
+                "columns": [
+                    { "data": "FirstRow", "autoWidth": true },
+                    { "data": "SecondRow", "autoWidth": true },
+                    //  { "data": "ThirdRow", "autoWidth": true },
+                    { "data": "InvoicedDate", "autoWidth": true },
+                    { "data": "PONo", "name": "PONumber", "autoWidth": true },
+                    { "data": "ProductName", "name": "ProductName", "autoWidth": true },
+                    { "data": "CASNo", "name": "CASNo", "width": "200px" },
+                    { "data": "CATNo", "name": "CATNo", "width": "200px" },
+                    { "data": "RequiredQty", "autoWidth": true, "orderable": false },
+                    { "data": "InvoiceBatchNo", "autoWidth": true, "orderable": false },
+                    { "data": "COARefNumber", "autoWidth": true, "orderable": false },
+                    { "data": "CompanyName", "width": "18%" },
+                    { "data": "CourierStr", "orderable": false, "autoWidth": true },
+                    { "data": "TrackingNoStr", "name": "CompanyName", "width": "6%" },
+                    { "data": "LocationStr", "name": "PONumber", "width": "6%" },
+                    { "data": "RefNameStr", "name": "Ref", "autoWidth": true },
+                    { "data": "PurposeDispatchStr", "orderable": false, "autoWidth": true },
+                    { "data": "DeliveryDateStr", "orderable": false, "autoWidth": true },
+                    { "data": "DeliveryStatusStr", "orderable": false, "autoWidth": true },
+                    { "data": "DataPendingStr", "orderable": false, "autoWidth": true },
+                    { "data": "Remark", "orderable": false, "autoWidth": true },
+                    { "data": "OrderRemark", "orderable": false, "autoWidth": true },
+                    { "data": "InvoiceRemarkStr", "name": "ProductName", "autoWidth": true },
+                    { "data": "InvoiceNoStr", "name": "Price", "autoWidth": true },
+                    { "data": "PaymentStatusStr", "orderable": false, "autoWidth": true },
+                    { "data": "InvoicePDF", "orderable": false, "autoWidth": true },
+                    { "data": "COAPath", "orderable": false, "autoWidth": true },
+                    { "data": "AnalyticalData", "orderable": false, "autoWidth": true },
+                ]
+
+            });
+        }
+    }
+
+    var invoicedocumentload = false;
+    function invoicedocumenttab() {
+        if (invoicedocumentload === false) {
+            var invoicedoctbl = $('#tblinvoicedocument').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+
+                },
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+                    $('.datepickerinvoice').datepicker({
+                        format: 'dd/mm/yyyy',
+                        onSelect: function (dateText, inst) {
+                            $(this).parent('td').next('td').find('select').val('Delivered');
+                        }
+                    });
+                },
+                "ajax": {
+                    "url": "../Form/LoadDocumentInvoiceData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnDrawCallback": function (settings) {
+                    $('.datepickerinvoice').datepicker({
+                        format: 'dd/mm/yyyy',
+                        onSelect: function (dateText, inst) {
+                            $(this).parent('td').next('td').find('select').val('Delivered');
+                        }
+                    });
+                    clsRowFunction();
+
+                    invoicedoctbl.columns.adjust();
+                    invoicedocumentload = true;
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                },
+                "columnDefs":
+                    [
+
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                },
+                "columns": [
+                    { "data": "InvoiceNo", "autoWidth": true },
+                    { "data": "CompanyName", "autoWidth": true },
+                    { "data": "Document", "name": "ProductName", "autoWidth": true },
+                    { "data": "Action", "name": "Action", "autoWidth": true }
+                ]
+
+            });
+        }
+    }
+
+    var invoiceload = false;
+    function invoicetab() {
+        if (invoiceload === false) {
+            var invoicetbl = $('#tblinvoice').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+
+                },
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+                    $('.datepickerinvoice').datepicker({
+                        format: 'dd/mm/yyyy',
+                        onSelect: function (dateText, inst) {
+                            $(this).parent('td').next('td').find('select').val('Delivered');
+                        }
+                    });
+                },
+                "ajax": {
+                    "url": "../Form/LoadgeneratedInvoiceData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnDrawCallback": function (settings) {
+                    $('.datepickerinvoice').datepicker({
+                        format: 'dd/mm/yyyy',
+                        onSelect: function (dateText, inst) {
+                            $(this).parent('td').next('td').find('select').val('Delivered');
+                        }
+                    });
+                    clsRowFunction();
+
+                    invoicetbl.columns.adjust();
+                    invoiceload = true;
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                },
+                "columnDefs":
+                    [
+
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                },
+                "columns": [
+                    { "data": "InvoiceNo", "autoWidth": true },
+                    { "data": "Courier", "autoWidth": true },
+                    { "data": "CompanyName", "autoWidth": true },
+                    { "data": "ShipCountry", "name": "PONumber", "autoWidth": true },
+                    { "data": "TrackingNo", "name": "ProductName", "autoWidth": true }
+                ]
+
+            });
+        }
+    }
+
+    var sampleload = false;
+    function Sampletab() {
+        if (sampleload === false) {
+            var sampletbl = $('#tblsample').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+
+                },
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+                    $('.datepickerinvoice').datepicker({
+                        format: 'dd/mm/yyyy',
+                        onSelect: function (dateText, inst) {
+                            $(this).parent('td').next('td').find('select').val('Delivered');
+                        }
+                    });
+                },
+                "ajax": {
+                    "url": "../Form/LoadInvoiceData?countryType=Sample",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnDrawCallback": function (settings) {
+                    $('.datepickerinvoice').datepicker({
+                        format: 'dd/mm/yyyy',
+                        onSelect: function (dateText, inst) {
+                            $(this).parent('td').next('td').find('select').val('Delivered');
+                        }
+                    });
+                    clsRowFunction();
+
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+                    var groupingCounts = [];
+                    var counter = 1;
+                    api.column(3, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+                            if (last !== undefined) {
+                                groupingCounts[group] = counter;
+                            }
+
+                            $(rows).eq(i).before(
+                                '<td class="group" id="groupid_' + group + '" colspan="23" data-groupname="' + group + '"  style="' + (rows[i].attributes["data-IsConversionReport"] != null && rows[i].attributes["data-IsConversionReport"].value == "true" ? "BACKGROUND-COLOR:#95647d;" :"BACKGROUND-COLOR:#3c8dbc;") +'font-weight:700;color:#fff;padding:10px;" >' + group + " | " + rows[i].attributes["data-company"].value + ' </td>'
+                            );
+
+                            last = group;
+                            counter = 1;
+                        } else {
+                            counter++;
+                        }
+                    });
+
+                    sampletbl.columns.adjust();
+                    sampleload = true;
+                    groupingCounts[last] = counter;
+                    CountRows(groupingCounts, 'tblsample');
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                },
+                "columnDefs":
+                    [
+                        { targets: 3, visible: false },
+                        { targets: 10, visible: false }
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-id', data.QuoteDetailsId);
+                    $(row).attr('data-courier', data.Courier);
+                    $(row).attr('data-deliverystatus', data.DeliveryStatus);
+                    $(row).attr('data-datapending', data.DataPending);
+                    $(row).attr('data-paymentstatus', data.PaymentStatus);
+                    if (data.PurposeDispatch === "--Select--") {
+                        $(row).attr('data-purposedispatch', '');
+                    }
+                    else {
+                        $(row).attr('data-purposedispatch', data.PurposeDispatch);
+                    }
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('data-company', data.CompanyName);
+                    $(row).attr('data-pono', data.PONo);
+                    $(row).attr('data-ProductCount', data.ProductCount);
+                    $(row).attr('data-IsConversionReport', data.IsConversionReport);
+                },
+                "columns": [
+                    { "data": "FirstRow", "autoWidth": true },
+                    { "data": "SecondRow", "autoWidth": true },
+                    //  { "data": "ThirdRow", "autoWidth": true },
+                    { "data": "InvoicedDate", "autoWidth": true },
+                    { "data": "PONo", "name": "PONumber", "autoWidth": true },
+                    { "data": "ProductName", "name": "ProductName", "autoWidth": true },
+                    { "data": "CASNo", "name": "CASNo", "width": "200px" },
+                    { "data": "CATNo", "name": "CATNo", "width": "200px" },
+                    { "data": "RequiredQty", "autoWidth": true, "orderable": false },
+                    { "data": "InvoiceBatchNo", "autoWidth": true, "orderable": false },
+                    { "data": "COARefNumber", "autoWidth": true, "orderable": false },
+                    { "data": "CompanyName", "width": "18%" },
+                    { "data": "CourierStr", "orderable": false, "autoWidth": true },
+                    { "data": "TrackingNoStr", "name": "CompanyName", "width": "6%" },
+                    { "data": "LocationStr", "name": "PONumber", "width": "6%" },
+                    { "data": "RefNameStr", "name": "Ref", "autoWidth": true },
+                    { "data": "PurposeDispatchStr", "orderable": false, "autoWidth": true },
+                    { "data": "DeliveryDateStr", "orderable": false, "autoWidth": true },
+                    { "data": "DeliveryStatusStr", "orderable": false, "autoWidth": true },
+                    { "data": "DataPendingStr", "orderable": false, "autoWidth": true },
+                    { "data": "Remark", "orderable": false, "autoWidth": true },
+                    { "data": "OrderRemark", "orderable": false, "autoWidth": true },
+                    { "data": "InvoiceRemarkStr", "name": "ProductName", "autoWidth": true },
+                    { "data": "InvoiceNoStr", "name": "Price", "autoWidth": true },
+                    { "data": "PaymentStatusStr", "orderable": false, "autoWidth": true },
+                    { "data": "InvoicePDF", "orderable": false, "autoWidth": true },
+                ]
+
+            });
+        }
+    }
+
+    $('#example1').on('order.dt', function () {
+        $('.datepickerinvoice').datepicker({
+            format: 'dd/mm/yyyy',
+            onSelect: function (dateText, inst) {
+                $(this).parent('td').next('td').find('select').val('Delivered');
+            }
+        });
+    })
+        .on('search.dt', function () {
+            $('.datepickerinvoice').datepicker({
+                format: 'dd/mm/yyyy',
+                onSelect: function (dateText, inst) {
+                    debugger;
+                    $(this).parent('td').next('td').find('select').val('Delivered');
+                }
+            });
+        })
+        .on('page.dt', function () {
+            $('.datepickerinvoice').datepicker({
+                format: 'dd/mm/yyyy',
+                onSelect: function (dateText, inst) {
+                    debugger;
+                    $(this).parent('td').next('td').find('select').val('Delivered');
+                }
+            });
+        })
+        .on('draw.dt', function () {
+            $('.datepickerinvoice').datepicker({
+                format: 'dd/mm/yyyy',
+                onSelect: function (dateText, inst) {
+                    debugger;
+                    $(this).parent('td').next('td').find('select').val('Delivered');
+                }
+            });
+        })
+        .on('page', function (e, settings, len) {
+            $('.datepickerinvoice').datepicker({
+                format: 'dd/mm/yyyy',
+                onSelect: function (dateText, inst) {
+                    debugger;
+                    $(this).parent('td').next('td').find('select').val('Delivered');
+                }
+            });
+        });
+
+    function clsRowFunction() {
+
+        $(".clsRow").each(function () {
+
+            var id = $(this).attr("data-id");
+            var courier = $(this).attr("data-courier");
+            var deliverystatus = $(this).attr("data-deliverystatus");
+            var datapending = $(this).attr("data-datapending");
+            var paymentstatus = $(this).attr("data-paymentstatus");
+            var purposedispatch = $(this).attr("data-purposedispatch");
+            if (courier != "" && courier !== undefined) {
+                $("#courier_" + id).val(courier);
+            }
+            if (deliverystatus != "" && deliverystatus !== undefined) {
+                $("#deliverystatus_" + id).val(deliverystatus);
+            }
+            if (datapending != "" && datapending !== undefined) {
+                $("#datapending_" + id).val(datapending);
+            }
+            if (paymentstatus != "" && paymentstatus !== undefined) {
+                $("#paymentStatus_" + id).val(paymentstatus);
+            }
+            if (purposedispatch !== "" && purposedispatch !== undefined) {
+                $("#purposeofdispatch_" + id).val(purposedispatch);
+            }
+            var dateValue = $(this).find('.datepickerinvoice').attr('data-value');
+            if (dateValue !== '') {
+
+                dateValue = dateValue.toString().replace(' 00:00:00', '');
+                $(this).find('.datepickerinvoice').datepicker("setDate", dateValue);
+            }
+        });
+    }
+    function SaveAll() {
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'domestic') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'sample') {
+            tableId = 'tblsample';
+        }
+        else {
+            tableId = 'tblexport';
+        }
+        var ids = [];
+        var qtyerror = 0;
+        $('#' + tableId).find('.clsSaverow').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product.");
+            return false;
+        }
+        if (qtyerror !== 0) {
+            toastr.error("Please add qty.");
+            return false;
+        }
+
+        var count = 1;
+        $('#' + tableId).find('.clsSaverow').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                var courier = $('#' + tableId).find("#courier_" + id).val();
+                var tracking = $('#' + tableId).find("#tracking_" + id).val();
+                var location = $('#' + tableId).find("#location_" + id).val();
+                var refno = $('#' + tableId).find("#refno_" + id).val();
+                var purposeofdispatch = $('#' + tableId).find("#purposeofdispatch_" + id).val();
+                var deliverydate = $('#' + tableId).find("#deliverydate_" + id).val();
+                var deliverystatus = $('#' + tableId).find("#deliverystatus_" + id).val();
+                var datapending = $('#' + tableId).find("#datapending_" + id).val();
+                var paymentStatus = $('#' + tableId).find("#paymentStatus_" + id).val();
+                var invoiceno = $('#' + tableId).find("#invoiceno_" + id).val();
+                var remark = $('#' + tableId).find("#remark_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateInvoiceInformation',
+                    data: {
+                        courier: courier,
+                        tracking: tracking,
+                        location: location,
+                        refno: refno,
+                        purposeofdispatch: purposeofdispatch,
+                        deliverydate: deliverydate,
+                        deliverystatus: deliverystatus,
+                        datapending: datapending,
+                        id: id,
+                        remark: remark,
+                        paymentStatus: paymentStatus,
+                        invoiceno: invoiceno
+                    },
+                    type: 'POST',
+                    async: false,
+                    success: function (data) { },
+                    complete: function (data) {
+                        successAlert(count, ids.length, tableId);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function successAlert(count, forloopcount, tableId) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product information.");
+
+            $('#' + tableId).DataTable().ajax.reload(null, false);
+            /*setTimeout(function () { window.location.reload(true); }, 2000);*/
+        }
+    }
+
+    function SaveInvoiceDetails(id) {
+        var courier = $("#courier_" + id).val();
+        var tracking = $("#tracking_" + id).val();
+        var location = $("#location_" + id).val();
+        var refno = $("#refno_" + id).val();
+        var purposeofdispatch = $("#purposeofdispatch_" + id).val();
+        var deliverydate = $("#deliverydate_" + id).val();
+        var deliverystatus = $("#deliverystatus_" + id).val();
+        var datapending = $("#datapending_" + id).val();
+        var paymentStatus = $("#paymentStatus_" + id).val();
+        var invoiceno = $("#invoiceno_" + id).val();
+        var remark = $("#remark_" + id).val();
+        $.ajax({
+            url: '/Form/UpdateInvoiceInformation?courier=' + courier + '&tracking=' + tracking + '&location=' + location + '&refno=' + refno + '&purposeofdispatch=' + purposeofdispatch + '&deliverydate=' + deliverydate + '&deliverystatus=' + deliverystatus + '&datapending=' + datapending + '&id=' + id + '&remark=' + remark + '&paymentStatus=' + paymentStatus + '&invoiceno=' + invoiceno,
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have updated product information.");
+                window.location.reload(true);
+            }
+        });
+    }
+
+    function sendorderemail() {
+
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'domestic') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'sample') {
+            tableId = 'tblsample';
+        }
+        else {
+            tableId = 'tblexport';
+        }
+
+        var ids = [];
+        $('#' + tableId).find('.clsMovePrint').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product.");
+            return false;
+        }
+
+        //var dataURL = "http://localhost:1360";
+        //$('.modal-body').load(dataURL, function () {
+        //    $('#myModal').modal({ show: true });
+        //});
+        //$('#myModal').modal('show');
+
+        $.ajax({
+            url: '/Form/SendInvoiceRecord',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1080px");
+            }
+        });
+    }
+
+    function Export() {
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+        var type = ""
+        var tableId = '';
+        if (menulink === 'domestic') {
+            tableId = 'example1';
+            type = "domestic";
+        }
+        else if (menulink === 'export') {
+            tableId = 'tblexport';
+            type = "export";
+        }
+        else {
+            toastr.error('Export feature is use for Domestic/Export only');
+            return false;
+        }
+
+        var companyname = $("#" + tableId).find(".clsCompanyId").val();
+        var fltcontrolledsubstance = $("#" + tableId).find("#fltcontrolledsubstance").is(":checked");
+        var fltstartdate = $("#home" + tableId).find("#fltstartdate").val();
+        var fltenddate = $("#home" + tableId).find("#fltenddate").val();
+        if (companyname === 'undefined' || companyname === undefined) {
+            companyname = "";
+        }
+        if (fltcontrolledsubstance === 'undefined' || fltcontrolledsubstance === undefined) {
+            fltcontrolledsubstance = "";
+        }
+        if (fltstartdate === 'undefined' || fltstartdate === undefined) {
+            fltstartdate = "";
+        }
+        if (fltenddate === 'undefined' || fltenddate === undefined) {
+            fltenddate = "";
+        }
+        window.location.href = "/Form/ExportInvoiceData?companyname=" + companyname +"&fltcontrolledsubstance=" + fltcontrolledsubstance + "&fltstartdate=" + fltstartdate + "&fltenddate=" + fltenddate + "&type=" + type;
+    }
+
+    function Reminder() {
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'domestic') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'sample') {
+            tableId = 'tblsample';
+        }
+        else {
+            tableId = 'tblexport';
+        }
+        var ids = [];
+        $('#' + tableId).find('.clsMovePrint').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product.");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/ReminderInvoiceRecord',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1080px");
+            }
+        });
+    }
+
+    function Printrecords() {
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'domestic') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'sample') {
+            tableId = 'tblsample';
+        }
+        else {
+            tableId = 'tblexport';
+        }
+        var ids = [];
+        $('#' + tableId).find('.clsMovePrint').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product.");
+            return false;
+        }
+
+        //var dataURL = "http://localhost:1360";
+        //$('.modal-body').load(dataURL, function () {
+        //    $('#myModal').modal({ show: true });
+        //});
+        //$('#myModal').modal('show');
+
+        $.ajax({
+            url: '/Form/PrintInvoiceRecord',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1080px");
+            }
+        });
+    }
+
+
+    function SearchDefault(value) {
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'domestic') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'export') {
+            tableId = 'tblexport';
+        }
+        else if (menulink === 'sample') {
+            tableId = 'tblsample';
+        }
+
+        $("#" + tableId).DataTable()
+            .search(value)
+            .draw();
+        //$("#" + tableId + "_filter").find('.input-sm').val(value);
+        //$("#" + tableId + "_filter").find('.input-sm').trigger('click');
+    }
+
+    $(".clsCompanyId").change(function () {
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+        var tableId = '';
+        if (menulink === 'domestic') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'export') {
+            tableId = 'tblexport';
+        }
+        else if (menulink === 'sample') {
+            tableId = 'tblsample';
+        }
+        $('#' + tableId).DataTable().draw();
+    });
+</script>
+<style type="text/css">
+    .modal-body {
+        font-family: calibri !important;
+    }
+
+        .modal-body .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #dedede;
+        }
+</style>
+
+@if (SessionCookieManagement.IsInternational)
+{
+    <text>
+        <script>
+            exporttab();
+        </script>
+    </text>
+}
+else
+{
+    <text>
+        <script>
+            domestictab();
+        </script>
+    </text>
+}

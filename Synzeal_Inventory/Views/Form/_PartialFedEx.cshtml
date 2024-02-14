@@ -1,0 +1,232 @@
+﻿@model  Synzeal_Inventory.Entity.SZ_InvoiceData
+@{
+    ViewBag.Title = "Company";
+    Layout = null;
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    var quoteData = db.SZ_Quotation.Where(x => x.Id == Model.QuoteId).FirstOrDefault();
+    decimal? finaltotal = 0;
+    int finalqty = 0;
+    string currency = "INR";
+    if (quoteData.CountryType == "Export")
+    {
+        currency = "USD";
+    }
+    if(!string.IsNullOrEmpty(quoteData.Currency))
+    {
+        currency = quoteData.Currency;
+    }
+    foreach (var item in Model.SZ_InvoiceDetailsData)
+    {
+        finalqty += Convert.ToInt32(item.Qty);
+        var total = item.Total;
+        finaltotal += total;
+    }
+}
+<div class="col-md-12" style="font-family:Calibri; color:#000; font-size:9px;">
+    <table width="100%" border="1" style="font-size:9px; border-collapse: collapse;">
+        <tr>
+            <td valign="middle" colspan="11" style="font-size: 12px;font-weight:bold; text-align: center; color: #000">
+                <img style="width:70px; height:30px;" src="https://synzeal.com/Themes/DefaultClean/Content/images/fedex.png" /> <b>Advance Paperwork to be forwarded to :  For AMD Clearance amdexport@mail.fedex.com</b>
+            </td>
+        </tr>
+        <tr>
+            <td valign="middle" colspan="11" style="font-size: 9px;padding: 3px 6px;font-weight:bold; text-align: center; color: #000">
+                <b>SHIPPER's LETTER OF INSTRUCTION</b>
+            </td>
+        </tr>
+        <tr>
+            <td width="1%" rowspan="6">1. B a s i c  I n f o</td>
+            <td width="10%"> <b>Date:</b> </td>
+            <td width="10%" style="text-align:center"> 07th-June-2021</td>
+            <td width="10%"> Invoice No. </td>
+            <td width="10%" style="text-align:center"> SRPL-21-22-330</td>
+            <td width="10%"> Destination </td>
+            <td width="14%" style="text-align:center"> Taiwan </td>
+            <td width="5%" rowspan="2"> Payment Type </td>
+            <td width="10%"> LUT </td>
+            <td width="15%" style="width: 1px; word-wrap: break-word; ">AD240321026216P</td>
+            <td width="1%" rowspan="25" style="word-wrap: break-word; ">M A N D A T O R Y</td>
+        </tr>
+        <tr>
+            <td width="10%"><b>FedEx A/c No.:</b> </td>
+            <td width="10%" style="text-align:center"> 263458419</td>
+            <td width="10%"> Date </td>
+            <td width="10%" style="text-align:center"> 07th-June-2021</td>
+            <td width="10%"> IEC No. </td>
+            <td width="14%" style="text-align:center"> 0814025277 </td>
+            <td width="10%"> Under IGST Paid </td>
+            <td style="text-align:center">No</td>
+        </tr>
+        <tr>
+            <td rowspan="2" colspan="2"></td>
+            <td>No.Of Pkgs</td>
+            <td style="text-align:center">1</td>
+            <td>IEC Branch Code</td>
+            <td></td>
+            <td colspan="3"></td>
+        </tr>
+        <tr>
+            <td>Marks & Numbers</td>
+            <td>-</td>
+            <td>PAN No.</td>
+            <td>AAVCS1383C</td>
+            <td rowspan="3">GSTN DETAILS</td>
+            <td>GSTN NO.</td>
+            <td>24AAVCS1383C1Z9 </td>
+        </tr>
+        <tr>
+            <td>EIN No. </td>
+            <td></td>
+            <td>Net Wt.</td>
+            <td>400 Mg</td>
+            <td>AD Code No.</td>
+            <td>0203037-5700009</td>
+            <td>STATE CODE</td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td>FedEx AWB No. </td>
+            <td>7739 2098 3241</td>
+            <td>Gross Wt.</td>
+            <td>1000 Gram</td>
+            <td>End Use Code</td>
+            <td></td>
+            <td>GSTIN TYPE</td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td colspan="10"> <br /></td>
+        </tr>
+        <tr>
+            <td width="1%" rowspan="8">2. S h i p p e r & C o n s i g n e e</td>
+            <td colspan="2" style="text-align:center"> <b>Shipper</b> </td>
+            <td colspan="2" style="text-align:center">  <b>Consignee</b></td>
+            <td colspan="2" style="text-align:center"> Buyer,if other than Consignee </td>
+            <td colspan="3" style="text-align:center"> Mandatory if PSD / EP copy delivery address other than IEC Add.</td>
+        </tr>
+        <tr>
+            <td colspan="2" rowspan="7" style="text-align:center">
+                SynZeal Research Private Limited Plot No:F,Ganesh industrial Estate,423/24/8,Mahagujarat industrial Estate,Sarkhej-Bavala road,Moraiya,Ahmedabad-382213
+            </td>
+            <td colspan="2" rowspan="7" style="text-align:center">
+                TWI Pharmaceuticals, Inc 3F, No.41, Lane 221 King Chien Rd., Nei-Hu Dist.,Taipei 114-94 Taiwan
+            </td>
+            <td colspan="2" rowspan="7" style="text-align:center">
+            </td>
+            <td colspan="3">
+                Post shipment document only in case of SEZ s/b.
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                Contact person
+            </td>
+            <td style="text-align:center">
+                Ketan Malani
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                Telephone / Mobile
+            </td>
+            <td style="text-align:center">
+                +91 75750 01093
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                Address 1
+            </td>
+            <td style="text-align:center">
+                Plot No:F,Ganesh industrial Estate,
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                Address 2
+            </td>
+            <td style="text-align:center">
+                423/24/8,Mahagujarat industrial Estate,
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                City
+            </td>
+            <td style="text-align:center">
+                Sarkhej-Bavala Road,Moraiya,Ahmedabad
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                Pin Code
+            </td>
+            <td style="text-align:center">
+                382213
+            </td>
+        </tr>
+        <tr>
+            <td colspan="10"> <br /></td>
+        </tr>
+        <tr>
+            <td width="1%" rowspan="8">3. S h i p p i n g B i l l & C o n t r a c t</td>
+            <td colspan="6" style="text-align:center">
+                <b>
+                    Contract Type (tick one)
+                </b>
+            </td>
+            <td colspan="3" style="text-align:center">
+                <b>
+                    Documents Enclosed (tick where applicable)
+                </b>
+            </td>
+        </tr>
+        <tr>
+            <td>2700</td>
+            <td>Ex-Works</td>
+            <td colspan="2">C & F (breakup)</td>
+            <td colspan="2">C I F (breakup)</td>
+            <td colspan="2">FedEx AWB (duly complete)</td>
+            <td>Yes</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>FOB : 10755</td>
+            <td colspan="2">Cost : 0</td>
+            <td colspan="2">Cost</td>
+            <td colspan="2">Invoice (4 copies)</td>
+            <td>Yes</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>0</td>
+            <td colspan="2">Freight : 0</td>
+            <td colspan="2">Insurance</td>
+            <td colspan="2">Export Value Declaration (EVD)</td>
+            <td>Yes</td>
+        </tr>
+        <tr>
+            <td colspan="2"></td>
+            <td colspan="4">Other - Please specify</td>
+            <td colspan="6"></td>
+        </tr>
+        <tr>
+            <td>Currency :  @currency</td>
+            <td>
+                @finaltotal
+            </td>
+            <td colspan="4"></td>
+            <td colspan="2">SDF / FEMA declaration</td>
+            <td>Yes</td>
+        </tr>
+        <tr>
+            <td colspan="4">Type of Shipping Bill (tick one)</td>
+            <td colspan="2">
+                EOU
+            </td>
+            <td colspan="2">Annexure C1 (For 100% EOU shipments)</td>
+            <td>Yes</td>
+        </tr>
+    </table>
+
+</div>

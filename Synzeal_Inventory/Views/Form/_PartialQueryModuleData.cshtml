@@ -1,0 +1,531 @@
+﻿@model List<Synzeal_Inventory.Entity.SZ_QueryModule>
+@using Synzeal_Inventory.Entity;
+@{
+    int loopCnt = 1;
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    List<int?> quotedetailsids = Model.Select(x => x.QuoteDetailsId).ToList();
+    var quotedetailsList = db.SZ_QuotationDetail.Where(x => quotedetailsids.Contains(x.Id)).ToList();
+    int loop = 1;
+}
+<style type="text/css">
+</style>
+<div class="box-body form-horizontal" id="profrm">
+    @if (Model.Count > 0)
+    {
+        if (ViewBag.Status == "Open")
+        {
+            <div>
+                <h2>Open</h2>
+            </div>
+            <table class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+                <thead>
+                    <tr>
+                        <th width="1%">
+                            #
+                        </th>
+                        <th>
+                            Query Date
+                        </th>
+                        <th>
+                            Query No
+                        </th>
+                        <th>
+                            Origin
+                        </th>
+                        <th>
+                            Company Name
+                        </th>
+                        <th>
+                            PO Date
+                        </th>
+                        <th>
+                            PO Number
+                        </th>
+                        <th>
+                            Product Name
+                        </th>
+                        <th>
+                            CAS #
+                        </th>
+                        <th>
+                            CAT #
+                        </th>
+                        <th>
+                            Qty
+                        </th>
+                        <th>
+                            Batch #
+                        </th>
+                        <th>
+                            Query Subject
+                        </th>
+                        <th>SZ Remark</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var k in Model)
+                    {
+                        <tr id="tr_@k.Id">
+                            <td>@loop</td>
+                            <td>@k.CreatedDate.Value.ToShortDateString()</td>
+                            <td>@k.QueryNo</td>
+                            <td>@k.Origin</td>
+                            <td>@quotedetailsList.Where(x => x.Id == k.QuoteDetailsId).Select(x => x.SZ_Quotation.CompanyName).FirstOrDefault()</td>
+                            <td>
+                                @if (k.PoDate.HasValue)
+                                {
+                                    @k.PoDate.Value.ToShortDateString()
+                                }
+                            </td>
+                            <td>@k.PONo</td>
+                            <td>@k.ProductName</td>
+                            <td>@k.CASNo</td>
+                            <td>@k.CATNo</td>
+                            <td>@k.Qty</td>
+                            <td>@k.BatchNo</td>
+                            <td>@k.QuerySubject</td>
+                            <td>
+                                <i class="fa fa-pencil" onclick="synzealremarkpopup(@k.Id)"></i>
+                                @if (!string.IsNullOrEmpty(k.SynzealRemark))
+                                {
+                                    <span>&nbsp; &nbsp;</span><i class="fa fa-info" title="@k.SynzealRemark"></i>
+                                }
+                            </td>
+                            <td>
+                                <a data-toggle="modal" href="/Form/QueryDetails/@k.Id" data-target="#myModalQueryDetails">Select</a>
+                            </td>
+                        </tr>
+                        loop += 1;
+                    }
+                </tbody>
+            </table>
+        }
+        if (ViewBag.Status == "In Process")
+        {
+            <div>
+                <h2>In Process</h2>
+            </div>
+            <table class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+                <thead>
+                    <tr>
+                        <th width="1%">
+                            #
+                        </th>
+                        <th>
+                            Query Date
+                        </th>
+                        <th>
+                            Query No
+                        </th>
+                        <th>
+                            Sub Status
+                        </th>
+                        <th>
+                            Origin
+                        </th>
+                        <th>
+                            Company Name
+                        </th>
+                        <th>
+                            PO Date
+                        </th>
+                        <th>
+                            PO Number
+                        </th>
+                        <th>
+                            Product Name
+                        </th>
+                        <th>
+                            CAS #
+                        </th>
+                        <th>
+                            CAT #
+                        </th>
+                        <th>
+                            Qty
+                        </th>
+                        <th>
+                            Batch #
+                        </th>
+                        <th>
+                            Query Subject
+                        </th>
+                        <th>Est. Date</th>
+                        <th>SZ Remark</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var k in Model)
+                    {
+                        string clasname = "";
+                        if (k.ClosingDate.HasValue)
+                        {
+                            if (k.ClosingDate.Value >= DateTime.Now.AddDays(-3) && k.ClosingDate.Value <= DateTime.Now)
+                            {
+                                clasname = "clsblue";
+                            }
+                            if (k.ClosingDate.Value <= DateTime.Now.AddDays(-3))
+                            {
+                                clasname = "clsoprange";
+                            }
+                        }
+
+                        <tr id="tr_@k.Id" class="@clasname">
+                            <td>@loop</td>
+                            <td>@k.CreatedDate.Value.ToShortDateString()</td>
+                            <td>@k.QueryNo</td>
+                            <td>@k.SubStatus</td>
+                            <td>@k.Origin</td>
+                            <td>@quotedetailsList.Where(x => x.Id == k.QuoteDetailsId).Select(x => x.SZ_Quotation.CompanyName).FirstOrDefault()</td>
+                            <td>
+                                @if (k.PoDate.HasValue)
+                                {
+                                    @k.PoDate.Value.ToShortDateString()
+                                }
+                            </td>
+                            <td>@k.PONo</td>
+                            <td>@k.ProductName</td>
+                            <td>@k.CASNo</td>
+                            <td>@k.CATNo</td>
+                            <td>@k.Qty</td>
+                            <td>@k.BatchNo</td>
+                            <td>@k.QuerySubject</td>
+                            <td>
+                                @if (k.ClosingDate.HasValue)
+                                {
+                                    @k.ClosingDate.Value.ToShortDateString()
+                                }
+                            </td>
+                            <td>
+                                <i class="fa fa-pencil" onclick="synzealremarkpopup(@k.Id)"></i>
+                                @if (!string.IsNullOrEmpty(k.SynzealRemark))
+                                {
+                                    <span>&nbsp; &nbsp;</span><i class="fa fa-info" title="@k.SynzealRemark"></i>
+                                }
+                            </td>
+                            <td>
+                                <a data-toggle="modal" href="/Form/QueryDetails/@k.Id" data-target="#myModalQueryDetails">Select</a> |
+                                <a href="/Form/QuerySolution/@k.Id">View</a>
+                            </td>
+                        </tr>
+                        loop += 1;
+                    }
+                </tbody>
+            </table>
+        }
+        if (ViewBag.Status == "Solved")
+        {
+            <div>
+                <h2>Solved</h2>
+            </div>
+            <table class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+                <thead>
+                    <tr>
+                        <th width="1%">
+                            #
+                        </th>
+                        <th>
+                            Query Date
+                        </th>
+                        <th>
+                            Query No
+                        </th>
+                        <th>
+                            Sub Status
+                        </th>
+                        <th>
+                            Origin
+                        </th>
+                        <th>
+                            Company Name
+                        </th>
+                        <th>
+                            PO Date
+                        </th>
+                        <th>
+                            PO Number
+                        </th>
+                        <th>
+                            Product Name
+                        </th>
+                        <th>
+                            CAS #
+                        </th>
+                        <th>
+                            CAT #
+                        </th>
+                        <th>
+                            Qty
+                        </th>
+                        <th>
+                            Batch #
+                        </th>
+                        <th>
+                            Query Subject
+                        </th>
+                        <th>Est. Date</th>
+                        <th>SZ Remark</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var k in Model)
+                    {
+                        <tr id="tr_@k.Id">
+                            <td>@loop</td>
+                            <td>@k.CreatedDate.Value.ToShortDateString()</td>
+                            <td>@k.QueryNo</td>
+                            <td>@k.SubStatus</td>
+                            <td>@k.Origin</td>
+                            <td>@quotedetailsList.Where(x => x.Id == k.QuoteDetailsId).Select(x => x.SZ_Quotation.CompanyName).FirstOrDefault()</td>
+                            <td>
+                                @if (k.PoDate.HasValue)
+                                {
+                                    @k.PoDate.Value.ToShortDateString()
+                                }
+                            </td>
+                            <td>@k.PONo</td>
+                            <td>@k.ProductName</td>
+                            <td>@k.CASNo</td>
+                            <td>@k.CATNo</td>
+                            <td>@k.Qty</td>
+                            <td>@k.BatchNo</td>
+                            <td>@k.QuerySubject</td>
+                            <td>
+                                @if (k.ClosingDate.HasValue)
+                                {
+                                    @k.ClosingDate.Value.ToShortDateString()
+                                }
+                            </td>
+                            <td>
+                                <i class="fa fa-pencil" onclick="synzealremarkpopup(@k.Id)"></i>
+                                @if (!string.IsNullOrEmpty(k.SynzealRemark))
+                                {
+                                    <span>&nbsp; &nbsp;</span><i class="fa fa-info" title="@k.SynzealRemark"></i>
+                                }
+                            </td>
+                            <td><a data-toggle="modal" href="/Form/QueryDetails/@k.Id" data-target="#myModalQueryDetails">Select</a> | <a href="/Form/ViewQueryModule/@k.Id?page=Solved">View</a></td>
+                        </tr>
+                        loop += 1;
+                    }
+                </tbody>
+
+
+            </table>
+        }
+        if (ViewBag.Status == "Completed")
+        {
+            <div>
+                <h2>Close</h2>
+                <div class="pull-right">
+                    <a href="javascript:void(0)" class="btn btn-primary" onclick="replacement()">Replacement</a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <table class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+                <thead>
+                    <tr>
+                        <th width="1%">
+
+                        </th>
+                        <th width="1%">
+                            #
+                        </th>
+                        <th>
+                            Query Date
+                        </th>
+                        <th>
+                            Query No
+                        </th>
+                        <th>
+                            Sub Status
+                        </th>
+                        <th>
+                            Origin
+                        </th>
+                        <th>
+                            Company Name
+                        </th>
+                        <th>
+                            PO Date
+                        </th>
+                        <th>
+                            PO Number
+                        </th>
+                        <th>
+                            Product Name
+                        </th>
+                        <th>
+                            CAS #
+                        </th>
+                        <th>
+                            CAT #
+                        </th>
+                        <th>
+                            Qty
+                        </th>
+                        <th>
+                            Batch #
+                        </th>
+                        <th>
+                            Query Subject
+                        </th>
+                        <th>Est. Date</th>
+                        <th>SZ Remark</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var k in Model)
+                    {
+                        <tr id="tr_@k.Id">
+                            <td>
+                                <input type="checkbox" class="clsreplacement" value="@k.QuoteDetailsId" />
+                            </td>
+                            <td>@loop</td>
+                            <td>@k.CreatedDate.Value.ToShortDateString()</td>
+                            <td>@k.QueryNo</td>
+                            <td>@k.SubStatus</td>
+                            <td>@k.Origin</td>
+                            <td>@quotedetailsList.Where(x => x.Id == k.QuoteDetailsId).Select(x => x.SZ_Quotation.CompanyName).FirstOrDefault()</td>
+                            <td>
+                                @if (k.PoDate.HasValue)
+                                {
+                                    @k.PoDate.Value.ToShortDateString()
+                                }
+                            </td>
+                            <td>@k.PONo</td>
+                            <td>@k.ProductName</td>
+                            <td>@k.CASNo</td>
+                            <td>@k.CATNo</td>
+                            <td>@k.Qty</td>
+                            <td>@k.BatchNo</td>
+                            <td>@k.QuerySubject</td>
+                            <td>
+                                @if (k.ClosingDate.HasValue)
+                                {
+                                    @k.ClosingDate.Value.ToShortDateString()
+                                }
+                            </td>
+                            <td>
+                                <i class="fa fa-pencil" onclick="synzealremarkpopup(@k.Id)"></i>
+                                @if (!string.IsNullOrEmpty(k.SynzealRemark))
+                                {
+                                    <span>&nbsp; &nbsp;</span><i class="fa fa-info" title="@k.SynzealRemark"></i>
+                                }
+                            </td>
+                            <td><a href="/Form/ViewQueryModule/@k.Id?page=Completed">View</a></td>
+                        </tr>
+                        loop += 1;
+                    }
+                </tbody>
+            </table>
+        }
+        if (ViewBag.Status == null)
+        {
+            <table class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+                <thead>
+                    <tr>
+                        <th width="1%">
+                            #
+                        </th>
+                        <th>
+                            Query Date
+                        </th>
+                        <th>
+                            Query No
+                        </th>
+                        <th>
+                            Status
+                        </th>
+                        <th>
+                            Sub Status
+                        </th>
+                        @*<th>
+            Origin
+        </th>*@
+                        <th>
+                            Company Name
+                        </th>
+                        @*<th>
+            PO Date
+        </th>*@
+                        <th>
+                            PO Number
+                        </th>
+                        <th>
+                            Product Name
+                        </th>
+                        <th>
+                            CAS #
+                        </th>
+                        <th>
+                            CAT #
+                        </th>
+                        <th>
+                            Qty
+                        </th>
+                        <th>
+                            Batch #
+                        </th>
+                        <th>
+                            Query Subject
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var k in Model)
+                    {
+                    <tr id="tr_@k.Id">
+                        <td>@loop</td>
+                        <td>@k.CreatedDate.Value.ToShortDateString()</td>
+                        <td>@k.QueryNo</td>
+                        @*<td>@k.Origin</td>*@
+
+                        <td>@k.Status</td>
+                        <td>@k.SubStatus</td>
+
+                        <td>@quotedetailsList.Where(x => x.Id == k.QuoteDetailsId).Select(x => x.SZ_Quotation.CompanyName).FirstOrDefault()</td>
+                        @*<td>
+            @if (k.PoDate.HasValue)
+            {
+                @k.PoDate.Value.ToShortDateString()
+            }
+        </td>*@
+                        <td>@k.PONo</td>
+                        <td>@k.ProductName</td>
+                        <td>@k.CASNo</td>
+                        <td>@k.CATNo</td>
+                        <td>@k.Qty</td>
+                        <td>@k.BatchNo</td>
+                        <td>@k.QuerySubject</td>
+                    </tr>
+                        loop += 1;
+                    }
+                </tbody>
+            </table>
+        }
+
+    }
+    else
+    {
+        <div style="text-align: center;color: lightgray;font-size: 36px;">
+            <i class="fa fa-database" style="font-size:120px;"></i> <br />No Products Found!!!
+        </div>
+    }
+</div>
+<script type="text/javascript">
+
+</script>
+<style>
+    .clsblue td {
+        background: #00c0ef3b
+    }
+
+    .clsoprange td {
+        background: #fed8b1
+    }
+</style>

@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "Upload Document And Data";
+    Layout = null;
+}
+@model  Synzeal_Inventory.Entity.SZ_QuotationDetail
+
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <form role="form" id="formuploaddoc">
+            <div class="box-body">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Document : </label>
+                        <span><input type="file" class="form-control" id="consubdocument" name="consubdocument" /></span>
+                        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+                    </div>
+                </div>
+                <div class="form-group" style="text-align:right">
+                    <button type="button" onclick="uploaddocumentdataconsub()" class="btn btn-primary">Save</button>
+                </div>
+                <div>
+                    @if (Model.SZ_QuoteDetailsControlSubstance != null && Model.SZ_QuoteDetailsControlSubstance.Count > 0)
+                    {
+                        int count = 1;
+                        <table style="width:100%" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>File Name</th>
+                                    <th>Download</th>
+                                </tr>
+                            </thead>
+                            @foreach (var i in Model.SZ_QuoteDetailsControlSubstance)
+                            {
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@i.Filename</td>
+                                    <td>
+                                        <a href="@i.Path" download=""><i class="fa fa-download"></i></a>    
+                                    </td>
+                                </tr>
+
+                                count += 1;
+                            }
+
+                        </table>
+                    }
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <script>
+    $.fn.serializeObject = function () {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function () {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+    function uploaddocumentdataconsub() {
+        $(".errorcls").each(function () {
+            $(this).removeClass('errorcls');
+        });
+    debugger;
+        var errorCount = 0;
+        //    if ($("#EP").val() === "") {
+        //        $("#EP").addClass('errorcls');
+        //        errorCount += 1;
+        //    }
+        //     if ($("#USP").val() === "") {
+        //        $("#USP").addClass('errorcls');
+        //         errorCount += 1;
+        //     }
+        //    if ($("#IUPAC").val() === "") {
+        //         $("#IUPAC").addClass('errorcls');
+        //        errorCount += 1;
+        //   }
+        // if (errorCount !== 0) {
+        //       return false;
+        //   }
+
+        var address = ""; //$("#address").val()
+        var model = $("#formuploaddoc").serializeObject();
+
+        var formData = new FormData();
+        var file = document.getElementById("consubdocument").files[0];
+        formData.append("Id", $("#Id").val());
+        formData.append("document", file);
+        $.ajax({
+            type: "POST",
+            url: "/Form/UploadControlledsubstanceDocumentQuotedetails",
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            success: function (results) {
+                if(results === "Success")
+                {
+                    $("#myModal").modal('hide');
+                    $("#myModal").find(".modal-body").html("");
+                    toastr.success("Information Saved Successfully.");
+                }
+            }
+        });
+
+
+        //$.ajax({
+        //    type: "POST",
+        //    url: "/Form/UploadDocumentQuotedetails",
+        //    data: $("#formuploaddoc").serializeObject(),
+        //    success: function (results) {
+        //        if (!results.success) {
+        //            swal("Opps!", results.message, "error");
+        //            return false;
+        //        }
+        //        swal("Good job!", "Representative COA generated.", "success");
+        //        setTimeout(function () {
+        //            ReloadChildMaster();
+        //            $('#myModal').modal('hide');
+        //        }, 2000);
+
+        //    }
+        //});
+    }
+
+
+    function delcoafn() {
+        $('#delcoa').val('true');
+        $('#divdelcoa').hide();
+    }
+    function deldatafn() {
+        $('#deldata').val('true');
+        $('#divdeldata').hide();
+    }
+    </script>

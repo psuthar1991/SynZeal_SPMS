@@ -1,0 +1,147 @@
+﻿@model List<Synzeal_Inventory.Models.CompanyModel>
+@using Synzeal_Inventory.Entity;
+@{
+    int loopCnt = 1;
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    string synthesis = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProjectType.Synthesis);
+    string pursynthesis = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProjectType.PurSynthesis);
+    string purchase = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProjectType.Purchase);
+}
+<!-- DataTables -->
+<script src="@Url.Content("~/Content/bower_components/datatables.net/js/jquery.dataTables.min.js")"></script>
+<script src="@Url.Content("~/Content/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js")"></script>
+<!-- DataTables -->
+<link rel="stylesheet" href="@Url.Content("~/Content/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css")">
+<style type="text/css">
+</style>
+
+<div class="box-body form-horizontal" style="overflow:scroll">
+    @if (Model.Count > 0)
+    {
+        <div class="fc-title">
+            <h5>
+                <b>Select Company of Quotation</b>
+            </h5>
+        </div>
+        <div>
+            RFQ Company Name : @ViewBag.companyName
+            <input type="hidden" id="hdnrfqids" value="@ViewBag.rfqItds" /><br />
+            <a style="float:right;    margin-bottom: 10px;" onclick="addnewcompanyselection()" id="lnkaddcompany" class="btn btn-primary" href="javascript:void(0)">Add Company</a>
+            <a style="float:right;display:none" onclick="backselecton()" id="lnkback" class="btn btn-primary" href="javascript:void(0)">Back</a>
+            <div class="clearfix"></div>
+        </div>
+        <fieldset id="fdsaddcompany" style="display:none">
+            <legend>Add New Company</legend>
+            <form role="form" >
+                <div class="box-body" style="padding-left:20px;">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Company Name</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Company Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Master Email <span style="font-size:13px"><i>(Use comma(;) when you use multiple email)</i></span></label>
+                        <input type="text" class="form-control" id="masteremail" name="masteremail" placeholder="Email">
+
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Terms</label>
+                        @Html.DropDownList("TermsId", (IEnumerable<SelectListItem>)ViewBag.termsList, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <div class="radio">
+                            <label style="padding-right:25px;">
+                                <input type="radio" id="CountryType" name="CountryType" value="Domestic">
+                                Domestic
+                            </label>
+                            <label>
+                                <input type="radio" id="CountryType" name="CountryType" value="Export">
+                                Export
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="radio">
+                            <label style="padding-right:25px;">
+                                <input type="radio" id="UserDistType" name="UserDistType" value="User">
+                                User
+                            </label>
+                            <label>
+                                <input type="radio" id="UserDistType" name="UserDistType" value="Distributor">
+                                Distributor
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group" style="text-align:right">
+                        <button type="button" onclick="Quote.addCompanyData(true)" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </form>
+            @*<div>
+                <a onclick="savenewcompany()" class="btn btn-primary" href="javascript:void(0)" style="margin-top: 15px;">Save</a>
+            </div>*@
+        </fieldset>
+
+        <table class="table table-bordered table-striped" id="tblrfqcompselection">
+            <thead>
+                <tr>
+                    <th>
+                        Company Name
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model)
+                {
+                    <tr>
+                        <td>@k.name</td>
+                        <td>
+                            <a href="javascript:void(0)" class="btn btn-primary" onclick="selectCompany(@k.id)">Select</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div style="text-align: center;color: lightgray;font-size: 36px;">
+            <i class="fa fa-database" style="font-size:120px;"></i> <br />No Products Found!!!
+        </div>
+    }
+</div>
+<script type="text/javascript">
+
+    function addnewcompanyselection() {
+        $("#lnkback").show();
+        $("#lnkaddcompany").hide(); 
+        $("#fdsaddcompany").show();
+        $("#tblrfqcompselection_wrapper").hide(); 
+    }
+
+    function backselecton() {
+        $("#lnkback").hide();
+        $("#lnkaddcompany").show();
+        $("#fdsaddcompany").hide();
+        $("#tblrfqcompselection_wrapper").show(); 
+    }
+
+
+    function selectCompany(id) {
+        $.ajax({
+            url: '/Form/GenerateRFQQuote?id=' + id + "&rfqid=" + $("#hdnrfqids").val(),
+            data: {},
+            type: 'POST',
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                if (data.success) {
+                    toastr.success("Quotation generated successfully.");
+                    window.location.href = "/Form/Quote?id=" + data.quoteId;
+                }
+                else {
+                    toastr.error(data.message);
+                }
+            }
+        });
+    }
+</script>

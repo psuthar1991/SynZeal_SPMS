@@ -1,0 +1,93 @@
+﻿@{
+    ViewBag.Title = "CompanyList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model List<Synzeal_Inventory.Entity.SZ_ReservedQty>
+@using Synzeal_Inventory.Models
+@{ 
+    int loop = 1;
+}
+<section class="content-header">
+    <h1>
+        Reserved Qty List  @*<a data-toggle="modal" data-target="#myModal" style="float:right" class="btn btn-primary" href="@Url.Action("AddReservedQty","Form")">Add Reserved Qty</a>*@
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Prodct Name </th>
+                                <th>Cat No </th>
+                                <th>CAS No </th>
+                                <th> Batch No </th>
+                                <th> Qty </th>
+                                <th>Available Qty</th>
+                                <th>Reference </th>
+                                <th>Reason </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Count > 0)
+                            {
+                                foreach (var i in Model)
+                                {
+                                    <tr>
+                                        <td>@loop</td>
+                                        <td>@i.Product.Name</td>
+                                        <td>@i.Product.Sku</td>
+                                        <td>@i.Product.ManufacturerPartNumber</td>
+                                        <td>@i.BatchNo</td>
+                                        <td>@i.Qty</td>
+                                        <td>@i.SZ_Inventory.AvailableQty</td>
+                                        <td>@i.Ref</td>
+                                        <td>@i.Reason</td>
+                                        <td>
+                                            @if (SessionCookieManagement.UserId == i.CreatedBy)
+                                            {
+                                                <a href="javascript:void(0)" onclick="UnfreezQty(@i.Id)"> Unfreez</a>
+                                            }
+                                        </td>
+                                    </tr>
+                                    loop += 1;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+	$(function () {
+	    $('#example1').DataTable({
+	        "pageLength": 25,
+	        "order": [[0, "asc"]]
+	    })
+    });
+
+    function UnfreezQty(id) {
+        $.ajax({
+            url: '/Form/UnfreezQty?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                toastr.error("Successfully release qty.");
+                window.location.reload(true);
+            }
+        });
+    }
+</script>

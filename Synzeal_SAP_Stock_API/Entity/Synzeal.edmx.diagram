@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="74d9f4efbc8e4a71b0e4a0defca32ea3" Name="Diagram1">
+        <EntityTypeShape EntityType="SynzealLiveModel.AclRecord" Width="1.5" PointX="17.25" PointY="59.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ActivityLog" Width="1.5" PointX="12" PointY="67.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ActivityLogType" Width="1.5" PointX="9.75" PointY="74.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Address" Width="1.5" PointX="7.5" PointY="64" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.AddressAttribute" Width="1.5" PointX="23.75" PointY="19.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.AddressAttributeValue" Width="1.5" PointX="26" PointY="19.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Affiliate" Width="1.5" PointX="9.75" PointY="54.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.BackInStockSubscription" Width="1.5" PointX="15" PointY="67.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.BlogComment" Width="1.5" PointX="12" PointY="63.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.BlogPost" Width="1.5" PointX="9.75" PointY="58.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Campaign" Width="1.5" PointX="5.75" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Category" Width="1.5" PointX="9.75" PointY="12.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.CategoryTemplate" Width="1.5" PointX="5.75" PointY="6.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.CheckoutAttribute" Width="1.5" PointX="23.75" PointY="9.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.CheckoutAttributeValue" Width="1.5" PointX="26" PointY="10.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Country" Width="1.5" PointX="5.75" PointY="9.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Country1" Width="1.5" PointX="3" PointY="52.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.CrossSellProduct" Width="1.5" PointX="11.75" PointY="12.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Currency" Width="1.5" PointX="16.75" PointY="5.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Customer" Width="1.5" PointX="9.75" PointY="63.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.CustomerAttribute" Width="1.5" PointX="5.75" PointY="19.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.CustomerAttributeValue" Width="1.5" PointX="8" PointY="19.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.CustomerRole" Width="1.5" PointX="15" PointY="62.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.DeliveryDate" Width="1.5" PointX="5.75" PointY="23.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Discount" Width="1.5" PointX="7.5" PointY="36" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.DiscountRequirement" Width="1.5" PointX="9.75" PointY="9" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.DiscountUsageHistory" Width="1.5" PointX="23.25" PointY="66.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Download" Width="1.5" PointX="5.75" PointY="26.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.EmailAccount" Width="1.5" PointX="23.75" PointY="4.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ExternalAuthenticationRecord" Width="1.5" PointX="12" PointY="71" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Forums_Forum" Width="1.5" PointX="15.75" PointY="49.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Forums_Group" Width="1.5" PointX="13.5" PointY="50.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Forums_Post" Width="1.5" PointX="15" PointY="71" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Forums_PrivateMessage" Width="1.5" PointX="12" PointY="78" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Forums_Subscription" Width="1.5" PointX="12" PointY="82.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Forums_Topic" Width="1.5" PointX="18" PointY="66.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.GenericAttribute" Width="1.5" PointX="23.75" PointY="23.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.GiftCard" Width="1.5" PointX="28.5" PointY="61.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.GiftCardUsageHistory" Width="1.5" PointX="26.25" PointY="67.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.GoogleProduct" Width="1.5" PointX="23.75" PointY="26.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Group" Width="1.5" PointX="0.75" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Group_Newsletter_Map" Width="1.5" PointX="3" PointY="10.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Language" Width="1.5" PointX="7.5" PointY="58.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.LocaleStringResource" Width="1.5" PointX="9.75" PointY="77.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.LocalizedProperty" Width="1.5" PointX="9.75" PointY="80.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Log" Width="1.5" PointX="12" PointY="89.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Manufacturer" Width="1.5" PointX="9.75" PointY="2.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ManufacturerTemplate" Width="1.5" PointX="2.75" PointY="27.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.MeasureDimension" Width="1.5" PointX="25.75" PointY="14.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.MeasureWeight" Width="1.5" PointX="25.75" PointY="23.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.MessageTemplate" Width="1.5" PointX="25.75" PointY="26.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.MessageTemplateNewsLetter" Width="1.5" PointX="0.75" PointY="30.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.News" Width="1.5" PointX="15.75" PointY="54.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.NewsComment" Width="1.5" PointX="18" PointY="63" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Newsletter" Width="1.5" PointX="0.75" PointY="13.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.NewsLetterSubscription" Width="1.5" PointX="2.75" PointY="30.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Order" Width="1.5" PointX="21" PointY="61.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.OrderItem" Width="1.5" PointX="26.25" PointY="60.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.OrderNote" Width="1.5" PointX="23.25" PointY="69.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.PaymentTerm" Width="1.5" PointX="4.75" PointY="30.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.PermissionRecord" Width="1.5" PointX="12.75" PointY="55.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Picture" Width="1.5" PointX="9.75" PointY="86" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Poll" Width="1.5" PointX="13.5" PointY="85.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.PollAnswer" Width="1.5" PointX="15.75" PointY="86.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.PollVotingRecord" Width="1.5" PointX="18" PointY="71.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.PredefinedProductAttributeValue" Width="1.5" PointX="15" PointY="79" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Product" Width="1.5" PointX="9.75" PointY="22.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Product_Category_Mapping" Width="1.5" PointX="21" PointY="26.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Product_Manufacturer_Mapping" Width="1.5" PointX="21" PointY="21.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Product_Picture_Mapping" Width="1.5" PointX="12" PointY="35.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Product_ProductAttribute_Mapping" Width="1.5" PointX="15" PointY="43.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Product_SpecificationAttribute_Mapping" Width="1.5" PointX="18" PointY="43.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ProductAttribute" Width="1.5" PointX="12.75" PointY="16.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ProductAttributeCombination" Width="1.5" PointX="12" PointY="42.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ProductAttributeValue" Width="1.5" PointX="17.25" PointY="74.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ProductReview" Width="1.5" PointX="12" PointY="58.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ProductReviewHelpfulness" Width="1.5" PointX="14.25" PointY="59.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ProductTag" Width="1.5" PointX="12" PointY="46" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ProductTemplate" Width="1.5" PointX="6.75" PointY="30.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ProductWarehouseInventory" Width="1.5" PointX="21" PointY="37.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.QueuedEmail" Width="1.5" PointX="26" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.RecurringPayment" Width="1.5" PointX="23.25" PointY="78.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.RecurringPaymentHistory" Width="1.5" PointX="25.5" PointY="79.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.RelatedProduct" Width="1.5" PointX="27.75" PointY="14.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ReturnRequest" Width="1.5" PointX="12" PointY="118.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.RewardPointsHistory" Width="1.5" PointX="26.25" PointY="70.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Rfq" Width="1.5" PointX="27.75" PointY="23.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ScheduleTask" Width="1.5" PointX="23.75" PointY="30.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SearchTerm" Width="1.5" PointX="27.75" PointY="27.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Setting" Width="1.5" PointX="25.75" PointY="30.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Shipment" Width="1.5" PointX="23.25" PointY="86.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ShipmentItem" Width="1.5" PointX="25.5" PointY="86.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ShippingByWeight" Width="1.5" PointX="27.75" PointY="30.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ShippingMethod" Width="1.5" PointX="0.75" PointY="53.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.ShoppingCartItem" Width="1.5" PointX="15" PointY="74.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SpecificationAttribute" Width="1.5" PointX="13.5" PointY="1.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SpecificationAttributeOption" Width="1.5" PointX="15.75" PointY="2.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.StateProvince" Width="1.5" PointX="5.25" PointY="78.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Store" Width="1.5" PointX="20.75" PointY="15.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.StoreMapping" Width="1.5" PointX="23" PointY="16.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SystemLog" Width="1.5" PointX="28.75" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Bug" Width="1.5" PointX="28.75" PointY="7.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_CartRfq" Width="1.5" PointX="28.75" PointY="17.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_CartRFQ_Product" Width="1.5" PointX="28.75" PointY="20.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Category_Price" Width="1.5" PointX="29.75" PointY="12.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_CategoryMaster" Width="1.5" PointX="29.75" PointY="23.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_CategoryMasterRange" Width="1.5" PointX="29.75" PointY="29.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_ChildCOA" Width="1.5" PointX="23.25" PointY="35.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Clientremark" Width="1.5" PointX="18.5" PointY="12.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_ClubQuote" Width="1.5" PointX="18.5" PointY="15.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_CompanyAddress" Width="1.5" PointX="14" PointY="5.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_CompanyList" Width="1.5" PointX="11.75" PointY="19.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Courier" Width="1.5" PointX="25.75" PointY="17.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Currency" Width="1.5" PointX="30.75" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Sz_DatabaseBackup" Width="1.5" PointX="30.75" PointY="6.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_DeleteRetest" Width="1.5" PointX="30.75" PointY="9.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_EmailSuggestion" Width="1.5" PointX="14" PointY="9.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Inventory" Width="1.5" PointX="18.75" PointY="47.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_InventoryLog" Width="1.5" PointX="21" PointY="40.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Invoice" Width="1.5" PointX="30.75" PointY="15.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_InvoiceData" Width="1.5" PointX="0.75" PointY="19.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_InvoiceDetailsData" Width="1.5" PointX="3" PointY="20.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Log" Width="1.5" PointX="6.75" PointY="33.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_MasterCOA" Width="1.5" PointX="21" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Meeting" Width="1.5" PointX="0.75" PointY="34.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_NameMaster" Width="1.5" PointX="2.75" PointY="34.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Notification" Width="1.5" PointX="31.75" PointY="12.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_PerformaInvoice" Width="1.5" PointX="31.75" PointY="21.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_PerformaInvoiceDetailsData" Width="1.5" PointX="31.75" PointY="29.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Physicalstate" Width="1.5" PointX="32.75" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Popup" Width="1.5" PointX="3" PointY="3.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_PopupGroup" Width="1.5" PointX="0.75" PointY="5.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_PopupGroupEmailList" Width="1.5" PointX="3" PointY="7.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Price" Width="1.5" PointX="32.75" PointY="6.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_PriceList" Width="1.5" PointX="12" PointY="94.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_ProductScheme" Width="1.5" PointX="12" PointY="38.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Project" Width="1.5" PointX="18.75" PointY="53.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_ProjectDetail" Width="1.5" PointX="21" PointY="30.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_PurchaseRFQ" Width="1.5" PointX="32.75" PointY="15.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_PurchaseSupplierCatalogue" Width="1.5" PointX="25.75" PointY="35.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Query" Width="1.5" PointX="27.75" PointY="35.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_QueryModule" Width="1.5" PointX="29.75" PointY="35.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Quotation" Width="1.5" PointX="14" PointY="20.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_QuotationDetail" Width="1.5" PointX="16.25" PointY="12.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_QuotationDetailLog" Width="1.5" PointX="31.75" PointY="35.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_QuoteDetailForm" Width="1.5" PointX="18.5" PointY="24.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_QuoteDetailPrice" Width="1.5" PointX="18.5" PointY="18.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_QuoteDetails_Form" Width="1.5" PointX="4.75" PointY="36.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_QuoteDetailsComment" Width="1.5" PointX="18.5" PointY="21.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_QuoteSummary" Width="1.5" PointX="33.75" PointY="11.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Retest" Width="1.5" PointX="33.75" PointY="20.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_SampleReason" Width="1.5" PointX="33.75" PointY="24.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_SampleRequest" Width="1.5" PointX="2.75" PointY="14.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_SampleRequestDetail" Width="1.5" PointX="5" PointY="13.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_ScientistStatus" Width="1.5" PointX="33.75" PointY="27.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_SolutionModule" Width="1.5" PointX="33.75" PointY="30.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Survey" Width="1.5" PointX="33.75" PointY="35.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_SystemNotification" Width="1.5" PointX="34.75" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_TempQuickAdd" Width="1.5" PointX="34.75" PointY="7.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_TempQuotationDetail" Width="1.5" PointX="35.75" PointY="11.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_Terms" Width="1.5" PointX="34.75" PointY="17.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_UserDashboard" Width="1.5" PointX="35.75" PointY="20.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.SZ_UserManagement" Width="1.5" PointX="12" PointY="126.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.TaxCategory" Width="1.5" PointX="35.75" PointY="25.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.TaxRate" Width="1.5" PointX="35.75" PointY="28.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.TierPrice" Width="1.5" PointX="20.25" PointY="58" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Topic" Width="1.5" PointX="35.75" PointY="32.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.TopicTemplate" Width="1.5" PointX="35.75" PointY="38.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.UrlRecord" Width="1.5" PointX="36.75" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Vendor" Width="1.5" PointX="36.75" PointY="6.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.Warehouse" Width="1.5" PointX="18.75" PointY="9.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.QuotationAndDetailsView" Width="1.5" PointX="4.75" PointY="39.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SynzealLiveModel.QuoteandDetailsview" Width="1.5" PointX="37.75" PointY="11.25" IsExpanded="true" />
+        <AssociationConnector Association="SynzealLiveModel.AclRecord_CustomerRole" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ActivityLog_ActivityLogType" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ActivityLog_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Address_Country" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Address_StateProvince" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Affiliate_Address" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Customer_BillingAddress" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Customer_ShippingAddress" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Order_BillingAddress" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Order_ShippingAddress" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.AddressAttributeValue_AddressAttribute" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.BackInStockSubscription_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.BackInStockSubscription_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.BlogComment_BlogPost" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.BlogComment_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.BlogPost_Language" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductCategory_Category" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.CheckoutAttributeValue_CheckoutAttribute" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.StateProvince_Country" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ExternalAuthenticationRecord_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_UserManagement_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ForumPost_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ForumSubscription_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ForumTopic_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Log_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.NewsComment_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Order_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.PollVotingRecord_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.PrivateMessage_FromCustomer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.PrivateMessage_ToCustomer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductReview_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ReturnRequest_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.RewardPointsHistory_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ShoppingCartItem_Customer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.CustomerAttributeValue_CustomerAttribute" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.TierPrice_CustomerRole" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Discount_DiscountRequirements" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.DiscountUsageHistory_Discount" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.DiscountUsageHistory_Order" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.QueuedEmail_EmailAccount" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Forum_ForumGroup" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ForumTopic_Forum" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ForumPost_ForumTopic" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.GiftCard_PurchasedWithOrderItem" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.GiftCardUsageHistory_GiftCard" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.GiftCardUsageHistory_UsedWithOrder" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_Group_Newsletter_Map_Group" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_Group_Newsletter_Map_Newsletter" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.LocaleStringResource_Language" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.LocalizedProperty_Language" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.NewsItem_Language" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Poll_Language" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductManufacturer_Manufacturer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.NewsComment_NewsItem" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.OrderItem_Order" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.OrderNote_Order" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.RecurringPayment_InitialOrder" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.RewardPointsHistory_UsedWithOrder" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Shipment_Order" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.OrderItem_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductPicture_Picture" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.PollAnswer_Poll" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.PollVotingRecord_PollAnswer" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.PredefinedProductAttributeValue_ProductAttribute" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_PriceList_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_ProductScheme_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_ProjectDetail_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductAttributeCombination_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductAttributeMapping_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductCategory_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductManufacturer_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductPicture_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductReview_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductSpecificationAttribute_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductWarehouseInventory_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ShoppingCartItem_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.TierPrice_Product" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductAttributeMapping_ProductAttribute" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductAttributeValue_ProductAttributeMapping" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductSpecificationAttribute_SpecificationAttributeOption" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductReviewHelpfulness_ProductReview" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ProductWarehouseInventory_Warehouse" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.RecurringPaymentHistory_RecurringPayment" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ShipmentItem_Shipment" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.SpecificationAttributeOption_SpecificationAttribute" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.StoreMapping_Store" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_ChildCOA_SZ_MasterCOA" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_Clientremark_SZ_QuotationDetail" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_ClubQuote_SZ_QuotationDetail" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_CompanyAddress_SZ_CompanyList" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK__SZ_Quotat__Compa__00750D23" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_EmailSuggestion_SZ_CompanyList" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_InventoryLog_SZ_Inventory" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_MasterCOA_SZ_Inventory" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_ProjectDetail_SZ_Inventory" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_InvoiceDetailsData_SZ_InvoiceData" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_Popup_SZ_PopupGroup" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_PopupGroupEmailList_SZ_PopupGroup" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_ProjectDetail_SZ_Project" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_QuotationDetail_SZ_Quotation" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_QuoteDetailForm_SZ_QuotationDetail" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_QuoteDetailPrice_SZ_QuotationDetail" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_QuoteDetailsComment_SZ_QuotationDetail" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.FK_SZ_SampleRequestDetail_SZ_SampleRequest" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Customer_CustomerRole_Mapping" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.CustomerAddresses" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Discount_AppliedToCategories" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Discount_AppliedToManufacturers" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Discount_AppliedToProducts" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.PermissionRecord_Role_Mapping" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.Product_ProductTag_Mapping" ManuallyRouted="false" />
+        <AssociationConnector Association="SynzealLiveModel.ShippingMethodRestrictions" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

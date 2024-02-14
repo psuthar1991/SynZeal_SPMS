@@ -1,0 +1,49 @@
+﻿@{
+    ViewBag.Title = "RuleManagement";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<Synzeal_Inventory.Entity.SZ_Rule>
+<section class="content-header">
+    <h1>
+        Rule Management
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div class="box box-primary">
+                <div class="box-body">
+                    <a data-toggle="modal" data-target="#myModal" class="btn btn-primary pull-right" href="@Url.Action("AddNewRule", "Form")">Add New Rule</a>
+
+                    <table id="example1" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Rule Name</th>
+                                <th>Tags</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Count > 0)
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.Name</td>
+                                        <td>@item.SZ_RuleDetail.Select(x=>x.Tag).FirstOrDefault()</td>
+                                        <td>
+                                            <a data-toggle="modal" data-target="#myModal" class="btn btn-primary" href="@Url.Action("AddNewRule", "Form", new {id = item.Id})">Edit</a>
+                                            <a class="btn btn-danger" href="javascript:void(0)" onclick="deleterules(@item.Id)">Delete</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,188 @@
+﻿@{
+    ViewBag.Title = "Graph";
+    Layout = "~/Views/Shared/_Layout.second.cshtml";
+}
+@using Synzeal_Inventory.Models;
+
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">@CommonOperation.GetLocalizestring("products.Graph") </h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">@CommonOperation.GetLocalizestring("products.home")</a></li>
+                    <li class="breadcrumb-item active">@CommonOperation.GetLocalizestring("products.Graph")</li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<script src="https://adminlte.io/themes/AdminLTE/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+<script src="/content/adminlte/plugins/chart.js/Chart.min.js"></script>
+<div class="row">
+    <section class="col-lg-12 connectedSortable" style="margin-left:15px;">
+        <label style=" float: left; padding-top: 6px;">@CommonOperation.GetLocalizestring("filter.startdate"):&nbsp;&nbsp;</label> <input type="text" class="form-control" id="startdate" style="width: 10%; float: left">
+        <label style=" float: left; padding-top: 6px; margin-left: 20px;">@CommonOperation.GetLocalizestring("filter.enddate"):&nbsp;&nbsp;</label> <input type="text" class="form-control" id="enddate" style="width: 10%;float: left" />
+                                                                                                                                                    <a href="javascript:void(0)" class="btn btn-primary" style=" float: left; margin-left: 20px;" onclick="GetSummary()"> @CommonOperation.GetLocalizestring("common.search")</a>
+        <div class="clearfix" style="margin-bottom: 15px;"></div>
+        <div class="card card-success">
+
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="stackedBarChart" style="min-height: 500px; height: 500px;  max-width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    $('#startdate').datepicker({
+        autoclose: true,
+        format: 'dd/mm/yyyy'
+    })
+
+    $('#enddate').datepicker({
+        autoclose: true,
+        format: 'dd/mm/yyyy'
+    })
+    var dt = new Date();
+    dt.setMonth(dt.getMonth() - 1);
+
+    $("#startdate").datepicker("update", dt);
+    $("#enddate").datepicker("update", new Date());
+
+    GetAccessedCompanyList();
+
+    setTimeout(function () {
+        GetSummary();
+    }, 1000);
+    var areaChartData = {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        datasets: [
+            {
+                label: 'Digital Goods',
+                backgroundColor: 'rgba(60,141,188,0.9)',
+                borderColor: 'rgba(60,141,188,0.8)',
+                pointRadius: false,
+                pointColor: '#3b8bba',
+                pointStrokeColor: 'rgba(60,141,188,1)',
+                pointHighlightFill: '#fff',
+                pointHighlightStroke: 'rgba(60,141,188,1)',
+                data: [28, 48, 40, 19, 86, 27, 90]
+            },
+            {
+                label: 'Electronics',
+                backgroundColor: 'rgba(210, 214, 222, 1)',
+                borderColor: 'rgba(210, 214, 222, 1)',
+                pointRadius: false,
+                pointColor: 'rgba(210, 214, 222, 1)',
+                pointStrokeColor: '#c1c7d1',
+                pointHighlightFill: '#fff',
+                pointHighlightStroke: 'rgba(220,220,220,1)',
+                data: [65, 59, 80, 81, 56, 55, 40]
+            },
+        ]
+    }
+
+    var areaChartOptions = {
+        maintainAspectRatio: false,
+        responsive: true,
+        legend: {
+            display: false
+        },
+        scales: {
+            xAxes: [{
+                gridLines: {
+                    display: false,
+                }
+            }],
+            yAxes: [{
+                gridLines: {
+                    display: false,
+                }
+            }]
+        }
+    }
+    /*var barChartData = $.extend(true, {}, areaChartData)*/
+    function GetSummary() {
+        var leftcompanyId = $("#leftcompanylist").val();
+        var startDate = $('#startdate').val();
+        var endDate = $('#enddate').val();
+        $.ajax({
+            type: "GET",
+            url: "/Form/GetSummary?leftcompanyId=" + leftcompanyId + "&startDate=" + startDate + "&endDate=" + endDate,
+            data: {},
+            cache: false,
+            success: function (data) {
+                var str = "<tr><td colspan='7'>No Data Found</td></tr>";
+                if (data != null && data.length > 0) {
+                    var labelarr = [];
+                    var datasetQuotedproduct = [];
+                    var datasetPOproduct = [];
+
+                    $(data).each(function (i, v) {
+                        if (v.TotalProduct !== 0) {
+                            labelarr.push(v.CompanyName);
+                            datasetQuotedproduct.push(v.TotalProduct);
+                            datasetPOproduct.push(v.TotalPOProduct);
+                        }
+                    });
+
+                    areaChartData = {
+                        labels: labelarr,
+                        datasets: [
+                            {
+                                label: 'Quoted Product',
+                                backgroundColor: 'rgba(60,141,188,0.9)',
+                                borderColor: 'rgba(60,141,188,0.8)',
+                                pointRadius: false,
+                                pointColor: '#3b8bba',
+                                pointStrokeColor: 'rgba(60,141,188,1)',
+                                pointHighlightFill: '#fff',
+                                pointHighlightStroke: 'rgba(60,141,188,1)',
+                                data: datasetQuotedproduct
+                            },
+                            {
+                                label: 'PO Product',
+                                backgroundColor: 'rgba(210, 214, 222, 1)',
+                                borderColor: 'rgba(210, 214, 222, 1)',
+                                pointRadius: false,
+                                pointColor: 'rgba(210, 214, 222, 1)',
+                                pointStrokeColor: '#c1c7d1',
+                                pointHighlightFill: '#fff',
+                                pointHighlightStroke: 'rgba(220,220,220,1)',
+                                data: datasetPOproduct
+                            },
+                        ]
+                    }
+                    var barChartData = $.extend(true, {}, areaChartData)
+                    var temp0 = areaChartData.datasets[0]
+                    var temp1 = areaChartData.datasets[1]
+                    barChartData.datasets[0] = temp1
+                    barChartData.datasets[1] = temp0
+
+                    var stackedBarChartCanvas = $('#stackedBarChart').get(0).getContext('2d')
+                    var stackedBarChartData = $.extend(true, {}, barChartData)
+
+                    var stackedBarChartOptions = {
+                        responsive: true,
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+
+                    new Chart(stackedBarChartCanvas, {
+                        type: 'horizontalBar',
+                        data: stackedBarChartData,
+                        options: stackedBarChartOptions
+                    })
+                }
+
+            }
+        });
+    }
+</script>

@@ -1,0 +1,251 @@
+﻿@{
+    ViewBag.Title = "ManagePrice";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
+}
+
+@model Synzeal_Inventory.Models.InventoryModel
+
+<div class="row-fluid">
+    <div class="span6">
+        <div class="widget-box">
+            <div class="widget-title">
+                <span class="icon"> <i class="icon-align-justify"></i> </span>
+                <h5>Price Info</h5>
+            </div>
+            <div style="padding:5px 30px;color:Red;font-size:15px;text-align:right" id="errorMsg">
+                
+            </div>
+            <div class="widget-content nopadding">
+                @using (Html.BeginForm("ManagePrice", "Form", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal",@Id= "EditPrice" }))
+                {
+                    <div class="control-group">
+                        <label class="control-label">Batch No :</label>
+                        <div class="controls">
+                            @Html.HiddenFor(model => model.ProductId)
+                            @Html.HiddenFor(model => model.PriceId)
+                            @Html.HiddenFor(model => model.InvId)
+                            @Model.BatchNo
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Qty :</label>
+                        <div class="controls">
+                            @Model.Qty<span> (MG)</span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Appearance :</label>
+                        <div class="controls">
+                            @Model.Appearance
+                        </div>
+                    </div>
+                    @*<div class="control-group">
+                            <label class="control-label">COA:</label>
+                            <div class="controls">
+                                <input type="file" class="span11" name="COA">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Standard Data:</label>
+                            <div class="controls">
+                                <input type="file" class="span11" name="SDF">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Additional Data:</label>
+                            <div class="controls">
+                                <input type="file" class="span11" name="ADDFile">
+                            </div>
+                        </div>*@
+                    <div class="control-group">
+                        <label class="control-label"> Re-Test Date:</label>
+                        <div class="controls">
+                            @Model.ReTestDate
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Inventory Remarks</label>
+                        <div class="controls">
+                            @Model.Remarks
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Categoty</label>
+                        <div class="controls">
+                            @Html.DropDownListFor(m => m.CategoryPriceId,Model.CategoryPriceList,new { @class="span11"})
+                        </div>
+                    </div>
+                    @*<div class="control-group">
+                            <label class="control-label">Currency</label>
+                            <div class="controls">
+                                <select id="Currancy" name="Currancy" class="span11">
+                                    <option value="USD">USD</option>
+                                    <option value="INR">INR</option>
+                                </select>
+                            </div>
+                        </div>*@
+                    <div class="control-group">
+                        <label class="control-label">Per MG Price</label>
+                        <div class="controls">
+                            <input type="text" id="Price" name="Price" class="span11" value="@Model.Price" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">INR Price</label>
+                        <div class="controls">
+                            <input type="text" id="INRPrice" name="INRPrice" class="span11" value="@Model.INRPrice" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Revised Price</label>
+                        <div class="controls">
+                            <input type="text" id="USDPrice" name="USDPrice" class="span11" value="@Model.USDPrice" />
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Lead Time</label>
+                        <div class="controls">
+                            <input type="text" id="LeadTime" name="LeadTime" class="span11" value="@Model.LeadTime" />
+                        </div>
+                    </div>
+
+                    @*<div class="control-group">
+                        <label class="control-label">Max Discount</label>
+                        <div class="controls">
+                            <input type="text" id="MaxDiscount" name="MaxDiscount" class="span11" value="@Model.MaxDiscount" />
+                        </div>
+                    </div>*@
+
+                    <div class="control-group">
+                        <label class="control-label">Remark</label>
+                        <div class="controls">
+                            <textarea id="PriceRemark" name="PriceRemark" class="span11" value="@Model.PriceRemark"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-success" onclick="return validation()">Save</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="span6">
+        <div class="widget-box">
+            <div class="widget-title">
+                <span class="icon"> <i class="icon-align-justify"></i> </span>
+                <h5>Product Info</h5>
+            </div>
+            <div class="widget-content nopadding">
+                @if (ViewBag.ProductModel != null)
+                {
+                    var productmodel = (Synzeal_Inventory.Models.ProductDetailsModel)ViewBag.ProductModel;
+                    <form class="form-horizontal">
+                        <div class="control-group">
+                            <label class="control-label">Product Name :</label>
+                            <div class="controls" style="font-size: 16px;font-weight: bold;">
+                                @productmodel.Name
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Product Image :</label>
+                            <div class="controls">
+                                <img src="@productmodel.DefaultPictureModel.ImageUrl" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">CAS # :</label>
+                            <div class="controls">
+                                @productmodel.ManufacturerPartNumber
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">SZ-Catalog # :</label>
+                            <div class="controls">
+                                @productmodel.Sku
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Molecular Weigth :</label>
+                            <div class="controls">
+                                @productmodel.MolecularWeight
+                            </div>
+                        </div>
+                    </form>
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#Currancy').val('@Model.Currancy');
+    $('textarea#PriceRemark').html('@Model.PriceRemark');
+    @*if ('@Model.ReTestDate.HasValue' == 'True') {
+        $("#ReTestDate").datepicker('setDate', '@Model.ReTestDate.Value.ToString("MM-dd-yyyy")');
+    }*@
+
+    $('#CategoryPriceId').change(function () {
+        $.ajax({
+            url: "/Form/GetCategoryPriceById?categoryId=" + $('#CategoryPriceId').val(),
+            type: 'GET',
+            dataType: 'json',
+            contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            success: function(data) {
+                $("#INRPrice").val(data.Price);
+                $("#LeadTime").val(data.LeadTime);
+
+            }
+        });
+
+    });
+    
+    function validation() {
+        
+        if ($('#CategoryPriceId').val() == 0) {
+            alert('Please select category.');
+            return false;
+        }
+
+        //if ($('#BatchNo').val().trim() == "") {
+        //    alert('Please enter batch no.');
+        //    return false;
+        //}
+        //if ($('#Qty').val().trim() == "") {
+        //    alert('Please enter qty.');
+        //    return false;
+        //}
+        //if ($('#Appearance').val().trim() == "") {
+        //    alert('Please enter appearance.');
+        //    return false;
+        //}
+        //return true;
+        
+
+        $.ajax({
+            url: '@Url.Action("ManagePrice", "Form")',
+            data: $('#EditPrice').serialize(),
+            type: 'POST',
+            success: function (data) {
+                if (data.type == 'success') {
+                    
+                    $("#grid").jqGrid('setGridParam', {
+                        postData: {
+                            searchString: APIName,
+                            searchField: 'MainCatName'
+                        }
+                    }).trigger('reloadGrid');
+                    closeModal();
+                    toastr.success(data.msg);
+                }
+                else {
+                    $('#errorMsg').html(data.msg);
+
+                }
+            }
+        });
+
+    }
+</script>

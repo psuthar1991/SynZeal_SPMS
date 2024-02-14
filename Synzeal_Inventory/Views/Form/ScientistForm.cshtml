@@ -1,0 +1,1932 @@
+﻿@{
+    ViewBag.Title = "ScientistForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using Synzeal_Inventory.Entity;
+@model List<SZ_QuotationModel>
+@using Synzeal_Inventory.Models
+@{
+    string inhouseProjectType = Convert.ToString((int)EnumList.ProjectType.InHouse);
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    var listItems = ViewBag.scientistItems as List<SelectListItem>;
+    //var scienList = db.Customers.Where(x => x.Deleted == false && x.Active == true && x.CustomerRoles.Select(z => z.SystemName.ToLower()).Contains("scientist")).ToList();
+    //foreach (var term in scienList)
+    //{
+    //    string customerName = string.Empty;
+    //    var genericAttr = db.GenericAttributes.Where(x => x.KeyGroup == "Customer" && x.EntityId == term.Id).ToList();
+    //    if (genericAttr.Count > 0)
+    //    {
+    //        customerName = genericAttr.Where(x => x.Key == "FirstName").Select(x => x.Value).FirstOrDefault() + " " + genericAttr.Where(x => x.Key == "LastName").Select(x => x.Value).FirstOrDefault();
+    //    }
+    //    listItems.Add(new SelectListItem
+    //    {
+    //        Text = customerName,
+    //        Value = term.Id.ToString()
+    //    });
+    //}
+    //var subscienList = db.Customers.Where(x => x.Deleted == false && x.Active == true && x.CustomerRoles.Select(z => z.SystemName.ToLower()).Contains("subscientist")).ToList();
+    //foreach (var term in subscienList)
+    //{
+    //    string customerName = string.Empty;
+    //    var genericAttr = db.GenericAttributes.Where(x => x.KeyGroup == "Customer" && x.EntityId == term.Id).ToList();
+    //    if (genericAttr.Count > 0)
+    //    {
+    //        customerName = genericAttr.Where(x => x.Key == "FirstName").Select(x => x.Value).FirstOrDefault() + " " + genericAttr.Where(x => x.Key == "LastName").Select(x => x.Value).FirstOrDefault();
+    //    }
+
+    //    listItems.Add(new SelectListItem
+    //    {
+    //        Text = customerName,
+    //        Value = term.Id.ToString()
+    //    });
+
+    //}
+}
+<section class="content-header">
+    <h1>
+        Product List :: Scientist Page
+    </h1>
+</section>
+
+<input type="hidden" id="hdnloginuserid" name="hdnloginuserid" value="@SessionCookieManagement.UserId" />
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <ul class="nav nav-tabs">
+                    @if (!SessionCookieManagement.IsSubScientist)
+                    {
+                        <li class="active"><a data-toggle="tab" href="#noaction">NO ACTION (@ViewBag.NoActionCount)</a></li>
+                    }
+                    @if (!SessionCookieManagement.IsSubScientist)
+                    {
+                        <li><a data-toggle="tab" href="#home">ALL (@ViewBag.All)</a></li>
+                    }
+                    else
+                    {
+                        <li class="active"><a data-toggle="tab" href="#home">ALL (@ViewBag.All)</a></li>
+                    }
+                    <li><a data-toggle="tab" href="#tabqcapproval" data-tabname="qcapproval">QC APPROVAL  @*(@ViewBag.QcApproval)*@</a></li>
+                    <li><a data-toggle="tab" href="#menu1" data-tabname="completed">COMPLETED @*(@ViewBag.Completed)*@</a></li>
+                    <li><a data-toggle="tab" href="#tabscalup">SCALE-UP (@ViewBag.Scaleup)</a></li>
+                    <li><a data-toggle="tab" href="#tabholdt">HOLD (@ViewBag.Hold)</a></li>
+                    <li><a data-toggle="tab" href="#tabhold">CANCELLED (@ViewBag.Cancelled)</a></li>
+                    @*<li><a data-toggle="tab" href="#tabquery">QUERY</a></li>*@
+                    <li><a data-toggle="tab" href="#tabsynthesislog">SYNTHESIS LOG (@ViewBag.SynthesisLog)</a></li>
+                    <li><a data-toggle="tab" href="#tablessqty">LESS QTY</a></li>
+                </ul>
+
+                <div class="tab-content">
+
+                    @{
+                        string noactioncls = "active";
+                        string allactioncls = "";
+                        if (SessionCookieManagement.IsSubScientist)
+                        {
+                            noactioncls = "";
+                            allactioncls = "active";
+                        }
+                    }
+
+                    <div id="noaction" class="tab-pane fade in @noactioncls">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            <div>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Copyrecords('tblnoaction')">Copy</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveNoActionScientistForm()">Save All</a> <br />
+                            </div>
+                            <table id="tblnoaction" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="chkselectllnoaction" /></th>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Chemist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Explanation</th>
+                                        <th>Assigned Date</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Data Remark</th>
+                                        <th>Project</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Count > 0)
+                                    {
+                                        int loop = 0;
+                                        foreach (var i in Model)
+                                        {
+                                            foreach (var k in i.SZ_QuotationProductModel.Where(x => string.IsNullOrEmpty(x.SubScientistName) && x.ReadyToDeliverScientistStatusId != x.ScientistStatus && x.ProjectType != inhouseProjectType && (x.IsOnHold == false || x.IsOnHold == null) && string.IsNullOrEmpty(x.TrackingNo)).OrderByDescending(x => x.MoveToScientistDate))
+                                            {
+                                                loop += 1;
+                                                string cls = "";
+                                                if (k.EstimateCompleteDate.HasValue)
+                                                {
+                                                    if (k.EstimateCompleteDate.Value.Date < DateTime.Now.Date)
+                                                    {
+                                                        cls = "redcls";
+                                                    }
+                                                }
+
+                                                if (k.IsSynthesisLog.HasValue && k.IsSynthesisLog.Value)
+                                                {
+                                                    if (string.IsNullOrEmpty(i.PONumber))
+                                                    {
+                                                        continue;
+                                                    }
+                                                }
+
+                                                <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" class="clsRow @cls" data-protype="@k.ProjectType">
+                                                    <td>
+                                                        <input type="checkbox" class="clssaveall" value="@k.QuoteDetailsId" />
+                                                    </td>
+                                                    <td>@loop</td>
+                                                    <td>@k.DifficultyLevel</td>
+                                                    <td>
+                                                        @if (k.IsPriority.HasValue && k.IsPriority.Value)
+                                                        {
+                                                            <label style="font-weight:bold;color:red">@k.ProductName</label>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label>@k.ProductName</label>
+                                                        }
+                                                    </td>
+                                                    <td><label>@k.RequiredQty</label></td>
+                                                    <td><label>@k.CASNo</label> </td>
+                                                    <td><label>@Html.Raw(k.CATText)</label> </td>
+                                                    <td>
+                                                        <label style="display:none">@k.SubScientistName</label>
+                                                        @Html.DropDownList("subScientistName_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.scientistItems, "--Select--", new { @class = "scientist", SubScientistName = k.SubScientistName, @quotedetailsid = k.QuoteDetailsId })
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            var attstring = "";
+                                                            if (Convert.ToString(SessionCookieManagement.UserId) != k.SubScientistName)
+                                                            {
+                                                                attstring = "readonly";
+                                                            }
+                                                        }
+                                                        <input id="chemist_@k.QuoteDetailsId" type="text" style="width:80px;" @attstring value="@k.Chemist" />
+                                                    </td>
+                                                    <td><label>@k.LeadTime</label> </td>
+                                                    <td>
+                                                        @Html.DropDownList("scientistStatus_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.listScientistStatus, new { @class = "form-control scientistStatusddl" })
+                                                        <label style="display:none">
+                                                            <span>@k.ScientistStatustext</span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <i class="fa fa-pencil" onclick="explainationGenerate(@k.QuoteDetailsId)"></i>
+                                                    </td>
+                                                    <td>
+                                                        <label>
+                                                            @if (k.MoveToScientistDate.HasValue)
+                                                            {
+                                                                @k.MoveToScientistDate.Value.ToShortDateString()
+                                                            }
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label style="display:none">
+                                                            @if (k.EstimateCompleteDate.HasValue)
+                                                            {
+                                                                @k.EstimateCompleteDate.Value.ToShortDateString()
+                                                            }
+                                                        </label><input id="esticompleteDate_@k.QuoteDetailsId" type="text" data-value="@k.EstimateCompleteDate" class="datepicker" style="width:80px" />
+                                                    </td>
+                                                    <td>
+                                                        @Html.Raw(k.AdditionalBatchNoText)
+                                                    </td>
+                                                    <td>
+                                                        <label style="display: none"> @k.Remark</label>
+                                                        <input id="remark_@k.QuoteDetailsId" type="text" value="@k.Remark" title="@k.Remark" style="width:100px" />
+                                                    </td>
+                                                    <td>@k.APIName</td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="home" class="tab-pane fade in @allactioncls">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            <div>
+                                <label style="float: left;margin-top: 7px;margin-right: 10px;">Sci. Filter: </label>
+                                @Html.DropDownList("filsubScientistName", (IEnumerable<SelectListItem>)ViewBag.scientistItems, "--Select--", new { @class = "fltscientist form-control", @style = "width: 15%;" })
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Copyrecords('example1')">Copy</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllScientistForm()">Save All</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllHold()">Hold</a><br />
+                            </div>
+                            <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="chkselectll" /></th>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Chemist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>
+                                            Status
+                                        </th>
+                                        <th>Explanation</th>
+                                        <th>Assigned Date</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Data Remark</th>
+                                        <th>Project</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Count > 0)
+                                    {
+                                        int loop = 0;
+                                        foreach (var i in Model)
+                                        {
+                                            foreach (var k in i.SZ_QuotationProductModel.Where(x => !string.IsNullOrEmpty(x.SubScientistName) && x.ReadyToDeliverScientistStatusId != x.ScientistStatus && x.ProjectType != inhouseProjectType && (x.IsOnHold == false || x.IsOnHold == null) && (x.IsHoldManually == false || x.IsHoldManually == null) && string.IsNullOrEmpty(x.TrackingNo)).OrderByDescending(x => x.MoveToScientistDate))
+                                            {
+                                                loop += 1;
+                                                string cls = "";
+                                                if (k.EstimateCompleteDate.HasValue)
+                                                {
+                                                    if (k.EstimateCompleteDate.Value.Date < DateTime.Now.Date)
+                                                    {
+                                                        cls = "redcls";
+                                                    }
+                                                }
+
+                                                if (k.IsSynthesisLog.HasValue && k.IsSynthesisLog.Value)
+                                                {
+                                                    if (string.IsNullOrEmpty(i.PONumber))
+                                                    {
+                                                        continue;
+                                                    }
+                                                }
+
+                                                <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" class="clsRow @cls" data-protype="@k.ProjectType">
+                                                    <td>
+                                                        <input type="checkbox" class="clssaveall" value="@k.QuoteDetailsId" />
+                                                    </td>
+                                                    <td>@loop</td>
+                                                    <td>@k.DifficultyLevel</td>
+                                                    <td>
+                                                        @if (k.IsPriority.HasValue && k.IsPriority.Value)
+                                                        {
+                                                            <label style="font-weight:bold;color:red">@k.ProductName</label>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label>@k.ProductName</label>
+                                                        }
+                                                    </td>
+                                                    <td><label>@k.RequiredQty</label></td>
+                                                    <td><label>@k.CASNo</label> </td>
+                                                    <td><label>@Html.Raw(k.CATText)</label> </td>
+                                                    <td>
+                                                        <label style="display:none">@k.SubScientistName</label>
+                                                        @*<input id="subScientistName_@k.QuoteDetailsId" type="text" value="@k.SubScientistName" style="width:80px" />*@
+                                                        @Html.DropDownList("subScientistName_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.scientistItems, "--Select--", new { @class = "scientist", SubScientistName = k.SubScientistName, @quotedetailsid = k.QuoteDetailsId })
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            var attstring = "";
+                                                            if (Convert.ToString(SessionCookieManagement.UserId) != k.SubScientistName)
+                                                            {
+                                                                attstring = "readonly";
+                                                            }
+                                                        }
+                                                        <input id="chemist_@k.QuoteDetailsId" type="text" style="width:80px" @attstring value="@k.Chemist" />
+                                                    </td>
+                                                    <td><label>@k.LeadTime</label> </td>
+                                                    <td>
+                                                        @Html.DropDownList("scientistStatus_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.listScientistStatus, new { @class = "form-control scientistStatusddl" })
+                                                        <label style="display:none">
+                                                            <span>@k.ScientistStatustext</span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <select id="reviewscistatus_@k.QuoteDetailsId" name="reviewscistatus_@k.QuoteDetailsId" class="clsreviewscistatus" data-value="@k.ReviewSciStatus">
+                                                            <option value="">--Select--</option>
+                                                            @foreach (EnumList.ScientistReviewStatusDDL r in Enum.GetValues(typeof(EnumList.ScientistReviewStatusDDL)))
+                                                            {
+                                                                var item = Enum.GetName(typeof(EnumList.ScientistReviewStatusDDL), r);
+                                                                var test = r.ToString();
+                                                                string text = SZ_Helper.GetEnumDescription((EnumList.ScientistReviewStatusDDL)(int)r);
+                                                                int val = (int)r;
+                                                                string selected = "";
+                                                                if (Convert.ToString(val) == k.ReviewSciStatus)
+                                                                {
+                                                                    selected = "selected ";
+                                                                }
+                                                                <option value="@val" @selected>@text</option>
+                                                            }
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <i class="fa fa-pencil" onclick="explainationGenerate(@k.QuoteDetailsId)"></i>
+                                                    </td>
+                                                    <td>
+                                                        <label>
+                                                            @if (k.MoveToScientistDate.HasValue)
+                                                            {
+                                                                @k.MoveToScientistDate.Value.ToShortDateString()
+                                                            }
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label style="display:none">
+                                                            @if (k.EstimateCompleteDate.HasValue)
+                                                            {
+                                                                @k.EstimateCompleteDate.Value.ToShortDateString()
+                                                            }
+                                                        </label><input id="esticompleteDate_@k.QuoteDetailsId" type="text" data-value="@k.EstimateCompleteDate" class="datepicker" style="width:80px" />
+                                                    </td>
+                                                    <td>
+                                                        @Html.Raw(k.AdditionalBatchNoText)
+                                                    </td>
+                                                    <td>
+                                                        <label style="display: none"> @k.Remark</label>
+                                                        <input id="remark_@k.QuoteDetailsId" type="text" value="@k.Remark" title="@k.Remark" style="width:100px" />
+                                                    </td>
+                                                    <td>@k.APIName</td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabqcapproval" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            <table id="tblqcapproval" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Qty</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Count > 0)
+                                    {
+                                        int loop = 0;
+                                        foreach (var i in Model)
+                                        {
+                                            foreach (var k in i.SZ_QuotationProductModel.Where(x => x.ScientistStatus == x.ReadyToDeliverScientistStatusId && (x.IsOnHold == false || x.IsOnHold == null)).OrderByDescending(x => x.MoveToScientistDate))
+                                            {
+                                                string ApprovalStatus = "";
+                                                loop += 1;
+                                                var formid = db.SZ_QuoteDetails_Form.Where(x => x.QuoteDetailsId == k.QuoteDetailsId).Select(x => x.FormId).FirstOrDefault();
+                                                var formdata = db.SZ_QuoteDetailForm.Where(x => x.Id == formid).OrderByDescending(x => x.Id).FirstOrDefault();
+                                                var classname = "";
+                                                var statusstr = "";
+                                                if (formdata != null)
+                                                {
+                                                    ApprovalStatus = formdata.ApprovalStatus;
+                                                    if (formdata.ApprovalStatus == Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ApprovedStatus.QCCorrection))
+                                                    {
+                                                        classname = "yellow";
+                                                        statusstr = "QC Correction";
+                                                    }
+                                                    if (formdata.ApprovalStatus == Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ApprovedStatus.QCApproved))
+                                                    {
+                                                        continue;
+                                                    }
+                                                    if (string.IsNullOrEmpty(formdata.ApprovalStatus))
+                                                    {
+                                                        classname = "skyblue";
+                                                        statusstr = "QC Appoval";
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    statusstr = "QC Appoval";
+                                                }
+                                                <tr id="sectr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" data-protype="@k.ProjectType" class="clsRow @classname">
+                                                    <td>@loop</td>
+                                                    <td>@k.DifficultyLevel</td>
+                                                    <td>
+                                                        @if (k.IsPriority.HasValue && k.IsPriority.Value)
+                                                        {
+                                                            <label style="font-weight:bold;color:red">@k.ProductName</label>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label>@k.ProductName</label>
+                                                        }
+                                                    </td>
+                                                    <td><label>@k.RequiredQty</label></td>
+                                                    <td><label>@k.CASNo</label> </td>
+                                                    <td><label>@Html.Raw(k.CATText)</label> </td>
+                                                    <td>
+                                                        @{
+                                                            string scinamedata = k.SubScientistName;
+                                                            if (!string.IsNullOrEmpty(k.SubScientistName))
+                                                            {
+                                                                var subsci = System.Text.RegularExpressions.Regex.IsMatch(k.SubScientistName, @"\d+");
+                                                                if (subsci)
+                                                                {
+                                                                    if (System.Text.RegularExpressions.Regex.Match(k.SubScientistName, @"\d+").Value == k.SubScientistName)
+                                                                    {
+                                                                        var subsciids = Convert.ToInt32(k.SubScientistName);
+                                                                        foreach (var r in listItems)
+                                                                        {
+                                                                            string selected = string.Empty;
+                                                                            if (r.Value == Convert.ToString(subsciids))
+                                                                            {
+                                                                                scinamedata = r.Text;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        <label style="display:none">@scinamedata</label>
+                                                        <input id="secsubScientistName_@k.QuoteDetailsId" type="text" value="@k.SubScientistName" style="width:80px" />
+                                                    </td>
+                                                    <td><label>@k.LeadTime</label> </td>
+                                                    <td>
+                                                        @Html.DropDownList("secscientistStatus_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.listScientistStatus, new { @class = "form-control scientistStatusddl" })
+                                                        <label style="display:none">
+                                                            <span>@statusstr</span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label style="display:none">
+                                                            @if (k.EstimateCompleteDate.HasValue)
+                                                            {
+                                                                @k.EstimateCompleteDate.Value.ToShortDateString()
+                                                            }
+                                                        </label>
+                                                        <input id="secesticompleteDate_@k.QuoteDetailsId" type="text" data-value="@k.EstimateCompleteDate" class="datepicker" style="width:80px" />
+                                                    </td>
+                                                    <td>
+                                                        <label style="display:none">
+                                                            @if (k.BatchCode1 != "undefined")
+                                                            {
+                                                                @k.BatchCode1
+                                                            }
+                                                        </label>
+                                                        <input id="secbatchcode1_@k.QuoteDetailsId" type="text" value="@k.BatchCode1" style="width:80px" />
+                                                    </td>
+                                                    <td>
+                                                        <label style="display:none">
+                                                            @if (k.Qty1 != "undefined")
+                                                            {
+                                                                @k.Qty1
+                                                            }
+                                                        </label>
+                                                        <input id="secqty1_@k.QuoteDetailsId" type="text" value="@k.Qty1" style="width:50px" />
+                                                    </td>
+                                                    <td>
+                                                        <a class="clsLast" href="javascript:void(0)" id="save_@k.QuoteDetailsId" onclick="secSaveScientistProductDetails('@k.QuoteDetailsId')"> Save</a>
+                                                        @if (k.ReadyToDeliverScientistStatusId == k.ScientistStatus)
+                                                        {
+                                                            <span class="clsLast">|</span> <a href="/Form/SubmitForm/@k.QuoteDetailsId?isnewform=true"> Make Form</a>
+                                                            <span>|</span><a href="/Form/ViewForm/@k.QuoteDetailsId"> View Form</a>
+                                                            <span>|</span><a href="javascript:void(0)" onclick="LinkWithQuotedetails(@k.QuoteDetailsId)"> Link Form</a>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="menu1" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            <table id="example2" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Qty</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Count > 0)
+                                    {
+                                        var proids = Model.Select(x => x.SZ_QuotationProductModel.Select(z => z.ProductId).ToList()).Distinct().ToList();
+                                        var pids = new List<int>();
+                                        if (proids != null && proids.Count > 0)
+                                        {
+                                            proids.ForEach(x =>
+                                            {
+                                                pids.AddRange(x.Select(z => z.Value).ToArray());
+                                            });
+                                        }
+                                        var inventoryList = db.SZ_Inventory.Where(x => pids.Contains(x.ProductId)).ToList();
+                                        int loop = 0;
+                                        foreach (var i in Model)
+                                        {
+                                            foreach (var k in i.SZ_QuotationProductModel.Where(x => x.ScientistStatus == x.ReadyToDeliverScientistStatusId && (x.IsOnHold == false || x.IsOnHold == null)).OrderByDescending(x => x.MoveToScientistDate))
+                                            {
+                                                var isprocess = false;
+                                                loop += 1;
+                                                var formid = db.SZ_QuoteDetails_Form.Where(x => x.QuoteDetailsId == k.QuoteDetailsId).Select(x => x.FormId).FirstOrDefault();
+                                                var formdata = db.SZ_QuoteDetailForm.Where(x => x.Id == formid).OrderByDescending(x => x.Id).FirstOrDefault();
+                                                var classname = "";
+                                                var statusstr = "";
+                                                if (formdata != null)
+                                                {
+
+                                                    if (formdata.ApprovalStatus == Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ApprovedStatus.QCApproved))
+                                                    {
+                                                        classname = "green";
+                                                        statusstr = "QC Approved";
+                                                        isprocess = true;
+                                                    }
+
+                                                }
+                                                if (isprocess)
+                                                {
+                                                    <tr id="sectr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" data-protype="@k.ProjectType" class="clsRow @classname">
+                                                        <td>@loop</td>
+                                                        <td>@k.DifficultyLevel</td>
+                                                        <td>
+                                                            @if (k.IsPriority.HasValue && k.IsPriority.Value)
+                                                            {
+                                                                <label style="font-weight:bold;color:red">@k.ProductName</label>
+                                                            }
+                                                            else
+                                                            {
+                                                                <label>@k.ProductName</label>
+                                                            }
+                                                        </td>
+                                                        <td><label>@k.RequiredQty</label></td>
+                                                        <td><label>@k.CASNo</label> </td>
+                                                        <td><label>@Html.Raw(k.CATText)</label> </td>
+                                                        <td>
+                                                            @{
+                                                                string scinamedata = k.SubScientistName;
+                                                                if (!string.IsNullOrEmpty(k.SubScientistName))
+                                                                {
+                                                                    var subsci = System.Text.RegularExpressions.Regex.IsMatch(k.SubScientistName, @"\d+");
+                                                                    if (subsci)
+                                                                    {
+                                                                        if (System.Text.RegularExpressions.Regex.Match(k.SubScientistName, @"\d+").Value == k.SubScientistName)
+                                                                        {
+                                                                            var subsciids = Convert.ToInt32(k.SubScientistName);
+                                                                            foreach (var r in listItems)
+                                                                            {
+                                                                                string selected = string.Empty;
+                                                                                if (r.Value == Convert.ToString(subsciids))
+                                                                                {
+                                                                                    scinamedata = r.Text;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            <label style="display:none">@scinamedata</label><input id="secsubScientistName_@k.QuoteDetailsId" type="text" value="@k.SubScientistName" style="width:80px" />
+                                                        </td>
+                                                        <td><label>@k.LeadTime</label> </td>
+                                                        <td>
+                                                            @Html.DropDownList("secscientistStatus_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.listScientistStatus, new { @class = "form-control scientistStatusddl" })
+                                                            <label style="display:none">
+                                                                @*<span>@k.ScientistStatustext</span>*@
+                                                                <span>@statusstr</span>
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <label style="display:none">
+                                                                @if (k.EstimateCompleteDate.HasValue)
+                                                                {
+                                                                    @k.EstimateCompleteDate.Value.ToShortDateString()
+                                                                }
+                                                            </label>
+                                                            <input id="secesticompleteDate_@k.QuoteDetailsId" type="text" data-value="@k.EstimateCompleteDate" class="datepicker" style="width:80px" />
+                                                        </td>
+                                                        <td>
+                                                            @{
+                                                                var szinv = inventoryList.Where(x => x.ProductId == k.ProductId).ToList();
+                                                            }
+                                                            <select class="form-control clsddl">
+                                                                @foreach (var itemss in szinv)
+                                                                {
+                                                                    <option>@itemss.BatchNo</option>
+                                                                }
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <label style="display:none">
+                                                                @if (k.Qty1 != "undefined")
+                                                                {
+                                                                    @k.Qty1
+                                                                }
+                                                            </label>
+                                                            <input id="secqty1_@k.QuoteDetailsId" type="text" value="@k.Qty1" style="width:50px" />
+                                                        </td>
+                                                        <td>
+                                                            <a class="clsLast" href="javascript:void(0)" id="save_@k.QuoteDetailsId" onclick="secSaveScientistProductDetails('@k.QuoteDetailsId')"> Save</a>
+                                                            @if (k.ReadyToDeliverScientistStatusId == k.ScientistStatus)
+                                                            {
+                                                                <a href="/Form/ViewForm/@k.QuoteDetailsId"> View Form</a>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabscalup" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            <div>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllScaleupScientistForm()">Save All</a> <br />
+                            </div>
+                            <table id="tblscalup" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Additional Batch No</th>
+                                        <th>Qty</th>
+                                        <th>Data Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Count > 0)
+                                    {
+                                        int loop = 0;
+                                        foreach (var i in Model)
+                                        {
+                                            foreach (var k in i.SZ_QuotationProductModel.Where(x => x.ReadyToDeliverScientistStatusId != x.ScientistStatus && x.ProjectType == inhouseProjectType && (x.IsOnHold == false || x.IsOnHold == null)).OrderByDescending(x => x.MoveToScientistDate))
+                                            {
+                                                loop += 1;
+                                                <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" data-protype="@k.ProjectType" class="thirdclsRow">
+                                                    <td>
+                                                        <input type="checkbox" class="clssaveall" value="@k.QuoteDetailsId" />
+                                                    </td>
+                                                    <td>@loop</td>
+                                                    <td>@k.DifficultyLevel</td>
+                                                    <td>
+                                                        @if (k.IsPriority.HasValue && k.IsPriority.Value)
+                                                        {
+                                                            <label style="font-weight:bold;color:red">@k.ProductName</label>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label>@k.ProductName</label>
+                                                        }
+                                                    </td>
+                                                    <td><label>@k.RequiredQty</label></td>
+                                                    <td><label>@k.CASNo</label> </td>
+                                                    <td><label>@Html.Raw(k.CATText)</label> </td>
+                                                    <td> <label style="display:none">@k.SubScientistName</label><input id="subScientistName_@k.QuoteDetailsId" type="text" value="@k.SubScientistName" style="width:80px" /></td>
+                                                    <td><label>@k.LeadTime</label> </td>
+                                                    <td>
+                                                        @Html.DropDownList("scientistStatus_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.listScientistStatus, new { @class = "form-control scientistStatusddl" })
+                                                        <label style="display:none">
+                                                            <span>@k.ScientistStatustext</span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label style="display:none">
+                                                            @if (k.EstimateCompleteDate.HasValue)
+                                                            {
+                                                                @k.EstimateCompleteDate.Value.ToShortDateString()
+                                                            }
+                                                        </label><input id="esticompleteDate_@k.QuoteDetailsId" type="text" data-value="@k.EstimateCompleteDate" class="datepicker" style="width:80px" />
+                                                    </td>
+                                                    <td> <label style="display:none">@k.BatchCode1</label><input id="batchcode1_@k.QuoteDetailsId" type="text" value="@k.BatchCode1" style="width:80px" /></td>
+                                                    <td>
+                                                        @Html.Raw(k.AdditionalBatchNoText)
+                                                    </td>
+                                                    <td> <label style="display:none">@k.Qty1</label><input id="qty1_@k.QuoteDetailsId" type="text" value="@k.Qty1" style="width:50px" /></td>
+                                                    <td>
+                                                        <label style="display: none"> @k.Remark</label>
+                                                        <input id="remark_@k.QuoteDetailsId" type="text" value="@k.Remark" title="@k.Remark" style="width:100px" />
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabholdt" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            @*<div>
+                    <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllScaleupScientistForm()">Save All</a> <br />
+                </div>*@
+                            <table id="tblholdt" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Additional Batch No</th>
+                                        <th>Qty</th>
+                                        <th>Data Remark</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Count > 0)
+                                    {
+                                        int loop = 0;
+                                        foreach (var i in Model)
+                                        {
+                                            foreach (var k in i.SZ_QuotationProductModel.Where(x => x.IsHoldManually == true))
+                                            {
+                                                loop += 1;
+                                                <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" data-protype="@k.ProjectType" class="fourclsRow">
+                                                    <td>@loop</td>
+                                                    <td>@k.DifficultyLevel</td>
+                                                    <td>
+                                                        @if (k.IsPriority.HasValue && k.IsPriority.Value)
+                                                        {
+                                                            <label style="font-weight:bold;color:red">@k.ProductName</label>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label>@k.ProductName</label>
+                                                        }
+                                                    </td>
+                                                    <td><label>@k.RequiredQty</label></td>
+                                                    <td><label>@k.CASNo</label> </td>
+                                                    <td><label>@Html.Raw(k.CATText)</label> </td>
+                                                    <td> <label>@k.SubScientistName</label></td>
+                                                    <td><label>@k.LeadTime</label> </td>
+                                                    <td>
+                                                        <label>
+                                                            <span>@k.ScientistStatustext</span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label>
+                                                            @if (k.EstimateCompleteDate.HasValue)
+                                                            {
+                                                                @k.EstimateCompleteDate.Value.ToShortDateString()
+                                                            }
+                                                        </label>
+                                                    </td>
+                                                    <td> <label>@k.BatchCode1</label></td>
+                                                    <td>
+                                                        @Html.Raw(k.AdditionalBatchNoText)
+                                                    </td>
+                                                    <td> <label>@k.Qty1</label></td>
+                                                    <td>
+                                                        <label> @k.Remark</label>
+                                                    </td>
+                                                    <td>
+                                                        <a href="/Form/RemoveHoldManually/@k.QuoteDetailsId"> Resume</a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabhold" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            @*<div>
+                    <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllScaleupScientistForm()">Save All</a> <br />
+                </div>*@
+                            <table id="tblhold" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Additional Batch No</th>
+                                        <th>Qty</th>
+                                        @*<th>Batch No 2</th>
+                            <th>Qty 2</th>*@
+                                        <th>Data Remark</th>
+                                        @*<th>Action</th>*@
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Count > 0)
+                                    {
+                                        int loop = 0;
+                                        foreach (var i in Model)
+                                        {
+                                            foreach (var k in i.SZ_QuotationProductModel.Where(x => x.IsOnHold == true))
+                                            {
+                                                loop += 1;
+                                                <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" data-protype="@k.ProjectType" class="fourclsRow">
+                                                    <td>@loop</td>
+                                                    <td>@k.DifficultyLevel</td>
+                                                    <td>
+                                                        @if (k.IsPriority.HasValue && k.IsPriority.Value)
+                                                        {
+                                                            <label style="font-weight:bold;color:red">@k.ProductName</label>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label>@k.ProductName</label>
+                                                        }
+                                                    </td>
+                                                    <td><label>@k.RequiredQty</label></td>
+                                                    <td><label>@k.CASNo</label> </td>
+                                                    <td><label>@Html.Raw(k.CATText)</label> </td>
+                                                    <td>
+                                                        @{
+                                                            string scinamedata = k.SubScientistName;
+                                                            if (!string.IsNullOrEmpty(k.SubScientistName))
+                                                            {
+                                                                var subsci = System.Text.RegularExpressions.Regex.IsMatch(k.SubScientistName, @"\d+");
+                                                                if (subsci)
+                                                                {
+                                                                    if (System.Text.RegularExpressions.Regex.Match(k.SubScientistName, @"\d+").Value == k.SubScientistName)
+                                                                    {
+                                                                        var subsciids = Convert.ToInt32(k.SubScientistName);
+                                                                        foreach (var r in listItems)
+                                                                        {
+                                                                            string selected = string.Empty;
+                                                                            if (r.Value == Convert.ToString(subsciids))
+                                                                            {
+                                                                                scinamedata = r.Text;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        <label>@scinamedata</label>
+                                                    </td>
+                                                    <td><label>@k.LeadTime</label> </td>
+                                                    <td>
+                                                        <label>
+                                                            <span>@k.ScientistStatustext</span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label>
+                                                            @if (k.EstimateCompleteDate.HasValue)
+                                                            {@k.EstimateCompleteDate.Value.ToShortDateString()}
+                                                        </label>
+                                                    </td>
+                                                    <td> <label>@k.BatchCode1</label></td>
+                                                    <td>
+                                                        @Html.Raw(k.AdditionalBatchNoText)
+                                                    </td>
+                                                    <td> <label>@k.Qty1</label></td>
+                                                    <td>
+                                                        <label> @k.Remark</label>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabquery" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            @*<div>
+                    <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllScaleupScientistForm()">Save All</a> <br />
+                </div>*@
+                            <table id="tblquery" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Additional Batch No</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Count > 0)
+                                    {
+                                        int loop = 0;
+                                        foreach (var i in Model)
+                                        {
+                                            foreach (var k in i.SZ_QuotationProductModel.Where(x => !string.IsNullOrEmpty(x.QueryText)))
+                                            {
+                                                loop += 1;
+                                                string classname = "fourclsRow";
+                                                if (k.IsQueryResolved.HasValue && k.IsQueryResolved.Value)
+                                                {
+                                                    classname += "fourclsRow clslightgreen";
+                                                }
+
+                                                <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" data-protype="@k.ProjectType" class="@classname">
+                                                    <td>@loop</td>
+                                                    <td>@k.DifficultyLevel</td>
+                                                    <td>
+                                                        @if (k.IsPriority.HasValue && k.IsPriority.Value)
+                                                        {
+                                                            <label style="font-weight:bold;color:red">@k.ProductName</label>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label>@k.ProductName</label>
+                                                        }
+                                                    </td>
+                                                    <td><label>@k.CASNo</label> </td>
+                                                    <td><label>@Html.Raw(k.CATText)</label> </td>
+                                                    <td>
+                                                        @Html.Raw(k.AdditionalBatchNoText)
+                                                    </td>
+                                                    <td style="background: @(k.IsAssignScientistQuery == true ? "red" : "" )">
+                                                        @if (!k.IsQueryResolved.HasValue || !k.IsQueryResolved.Value)
+                                                        {
+                                                            <i class="fa fa-pencil" onclick="queryGenerate(@k.QuoteDetailsId)"></i>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabsynthesislog" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            @*<div>
+                    <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllScaleupScientistForm()">Save All</a> <br />
+                </div>*@
+                            <table id="tblsynthesislog" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Additional Batch No</th>
+                                        <th>Qty</th>
+                                        <th>Data Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Count > 0)
+                                    {
+                                        var loop = 0;
+                                        foreach (var i in Model)
+                                        {
+                                            foreach (var k in i.SZ_QuotationProductModel.Where(x => x.IsSynthesisLog == true && string.IsNullOrEmpty(i.PONumber)).OrderByDescending(x => x.MoveToScientistDate))
+                                            {
+                                                loop += 1;
+                                                <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" data-protype="@k.ProjectType" class="fourclsRow">
+                                                    @*<td>
+                                            <input type="checkbox" class="clssaveall" value="@k.QuoteDetailsId" />
+                                        </td>*@
+                                                    <td>@loop</td>
+                                                    <td>
+                                                        @if (k.IsPriority.HasValue && k.IsPriority.Value)
+                                                        {
+                                                            <label style="font-weight:bold;color:red">@k.ProductName</label>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label>@k.ProductName</label>
+                                                        }
+                                                    </td>
+                                                    <td><label>@k.RequiredQty</label></td>
+                                                    <td><label>@k.CASNo</label> </td>
+                                                    <td><label>@Html.Raw(k.CATText)</label> </td>
+                                                    <td> <label>@k.SubScientistName</label></td>
+                                                    <td><label>@k.LeadTime</label> </td>
+                                                    <td>
+                                                        <label>
+                                                            <span>@k.ScientistStatustext</span>
+                                                        </label>
+                                                    </td>
+                                                    <td>
+                                                        <label>
+                                                            @if (k.EstimateCompleteDate.HasValue)
+                                                            {
+                                                                @k.EstimateCompleteDate.Value.ToShortDateString()
+                                                            }
+                                                        </label>
+                                                    </td>
+                                                    <td> <label>@k.BatchCode1</label></td>
+                                                    <td>
+                                                        @Html.Raw(k.AdditionalBatchNoText)
+                                                    </td>
+                                                    <td> <label>@k.Qty1</label></td>
+                                                    <td>
+                                                        <label> @k.Remark</label>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tablessqty" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            <table id="tbllessqty" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Count > 0)
+                                    {
+                                        var proids = Model.Select(x => x.SZ_QuotationProductModel.Select(z => z.ProductId).ToList()).Distinct().ToList();
+                                        var pids = new List<int>();
+                                        if (proids != null && proids.Count > 0)
+                                        {
+                                            proids.ForEach(x =>
+                                            {
+                                                pids.AddRange(x.Select(z => z.Value).ToArray());
+                                            });
+                                        }
+                                        var inventoryList = db.SZ_Inventory.Where(x => pids.Contains(x.ProductId)).ToList();
+                                        int loop = 0;
+                                        foreach (var i in Model)
+                                        {
+                                            foreach (var k in i.SZ_QuotationProductModel.Where(x => x.IntRequiredQty <= 100 && x.ScientistStatus == x.ReadyToDeliverScientistStatusId && (x.IsOnHold == false || x.IsOnHold == null)).OrderByDescending(x => x.MoveToScientistDate))
+                                            {
+                                                var isprocess = false;
+                                                loop += 1;
+                                                var formid = db.SZ_QuoteDetails_Form.Where(x => x.QuoteDetailsId == k.QuoteDetailsId).Select(x => x.FormId).FirstOrDefault();
+                                                var formdata = db.SZ_QuoteDetailForm.Where(x => x.Id == formid).OrderByDescending(x => x.Id).FirstOrDefault();
+                                                var classname = "";
+                                                var statusstr = "";
+                                                if (formdata != null)
+                                                {
+                                                    if (formdata.ApprovalStatus == Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ApprovedStatus.QCApproved))
+                                                    {
+                                                        classname = "green";
+                                                        statusstr = "QC Approved";
+                                                        isprocess = true;
+                                                    }
+                                                }
+                                                if (isprocess)
+                                                {
+                                                    <tr id="sectr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" data-protype="@k.ProjectType" class="clsRow @classname">
+                                                        <td>@loop</td>
+                                                        <td>@k.DifficultyLevel</td>
+                                                        <td>
+                                                            @if (k.IsPriority.HasValue && k.IsPriority.Value)
+                                                            {
+                                                                <label style="font-weight:bold;color:red">@k.ProductName</label>
+                                                            }
+                                                            else
+                                                            {
+                                                                <label>@k.ProductName</label>
+                                                            }
+                                                        </td>
+                                                        <td><label>@k.RequiredQty</label></td>
+                                                        <td><label>@k.CASNo</label> </td>
+                                                        <td><label>@Html.Raw(k.CATText)</label> </td>
+                                                        <td>
+                                                            @{
+                                                                string scinamedata = k.SubScientistName;
+                                                                if (!string.IsNullOrEmpty(k.SubScientistName))
+                                                                {
+                                                                    var subsci = System.Text.RegularExpressions.Regex.IsMatch(k.SubScientistName, @"\d+");
+                                                                    if (subsci)
+                                                                    {
+                                                                        if (System.Text.RegularExpressions.Regex.Match(k.SubScientistName, @"\d+").Value == k.SubScientistName)
+                                                                        {
+                                                                            var subsciids = Convert.ToInt32(k.SubScientistName);
+                                                                            foreach (var r in listItems)
+                                                                            {
+                                                                                string selected = string.Empty;
+                                                                                if (r.Value == Convert.ToString(subsciids))
+                                                                                {
+                                                                                    scinamedata = r.Text;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            <label style="display:none">@scinamedata</label><input id="secsubScientistName_@k.QuoteDetailsId" type="text" value="@k.SubScientistName" style="width:80px" />
+                                                        </td>
+                                                        <td><label>@k.LeadTime</label> </td>
+                                                        <td>
+                                                            @Html.DropDownList("secscientistStatus_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.listScientistStatus, new { @class = "form-control scientistStatusddl" })
+                                                            <label style="display:none">
+                                                                @*<span>@k.ScientistStatustext</span>*@
+                                                                <span>@statusstr</span>
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <label style="display:none">
+                                                                @if (k.EstimateCompleteDate.HasValue)
+                                                                {
+                                                                    @k.EstimateCompleteDate.Value.ToShortDateString()
+                                                                }
+                                                            </label>
+                                                            <input id="secesticompleteDate_@k.QuoteDetailsId" type="text" data-value="@k.EstimateCompleteDate" class="datepicker" style="width:80px" />
+                                                        </td>
+                                                        <td>
+                                                            @{
+                                                                var szinv = inventoryList.Where(x => x.ProductId == k.ProductId).ToList();
+                                                            }
+                                                            <select class="form-control clsddl">
+                                                                @foreach (var itemss in szinv)
+                                                                {
+                                                                    <option>@itemss.BatchNo</option>
+                                                                }
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <label style="display:none">
+                                                                @if (k.Qty1 != "undefined")
+                                                                {
+                                                                    @k.Qty1
+                                                                }
+                                                            </label>
+                                                            <input id="secqty1_@k.QuoteDetailsId" type="text" value="@k.Qty1" style="width:50px" />
+                                                        </td>
+                                                        @*<td>
+                                                            <a class="clsLast" href="javascript:void(0)" id="save_@k.QuoteDetailsId" onclick="secSaveScientistProductDetails('@k.QuoteDetailsId')"> Save</a>
+                                                            @if (k.ReadyToDeliverScientistStatusId == k.ScientistStatus)
+                                                            {
+                                                                <a href="/Form/ViewForm/@k.QuoteDetailsId"> View Form</a>
+                                                            }
+                                                        </td>*@
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    function explainationGenerate(id)
+    {
+        $.ajax({
+                url: '/Form/Addexplaination?id=' + id,
+                data: {},
+                type: 'GET',
+                traditional: true, // add this
+                dataType: 'json',
+                success: function (data) {
+                    $('#invoiceQueryModal .modal-body').html(data.html);
+                    $('#invoiceQueryModal').modal({ show: true });
+                }
+            });
+    }
+
+    function queryGenerate(id) {
+        $.ajax({
+            url: '/Form/AddQuery?id=' + id + '&sectionName=scientist',
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+            }
+        });
+    }
+
+    var tblExample1;
+    $(function () {
+        $('#tblnoaction').DataTable({
+            "pageLength": 25,
+            "ordering": false,
+        });
+        tblExample1 = $('#example1').DataTable({
+            "pageLength": 25,
+            "ordering": false,
+        });
+        $('#example2').DataTable({
+            "pageLength": 25,
+            "ordering": false,
+        });
+        $('#tblqcapproval').DataTable({
+            "pageLength": 25,
+            "ordering": false,
+        });
+        $('#tblscalup').DataTable({
+            "pageLength": 25,
+            "ordering": false,
+        });
+        $('#tblhold').DataTable({
+            "pageLength": 25,
+            "ordering": false,
+        });
+        $('#tblholdt').DataTable({
+            "pageLength": 25,
+            "ordering": false,
+        });
+        $('#tblsynthesislog').DataTable({
+            "pageLength": 25,
+            "ordering": false,
+        });
+        $(document).on("change", "#chkselectll", function () {
+            if ($(this).is(":checked")) {
+                $('#example1').find('.clssaveall').each(function () {
+                    $(this).prop("checked", true);
+                });
+            }
+            else {
+                $('#example1').find(".clssaveall").each(function () {
+                    $(this).prop("checked", false);
+                });
+            }
+        });
+        $(document).on("change", "#chkselectllnoaction", function () {
+            if ($(this).is(":checked")) {
+                $('#tblnoaction').find('.clssaveall').each(function () {
+                    $(this).prop("checked", true);
+                });
+            }
+            else {
+                $('#tblnoaction').find(".clssaveall").each(function () {
+                    $(this).prop("checked", false);
+                });
+            }
+        });
+    });
+
+
+    function calledExtra()
+    {
+        setTimeout(function () {
+                $('.datepicker').datepicker({
+                    format: 'dd/mm/yyyy'
+                });
+
+            $(".clsRow").each(function () {
+                    var status = $(this).attr("data-status");
+                    var protype = $(this).attr("data-protype");
+                    var detailsId = $(this).attr("id").replace("tr_", "");
+                    $("#scientistStatus_" + detailsId).val(status);
+                    var readytodeliverId = 0;
+                    $(".scientistStatusddl option").each(function () {
+                        var text = $(this).text();
+                        if (text === 'Ready for dispatch.') {
+                            readytodeliverId = $(this).val();
+                        }
+                    });
+                    $(".clsreviewscistatus").each(function () {
+
+                        var text = $(this).attr('data-value');
+                        if (text !== '') {
+                            $(this).val(text);
+                        }
+                    });
+                    if (status === readytodeliverId) {
+                        $(this).find('input[type=text]').hide();
+                        $(this).find('select').hide();
+                        $(this).find('label').show();
+                        $(this).find(".clsLast").hide(); $(this).find(".clsddl").show();
+                    }
+                    var dateValue = $(this).find('.datepicker').attr('data-value');
+                    if (dateValue !== '') {
+                        dateValue = dateValue.toString().replace(' 00:00:00', '');
+                        $(this).find('.datepicker').datepicker("setDate", dateValue);
+                    }
+                    if (protype === '@((int)EnumList.ProjectType.InHouse)') {
+                        $(this).css('background-color','#d7f5ff');
+                    }
+                });
+
+            $(".scientist").each(function () {
+                var scientstname = $(this).attr('subscientistname');
+                var elementid = $(this).attr("id");
+                $("#" + elementid).val(scientstname);
+            });
+            //FilterSciData($("#filsubScientistName").val());
+
+
+            }, 500);
+    }
+
+    $(document).ready(function () {
+        $('.datepicker').datepicker({
+            format: 'dd/mm/yyyy'
+        });
+
+        $('#tblnoaction').on('search.dt', function () {
+            calledExtra();
+        });
+        $('#tblnoaction').on('page.dt', function () {
+            calledExtra();
+        });
+        $('#example1').on('search.dt', function () {
+            calledExtra();
+        });
+        $('#example1').on('page.dt', function () {
+           calledExtra();
+        });
+        $('#example2').on('search.dt', function () {
+            calledExtra();
+        });
+        $('#example2').on('page.dt', function () {
+           calledExtra();
+        });
+        $('#tblqcapproval').on('search.dt', function () {
+           calledExtra();
+        });
+        $('#tblqcapproval').on('page.dt', function () {
+            calledExtra();
+        });
+
+
+        $(".clsRow").each(function () {
+            var status = $(this).attr("data-status");
+            var protype = $(this).attr("data-protype");
+            var detailsId = $(this).attr("id").replace("tr_", "");
+            $("#scientistStatus_" + detailsId).val(status);
+            var readytodeliverId = 0;
+            $(".scientistStatusddl option").each(function () {
+                var text = $(this).text();
+                if (text === 'Ready for dispatch.') {
+                    readytodeliverId = $(this).val();
+                }
+            });
+            if (status === readytodeliverId) {
+                $(this).find('input[type=text]').hide();
+                $(this).find('select').hide();
+                $(this).find('label').show();
+                $(this).find(".clsLast").hide(); $(this).find(".clsddl").show();
+            }
+            var dateValue = $(this).find('.datepicker').attr('data-value');
+            if (dateValue !== '') {
+                dateValue = dateValue.toString().replace(' 00:00:00', '');
+                $(this).find('.datepicker').datepicker("setDate", dateValue);
+            }
+            if (protype === '@((int)EnumList.ProjectType.InHouse)') {
+                $(this).css('background-color','#d7f5ff');
+            }
+        });
+
+        $(".secclsRow").each(function () {
+            var status = $(this).attr("data-status");
+            var protype = $(this).attr("data-protype");
+            var detailsId = $(this).attr("id").replace("tr_", "");
+            $("#secscientistStatus_" + detailsId).val(status);
+            var readytodeliverId = 0;
+            $(".scientistStatusddl option").each(function () {
+                var text = $(this).text();
+                if (text === 'Ready for dispatch.') {
+                    readytodeliverId = $(this).val();
+                }
+            });
+            if (status === readytodeliverId) {
+                $(this).find('input[type=text]').hide();
+                $(this).find('select').hide();
+                $(this).find('label').show();
+                $(this).find(".clsLast").hide(); $(this).find(".clsddl").show();
+            }
+            var dateValue = $(this).find('.datepicker').attr('data-value');
+            if (dateValue !== '') {
+                dateValue = dateValue.toString().replace(' 00:00:00', '');
+                $(this).find('.datepicker').datepicker("setDate", dateValue);
+            }
+            if (protype === '@((int)EnumList.ProjectType.InHouse)') {
+                $(this).css('background-color','#d7f5ff');
+            }
+        });
+
+        $(".thirdclsRow").each(function () {
+
+            var status = $(this).attr("data-status");
+            var protype = $(this).attr("data-protype");
+            var detailsId = $(this).attr("id").replace("tr_", "");
+            $('#tblscalup').find("#scientistStatus_" + detailsId).val(status);
+            var readytodeliverId = 0;
+            $('#tblscalup').find(".scientistStatusddl option").each(function () {
+                var text = $(this).text();
+                if (text === 'Ready for dispatch.') {
+                    readytodeliverId = $(this).val();
+                }
+            });
+            if (status === readytodeliverId) {
+                $(this).find('input[type=text]').hide();
+                $(this).find('select').hide();
+                $(this).find('label').show();
+                $(this).find(".clsLast").hide();
+                $(this).find(".clsddl").show();
+            }
+            var dateValue = $(this).find('.datepicker').attr('data-value');
+            if (dateValue !== '') {
+                dateValue = dateValue.toString().replace(' 00:00:00', '');
+                $(this).find('.datepicker').datepicker("setDate", dateValue);
+            }
+
+        });
+    });
+
+    function secSaveScientistProductDetails(id) {
+        var scStatus = $("#secscientistStatus_" + id).val();
+        var batchcode1 = $("#secbatchcode1_" + id).val();
+
+        var qty1 = $("#secqty1_" + id).val();
+        var batchcode2 = "";
+        var qty2 = "";
+        var esticompleteDate = $("#secesticompleteDate_" + id).val();
+        var subscientist = $("#secsubScientistName_" + id).val();
+        $.ajax({
+            url: '/Form/UpdateScientistProjectInfo?scStatus=' + scStatus + '&batchcode1=' + batchcode1 + '&qty1=' + qty1 + '&batchcode2=' + batchcode2 + '&qty2=' + qty2 + '&id=' + id + '&esticompleteDate=' + esticompleteDate + '&subscientist=' + subscientist,
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have updated product information.");
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (scStatus === readytodeliverId) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+
+    function SaveScientistProductDetails(id) {
+
+        var scStatus = $("#scientistStatus_" + id).val();
+        var batchcode1 = $("#batchcode1_" + id).val();
+        var qty1 = $("#qty1_" + id).val();
+        var remark = $("#remark_" + id).val();
+        var batchcode2 = "";
+        var qty2 = "";
+        var esticompleteDate = $("#esticompleteDate_" + id).val();
+        $.ajax({
+            url: '/Form/UpdateScientistProjectInfo?scStatus=' + scStatus + '&batchcode1=' + batchcode1 + '&qty1=' + qty1 + '&batchcode2=' + batchcode2 + '&qty2=' + qty2 + '&id=' + id + '&esticompleteDate=' + esticompleteDate+ '&remark=' + remark,
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have updated product information.");
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (scStatus === readytodeliverId) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+
+    function SaveNoActionScientistForm() {
+
+        var count = 1;
+        var ids = [];
+        $('#tblnoaction').find('.clssaveall').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        $('#tblnoaction').find('.clssaveall').each(function () {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var scStatus = $('#tblnoaction').find("#scientistStatus_" + id).val();
+                var batchcode1 = $('#tblnoaction').find("#batchcode1_" + id).val();
+                var qty1 = $('#tblnoaction').find("#qty1_" + id).val();
+                var remark = $('#tblnoaction').find("#remark_" + id).val();
+                var reason = $('#tblnoaction').find("#reason_" + id).val();
+                var batchcode2 = "";
+                var qty2 = "";
+                var chemist = $('#tblnoaction').find("#chemist_" + id).val();
+                var esticompleteDate = $('#tblnoaction').find("#esticompleteDate_" + id).val();
+                var subscientist = $('#tblnoaction').find("#subScientistName_" + id).val();
+                if (scStatus === "") {
+                    scStatus = null;
+                }
+                $.ajax({
+                    url: '/Form/UpdateScientistProjectInfo?scStatus=' + scStatus + '&batchcode1=' + batchcode1 + '&qty1=' + qty1 + '&batchcode2=' + batchcode2 + '&qty2=' + qty2 + '&id=' + id + '&esticompleteDate=' + esticompleteDate + '&remark=' + remark + '&subscientist=' + subscientist + '&reason=' + reason + '&chemist=' + chemist+ '&tabname=scientist-NOACTION',
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                        successSavenoactionDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function successSavenoactionDispatchAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product information.");
+
+            setTimeout(function () {
+                window.location.reload(true);
+            }, 2000);
+
+        }
+    }
+
+    function SaveAllScientistForm() {
+
+        var count = 1;
+        var ids = [];
+        $('#example1').find('.clssaveall').each(function() {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        $('#example1').find('.clssaveall').each(function() {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var scStatus = $('#example1').find("#scientistStatus_" + id).val();
+                var batchcode1 = $('#example1').find("#batchcode1_" + id).val();
+                var qty1 = $('#example1').find("#qty1_" + id).val();
+                var remark = $('#example1').find("#remark_" + id).val();
+                var reason = $('#example1').find("#reason_" + id).val();
+                var chemist = $('#example1').find("#chemist_" + id).val();
+                var batchcode2 = "";
+                var qty2 = "";
+                var esticompleteDate =$('#example1').find("#esticompleteDate_" + id).val();
+                var subscientist = $('#example1').find("#subScientistName_" + id).val();
+                var reviewscistatus = $('#example1').find("#reviewscistatus_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateScientistProjectInfo?scStatus=' + scStatus + '&batchcode1=' + batchcode1 + '&qty1=' + qty1 + '&batchcode2=' + batchcode2 + '&qty2=' + qty2 + '&id=' + id + '&esticompleteDate=' + esticompleteDate + '&remark=' + remark + '&subscientist=' + subscientist + '&reason=' + reason + '&chemist=' + chemist + '&reviewscistatus=' + reviewscistatus +  '&tabname=scientist-All',
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                        successSaveallDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function SaveAllHold() {
+
+        var count = 1;
+        var errrorcnt = 0;
+        var ids = [];
+        $('#example1').find('.clssaveall').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+                if ($("#scientistStatus_" + $(this).val()).val() !== "17") {
+                    errrorcnt += 1;
+                }
+            }
+        });
+
+        if (errrorcnt !== 0) {
+            toastr.error("Please select proper status to move this product on HOLD.");
+            return false;
+        }
+
+        $('#example1').find('.clssaveall').each(function () {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var scStatus = $('#example1').find("#scientistStatus_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateScientistProductInfoForHold?scStatus=' + scStatus + '&id=' + id,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                        successSaveallDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+
+    function successSaveallDispatchAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product information.");
+
+            setTimeout(function(){
+                window.location.reload(true);
+            }, 2000);
+
+        }
+    }
+    $(".resizediv").css('height', window.innerHeight - 200);
+
+    function SaveAllScaleupScientistForm() {
+
+        var count = 1;
+        var ids = [];
+        $('#tblscalup').find('.clssaveall').each(function() {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        $('#tblscalup').find('.clssaveall').each(function() {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var scStatus = $('#tblscalup').find("#scientistStatus_" + id).val();
+                var batchcode1 = $('#tblscalup').find("#batchcode1_" + id).val();
+                var qty1 = $('#tblscalup').find("#qty1_" + id).val();
+                var remark = $('#tblscalup').find("#remark_" + id).val();
+                var batchcode2 = "";
+                var qty2 = "";
+                var esticompleteDate = $('#tblscalup').find("#esticompleteDate_" + id).val();
+                var subscientist = $('#tblscalup').find("#subScientistName_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateScientistProjectInfo?scStatus=' + scStatus + '&batchcode1=' + batchcode1 + '&qty1=' + qty1 + '&batchcode2=' + batchcode2 + '&qty2=' + qty2 + '&id=' + id + '&esticompleteDate=' + esticompleteDate + '&remark=' + remark + '&subscientist=' + subscientist,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                        successScaleupSaveallDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function successScaleupSaveallDispatchAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product information.");
+
+            setTimeout(function(){
+                window.location.reload(true);
+            }, 2000);
+
+        }
+    }
+
+    //setTimeout(function () {
+    //    $(".scientist").each(function () {
+    //        var scientstname = $(this).attr('subscientistname');
+    //        var elementid = $(this).attr("id");
+    //        $("#" + elementid + " option:contains(" + scientstname + ")").attr('selected', true);
+    //        $("#" + elementid).val(scientstname);
+    //    });
+    //}, 1000);
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        $(".scientist").each(function () {
+            var scientstname = $(this).attr('subscientistname');
+            var elementid = $(this).attr("id");
+            $("#" + elementid).val(scientstname);
+        });
+
+        $("#filsubScientistName").val("@SessionCookieManagement.UserId");
+        FilterSciData('@SessionCookieManagement.UserId');
+    }, false);
+
+
+
+    $(document).on("change", ".scientist", function () {
+        var hdnloginuserid = $("#hdnloginuserid").val();
+        var selecteduserid = $(this).val();
+        if (selecteduserid === hdnloginuserid) {
+            var id = $(this).attr("id").replace("subScientistName_", "");
+            $("#chemist_" + id).attr("readonly", false);
+            $("#chemist_" + id).val("");
+        }
+        else {
+            var id = $(this).attr("id").replace("subScientistName_", "");
+            $("#chemist_" + id).attr("readonly", true);
+            $("#chemist_" + id).val("");
+        }
+    });
+
+
+
+    $(document).on("change", "#filsubScientistName", function () {
+        console.log("Main change calling ");
+        FilterSciData($(this).val());
+    });
+
+    function FilterSciData(sciId) {
+        console.log(sciId);
+        tblExample1.column(7)
+            .search(sciId)
+            .draw();
+        //if (sciId === null || sciId === undefined || sciId === "") {
+        //    $("#example1").find(".scientist").each(function () {
+        //        $(this).closest('tr').css('display', '');
+        //    });
+        //}
+        //else {
+        //    $("#example1").find(".scientist").each(function () {
+        //        if ($(this).val() === sciId) {
+        //            $(this).closest('tr').css('display', '');
+        //        }
+        //        else {
+        //            $(this).closest('tr').css('display', 'none');
+        //        }
+        //    });
+        //}
+    }
+
+    function Copyrecords(tablename) {
+        var ids = []; var refNoarr = [];
+        $("#" + tablename).find('.clssaveall').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/PrintScientistAllRecord',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1080px");
+
+                $('#myModal').find(".modal-footer").hide();
+            }
+        });
+    }
+
+    var querystring = getUrlVars();
+    if (querystring["tab"] === '' || querystring["tab"] === undefined) {
+
+    }
+    else {
+        $(".nav-tabs").find('a').each(function () {
+            if (querystring["tab"].toLowerCase() === $(this).attr("data-tabname")) {
+                $(this).click();
+            }
+        });
+    }
+
+    function LinkWithQuotedetails(quotedetailsid) {
+        $.ajax({
+            url: '/Form/OpenBatchNoFromCat?quotedetailsid=' + quotedetailsid,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+                // $("#invoiceQueryModal .modal-content").css("width", "1080px");
+            }
+        });
+    }
+</script>
+<style>
+    #tblquery td label {
+        font-weight: normal;
+    }
+
+    .redcls {
+        background: #ffe0e0 !important;
+    }
+
+    .clslightgreen {
+        background: rgb(169, 230, 169) !important;
+    }
+
+    .yellow {
+        background: #f3f373 !important
+    }
+
+    .green {
+        background: #74f674 !important
+    }
+
+    .skyblue {
+        background: #b0e8ff !important
+    }
+</style>

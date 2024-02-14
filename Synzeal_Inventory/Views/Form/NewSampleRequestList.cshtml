@@ -1,0 +1,81 @@
+﻿@{
+    ViewBag.Title = "NewSampleRequestList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model List<SZ_SampleRequestDetail>
+@using Synzeal_Inventory.Entity
+
+<section class="content-header">
+    <h1>
+        Sample Request List
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <div class="box-body divQuote">
+                    <a href="/Form/NewSampleRequest" style="float:right;margin-right:8px;margin-bottom:15px;" class="btn btn-primary">New Request</a>
+                    <div class="clearfix"></div>
+                    <table id="example1" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Request No</th>
+                                <th>Request Date</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Product Name</th>
+                                <th>CAT No</th>
+                                <th>CAS No</th>
+                                <th>Batch No</th>
+                                <th>QTY</th>
+                                <th>Reason</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Count > 0)
+                            {
+                                int sr = 1;
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@sr</td>
+                                        <td>@item.SZ_SampleRequest.RequestNo</td>
+                                        <td>
+                                            @if (item.SZ_SampleRequest.RequestDate != null)
+                                            {
+                                                @item.SZ_SampleRequest.RequestDate.ToShortDateString()
+                                            }
+                                        </td>
+                                        <td>@item.SZ_SampleRequest.Name</td>
+                                        <td>@item.SZ_SampleRequest.Department</td>
+                                        <td>@item.ProductName</td>
+                                        <td>@item.CATNo</td>
+                                        <td>@item.CASNo</td>
+                                        <td>@item.BatchCode</td>
+                                        <td>@item.Qty</td>
+                                        <td>@item.Reason</td>
+                                        <td><a href="/Form/NewSampleRequest/@item.SampleRequestId"><i class="fa fa-pencil"></i></a></td>
+                                    </tr>
+
+                                    sr += 1;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+
+</section>
+<script>
+    $('#example1').DataTable({
+        "pageLength": 25
+    });
+</script>

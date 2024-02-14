@@ -1,0 +1,88 @@
+﻿@{
+    ViewBag.Title = "Upload Product Scheme";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model  Synzeal_Inventory.Entity.Product
+
+
+<section class="content-header">
+    <h1>
+        Product Scheme
+    </h1>
+</section>
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+
+        <!-- /.box-header -->
+        <!-- form start -->
+        @using (Html.BeginForm("UploadProductScheme", "Form", FormMethod.Post, new
+        {
+            enctype = "multipart/form-data"
+        }))
+        {
+            <input type="hidden" id="productId" name="productId" value="@Model.Id" />
+            <div class="box-body col-md-6">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Name</label>
+                    @Model.Name
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">CAT #</label>
+                    @Model.Sku
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">CAS #</label>
+                    @Model.ManufacturerPartNumber
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Mol Formula</label>
+                    @Model.Gtin
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Mol Weight</label>
+                    @Model.MolecularWeight
+                </div>
+            </div>
+            <div class="box-body col-md-6">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Upload</label>
+                    <input type="file" class="form-control" id="file" name="file" required>
+                </div>
+                <input type="submit" title="save" class="btn btn-primary" />
+            </div>
+
+            <div class="clearfix"></div>
+        }
+    </div>
+    <div class="clearfix"></div>
+
+    @if (Model.SZ_ProductScheme != null && Model.SZ_ProductScheme.Count > 0)
+    {
+<div class="box box-primary">
+    
+    <table class="table table-responsive">
+        <thead>
+            <tr>
+                <td>Image</td>
+                <td>Action</td>
+            </tr>
+        </thead>
+        @foreach (var item in Model.SZ_ProductScheme.OrderByDescending(x=>x.CreatedDate))
+        {
+    <tr>
+        <td>
+            <img src="@item.Scheme.Replace("..","")" height="100px" width="200px" />
+        </td>
+        <td>
+            <a href="/Form/DeleteUploadProductScheme/@item.Id">
+                <i class="fa fa-remove" style="color:red;"></i>
+            </a>
+        </td>
+    </tr>
+        }
+    </table>
+</div>
+    }
+</div>

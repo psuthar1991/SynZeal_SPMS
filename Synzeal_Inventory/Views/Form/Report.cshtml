@@ -1,0 +1,132 @@
+﻿@{
+    ViewBag.Title = "Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Report
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <a href="/Form/QuoteDailyReport">
+                    <span class="info-box-icon bg-aqua"><i class="ion ion-document"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text" style="font-size: 25px;color:#000;">Quote Daily Updates</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <a href="/Form/FollowupReport">
+                    <span class="info-box-icon bg-blue"><i class="ion ion-document"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text" style="font-size: 25px;color:#000;">Followup Updates</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+
+        @if (Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "karan@synzeal.com" ||
+            Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "neh@synzeal.com" ||
+            Synzeal_Inventory.Models.SessionCookieManagement.IsAdmin)
+        {
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/CompanyReport">
+                        <span class="info-box-icon bg-blue"><i class="ion ion-document"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="font-size: 25px;color:#000;">Company PO Updates</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+        @if (Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "garima.singh@synzeal.com")
+        {
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/POReport">
+                        <span class="info-box-icon bg-blue"><i class="ion ion-document"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="font-size: 25px;color:#000;">PO Report</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+        @if (Synzeal_Inventory.Models.SessionCookieManagement.IsMasterAdmin || Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "parthsuthar2010@gmail.com")
+        {
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/POReport">
+                        <span class="info-box-icon bg-blue"><i class="ion ion-document"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="font-size: 25px;color:#000;">PO Report</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/ConversionReport">
+                        <span class="info-box-icon bg-blue"><i class="ion ion-document"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="font-size: 25px;color:#000;">Conversion Report</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/NewCompanyReport">
+                        <span class="info-box-icon bg-blue"><i class="ion ion-document"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="font-size: 25px;color:#000;">Company Report</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/minAmountProductReport">
+                        <span class="info-box-icon bg-blue"><i class="ion ion-document"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="font-size: 25px;color:#000;">Pro Min Report</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+        <!-- left column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <form role="form">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Company Name</label>
+                            @Html.DropDownList("companyId", (IEnumerable<SelectListItem>)ViewBag.listCompItems, new { @class = "form-control" })
+                        </div>
+                        <div style="float:left">
+                            <div>
+                                <label for="inputPassword3" class="col-sm-10 control-label"></label>
+                                <div>
+                                    <button type="button" class="btn btn-primary" onclick="Quote.GenerateReport()">Generate PDF</button>
+                                    <button type="button" class="btn btn-primary" onclick="Quote.GenerateExcelReport()">Generate Excel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

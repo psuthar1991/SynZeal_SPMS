@@ -1,0 +1,134 @@
+﻿@model List<Synzeal_Inventory.Entity.SZ_Quotation>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+}
+@*<style type="text/css">
+        .proinfo {
+            border-collapse: collapse;
+        }
+
+            .proinfo th {
+                text-align: center;
+            }
+
+            .proinfo, .proinfo th, .proinfo td {
+                border: 1px solid #ececec;
+            }
+    </style>*@
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+@using Synzeal_Inventory.Models
+
+<div style="margin:2% 33%;float:left;box-shadow:0 0 3px #aaa; height:auto;color:gray;">
+    <table width="100%">
+        <tr>
+            <td valign="top">
+                <img src="http://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" width="200px" />
+            </td>
+            <td style="float:right">
+                <span style="font-size:11px;float:right;padding:10px; text-align:right;color:gray;line-height:18px;">
+                    <b style="color:#000">Syn</b><b style="color: #00659e;">Zeal</b><b style="color:#000"> Research Pvt Ltd</b><br />
+                    Plot No. F, Shree Ganesh Industrial Estate,<br />
+                    423/24/8, Mahagujarat Industrial Estate,<br />
+                    Sarkhej-Bavla Road , Moraiya , India-382213<br />
+                    <b>Email:-</b> standards@synzeal.com<br />
+                    <b>Phone:-</b> +91-757-500-2050<br />
+                    <br />
+                </span>
+            </td>
+        </tr>
+    </table>
+    <br />
+    <hrline />
+    
+    @if (Model != null && Model.Count > 0)
+    {
+        int loop = 1;
+        foreach (var quote in Model)
+        {
+            if (loop != 1)
+            {
+                <br /><br />
+                <hrline />
+            }
+            <div>
+                <b>Customer Name : @quote.SZ_CompanyList.Name </b>
+                <p><b>Date : </b> @DateTime.Now.Day<sup>@GetDaySuffix(DateTime.Now.Day)</sup> @DateTime.Now.ToString("MMMM yy")</p>
+            </div>
+            <div style="padding:0px; float:left;padding-top:10px;">
+                <div style="text-align:center;padding:8px;font-weight:normal;font-size:11px;color:#000;">
+                    PO No @quote.PONo dated @quote.CreatedDate.Value.Day<sup>@GetDaySuffix(quote.CreatedDate.Value.Day)</sup> @quote.CreatedDate.Value.ToString("MMMM yy")
+                </div>
+                <br />
+                <hrline />
+                <table width="100%" class="proinfo" cellpadding="4" cellspacing="3" border="1">
+                    <thead>
+                        <tr style="font-size:10px">
+                            <th width="2%">
+                                <b>#</b>
+                            </th>
+                            <th>
+                                <b style="text-align:center;">Product Name</b>
+                            </th>
+                            <th><b>Qty</b></th>
+                            <th><b>CAS No.</b></th>
+                            <th><b>CAT No.</b></th>
+                            <th><b>Current Status </b></th>
+                            <th><b>Reason </b></th>
+                            <th><b>Dispatch Details</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int srno = 1;
+                            foreach (var item in quote.SZ_QuotationDetail.Where(x => x.MoveToProject == true).OrderByDescending(x=>x.MoveProjectDate).ToList())
+                            {
+                        <tr style="color:#000;">
+                            <td style="font-size:9px;text-align:center;" width="2%">
+                                @srno
+                            </td>
+                            <td style="font-size:9px;text-align:center;">
+                                @Html.Raw(item.ProductName)
+                            </td>
+                            <td style="font-size:9px;">@item.RequiredQty</td>
+                            <td style="font-size:9px;">@Html.Raw(item.CASNo)</td>
+                            <td style="font-size:9px;">@Html.Raw(item.CATNo)</td>
+                            <td style="font-size:9px;">@item.AdminScientistStatus</td>
+                            <td style="font-size:9px;">@item.Reason</td>
+                            <td style="font-size:9px;">@item.TrackingNo</td>
+                        </tr>
+                                srno += 1;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            loop += 1;
+        }
+    }
+    else
+    {
+        <div style="text-align:center;padding-top:80px;">
+            NO DATA FOUND
+        </div>
+    }
+</div>

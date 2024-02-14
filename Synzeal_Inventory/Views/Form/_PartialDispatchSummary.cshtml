@@ -1,0 +1,49 @@
+﻿@model List<Synzeal_Inventory.Models.DispatchSummaryModel>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    int loop = 1;
+}
+@using Synzeal_Inventory.Models
+<div class="box-body form-horizontal">
+    <table width="100%" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>PO No.</th>
+                <th>Company Name</th>
+                <th>Team leader</th>
+                <th>Product Name</th>
+                <th>Project Status</th>
+                <th>QTY</th>
+                <th>CAS No</th>
+                <th>CAT No</th>
+                <th>Dispatch Date</th>
+                <th>Batch No</th>
+                <th>Query Received</th>
+            </tr>
+        </thead>
+        @foreach (var k in Model)
+        {
+            <tr>
+                <td>@loop</td>
+                <td>@k.PONo</td>
+                <td>@k.CompanyName</td>
+                <td>@k.TeamLeader</td>
+                <td>@k.ProductName</td>
+                <td>
+                    @k.ProjectStatus
+                </td>
+                <td>@k.Qty</td>
+                <td>@k.CASNo</td>
+                <td>@k.CATNo</td>
+                <td>@k.DispatchedDate</td>
+                <td>@k.BatchNo</td>
+                <td>
+                    @k.QueryReceived
+                </td>
+            </tr>
+
+            loop += 1;
+        }
+    </table>
+</div>

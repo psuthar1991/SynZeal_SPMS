@@ -1,0 +1,53 @@
+﻿@model List<Synzeal_Inventory.Models.Chat.UserModel>
+@{
+    Layout = null;
+}
+@if (Model != null)
+{
+    if (Model.Count > 0)
+    {
+        <ul class="list-unstyled chat-list chat-user-list chat-leftsidebar" style="overflow: auto; height: 270px;">
+            @foreach (var item in Model.Where(x => !string.IsNullOrEmpty(x.Name)))
+            {
+                //string name = item.Name.IndexOf(" ") > 0 ? item.Name.Substring(0, item.Name.IndexOf(" ")) : item.Name;
+                string name = item.Name;
+                <li class="unread">
+                    <a href="javascript:;" data-user-id="@item.UserID" class="list-group-item chat-user">
+                        <div class="d-flex">
+                            <div class="chat-user-img @(item.IsOnline ? "online" : "") align-self-center me-3 ms-0" style="float:left">
+                                <div style="height: 20px; width: 20px; border-radius: 50%; background: #ebdbdb; padding: 7px; display: inline;">
+                                    @if (name.Split(' ').Count() > 1)
+                                    {
+                                        @Char.ToUpper(name.Split(' ')[0][0])
+                                        <sypan></sypan> @Char.ToUpper(name.Split(' ')[1][0])
+                                    }
+                                    else
+                                    {
+                                        @Char.ToUpper(name.Split(' ')[0][0])
+                                    }
+                                </div>
+                                <div class="user-status"></div>
+                            </div>
+
+                            <div class="flex-grow-1 overflow-hidden">
+                                <h5 class="text-truncate font-size-15 mb-1" style="padding-left: 42px; padding-top: 2px; font-size: 16px !important;">@name</h5>
+                                @*<p class="chat-user-message text-truncate mb-0">@item.Bio</p>*@
+                            </div>
+                            @*<div class="font-size-11">@item.CreatedOn</div>*@
+                            @if (!string.IsNullOrEmpty(item.UnReadMessages))
+                            {
+                                <div class="unread-message">
+                                    <span class="badge badge-soft-danger rounded-pill chat-message-count">@item.UnReadMessages</span>
+                                </div>
+                            }
+                        </div>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <span>No one online</span>
+    }
+}

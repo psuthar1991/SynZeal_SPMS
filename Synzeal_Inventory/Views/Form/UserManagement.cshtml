@@ -1,0 +1,145 @@
+﻿@{
+    ViewBag.Title = "UserManagement";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using Synzeal_Inventory.Models;
+@model List<UserManagementModel>
+
+<section class="content-header">
+    <h1>
+        User Management List <a style="float:right" class="btn btn-primary" href="@Url.Action("AddUserManagement","Form")">Add</a>
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <div class="box-body divQuote">
+                    <div class="clearfix"></div>
+                    <table id="example1" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Company Name(s)</th>
+                                <th style="text-align:center">Payment Show?</th>
+                                <th style="text-align:center">Notification</th>
+                                <th style="text-align:center">Newsletter</th>
+                                <th style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Count > 0)
+                            {
+                                int sr = 1;
+                                foreach (var item in Model)
+                                {
+                            <tr>
+                                <td>@sr</td>
+                                <td>@item.Username</td>
+                                <td>@item.EmailAddress</td>
+                                <td>@item.CompanyNames</td>
+                                <td style="text-align:center">
+                                    @if (item.IsPaymentShow)
+                                    {
+                                        <i style="color:darkgreen" class="fa fa-check"></i>
+                                    }
+                                    else
+                                    {
+                                        <i style="color:darkorange" class="fa fa-times"></i>
+                                    }
+                                </td>
+                                <td style="text-align:center">
+                                    @if (item.IsNotification)
+                                    {
+                                        <i style="color:darkgreen" class="fa fa-check"></i>
+                                    }
+                                    else
+                                    {
+                                        <i style="color:darkorange" class="fa fa-times"></i>
+                                    }
+                                </td>
+                                <td style="text-align:center">
+                                    @if (item.isNewsLetter)
+                                    {
+                                        <i style="color:darkgreen" class="fa fa-check"></i>
+                                    }
+                                    else
+                                    {
+                                        <i style="color:darkorange" class="fa fa-times"></i>
+                                    }
+                                </td>
+                                <td style="text-align:center">
+                                    <a href="/Form/AddUserManagement/@item.Id"><i class="fa fa-pencil"></i></a>
+                                </td>
+                                @*<td style="text-align:center">
+            <a href="javascript:void(0)" onclick="ApprovedSampleRequest(@item.Id)"><i class="fa fa-check"></i></a>
+        </td>
+        <td style="text-align:center">
+            <a href="javascript:void(0)" onclick="RejectedSampleRequest(@item.Id)"><i class="fa fa-times  "></i></a>
+        </td>*@
+                            </tr>
+                                sr += 1;
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script type="">
+    $('#example1').DataTable()
+
+    function ApprovedSampleRequest(id) {
+        $.ajax({
+            type: "GET",
+            url: "/Form/ApprovedSampleRequest?id=" + id,
+            dataType: "json",
+            traditional: true,
+            data: {},
+            success: function (result) {
+                window.location.reload(true);
+            }
+        });
+    }
+
+    function RejectedSampleRequest(id) {
+        var str = "<div class='row'><div class='col-md-12'><p>Please enter park reason:<p> <textarea id='txtparkreason' style='width:100%'></textarea></div></div>";
+        swal({
+            title: "Are you sure want to reject it?",
+            text: str,
+            html: true,
+            type: "warning", customClass: 'swalwide',
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    var reason = $('#txtparkreason').val();
+                    if (reason === "") {
+                        toastr.error("Please enter reject reason.");
+                        return false;
+                    }
+                    $.ajax({
+                        type: "GET",
+                        url: "/Form/RejectedSampleRequest?id=" + id + "&reason=" + reason,
+                        dataType: "json",
+                        traditional: true,
+                        data: {},
+                        success: function (result) {
+                            window.location.reload(true);
+                        }
+                    });
+                } else {
+                    toastr.error("Your added sample is safe :)");
+                }
+            });
+    }
+</script>

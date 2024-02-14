@@ -1,0 +1,86 @@
+﻿@model List<Synzeal_Inventory.Models.WeeklySummaryModel>
+@{
+    
+    int loop = 1;
+}
+
+<div class="box-body form-horizontal" id="profrm" style="overflow:scroll">
+    @if (Model != null)
+    {
+        <div style="text-align: center; vertical-align: middle">
+            <h3><b>Quotation Summary</b></h3>
+        </div>
+        <table border="1" class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+            <thead>
+                <tr style="vertical-align: middle">
+                    <th width="6%" style="text-align: center; vertical-align: middle">
+                        #
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        Company
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        Quote ID
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        Product
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        CAS No
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        CAT No
+                    </th>
+                    @*<th width="" style="text-align: center;vertical-align: middle">
+                        Quantity Quoted
+                    </th>*@
+                    <th style="text-align: center;vertical-align: middle">
+                        Lead Time
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        Product Remarks
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        Export / Domestic
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model)
+                {
+                    <tr>
+                        <td class="" style="text-align:center; ">
+                            @loop
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Company
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.QuoteID
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Product
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.CASNo
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.CATNo
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.LeadTime
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.ProductRemarks
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.ExportDomestic
+                        </td>
+                    </tr>
+
+                    loop += 1;
+                }
+            </tbody>
+        </table>
+    }
+</div>

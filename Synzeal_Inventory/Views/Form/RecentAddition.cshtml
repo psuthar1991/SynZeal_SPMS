@@ -1,0 +1,133 @@
+﻿@{
+    ViewBag.Title = "Recent Addition";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model List<Synzeal_Inventory.Models.ProductModel>
+
+<style type="text/css">
+    .rowqty .redrowqty {
+        background: rgba(240, 128, 128, 0.28);
+    }
+
+    .letter {
+        padding: 8px;
+        background: #2e363f;
+        color: #fff;
+        font-size: 13px;
+        cursor: pointer;
+        width: 15px;
+        float: left;
+        margin: 2px 0.6%;
+        text-align: center;
+    }
+
+    th.ui-th-column div {
+        white-space: normal !important;
+        height: auto !important;
+        padding: 2px;
+    }
+
+    .showimage {
+        position: absolute;
+        left: 32%;
+        padding: 10px;
+        border: 5px solid #5c5c5c;
+        background: #fff;
+        margin-top: -1.5%;
+    }
+
+    .showSynonym {
+        position: absolute;
+        left: 25%;
+        padding: 10px;
+        border: 5px solid #5c5c5c;
+        background: #fff;
+        margin-top: -1.5%;
+    }
+
+    #loadapi .span2 {
+        background: #ef6718;
+        font-size: 14px;
+        color: #fff;
+        padding: 8px 5px;
+        margin: 2px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
+
+<div id="showimage">
+
+</div>
+<div class="container-fluid">
+    <div class="clearfix"></div>
+    <div style="font-size: 15px; text-align: right; color: red;padding-top:10px">
+        <a href="@Url.Action("ExportRecentAdditionList","Form")" class="btn btn-primary">Export Data</a>
+    </div>
+    <div class="tags_clear"></div>
+    <div id="invgrid" style="margin:15px;">
+        <table id="grid"></table>
+        <div id="pager"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    
+    $(document).ready(function () {
+        RecentAditionGrid();
+    });
+  
+</script>
+
+<style type="text/css">
+    .rowqty .redrowqty {
+        background: rgba(240, 128, 128, 0.28);
+    }
+
+    .letter {
+        padding: 8px;
+        background: #2e363f;
+        color: #fff;
+        font-size: 13px;
+        cursor: pointer;
+        width: 15px;
+        float: left;
+        margin: 2px 0.6%;
+        text-align: center;
+    }
+
+    th.ui-th-column div {
+        white-space: normal !important;
+        height: auto !important;
+        padding: 2px;
+    }
+
+    .showimage {
+        position: absolute;
+        left: 32%;
+        padding: 10px;
+        border: 5px solid #5c5c5c;
+        background: #fff;
+        margin-top: -1.5%;
+    }
+
+    .showSynonym {
+        position: absolute;
+        left: 25%;
+        padding: 10px;
+        border: 5px solid #5c5c5c;
+        background: #fff;
+        margin-top: -1.5%;
+    }
+
+    #loadapi .span2 {
+        background: #ef6718;
+        font-size: 14px;
+        color: #fff;
+        padding: 8px 5px;
+        margin: 2px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>

@@ -1,0 +1,69 @@
+﻿@model List<Synzeal_Inventory.Entity.SZ_TempQuickAdd>
+
+@if (Model.Count > 0)
+{
+    foreach (var item in Model)
+    {
+        <tr class="trquickadd">
+            <td>
+                @item.CatNo
+            </td>
+            <td>
+                @item.CasNo
+            </td>
+            <td>
+                @item.ProductName
+            </td>
+            <td>
+                @Html.DropDownList("scientistid_" + item.Id, (IEnumerable<SelectListItem>)ViewBag.listScientist, new { @class = "form-control clsScientist" })
+            </td>
+            <td>
+                <input type="text" id="qty_@item.Id" name="qty_@item.Id" value="@item.Qty" class="clsQty" />
+            </td>
+            <td>
+                <a href="javascript:void(0)" onclick="deleteQuickAdd('@item.Id')"> Delete</a>
+            </td>
+        </tr>
+    }
+
+}
+else
+{
+    <tr>
+        <td colspan="5">No Data Found</td>
+    </tr>
+}
+<script type="text/javascript">
+    function deleteQuickAdd(id)
+    {
+    swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this product!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+        closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Form/DeleteQuickAdd?id=" + id,
+                        data: {},
+                        success: function (results) {
+                            if (results.success) {
+    toastr.success("Product has been deleted.");
+                                setTimeout(function () { window.location.reload(true); }, 2000);
+                            }
+                        }
+                    });
+
+                } else {
+    toastr.error('Your added product is safe.');
+                }
+            });
+    }
+</script>

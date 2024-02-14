@@ -1,0 +1,164 @@
+﻿@{
+    ViewBag.Title = "RecentProductSubmit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    #example1 input {
+        border: 0px;
+    }
+</style>
+<section class="content-header">
+    <h1>
+        Recent Product Submission
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <div class="box-body" style="overflow: scroll;" id="divProj">
+                    <div style="    height: 40px;text-align: right;font-weight: bold;">
+                        Filter Last Week : <select id="filterby">
+                            <option value="">All</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Sr No</th>
+                                <th>Product Name</th>
+                                <th>CAS No</th>
+                                <th>CAT No</th>
+                                <th>Batch No</th>
+                                <th>Quantity Demanded</th>
+                                <th>Team leader</th>
+                                <th> Dt of Submission</th>
+                                @*<th>Quantity Submitted</th>
+        <th>Team leader</th>
+        <th> Dt of Submission</th>
+        <th>Current Status</th>*@
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    $(function () {
+        $("#filterby").change(function () {
+            var value = $(this).val();
+            if (value === '') {
+                $('#example1').DataTable().search("").draw();
+            }
+            else {
+                $('#example1').DataTable().search("Last Week " + value).draw();
+            }
+        });
+
+        $('#example1').DataTable({
+            "ordering": false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "orderMulti": false, // for disable multiple column at once
+            "pageLength": 25,
+            "fnDrawCallback": function (oSettings) {
+                $("#selectAllclsMoveDispatch").click(function () {
+                    if ($(this).is(":checked")) {
+                        $('.clsMoveDispatch').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $(".clsMoveDispatch").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+                $("#selectAllclsSaverow").click(function () {
+                    if ($(this).is(":checked")) {
+                        $('.clsSaverow').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $(".clsSaverow").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+
+            },
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "initComplete": function (settings, json) {
+                $(document).on("change", ".addbatch", function () {
+                    var $this = $(this);
+                    var value = $(this).children("option:selected").attr('data-value');
+                    $.ajax({
+                        url: '/Form/GetInfoByBatchNo?batchno=' + value,
+                        data: {},
+                        type: 'GET',
+                        success: function (data) {
+                            if (data.Id != 0) {
+                                $("#scname_" + data.ProductId).text(data.ScientistName);
+                                $("#dtsubmisstion_" + data.ProductId).text(ConvertJSONDate(data.CreatedDate));
+                                $("#reqqty_" + data.ProductId).text(data.ReqQty);
+                            }
+                            else {
+                                $this.parent().next().find('span').text('')
+                                $this.parent().next().next().find('span').text('')
+                                $this.parent().next().next().next().find('span').text('')
+                            }
+                        },
+                        error: function (e) {
+
+                        }
+                    });
+                });
+            },
+            "ajax": {
+                "url": "../Form/LoadRecentProductData",
+                "type": "POST",
+                "datatype": "json"
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.MoveToInvoice === true) {
+                    $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                }
+            },
+            "columnDefs": [],
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                $(row).children()[0].innerText = dataIndex + 1;
+            },
+            "columns": [
+                { "data": "SrPo", "width": "3%" },
+                { "data": "ProductName", "width": "18%" },
+                { "data": "CASNo", "name": "CASNo", "width": "6%" },
+                { "data": "CATNo", "name": "CATNo", "width": "6%" },
+                { "data": "AdditionalBatchNoText", "name": "AdditionalBatchNoText", "autoWidth": true },
+                { "data": "RequiredQty", "name": "RequiredQty", "autoWidth": true },
+                { "data": "ScientistName", "name": "ScientistName", "autoWidth": true },
+                { "data": "MoveProjectDateText", "name": "MoveProjectDateText", "autoWidth": true }
+            ]
+
+        });
+
+    });
+
+</script>

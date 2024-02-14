@@ -1,0 +1,1980 @@
+﻿@{
+    ViewBag.Title = "Performa Invoice";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isQuoteViewOnly = Convert.ToBoolean(ViewBag.IsQuoteViewOnly);
+    bool isCulbQuotationValue = Convert.ToBoolean(ViewBag.IsClubQuote);
+
+    var BillAddress = Convert.ToString(ViewBag.BillAddress);
+    var ShipAddress = Convert.ToString(ViewBag.ShipAddress);
+}
+@model Synzeal_Inventory.Entity.SZ_PerformaInvoice
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js" integrity="sha512-GDey37RZAxFkpFeJorEUwNoIbkTwsyC736KNSYucu1WJWFK9qTdzYub8ATxktr6Dwke7nbFaioypzbDOQykoRg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css" integrity="sha512-63+XcK3ZAZFBhAVZ4irKWe9eorFG0qYsy2CaM5Z+F3kUn76ukznN0cp4SArgItSbDFD1RrrWgVMBY9C/2ZoURA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style type="text/css">
+    #batchTbl, #priceTbl {
+        margin: 0 10px;
+        width: 60%;
+    }
+
+#batchTbl th, #batchTbl tr td, #priceTbl th, #priceTbl tr td {
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #3c8dbc;
+}
+
+        #batchTbl th, #priceTbl th {
+            background: #3c8dbc;
+            color: #fff;
+        }
+
+    #profrm .col-sm-8 {
+        padding-top: 7px;
+    }
+
+    #dvTempProductList .protempdet {
+        height: 1%;
+        overflow: hidden;
+        padding: 4px 0;
+        margin: -1px 0 0;
+    }
+
+        #dvTempProductList .protempdet + .protempdet {
+            border-top: 1px solid #3c8dbc;
+        }
+
+    #dvTempProductList .form-group {
+        margin-bottom: 0px;
+    }
+
+    #Emailautocomplete-list {
+        position: absolute !important;
+    }
+</style>
+<section class="content-header">
+    <h1>
+        Proforma Invoice
+
+        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+
+        @if (Model.Id != 0)
+        {
+            <span style="color: darkgreen;font-weight: bold;">(Ref # @Model.PerformaInvoiceNo)</span>
+        }
+        @if (!string.IsNullOrEmpty(Model.CreatedBy))
+        {
+            <span style="color: blue;font-weight: bold;font-size:11px">Created By @Model.CreatedBy</span>
+        }
+        @if (Model.CreatedDate != null && Model.CreatedDate != DateTime.MinValue)
+        {
+            <span style="color: blue;font-weight: bold;font-size:11px">on @Model.CreatedDate</span>
+        }
+
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <!-- left column -->
+        <div id="expandicon" style="display:none">
+            <i class="fa fa-bars" style="background:#3c8dbc; padding:5px 10px; font-size:22px;" onclick="expandCollapse(false)"></i>
+        </div>
+        <div class="col-md-12" id="leftsidediv">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Performa Invoice Details <p class="pull-right" style=" font-size: 14px; float: right; margin-left: 56px; color: #065dfb; text-transform: capitalize;">@TempData["Quotation"]</p></h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <!-- form start -->
+
+                <div class="box-body">
+
+                    <div class="form-group col-md-3">
+                        <input type="hidden" id="isClubQuote" name="isClubQuote" value="@isCulbQuotationValue.ToString()" />
+                        <input type="hidden" id="QuoteId" name="QuoteId" value="0" />
+                        <input type="hidden" id="UniqueId" name="UniqueId" value="@Guid.NewGuid()" />
+                        @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.listCompItems, new { @class = "form-control", @style = "width:90%; float:left" })
+
+                        <i class="fa fa-plus-square" style="float: left;margin-left: 3%;margin-top: 8px;font-size: 19px;" onclick="addcompanypopup()"></i>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <input type="text" class="form-control" id="PerformaInvoiceNo" name="PerformaInvoiceNo" placeholder="Invoice No" autocomplete="Off" value="@Model.PerformaInvoiceNo" required>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <input type="text" class="form-control" id="CustomerPoNo" name="CustomerPoNo" placeholder="Customer Po No" autocomplete="off" required>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <input type="text" class="form-control" id="PerformaInvoiceDate" name="PerformaInvoiceDate" placeholder="Performa Invoice Date" autocomplete="off">
+                    </div>
+                    <div class="form-group col-md-1">
+                        @Html.DropDownList("Currency", (IEnumerable<SelectListItem>)ViewBag.listItemscurrency, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group col-md-2">
+                        @Html.DropDownList("PaymentTerm", (IEnumerable<SelectListItem>)ViewBag.listPaymentTermsItems, new { @class = "form-control", @datavalue = Model.TermsId, @style = "width:100%; float:left" })
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="box-body">
+
+                    <div class="form-group col-md-3">
+                        <label>Billing</label>
+                        @Html.DropDownList("ddlBillingAddress", (IEnumerable<SelectListItem>)ViewBag.billingaddressItems, new { @class = "form-control", @style = "width:100%; float:left" })
+
+                        <input type="text" class="form-control" id="BillCompanyName" name="BillCompanyName" placeholder="Bill Company Name" autocomplete="off">
+                        <br />
+                        <textarea id="BillAddress" name="BillAddress" class="form-control"></textarea>
+                        <input type="hidden" id="hdnbillingaddress" value="@BillAddress" />
+                        <br />
+                        @Html.DropDownList("BillCountry", (IEnumerable<SelectListItem>)ViewBag.CountryList, Model.BillCountry, new { @class = "form-control" })
+                        <br />
+                        <input type="text" class="form-control" id="BillTelno" name="BillTelno" placeholder="Billing Tel. No" autocomplete="off">
+                        <br />
+                        <input type="text" class="form-control" id="BillGSTNo" name="BillGSTNo" placeholder="Billing GST No" autocomplete="off">
+
+                        <input type="hidden" id="BillAddressId" name="BillAddressId" value="@Model.BillAddressId" />
+                        <input type="hidden" id="ShipAddressId" name="ShipAddressId" value="@Model.ShipAddressId" />
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>Shipping</label>
+                        @Html.DropDownList("ddlShippingAddress", (IEnumerable<SelectListItem>)ViewBag.shippingaddressItems, new { @class = "form-control", @style = "width:100%; float:left" })
+                        <input type="text" class="form-control" id="ShipCompanyName" name="ShipCompanyName" placeholder="Ship Company Name" autocomplete="off">
+                        <br />
+                        <textarea id="ShipAddress" name="ShipAddress" class="form-control"></textarea>
+                        <input type="hidden" id="hdnshippingaddress" value="@ShipAddress" />
+                        <br />
+                        @Html.DropDownList("ShipCountry", (IEnumerable<SelectListItem>)ViewBag.CountryList, Model.ShipCountry, new { @class = "form-control" })
+                        <br />
+                        <input type="text" class="form-control" id="ShipTelno" name="ShipTelno" placeholder="Shipping Tel. No" autocomplete="off">
+                        <br /><input type="text" class="form-control" id="ShipGSTNo" name="ShipGSTNo" placeholder="Shipping GST No" autocomplete="off">
+                    </div>
+                    <div class="form-group col-md-3">
+                        @Html.DropDownList("Courier", (IEnumerable<SelectListItem>)ViewBag.listItemscourier, new { @class = "form-control" })<br />
+                        <input type="text" class="form-control" id="GrossWeight" name="GrossWeight" placeholder="Gross Weight" autocomplete="off"> <br />
+                        <input type="text" class="form-control" id="NetWeight" name="NetWeight" placeholder="Net Weight" autocomplete="off"> <br />
+                        <input type="text" class="form-control" id="HSNCode" name="HSNCode" placeholder="HSN Code" autocomplete="off">
+                        <input type="password" style="display:none; margin-top:20px" class="form-control" id="SecurityCode" name="SecurityCode" placeholder="Validate Code" autocomplete="off">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <input type="text" class="form-control" id="ShippingCost" name="ShippingCost" placeholder="Shipping Cost" autocomplete="off"> <br />
+
+                        <input type="text" class="form-control" id="Incoterm" name="Incoterm" placeholder="Incoterm" autocomplete="off"> <br />
+                        <input type="text" class="form-control" id="PortOfDischarge" name="PortOfDischarge" placeholder="Port Of Discharge" autocomplete="off">
+                        <br />
+                        <input type="radio" id="fltgst" name="fltgst" value="CGST" /> (CGST/SGST) &nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="radio" id="fltgst" name="fltgst" value="IGST" /> IGST
+
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <div style="text-align:right">
+                        <button type="button" class="btn btn-primary" id="btnsave" onclick="Quote.savePI(false)">Save</button>
+                        <button type="button" class="btn btn-primary" id="btnpdf" onclick="Quote.savePI(true)">PDF </button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.box -->
+        </div>
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary" id="step1">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Added Product List</h3>
+                </div>
+                <div class="clearfix"></div>
+                <!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body">
+                    <form role="form" id="dvTempProductList">
+                        <div class="box-body">
+                            <div style="text-align: center;color: lightgray;font-size: 36px;">
+                                <i class="fa fa-database" style="font-size:120px;"></i> <br />No Products Found!!!
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- /.row -->
+</section>
+<style>
+    .attachitems {
+        padding: 10px 10px 10px 15px;
+        background: #ececec;
+        margin: 5px;
+        border-radius: 6px;
+    }
+    .clsisControlled{
+        color:red;
+    }
+</style>
+<script type="text/javascript">
+
+    Quote.LoadClubPIData();
+
+    function stepmove(step) {
+        $('html, body').animate({
+            scrollTop: $("#" + step).offset().top
+        }, 1000);
+    }
+    function removeattachment(filename) {
+        $('.attachitems').each(function () {
+            if (filename === $(this).attr("data-filename")) {
+                $(this).remove();
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $('#QuotePDF').on('change', function (e) {
+            var files = e.target.files;
+            //var myID = 3; //uncomment this to make sure the ajax URL works
+            if (files.length > 0) {
+                if (window.FormData !== undefined) {
+                    var data = new FormData();
+                    for (var x = 0; x < files.length; x++) {
+                        data.append("file" + x, files[x]);
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/Form/UploadFiles',
+                        contentType: false,
+                        processData: false,
+                        data: data,
+                        success: function (result) {
+                            $("#txtquotepdf").val(result);
+                        },
+                        error: function (xhr, status, p3, p4) {
+                            var err = "Error " + " " + status + " " + p3 + " " + p4;
+                            if (xhr.responseText && xhr.responseText[0] == "{")
+                                err = JSON.parse(xhr.responseText).Message;
+                            console.log(err);
+                        }
+                    });
+                } else {
+                    alert("This browser doesn't support HTML5 file uploads!");
+                }
+            }
+        });
+        $('#txtUploadFile').on('change', function (e) {
+            var files = e.target.files;
+            //var myID = 3; //uncomment this to make sure the ajax URL works
+            if (files.length > 0) {
+                if (window.FormData !== undefined) {
+                    var data = new FormData();
+                    for (var x = 0; x < files.length; x++) {
+                        data.append("file" + x, files[x]);
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/Form/UploadFiles',
+                        contentType: false,
+                        processData: false,
+                        data: data,
+                        success: function (result) {
+                            $("#multiimagediv").append('<div class="attachitems" data-filename="' + result + '"><a href="/Content/Attachment/' + result + '" target="_blank">' + result + '</a><i class="fa fa-remove" style="float: right;color: red;margin-top: 5px;" onclick="removeattachment(\'' + result + '\')"></i></div>');
+                        },
+                        error: function (xhr, status, p3, p4) {
+                            var err = "Error " + " " + status + " " + p3 + " " + p4;
+                            if (xhr.responseText && xhr.responseText[0] == "{")
+                                err = JSON.parse(xhr.responseText).Message;
+                            console.log(err);
+                        }
+                    });
+                } else {
+                    alert("This browser doesn't support HTML5 file uploads!");
+                }
+            }
+        });
+        $("#divFullscreen").click(function () {
+            $("#dvTempProductList").fullscreen();
+        });
+
+        $("input[name='productsRadios']").change(function () {
+            var value = $(this).val();
+            if (value === "new") {
+                $("#dvNewProduct").show();
+                $(".dvFromDb").hide();
+            }
+            else {
+                $(".dvFromDb").show();
+                $("#dvNewProduct").hide();
+            }
+        });
+
+        //$("#ProductName").autocomplete({
+        //    source: function (request, response) {
+        //        $.ajax({
+        //            url: "/Form/GetProduct",
+        //            dataType: "json",
+        //            data: {
+        //                term: request.term
+        //            },
+        //            success: function (data) {
+        //                var items = [];
+        //                $.each(data, function (key, val) {
+        //                    var obj = {
+        //                        "value": val.Name,
+        //                        "id": val.id,
+        //                        "label": val.Name,
+        //                    };
+        //                    items.push(obj);
+        //                });
+        //                response(items);
+        //            }
+        //        });
+        //    },
+        //    minLength: 1,
+        //    select: function (event, ui) {
+        //    }
+        //});
+
+        $(document).on("focus", "#tblalready td", function () {
+            $('#tblalready').find('td').removeClass('addcolorbg');
+            $('#tblalready').find('tr').removeClass('addcolorgreybg');
+            $(this).addClass('addcolorbg');
+            $(this).parent('tr').addClass('addcolorgreybg');
+        });
+        $(document).on("focus", "#tbltempproduct td", function () {
+            $('#tbltempproduct').find('td').removeClass('addcolorbg');
+            $('#tbltempproduct').find('tr').removeClass('addcolorgreybg');
+            $(this).addClass('addcolorbg');
+            $(this).parent('tr').addClass('addcolorgreybg');
+        });
+    });
+</script>
+<style>
+    .addcolorbg {
+        background: #72a4c1;
+    }
+
+    .addcolorgreybg {
+        background: lightgrey !important;
+    }
+
+        .addcolorgreybg a {
+            color: #fff;
+        }
+
+    .addcolorbg a {
+        color: #fff;
+    }
+</style>
+@if (Model.Id > 0)
+{
+    <text>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $("#QuoteId").val('@Model.Id');
+                $("#CompanyName").val('@Model.BillCompanyName');
+                $("#TermsId").val('@Model.TermsId');
+                $("#GrossWeight").val('@Model.GrossWeight');
+                $("#NetWeight").val('@Model.NetWeight');
+                $("#HSNCode").val('@Model.HSNCode');
+                $("#Currency").val('@Model.Currency');
+                $("#Incoterm").val('@Model.Incoterm');
+                $("#PerformaInvoiceNo").val('@Model.PerformaInvoiceNo');
+                $("#CustomerPoNo").val('@Model.CustomerPoNo');
+                $("#PerformaInvoiceDate").val('@Model.PerformaInvoiceDate');
+                $("#PerformaInvoiceDate").attr('data-value','@Model.PerformaInvoiceDate');
+                $("#PaymentTerm").val('@Model.TermsId');
+                $("#BillCompanyName").val('@Model.BillCompanyName');
+                $("#BillTelno").val('@Model.BillTelno');
+                $("#BillGSTNo").val('@Model.BillGSTNo');
+                $("#ShipCompanyName").val('@Model.ShipCompanyName');
+                $("#ShipTelno").val('@Model.ShipTelno');
+                $("#ShipGSTNo").val('@Model.ShipGSTNo');
+                $("#Incoterm").val('@Model.Incoterm');
+                $("#ShippingCost").val('@Model.ShippingCost');
+                $("#PortOfDischarge").val('@Model.PortOfDischarge');
+                $("#BillAddress").val($("#hdnbillingaddress").val());
+                $("#ShipAddress").val($("#hdnshippingaddress").val());
+
+                var dateValue = $("#PerformaInvoiceDate").attr('data-value');
+                if (dateValue !== '') {
+                    dateValue = dateValue.toString().replace(' 00:00:00', '');
+                    $("#PerformaInvoiceDate").datepicker("setDate", dateValue);
+                }
+                if ('@Model.IsIGST' === 'True') {
+                    $("input[name=fltgst][value='IGST']").prop("checked", true);
+                }
+                else if ('@Model.IsIGST' === 'False') {
+                    $("input[name=fltgst][value='CGST']").prop("checked", true);
+                }
+            });
+        </script>
+    </text>
+}
+else
+{
+    <script>
+        $("#rightsidediv").hide();
+        $("#rightsidedivcolmd6").hide();
+        $("#rightsidediv *").attr("disabled", "disabled").off('click');
+        $("#rightsidedivcolmd6 *").attr("disabled", "disabled").off('click');
+        $("#btnmail").hide();
+        $('#IsCOA').attr('checked', true);
+        $('#IsImageAttach').attr('checked', true);
+        $('#IsAnalyticalData').attr('checked', true);
+    </script>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('input[name=productsRadios]').each(function () {
+            var value = $(this).val();
+            if (value === "db") {
+                $(this).click();
+            }
+        });
+
+        var dateValue = $("#PerformaInvoiceDate").attr('data-value');
+        if (dateValue !== '' && dateValue !== undefined) {
+            dateValue = dateValue.toString().replace(' 00:00:00', '');
+            $("#PerformaInvoiceDate").datepicker("setDate", dateValue);
+        }
+
+    });
+</script>
+<style type="text/css">
+    .autocomplete {
+        /*the container must be positioned relative:*/
+        position: relative;
+        display: inline-block;
+    }
+
+    input {
+        border: 1px solid transparent;
+        background-color: #f1f1f1;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+        input[type=text], input[type=number] {
+            background-color: #f1f1f1;
+            width: 100%;
+        }
+
+        input[type=submit] {
+            background-color: DodgerBlue;
+            color: #fff;
+        }
+
+    .autocomplete-items {
+        position: relative;
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 99;
+        /*position the autocomplete items to be the same width as the container:*/
+        top: 100%;
+        left: 0;
+        right: 0;
+    }
+
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
+
+            .autocomplete-items div:hover {
+                /*when hovering an item:*/
+                background-color: #e9e9e9;
+            }
+
+    .autocomplete-active {
+        /*when navigating through the items using the arrow keys:*/
+        background-color: DodgerBlue !important;
+        color: #ffffff;
+    }
+</style>
+
+<script type="text/javascript">
+    $('#PerformaInvoiceDate').datepicker({
+        format: 'dd/mm/yyyy',
+        onSelect: function (dateText, inst) {
+
+        }
+    })
+
+    function autocomplete(inp, arr) {
+        /*the autocomplete function takes two arguments,
+        the text field element and an array of possible autocompleted values:*/
+        var currentFocus;
+        /*execute a function when someone writes in the text field:*/
+        inp.addEventListener("input", function (e) {
+            var a, b, i, val = this.value;
+            /*close any already open lists of autocompleted values*/
+            closeAllLists();
+            if (!val) { return false; }
+            currentFocus = -1;
+            /*create a DIV element that will contain the items (values):*/
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            /*append the DIV element as a child of the autocomplete container:*/
+            this.parentNode.appendChild(a);
+            /*for each item in the array...*/
+            for (i = 0; i < arr.length; i++) {
+                /*check if the item starts with the same letters as the text field value:*/
+                if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                    /*create a DIV element for each matching element:*/
+                    b = document.createElement("DIV");
+                    /*make the matching letters bold:*/
+                    b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                    b.innerHTML += arr[i].substr(val.length);
+                    /*insert a input field that will hold the current array item's value:*/
+                    b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                    /*execute a function when someone clicks on the item value (DIV element):*/
+                    b.addEventListener("click", function (e) {
+
+                        /*insert the value for the autocomplete text field:*/
+                        inp.value = this.getElementsByTagName("input")[0].value;
+
+                        GetCompanyDetailsFromEmail(inp.value);
+
+                        /*close the list of autocompleted values,
+                        (or any other open lists of autocompleted values:*/
+                        closeAllLists();
+                    });
+                    a.appendChild(b);
+                }
+            }
+        });
+        /*execute a function presses a key on the keyboard:*/
+        inp.addEventListener("keydown", function (e) {
+            var x = document.getElementById(this.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+                /*If the arrow DOWN key is pressed,
+                increase the currentFocus variable:*/
+                currentFocus++;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 38) { //up
+                /*If the arBillAddressIdressIdessId is pressed,
+                decrease the currentFocus variable:*/
+                currentFocus--;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 13) {
+                /*If the ENTER key is pressed, prevent the form from being submitted,*/
+                e.preventDefault();
+                if (currentFocus > -1) {
+                    /*and simulate a click on the "active" item:*/
+                    if (x) x[currentFocus].click();
+                }
+            }
+        });
+        inp.addEventListener("focus", function (e) {
+            var a, b, i, val = this.value;
+            /*close any already open lists of autocompleted values*/
+            closeAllLists();
+            //if (!val) { return false; }
+            currentFocus = -1;
+            /*create a DIV element that will contain the items (values):*/
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            /*append the DIV element as a child of the autocomplete container:*/
+            this.parentNode.appendChild(a);
+            /*for each item in the array...*/
+            for (i = 0; i < arr.length; i++) {
+                /*check if the item starts with the same letters as the text field value:*/
+                if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                    /*create a DIV element for each matching element:*/
+                    b = document.createElement("DIV");
+                    /*make the matching letters bold:*/
+                    b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                    b.innerHTML += arr[i].substr(val.length);
+                    /*insert a input field that will hold the current array item's value:*/
+                    b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                    /*execute a function when someone clicks on the item value (DIV element):*/
+                    b.addEventListener("click", function (e) {
+
+                        /*insert the value for the autocomplete text field:*/
+                        inp.value = this.getElementsByTagName("input")[0].value;
+                        /*close the list of autocompleted values,
+                        (or any other open lists of autocompleted values:*/
+                        closeAllLists();
+                    });
+                    a.appendChild(b);
+                }
+            }
+        });
+        function addActive(x) {
+            /*a function to classify an item as "active":*/
+            if (!x) return false;
+            /*start by removing the "active" class on all items:*/
+            removeActive(x);
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = (x.length - 1);
+            /*add class "autocomplete-active":*/
+            x[currentFocus].classList.add("autocomplete-active");
+        }
+        function removeActive(x) {
+            /*a function to remove the "active" class from all autocomplete items:*/
+            for (var i = 0; i < x.length; i++) {
+                x[i].classList.remove("autocomplete-active");
+            }
+        }
+        function closeAllLists(elmnt) {
+            /*close all autocomplete lists in the document,
+            except the one passed as an argument:*/
+            var x = document.getElementsByClassName("autocomplete-items");
+            for (var i = 0; i < x.length; i++) {
+                if (elmnt != x[i] && elmnt != inp) {
+                    x[i].parentNode.removeChild(x[i]);
+                }
+            }
+        }
+
+        document.addEventListener("click", function (e) {
+            closeAllLists(e.target);
+        });
+    }
+
+    // autocomplete(document.getElementById("PONumber"), countries);
+
+    $("#CompanyId").change(function () {
+    /*Quote.getCompInformation($(this).val());*/
+
+        getBillingandShippingAddress();
+
+    });
+
+
+    $("#CompanyId option").each(function () {
+        var text = $(this).text();
+        if (text.indexOf("True") !== -1) {
+            $(this).attr('class', 'red');
+        }
+        $(this).text($(this).text().replace("True", "").replace("False", ""))
+    });
+
+    function getBillingandShippingAddress() {
+        var companyId = $("#CompanyId").val();
+
+        $.ajax({
+            url: "/Form/GetCompanyBillingandShippingAddress/" + companyId ,
+            dataType: "json",
+            data: {},
+            success: function (data) {
+                var strbill = "";
+                $(data.billingAddress).each(function (i,v) {
+                    strbill += "<option value='" + v.Value + "'>" + v.Text +"</option>";
+                });
+                $("#ddlBillingAddress").html(strbill)
+
+
+                var strship = "";
+                $(data.shippingAddress).each(function (i, v) {
+                    strship += "<option value='" + v.Value + "'>" + v.Text + "</option>";
+                });
+                $("#ddlShippingAddress").html(strship)
+            }
+        });
+    }
+
+    /*GetAllEmail();*/
+    function GetAllEmail() {
+        $.ajax({
+            url: "/Form/GetAllEmail",
+            dataType: "json",
+            data: {},
+            success: function (data) {
+                autocomplete(document.getElementById("Email"), data);
+            }
+        });
+    }
+
+    $(document).on('keyup', '.clsalreadyprice', function (event) {
+        var db = [];
+        $(".clsalreadyprice").each(function () {
+            if ($(this).val() !== "" && (db.indexOf($(this).val()) === -1)) {
+                db.push($(this).val());
+            }
+        });
+
+        var id = $(this).attr('id');
+        autocomplete(document.getElementById(id), db);
+    });
+
+
+    function GetAllEmailByCompanyId(compId) {
+        $.ajax({
+            url: "/Form/GetAllEmailByCompanyId",
+            dataType: "json",
+            data: {
+                compId: compId
+            },
+            success: function (data) {
+                autocomplete(document.getElementById("Email"), data);
+            }
+        });
+    }
+
+    function GetCompanyDetailsFromEmail(email) {
+        $.ajax({
+            url: "/Form/GetCompanyDetailsFromEmail",
+            dataType: "json",
+            data: {
+                email: email
+            },
+            success: function (data) {
+                if (data.length > 0) {
+                    $("#CompanyId").val(data[0]);
+                    GetAllEmailByCompanyId(data[0]);
+                    Quote.getCompInformation(data[0]);
+                }
+            }
+        });
+    }
+
+    function expandCollapse(expand) {
+        if (expand) {
+            $('#leftsidediv').css('display', 'none');
+            $('#rightsidediv').addClass('col-md-12');
+            $('#rightsidediv').removeClass('col-md-9');
+            $('#expandicon').css('display', 'block');
+        }
+        else {
+            $('#leftsidediv').css('display', 'block');
+            $('#rightsidediv').addClass('col-md-9');
+            $('#rightsidediv').removeClass('col-md-12');
+            $('#expandicon').css('display', 'none');
+        }
+    }
+    function editallalreadyProduct() {
+        $('#tblalready > tbody').find('tr').each(function () {
+            $(this).find('label').hide();
+            $(this).find('input').show();
+        });
+
+        $('#tblalready > tbody').find('.clshistory').each(function () {
+            $(this).find('label').show();
+            $(this).find('input').hide();
+        });
+    }
+
+    function addcompanypopup() {
+        $.ajax({
+            url: '/Form/AddNewCompanyPopup',
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#myModal').find('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $('#myModal').find(".modal-dialog").css("width", "1080px");
+                $('#myModal').find('.modal-body').find(".box-body").css('overflow', 'scroll').css('height', '400px');
+                $("#tblrfqcompselection").DataTable();
+            }
+        });
+    }
+
+    function deleteallalreadyProduct() {
+        var count = 1;
+        var forloopcnt = 0;
+        $('.delclass').each(function () {
+            if ($(this).is(":checked")) {
+                forloopcnt += 1;
+            }
+        });
+
+        if (forloopcnt === 0) {
+            toastr.error("Please select product");
+            return false;
+        }
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this product!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+
+                    $('.delclass').each(function () {
+                        if ($(this).is(":checked")) {
+                            var quoteId = $("#QuoteId").val();
+                            var id = $(this).val();
+                            var obj = {
+                                id: id
+                            };
+                            if (id != undefined) {
+
+                                $.ajax({
+                                    url: "/Form/DeleteProductFromQuoteDetails?id=" + id,
+                                    //url: '/Form/UpdateProductInfo?ProductName=' + productname + '&casno=' + casno + '&catNo=' + catno + '&price=' + price.toString() + '&leadtime=' + leadtime + '&id=' + id,
+                                    data: JSON.stringify({ model: obj }),
+                                    type: 'POST',
+                                    contentType: "application/json; charset=utf-8",
+                                    success: function (data) {
+                                        if (data.success) {
+                                            //  Quote.getProductListForQuote(quoteId);
+                                            //window.location.href = "/Form/Quotation/" + quoteId;
+                                        }
+                                    },
+                                    complete: function (data) {
+                                        successAlert(count, forloopcnt, quoteId);
+                                        count += 1;
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+
+
+                } else {
+                    toastr.error("Your added product is safe :)");
+                }
+            });
+    }
+
+    function deletePIalreadyProduct() {
+        var count = 1;
+        var forloopcnt = 0;
+        $('.delclass').each(function () {
+            if ($(this).is(":checked")) {
+                forloopcnt += 1;
+            }
+        });
+
+        if (forloopcnt === 0) {
+            toastr.error("Please select product");
+            return false;
+        }
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this product!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $('.delclass').each(function () {
+                        if ($(this).is(":checked")) {
+                           var id = $(this).val();
+                            var obj = {
+                                id: id
+                            };
+                            if (id != undefined) {
+                                $.ajax({
+                                    url: "/Form/DeletePIProduct?id=" + id,
+                                    data: JSON.stringify({ model: obj }),
+                                    type: 'POST',
+                                    contentType: "application/json; charset=utf-8",
+                                    success: function (data) {
+                                        if (data.success) {
+                                            //  Quote.getProductListForQuote(quoteId);
+                                            //window.location.href = "/Form/Quotation/" + quoteId;
+                                        }
+                                    },
+                                    complete: function (data) {
+                                        successTempAlert(count, forloopcnt, $("#Id").val());
+                                        count += 1;
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+
+
+                } else {
+                    toastr.error("Your added product is safe :)");
+                }
+            });
+    }
+
+    function synthesisProduct(isPurchase) {
+
+        var count = 1;
+        var forloopcnt = 0;
+        $('.synthesislogclass').each(function () {
+            if ($(this).is(":checked")) {
+                forloopcnt += 1;
+            }
+        });
+
+        $('.synthesislogclass').each(function () {
+            if ($(this).is(":checked")) {
+                var quoteId = $("#QuoteId").val();
+                var id = $(this).val();
+                var obj = {
+                    id: id
+                };
+                if (id != undefined) {
+
+                    $.ajax({
+                        url: '/Form/SaveSynthesisLog',
+                        //url: '/Form/UpdateProductInfo?ProductName=' + productname + '&casno=' + casno + '&catNo=' + catno + '&price=' + price.toString() + '&leadtime=' + leadtime + '&id=' + id,
+                        data: JSON.stringify({ model: obj }),
+                        type: 'POST',
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            if (data.success) {
+                                //  Quote.getProductListForQuote(quoteId);
+                                //window.location.href = "/Form/Quotation/" + quoteId;
+                            }
+                        },
+                        complete: function (data) {
+                            successAlert(count, forloopcnt, quoteId);
+                            count += 1;
+                        }
+                    });
+                }
+            }
+        });
+
+    }
+
+    var isCOADownloadWithQuote = false;
+    function myTrim(x) {
+        return x.replace(/^\s+|\s+$/gm, '');
+    }
+    function saveallalreadyProduct(isCOA) {
+        isCOADownloadWithQuote = isCOA;
+        var count = 1;
+        var forloopcnt = parseInt($('#tblalready').find('tbody').find('tr').length);
+        if ($("input[name='LayoutType']:checked").val() === "Standard") {
+            forloopcnt = parseInt($('#tblalready').find('tbody').find('tr').length) - 1;
+        }
+        var mainModel = [];
+        $('#tblalready').find('tr').each(function () {
+            var id = $(this).attr("data-id");
+            var quoteId = $(this).attr("data-quoteid");
+            var productname = $("#productname_" + id).val();
+            var price = $("#price_" + id).val();
+            var finalprice = $("#finalprice_" + id).val();
+            var casno = $("#casno_" + id).val();
+            var catno = $("#catno_" + id).val();
+            var leadtime = $("#leadtime_" + id).val();
+            var displayorder = $("#displayorder_" + id).val();
+            var productremark = $("#productremark_" + id).val();
+            var estimateDispatchDate = $("#estimateDispatchDate_" + id).val();
+            var synthesislog = $("#synthesislog_" + id).is(':checked');
+            var batchno = $("#batchno_" + id).val();
+            var isClubQuote = $("#isClubQuote").val();
+            var countryType = $("input[name='CountryType']:checked").val();
+            var discount = "";
+            var currency = "";
+            if (countryType === "Export") {
+                currency = "USD";
+            }
+            else {
+                currency = "INR";
+            }
+
+            if ($("#Currency").val() !== '' && $("#Currency").val() !== null && $("#Currency").val() !== undefined) {
+                currency = $("#Currency").val();
+            }
+
+            if ($("input[name='LayoutType']:checked").val() === "Standard") {
+                var str = [];
+                var mg1 = $("#pricemg_1_" + id).val();
+                var mg2 = $("#pricemg_2_" + id).val();
+                var mg3 = $("#pricemg_3_" + id).val();
+                var mg4 = $("#pricemg_4_" + id).val();
+                var mg5 = $("#pricemg_5_" + id).val();
+                var ps1 = $("#packsize_1_" + id).val();
+                var ps2 = $("#packsize_2_" + id).val();
+                var ps3 = $("#packsize_3_" + id).val();
+                var ps4 = $("#packsize_4_" + id).val();
+                var ps5 = $("#packsize_5_" + id).val();
+                if (mg1 !== '' && mg1 !== undefined) {
+                    var label = mg1.trim() + ' mg&#64;' + $("#price_1_" + id).val() + ' ' + currency;
+                    if (ps1 !== null && ps1 !== undefined && ps1.trim() !== "") {
+                        label += ' X ' + ps1 + ' = ' + parseFloat($("#price_1_" + id).val()) * parseFloat(ps1) + ' ' + currency;
+                    }
+                    str.push(label);
+                }
+                if (mg2 !== '' && mg2 !== undefined) {
+                    var label = mg2.trim() + ' mg&#64;' + $("#price_2_" + id).val() + ' ' + currency;
+                    if (ps2 !== null && ps2 !== undefined && ps2.trim() !== "") {
+                        label += ' X ' + ps2 + ' = ' + parseFloat($("#price_2_" + id).val()) * parseFloat(ps2) + ' ' + currency;
+                    }
+                    str.push(label);
+                }
+                if (mg3 !== '' && mg3 !== undefined) {
+                    var label = mg3.trim() + ' mg&#64;' + $("#price_3_" + id).val() + ' ' + currency;
+                    if (ps3 !== null && ps3 !== undefined && ps3.trim() !== "") {
+                        label += ' X ' + ps3 + ' = ' + parseFloat($("#price_3_" + id).val()) * parseFloat(ps3) + ' ' + currency;
+                    }
+                    str.push(label);
+                }
+                if (mg4 !== '' && mg4 !== undefined) {
+                    var label = mg4.trim() + ' mg&#64;' + $("#price_4_" + id).val() + ' ' + currency;
+                    if (ps4 !== null && ps4 !== undefined && ps4.trim() !== "") {
+                        label += ' X ' + ps4 + ' = ' + parseFloat($("#price_4_" + id).val()) * parseFloat(ps4) + ' ' + currency;
+                    }
+                    str.push(label);
+                }
+                if (mg5 !== '' && mg5 !== undefined) {
+                    var label = mg5.trim() + ' mg&#64;' + $("#price_5_" + id).val() + ' ' + currency;
+                    if (ps5 !== null && ps5 !== undefined && ps5.trim() !== "") {
+                        label += ' X ' + ps5 + ' = ' + parseFloat($("#price_5_" + id).val()) * parseFloat(ps5) + ' ' + currency;
+                    }
+                    str.push(label);
+                }
+                if (str.length > 0) {
+                    price = $.parseHTML(str.join(', '))[0].data;
+                }
+            }
+
+            if (batchno !== '' && batchno !== undefined && batchno !== 'undefined') {
+                batchno = batchno.trim();
+            }
+
+            var obj = {
+                ProductName: productname,
+                casno: casno,
+                catNo: catno,
+                price: price,
+                finalprice: finalprice,
+                leadtime: leadtime,
+                displayOrder: displayorder,
+                productremark: productremark,
+                estimateDispatchDate: estimateDispatchDate,
+                id: id,
+                synthesislog: synthesislog,
+                actionname: 'partialproductupdate',
+                batchno: batchno,
+                isClubQuote: isClubQuote,
+                discount: $("#discount_" + id).val()
+            };
+            mainModel.push(obj);
+            //if (id != undefined) {
+            //    $.ajax({
+            //        url: '/Form/UpdateProductInfo',
+            //        //url: '/Form/UpdateProductInfo?ProductName=' + productname + '&casno=' + casno + '&catNo=' + catno + '&price=' + price.toString() + '&leadtime=' + leadtime + '&id=' + id,
+            //        data: JSON.stringify({ model: obj }),
+            //        type: 'POST',
+            //        contentType: "application/json; charset=utf-8",
+            //        success: function (data) {
+            //            if (data.success) {
+            //                //  Quote.getProductListForQuote(quoteId);
+            //                //window.location.href = "/Form/Quotation/" + quoteId;
+            //            }
+            //        },
+            //        complete: function (data) {
+            //            successAlert(count, forloopcnt, quoteId);
+            //            count += 1;
+            //        }
+            //    });
+            //}
+        });
+        if (mainModel.length > 0) {
+            $.ajax({
+                url: '/Form/UpdateNewProductInfo',
+                data: JSON.stringify({ mainmodel: mainModel }),
+                type: 'POST',
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                },
+                complete: function (data) {
+                    toastr.success("Saved successfully");
+                    if (!isCOADownloadWithQuote) {
+                        //Quote.getProductListForQuote(quoteId);
+                    }
+                }
+            });
+        }
+    }
+
+    function saveallalreadyProductAndCheck(isCOA) {
+        isCOADownloadWithQuote = isCOA;
+        var paramData = [];
+        var count = 1;
+        var forloopcnt = parseInt($('#tblalready').find('tbody').find('tr').length);
+        if ($("input[name='LayoutType']:checked").val() === "Standard") {
+            forloopcnt = parseInt($('#tblalready').find('tbody').find('tr').length) - 1;
+        }
+        $('#tblalready').find('tr').each(function () {
+            var id = $(this).attr("data-id");
+            var quoteId = $(this).attr("data-quoteid");
+            var productname = $("#productname_" + id).val();
+            var price = $("#price_" + id).val();
+            var finalprice = $("#finalprice_" + id).val();
+            var casno = $("#casno_" + id).val();
+            var catno = $("#catno_" + id).val();
+            var leadtime = $("#leadtime_" + id).val();
+            var displayorder = $("#displayorder_" + id).val();
+            var productremark = $("#productremark_" + id).val();
+            var estimateDispatchDate = $("#estimateDispatchDate_" + id).val();
+            var synthesislog = $("#synthesislog_" + id).is(':checked');
+            var batchno = $("#batchno_" + id).val();
+            var isClubQuote = $("#isClubQuote").val();
+            var countryType = $("input[name='CountryType']:checked").val();
+            var discount = "";
+            var currency = "";
+            if (countryType === "Export") {
+                currency = "USD";
+            }
+            else {
+                currency = "INR";
+            }
+
+            if ($("input[name='LayoutType']:checked").val() === "Standard") {
+                var str = [];
+                var mg1 = $("#pricemg_1_" + id).val();
+                var mg2 = $("#pricemg_2_" + id).val();
+                var mg3 = $("#pricemg_3_" + id).val();
+                var mg4 = $("#pricemg_4_" + id).val();
+                var mg5 = $("#pricemg_5_" + id).val();
+                var ps1 = $("#packsize_1_" + id).val();
+                var ps2 = $("#packsize_2_" + id).val();
+                var ps3 = $("#packsize_3_" + id).val();
+                var ps4 = $("#packsize_4_" + id).val();
+                var ps5 = $("#packsize_5_" + id).val();
+                if (mg1 !== '' && mg1 !== undefined) {
+                    var label = mg1.trim() + ' mg&#64;' + $("#price_1_" + id).val() + ' ' + currency;
+                    if (ps1 !== null && ps1 !== undefined && ps1.trim() !== "") {
+                        label += ' X ' + ps1 + ' = ' + parseFloat($("#price_1_" + id).val()) * parseFloat(ps1) + ' ' + currency;
+                    }
+                    str.push(label);
+                }
+                if (mg2 !== '' && mg2 !== undefined) {
+                    var label = mg2.trim() + ' mg&#64;' + $("#price_2_" + id).val() + ' ' + currency;
+                    if (ps2 !== null && ps2 !== undefined && ps2.trim() !== "") {
+                        label += ' X ' + ps2 + ' = ' + parseFloat($("#price_2_" + id).val()) * parseFloat(ps2) + ' ' + currency;
+                    }
+                    str.push(label);
+                }
+                if (mg3 !== '' && mg3 !== undefined) {
+                    var label = mg3.trim() + ' mg&#64;' + $("#price_3_" + id).val() + ' ' + currency;
+                    if (ps3 !== null && ps3 !== undefined && ps3.trim() !== "") {
+                        label += ' X ' + ps3 + ' = ' + parseFloat($("#price_3_" + id).val()) * parseFloat(ps3) + ' ' + currency;
+                    }
+                    str.push(label);
+                }
+                if (mg4 !== '' && mg4 !== undefined) {
+                    var label = mg4.trim() + ' mg&#64;' + $("#price_4_" + id).val() + ' ' + currency;
+                    if (ps4 !== null && ps4 !== undefined && ps4.trim() !== "") {
+                        label += ' X ' + ps4 + ' = ' + parseFloat($("#price_4_" + id).val()) * parseFloat(ps4) + ' ' + currency;
+                    }
+                    str.push(label);
+                }
+                if (mg5 !== '' && mg5 !== undefined) {
+                    var label = mg5.trim() + ' mg&#64;' + $("#price_5_" + id).val() + ' ' + currency;
+                    if (ps5 !== null && ps5 !== undefined && ps5.trim() !== "") {
+                        label += ' X ' + ps5 + ' = ' + parseFloat($("#price_5_" + id).val()) * parseFloat(ps5) + ' ' + currency;
+                    }
+                    str.push(label);
+                }
+                if (str.length > 0) {
+                    price = $.parseHTML(str.join(', '))[0].data;
+                }
+            }
+
+            if (batchno !== '' && batchno !== undefined && batchno !== 'undefined') {
+                batchno = batchno.trim();
+            }
+
+            var obj = {
+                ProductName: productname,
+                casno: casno,
+                catNo: catno,
+                price: price,
+                finalprice: finalprice,
+                leadtime: leadtime,
+                displayOrder: displayorder,
+                productremark: productremark,
+                estimateDispatchDate: estimateDispatchDate,
+                id: id,
+                synthesislog: synthesislog,
+                actionname: 'partialproductupdate',
+                batchno: batchno,
+                isClubQuote: isClubQuote,
+                discount: $("#discount_" + id).val()
+            };
+
+            if (id != undefined) {
+                paramData.push(obj);
+                //$.ajax({
+                //    url: '/Form/UpdateProductInfo',
+                //    //url: '/Form/UpdateProductInfo?ProductName=' + productname + '&casno=' + casno + '&catNo=' + catno + '&price=' + price.toString() + '&leadtime=' + leadtime + '&id=' + id,
+                //    data: JSON.stringify({ model: obj }),
+                //    type: 'POST',
+                //    contentType: "application/json; charset=utf-8",
+                //    success: function (data) {
+                //        if (data.success) {
+                //            //  Quote.getProductListForQuote(quoteId);
+                //            //window.location.href = "/Form/Quotation/" + quoteId;
+                //        }
+                //    },
+                //    complete: function (data) {
+                //        successAlert(count, forloopcnt, quoteId);
+                //        count += 1;
+                //    }
+                //});
+            }
+        });
+        var quoteId = $('#tblalready').find('tr').attr("data-quoteid");
+        $.ajax({
+            url: '/Form/UpdateProductInfoAndCheck',
+            data: JSON.stringify({ modelss: paramData, compId: $("#CompanyId").val() }),
+            type: 'POST',
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                if (data.success) {
+                    $('.modal-body').html(data.html);
+                    $('#myModal').modal({ show: true });
+                    $(".modal-dialog").css("width", "1080px");
+
+                    $('#myModal').find(".modal-footer").hide();
+                }
+            },
+            complete: function (data) {
+                successAlert(count, forloopcnt, quoteId);
+                count += 1;
+            }
+        });
+    }
+
+    function discountrecord(tablename) {
+        var ids = [];
+        $("#" + tablename).find('.delclass').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/PrintQuotationListAllRecordWithDiscount',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1080px");
+
+                $('#myModal').find(".modal-footer").hide();
+            }
+        });
+    }
+
+    function Copyrecords(tablename) {
+        var ids = [];
+        $("#" + tablename).find('.delclass').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/PrintQuotationListAllRecord',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1080px");
+
+                $('#myModal').find(".modal-footer").hide();
+            }
+        });
+    }
+
+    function editTempPartialProductDetails() {
+        $('#tbltempproduct  > tbody').find('tr').each(function () {
+            $(this).find('label').hide();
+            $(this).find('input').show();
+        });
+    }
+
+    function SaveallPIPartialProductDetails() {
+        var currency = "";
+        //if (countryType === "Export") {
+        //    currency = "USD";
+        //}
+        //else {
+        //    currency = "INR";
+        //}
+
+        if ($("#Currency").val() !== '' && $("#Currency").val() !== null && $("#Currency").val() !== undefined) {
+            currency = $("#Currency").val();
+        }
+        var count = 1;
+        var forloopcnt = $('#tblalready > tbody').find('tr').length;
+        $('#tblalready  > tbody').find('tr').each(function () {
+
+            var id = $(this).attr("data-id");
+            var quoteId = $("#QuoteId").val();
+            var str = [];
+            var mg1 = $("#pricemg_1_" + id).val();
+            var mg2 = $("#pricemg_2_" + id).val();
+            var mg3 = $("#pricemg_3_" + id).val();
+            var mg4 = $("#pricemg_4_" + id).val();
+            var mg5 = $("#pricemg_5_" + id).val();
+            var ps1 = $("#packsize_1_" + id).val();
+            var ps2 = $("#packsize_2_" + id).val();
+            var ps3 = $("#packsize_3_" + id).val();
+            var ps4 = $("#packsize_4_" + id).val();
+            var ps5 = $("#packsize_5_" + id).val();
+            if (mg1 !== '' && mg1 !== undefined) {
+                var label = mg1.trim() + ' mg&#64;' + $("#price_1_" + id).val() + ' ' + currency;
+                if (ps1 !== null && ps1 !== undefined && ps1.trim() !== "") {
+                    label += ' X ' + ps1 + ' = ' + parseFloat($("#price_1_" + id).val()) * parseFloat(ps1) + ' ' + currency;
+                }
+                str.push(label);
+            }
+            if (mg2 !== '' && mg2 !== undefined) {
+                var label = mg2.trim() + ' mg&#64;' + $("#price_2_" + id).val() + ' ' + currency;
+                if (ps2 !== null && ps2 !== undefined && ps2.trim() !== "") {
+                    label += ' X ' + ps2 + ' = ' + parseFloat($("#price_2_" + id).val()) * parseFloat(ps2) + ' ' + currency;
+                }
+                str.push(label);
+            }
+            if (mg3 !== '' && mg3 !== undefined) {
+                var label = mg3.trim() + ' mg&#64;' + $("#price_3_" + id).val() + ' ' + currency;
+                if (ps3 !== null && ps3 !== undefined && ps3.trim() !== "") {
+                    label += ' X ' + ps3 + ' = ' + parseFloat($("#price_3_" + id).val()) * parseFloat(ps3) + ' ' + currency;
+                }
+                str.push(label);
+            }
+            if (mg4 !== '' && mg4 !== undefined) {
+                var label = mg4.trim() + ' mg&#64;' + $("#price_4_" + id).val() + ' ' + currency;
+                if (ps4 !== null && ps4 !== undefined && ps4.trim() !== "") {
+                    label += ' X ' + ps4 + ' = ' + parseFloat($("#price_4_" + id).val()) * parseFloat(ps4) + ' ' + currency;
+                }
+                str.push(label);
+            }
+            if (mg5 !== '' && mg5 !== undefined) {
+                var label = mg5.trim() + ' mg&#64;' + $("#price_5_" + id).val() + ' ' + currency;
+                if (ps5 !== null && ps5 !== undefined && ps5.trim() !== "") {
+                    label += ' X ' + ps5 + ' = ' + parseFloat($("#price_5_" + id).val()) * parseFloat(ps5) + ' ' + currency;
+                }
+                str.push(label);
+            }
+            if (str.length > 0) {
+                price = $.parseHTML(str.join(', '))[0].data;
+            }
+            var trace = $("#trace_" + id).val();
+            var addtest = $("#addtest_" + id).val();
+            var coldship = $("#coldship_" + id).val();
+            var HSNCode = $("#HsnCode_" + id).val();
+            var model = {
+                price: price,
+                id: id,
+                coldship: coldship,
+                trace: trace,
+                addtest: addtest,
+                HSNCode: HSNCode
+            };
+            $.ajax({
+                url: '/Form/UpdatePerformaInvoiceProductInfo',
+                data: model,
+                type: 'POST',
+                success: function (data) {
+                    if (data.success) {
+                        //  Quote.tempProductListForQuote();
+                    }
+                },
+                complete: function (data) {
+                    successTempAlert(count, forloopcnt, quoteId);
+                    count += 1;
+                }
+            });
+        })
+    }
+
+    function successTempAlert(count, forloopcount, quoteId) {
+        if (count === forloopcount) {
+
+            /*Quote.tempProductListForQuote();*/
+            /*window.location.reload(true);*/
+        }
+    }
+
+    function successAlert(count, forloopcount, quoteId) {
+        if (count === forloopcount) {
+            toastr.success("Saved successfully");
+            if (!isCOADownloadWithQuote) {
+                //Quote.getProductListForQuote(quoteId);
+            }
+        }
+    }
+
+    function showpopupInfo(id, quotedetailsId) {
+        $.ajax({
+            url: '/Form/showpopupInfo?id=' + id + '&quoteDetailsId=' + quotedetailsId,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-dialog').css('width', '1100px');
+                $('#invoiceQueryModal .modal-content').css('width', '1100px');
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+            }
+        });
+    }
+
+    function AllQuotePrice(id) {
+        $.ajax({
+            url: '/Form/AllQuotePrice?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+            }
+        });
+    }
+
+
+    function GetAllBatchNo(id) {
+        $.ajax({
+            url: '/Form/GetAllBatchNo?id=' + id + '&actiontxt=quote',
+            data: {},
+            type: 'GET',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+            }
+        });
+    }
+
+    function GetAuditLogForQuoteDetail(id) {
+        $.ajax({
+            url: '/Form/GetAuditLogForQuoteDetail?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+            }
+        });
+    }
+
+    $("#IsInstock").change(function () {
+        if ($(this).is(':checked')) {
+            $("#IsCustomSynthesis").prop('checked', false);
+        }
+    });
+    $("#IsCustomSynthesis").change(function () {
+        if ($(this).is(':checked')) {
+            $("#IsInstock").prop('checked', false);
+        }
+    });
+
+    $(document).on("keyup", ".clstblleadtime", function () {
+        refreshHighlighted();
+    });
+    $(document).on("keyup", ".clspriceone", function () {
+        var str = 0;
+        $(".clspriceone").each(function (i, v) {
+            if ($(this).val() !== "") {
+                str += parseInt($(this).val());
+            }
+        });
+        $("#clspriceonetext").text(str);
+
+        refreshHighlighted();
+    });
+    $(document).on("keyup", ".clspricetwo", function () {
+        var str = 0;
+        $(".clspricetwo").each(function (i, v) {
+            if ($(this).val() !== "") {
+                str += parseInt($(this).val());
+            }
+        });
+        $("#clspricetwotext").text(str);
+        refreshHighlighted();
+    });
+    $(document).on("keyup", ".clspricethree", function () {
+        var str = 0;
+        $(".clspricethree").each(function (i, v) {
+            if ($(this).val() !== "") {
+                str += parseInt($(this).val());
+            }
+        });
+        $("#clspricethreetext").text(str);
+        refreshHighlighted();
+    });
+    $(document).on("keyup", ".clspricefour", function () {
+        var str = 0;
+        $(".clspricefour").each(function (i, v) {
+            if ($(this).val() !== "") {
+                str += parseInt($(this).val());
+            }
+        });
+        $("#clspricefourtext").text(str);
+        refreshHighlighted();
+    });
+    $(document).on("keyup", ".clspricefive", function () {
+        var str = 0;
+        $(".clspricefive").each(function (i, v) {
+            if ($(this).val() !== "") {
+                str += parseInt($(this).val());
+            }
+        });
+        $("#clspricefivetext").text(str);
+        refreshHighlighted();
+    });
+
+    function refreshHighlighted() {
+        $(".clspriceone").each(function (i, v) {
+            var id = $(this).attr("id").replace("price_1_", "");
+            if ($(this).val() === "" && $("#pricemg_1_" + id).val() !== "") {
+                $(this).css("background", "#c8d1f1");
+            }
+            else {
+                $(this).css("background", "");
+            }
+
+            if ($("#casno_" + id).val() === "" && $("#catno_" + id).val() === "") {
+                $("#casno_" + id).css("background", "#c8d1f1");
+                $("#catno_" + id).css("background", "#c8d1f1");
+            }
+            else {
+                $("#casno_" + id).css("background", "");
+                $("#catno_" + id).css("background", "");
+            }
+        });
+        $(".clspricetwo").each(function (i, v) {
+            var id = $(this).attr("id").replace("price_2_", "");
+            if ($(this).val() === "" && $("#pricemg_2_" + id).val() !== "") {
+                $(this).css("background", "#c8d1f1");
+            } else {
+                $(this).css("background", "");
+            }
+        });
+        $(".clspricethree").each(function (i, v) {
+            var id = $(this).attr("id").replace("price_3_", "");
+            if ($(this).val() === "" && $("#pricemg_3_" + id).val() !== "") {
+                $(this).css("background", "#c8d1f1");
+            } else {
+                $(this).css("background", "");
+            }
+        });
+        $(".clspricefour").each(function (i, v) {
+            var id = $(this).attr("id").replace("price_4_", "");
+            if ($(this).val() === "" && $("#pricemg_4_" + id).val() !== "") {
+                $(this).css("background", "#c8d1f1");
+            } else {
+                $(this).css("background", "");
+            }
+        });
+        $(".clspricefive").each(function (i, v) {
+            var id = $(this).attr("id").replace("price_5_", "");
+            if ($(this).val() === "" && $("#pricemg_5_" + id).val() !== "") {
+                $(this).css("background", "#c8d1f1");
+            } else {
+                $(this).css("background", "");
+            }
+        });
+        setTimeout(function () {
+            $(".clstblleadtime").each(function (i, v) {
+                if ($(this).val() === "") {
+                    $(this).css("background", "#c8d1f1");
+                } else {
+                    $(this).css("background", "");
+                }
+            });
+        }, 500);
+        checkisFollowup();
+    }
+
+    $(document).on("keyup", ".clsmasterleadtime", function () {
+        var value = $(this).val();
+        $(".clstblleadtime").each(function (i, v) {
+            $(this).val(value);
+        });
+    });
+    $(document).on("keyup", ".clsmasterone", function () {
+        var value = $(this).val();
+        $(".clspriceonemg").each(function (i, v) {
+            $(this).val(value);
+        });
+    });
+    $(document).on("keyup", ".clsmastertwo", function () {
+        var value = $(this).val();
+        $(".clspricetwomg").each(function (i, v) {
+            $(this).val(value);
+        });
+    });
+    $(document).on("keyup", ".clsmasterthree", function () {
+        var value = $(this).val();
+        $(".clspricethreemg").each(function (i, v) {
+            $(this).val(value);
+        });
+    });
+    $(document).on("keyup", ".clsmasterfour", function () {
+        var value = $(this).val();
+        $(".clspricefourmg").each(function (i, v) {
+            $(this).val(value);
+        });
+    });
+
+    $(document).on("click", "#chkpredefined", function () {
+        var value = $(this).is(":checked");
+        if (value) {
+            swal({
+                title: "Are you sure?",
+                text: "All price mg will change.",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes, change it!",
+                cancelButtonText: "No, cancel!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        $(".clspriceonemg").each(function () {
+                            $(this).val('10');
+                        });
+                        $(".clspricetwomg").val('25');
+                        $(".clspricethreemg").val('50');
+                        $(".clspricefourmg").val('100');
+                    } else {
+                        toastr.error("Your mg price safe :)");
+                    }
+                });
+        }
+        else {
+            swal({
+                title: "Are you sure?",
+                text: "It will clear all price mg value.",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes, change it!",
+                cancelButtonText: "No, cancel!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        $(".clspriceonemg").each(function () {
+                            $(this).val('');
+                        });
+                        $(".clspricetwomg").val('');
+                        $(".clspricethreemg").val('');
+                        $(".clspricefourmg").val('');
+                    } else {
+                        toastr.error("Your mg price safe :)");
+                    }
+                });
+        }
+    });
+
+
+    function refreshDiscountPrice() {
+
+        
+        
+        var strone = 0;
+        $(".clspriceone").each(function (i, v) {
+            var id = $(this).attr('id').replace('price_1_', '');
+            var dis = $("#discount_" + id).val();
+            if ($(this).val().trim() !== "") {
+                if (dis !== '') {
+                    dis = parseFloat(dis);
+                    strone += $(this).val() - (($(this).val() / 100) * dis);
+                }
+                else {
+                    strone += parseFloat($(this).val());
+                }
+            }
+        });
+        var strtwo = 0;
+        $(".clspricetwo").each(function (i, v) {
+            var id = $(this).attr('id').replace('price_2_', '');
+            var dis = $("#discount_" + id).val();
+            if ($(this).val().trim() !== "") {
+                if (dis !== '') {
+                    dis = parseFloat(dis);
+                    strtwo += $(this).val() - (($(this).val() / 100) * dis);
+                }
+                else {
+                    strtwo += parseFloat($(this).val());
+                }
+            }
+        });
+        var strthree = 0;
+        $(".clspricethree").each(function (i, v) {
+            var id = $(this).attr('id').replace('price_3_', '');
+            var dis = $("#discount_" + id).val();
+            if ($(this).val().trim() !== "") {
+                if (dis !== '') {
+                    dis = parseFloat(dis);
+                    strthree += $(this).val() - (($(this).val() / 100) * dis);
+                }
+                else {
+                    strthree += parseFloat($(this).val());
+                }
+            }
+        });
+        var strfour = 0;
+        $(".clspricefour").each(function (i, v) {
+            var id = $(this).attr('id').replace('price_4_', '');
+            var dis = $("#discount_" + id).val();
+            if ($(this).val().trim() !== "") {
+                if (dis !== '') {
+                    dis = parseFloat(dis);
+                    strfour += $(this).val() - (($(this).val() / 100) * dis);
+                }
+                else {
+                    strfour += parseFloat($(this).val());
+                }
+            }
+        });
+        var strfive = 0;
+        $(".clspricefive").each(function (i, v) {
+            var id = $(this).attr('id').replace('price_5_', '');
+            var dis = $("#discount_" + id).val();
+            if ($(this).val().trim() !== "") {
+                if (dis !== '') {
+                    dis = parseFloat(dis);
+                    strfive += $(this).val() - (($(this).val() / 100) * dis);
+                }
+                else {
+                    strfive += parseFloat($(this).val());
+                }
+            }
+        });
+        $("#clspriceonetext").text(strone);
+        $("#clspricefourtext").text(strfour);
+        $("#clspricetwotext").text(strtwo);
+        $("#clspricethreetext").text(strthree);
+        $("#clspricefivetext").text(strfive);
+
+        checkisFollowup();
+    }
+
+    function checkisFollowup() {
+        var pri1 = 0;
+        if ($("#clspriceonetext").text() !== "") {
+            pri1 = parseInt($("#clspriceonetext").text());
+        }
+        else {
+            pri1 = 0;
+        }
+        var pri2 = 0;
+        if ($("#clspricetwotext").text() !== "") {
+            pri2 = parseInt($("#clspricetwotext").text());
+        }
+        else {
+            pri2 = 0;
+        }
+        var pri3 = 0;
+        if ($("#clspricethreetext").text() !== "") {
+            pri3 = parseInt($("#clspricethreetext").text());
+        }
+        else {
+            pri3 = 0;
+        }
+        var pri4 = 0;
+        if ($("#clspricefourtext").text() !== "") {
+            pri4 = parseInt($("#clspricefourtext").text());
+        }
+        else {
+            pri4 = 0;
+        }
+        var pri5 = 0;
+        if ($("#clspricefivetext").text() !== "") {
+            pri5 = parseInt($("#clspricefivetext").text());
+        }
+        else {
+            pri5 = 0;
+        }
+        var finpri = pri1 + pri2 + pri3 + pri4 + pri5;
+        if ($('input[name=CountryType]:checked').val() === "Export") {
+            if (finpri >= 4000) {
+                $("#IsFollowupRequired").prop('checked', true);
+            }
+        }
+        else {
+            if (finpri >= 300000) {
+                $("#IsFollowupRequired").prop('checked', true);
+            }
+        }
+    }
+
+    $(document).on("keyup", ".clsdiscount", function () {
+        refreshDiscountPrice();
+    });
+
+    $(document).on("keyup", ".clscommondiscount", function () {
+        $(".clsdiscount").val($(this).val());
+        refreshDiscountPrice();
+    });
+
+    //setup before functions
+    var pronametypingTimer;                //timer identifier
+    var doneTypingprodnameInterval = 3000;  //time in ms (5 seconds)
+
+    //on keyup, start the countdown
+    $('#ProductName').keyup(function () {
+        clearTimeout(pronametypingTimer);
+        if ($('#ProductName').val()) {
+            typingTimer = setTimeout(ProductNameTyping, doneTypingprodnameInterval);
+        }
+    });
+
+    //user is "finished typing," do something
+    function ProductNameTyping() {
+        $.ajax({
+            url: "/Form/GetAllProductName?value=" + $('#ProductName').val(),
+            dataType: "json",
+            data: {},
+            success: function (data) {
+                autocomplete(document.getElementById("ProductName"), data);
+            }
+        });
+    }
+
+    $(document).on("click", '#chksaveallalready', function () {
+        if ($(this).is(":checked")) {
+            $("#tblalready").find(".delclass").each(function () {
+                $(this).prop('checked', true);
+            });
+        }
+        else {
+            $("#tblalready").find(".delclass").each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+</script>
+<style>
+    .lightred {
+        color: lightcoral;
+    }
+
+    #dvTempProductList input[type=text] {
+        padding: 0px;
+    }
+
+    .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+        padding: 5px;
+    }
+
+    table th, table td {
+        border: 1px solid #a4a4a4 !important;
+    }
+
+    #tblalready .autocomplete-items, #ProductNameautocomplete-list .autocomplete-items {
+        position: relative;
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 9999;
+        top: 0%;
+        left: 0;
+        right: 0;
+    }
+
+    .autocomplete-items div {
+        text-align: left;
+    }
+</style>
+@if (isQuoteViewOnly)
+{
+    <text>
+        <script type="text/javascript">
+            setInterval(function () {
+                $(".btn").css('display', 'none');
+                $(".fa-history").css('display', 'none');
+                $(".fa-clone").css('display', 'none');
+                $(".fa-cube").css('display', 'none');
+                $("#impExcelFile").css('display', 'none');
+            }, 1000);
+
+        </script>
+    </text>
+}
+<style type="text/css">
+    option.red {
+        color: #cc0000;
+    }
+</style>
+<script>
+    $("#ddlBillingAddress").val('@Model.BillAddressId');
+    $("#ddlShippingAddress").val('@Model.ShipAddressId');
+
+    if ($("#ddlBillingAddress").val() != "0") {
+        $("#BillAddress").prop("readonly", true);
+        
+    }
+    if ($("#ddlShippingAddress").val() != "0") {
+        $("#ShipAddress").prop("readonly", true);
+    }
+
+    $("#ddlBillingAddress").change(function () {
+        var val = $(this).val();
+        if (val != "0") {
+            var text = $("#ddlBillingAddress option:selected").text();
+            $("#BillAddress").val(text);
+            $("#BillAddress").prop("readonly", true);
+        }
+        else {
+            $("#BillAddress").val('');
+            $("#BillAddress").prop("readonly", false);
+        }
+    });
+
+    $("#ddlShippingAddress").change(function () {
+        var val = $(this).val();
+        if (val != "0") {
+            var text = $("#ddlShippingAddress option:selected").text();
+            $("#ShipAddress").val(text);
+            $("#ShipAddress").prop("readonly", true);
+        }
+        else {
+            $("#ShipAddress").val('');
+            $("#ShipAddress").prop("readonly", false);
+        }
+    });
+</script>

@@ -1,0 +1,143 @@
+﻿@model  Synzeal_Inventory.Entity.SZ_QuotationDetail
+@{
+    ViewBag.Title = "Company";
+    Layout = null;
+    string sectionName = ViewBag.sectionName;
+
+}
+<div class="col-md-12">
+    <!-- general form elements -->
+    <!-- /.box-header -->
+    <div class="box">
+        @*<div class="box-header with-border">
+                <h3 class="box-title">Add Query</h3>
+            </div>*@
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body">
+                @*<div class="form-group">
+            <label for="exampleInputEmail1">Service call type</label>
+            <input id="QueryType" name="QueryType" type="text" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Subject</label>
+            <input id="Subject" name="Subject" type="text" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Status</label>
+            <select id="Status" name="Status" class="form-control">
+                <option value="Open">Open</option>
+                <option value="Close">Close</option>
+                <option value="Pending">Pending</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Priority</label>
+            <input id="Priority" name="Priority" type="text" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Date</label>
+            <input id="CreatedDate" name="CreatedDate" type="text" class="datepicker" />
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Closing On</label>
+            <input id="ClosingOn" name="ClosingOn" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Close Date</label>
+            <input id="CloseDate" name="CloseDate" type="text" class="datepicker" />
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Origin</label>
+            <select id="Origin" name="Origin" class="form-control">
+                <option value="Call">Call</option>
+                <option value="Email">Email</option>
+                <option value="Web">Web</option>
+
+            </select>
+        </div>*@
+                @*<div class="form-group">
+            <label for="exampleInputEmail1">Scientist</label>
+            @Html.DropDownList("scientistId", (IEnumerable<SelectListItem>)ViewBag.ScientistList, "--Select--", new { @class = "scientist", @scientistId = Model.ScientistCustomerId, @quotedetailsid = Model.Id })
+        </div>*@
+
+                @*<div class="form-group" style="display:none" id="divestdate">
+            <label for="exampleInputEmail1">Estimate Date</label>
+            <input id="esticompleteDate" type="text" data-value="@Model.EstimateCompleteDate" class="datepicker" />
+        </div>*@
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Email</label>
+                    <input id="Email" name="Email" type="text" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Query Subject</label>
+                    <input id="QuerySubject" name="QuerySubject" type="text" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Type</label>
+                    <select id="Type" name="Type" class="form-control">
+                        <option value="Technical">Technical</option>
+                        <option value="Document">Document</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Origin</label>
+                    <select id="Origin" name="Origin" class="form-control">
+                        <option value="Email">Email</option>
+                        <option value="Call">Call</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Query Details</label>
+                    <textarea class="form-control" id="QueryText" name="QueryText" rows="25" value="@Model.QueryText"></textarea>
+                    <input type="hidden" id="qdid" name="qdid" value="@Model.Id" />
+                    <input type="hidden" id="sectionName" name="sectionName" value="@sectionName" />
+                    <input type="hidden" id="qdids" name="qdids" value="@ViewBag.ids" />
+                </div>
+                <div class="form-group" style="text-align: right">
+                    <button type="button" onclick="Quote.addQueryData()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@*<script>
+    $('.datepicker').datepicker({
+        format: 'dd/mm/yyyy'
+    });
+    var dateValue = $("#esticompleteDate").attr('data-value');
+    if (dateValue !== '') {
+        dateValue = dateValue.toString().replace(' 00:00:00', '');
+        $("#esticompleteDate").datepicker("setDate", dateValue);
+    }
+
+    $(".scientist").each(function () {
+        var sciId = $(this).attr('scientistId');
+        $(this).val(sciId);
+    });
+</script>*@
+@if (!string.IsNullOrEmpty(Model.QueryText))
+{
+    <text>
+        <script type="text/javascript">
+            var test = $("#QueryText").attr('value');
+            document.getElementById("QueryText").value = test;
+        </script>
+    </text>
+}
+@*@if (sectionName == "scientist")
+{
+    <text>
+        <script type="text/javascript">
+            $("#divestdate").show();
+        </script>
+    </text>
+}
+@if (Synzeal_Inventory.Models.SessionCookieManagement.IsScientist)
+{
+    <text>
+        <script type="text/javascript">
+            $(".scientist").prop("disabled", true);
+        </script>
+    </text>
+}*@

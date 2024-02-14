@@ -1,0 +1,1915 @@
+﻿@{
+    ViewBag.Title = "Purchase";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<SZ_QuotationModel>
+@using Synzeal_Inventory.Models
+<section class="content-header">
+    <h1> Purchase List </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#home" data-tabname="all">ALL (@ViewBag.AllCount)</a></li>
+                    <li><a data-toggle="tab" href="#tabpurchaserfq" onclick="purchaseloginrfqtab()" data-tabname="rfq">RFQ (@ViewBag.RFQCount)</a></li>
+                    @*<li><a data-toggle="tab" href="#tabsynzeal">SYNTHESIS LOG</a></li>*@
+                    <li><a data-toggle="tab" href="#tabpurchasesubmitted" onclick="purchasesubmittedtab()" data-tabname="purchasesubmitted">SUBMITTED (@ViewBag.SubmittedCount)</a></li>
+                    <li><a data-toggle="tab" href="#tabordered" onclick="purordertab()">ORDERED (@ViewBag.OrderedCount)</a></li>
+                    <li><a data-toggle="tab" href="#tabdispatched" onclick="purdispatchedtab()">DISPATCHED (@ViewBag.DispatchedCount)</a></li>
+                    <li><a data-toggle="tab" href="#tabquoteapproval" onclick="purquoteapprovaltab()">QUOTE APPROVAL (@ViewBag.QuoteApprovalCount)</a></li>
+                    <li><a data-toggle="tab" href="#tabtransit" onclick="purtransittab()">TRANSIT (@ViewBag.TRANSITCount)</a></li>
+                    <li><a data-toggle="tab" href="#tabpurchaseenquiry" onclick="purchaseenquirytab()" data-tabname="enquiry">ENQUIRY (@ViewBag.ENQUIRYCount)</a></li>
+                    <li><a data-toggle="tab" href="#tabpurchaseinhouse" onclick="purchaseinhousetab()" data-tabname="inhouse">IN-HOUSE</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="home" class="tab-pane fade in active">
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <div class="col-md-4" style="margin-top:6px">
+                                <div class="radio">
+                                    <label>
+                                        Purchase Status:
+                                        @Html.DropDownList("filallpurchaserfqstatus", (IEnumerable<SelectListItem>)ViewBag.fltPurchaseStatus, "--Select--", new { @class = "fltPurchaseStatus form-control", @onchange = "$('#example1').DataTable().draw()" })
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3" style="margin-top:6px">
+                                @*<div class="radio">
+                        <label>
+                            PO: <select id="filallpo" onchange="purchaseallchange()">
+                                <option value="">All</option>
+                                <option value="PO">PO</option>
+                                <option value="WithoutPO">Without PO</option>
+                            </select>
+                        </label>
+                    </div>*@
+                            </div>
+                            <div class="col-md-5 pull-right" style="margin-top:13px;">
+                                <a href="javascript:void(0)" style="float: right;margin-left: 10px;" class="btn btn-primary" onclick="MovebacktoNoAction()">Move Back</a>
+                                <a href="/Form/ExportPurchaseList" style="float:right; margin-left:10px;" class="btn btn-primary">Export</a>
+                                <a href="javascript:void(0)" style="float: right;margin-left: 10px;" class="btn btn-primary" onclick="markInstock()">Mark In-Stock</a>
+                                <a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="saveall()">Save All</a>
+                            </div>
+                            <div class="clearfix"> </div>
+                            <br />
+                            <div style="overflow: auto">
+                                <table id="example1" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="chkselectall" /></th>
+                                            <th>Date</th>
+                                            <th>Purchase Status</th>
+                                            <th>PO No</th>
+                                            <th>Product Name</th>
+                                            <th>CAS No</th>
+                                            <th>CAT No</th>
+                                            <th>Qty</th>
+                                            <th>Batch No</th>
+                                            <th>Est. Date</th>
+                                            <th>Lead Time</th>
+                                            <th>Summary</th>
+                                            <th>Purchase Remark</th>
+                                            <th>Reason</th>
+                                            <th>Management Remark</th>
+                                            <th>Client PO Date</th>
+                                            <th>SZ PO Date</th>
+                                            <th>Expected Receipt Date</th>
+                                            <th>Current Exp Date</th>
+                                            <th>Actual Receipt Date</th>
+                                            <th>Target Dispatch Date</th>
+                                            <th>SZ PO No</th>
+                                            <th>Vendor Price</th>
+                                            <th>
+                                                @if (SessionCookieManagement.IsAdmin)
+                                                {
+                                                    <span>Price</span>
+                                                }
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    @*<tbody>
+                            @if (Model.Count > 0)
+                            {
+                                foreach (var i in Model)
+                                {
+                                    foreach (var k in i.SZ_QuotationProductModel.Where(x => x.PurchaseDDLStatus != "28" && x.ReadyToDeliverScientistStatusId != x.ScientistStatus).OrderByDescending(x => x.PurchaseDate).ToList())
+                                    {
+                                        <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" class="clsRow">
+                                            <td><input type="checkbox" class="chkrow" value="@k.QuoteDetailsId" /></td>
+                                            <td>
+                                                <label>
+                                                    @if (k.PurchaseDate.HasValue)
+                                                    {
+                                                        @k.PurchaseDate.Value.ToShortDateString()
+                                                    }
+                                                </label>
+                                            </td>
+
+                                            <td>
+                                                @Html.DropDownList("purchaseddlstatus_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.fltPurchaseStatus, "--Select--", new { @class = "allpurstat form-control", @id = "purchaseddlstatus_" + k.QuoteDetailsId, @datavalue = @k.PurchaseDDLStatus })
+                                            </td>
+                                            <td>
+                                                <input type="hidden" id="allpurchasepo_@k.QuoteDetailsId" value="@i.PONumber" />
+                                                @i.PONumber
+                                            </td>
+                                            <td><label>@k.ProductName</label></td>
+                                            <td><label>@k.CASNo</label> </td>
+                                            <td><label>@k.CATNo</label> </td>
+                                            <td><label>@k.RequiredQty</label> </td>
+                                            <td><label>@k.BatchNo</label> </td>
+                                            <td>
+                                                <input type="text" id="estDate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.EstimateCompleteDate" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purchasestatus_@k.QuoteDetailsId" value="@k.PurchaseStatus" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purchaseremark_@k.QuoteDetailsId" value="@k.PurchaseRemark" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="reason_@k.QuoteDetailsId" value="@k.Reason" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ClientPODate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurClientPODate" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="OurPODt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurOurPODt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ExpectedReceiptDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurExpectedReceiptDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="CurrentExpDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurCurrentExpDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ActualReceiptDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurActualReceiptDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="TargetDispatchDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurTargetDispatchDt" />
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+                            }
+                        </tbody>*@
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <div id="tabpurchaserfq" class="tab-pane fade in">
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <div class="col-md-4" style="margin-top:6px">
+                                <div class="radio">
+                                    <label>
+                                        Purchase Status:
+                                        @Html.DropDownList("filrfqpurchaserfqstatus", (IEnumerable<SelectListItem>)ViewBag.fltPurchaseStatus, "--Select--", new { @class = "fltPurchaseStatus form-control", @onchange = "$('#tblpurchaserfq').DataTable().draw()" })
+
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3" style="margin-top:6px">
+                                @*<div class="radio">
+                        <label>
+                            PO: <select id="filallpo" onchange="purchaseallchange()">
+                                <option value="">All</option>
+                                <option value="PO">PO</option>
+                                <option value="WithoutPO">Without PO</option>
+                            </select>
+                        </label>
+                    </div>*@
+                            </div>
+                            <div class="col-md-5 pull-right" style="margin-top:13px;">
+
+                                <a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="saveall('tblpurchaserfq')">Save All</a>
+                            </div>
+                            <div class="clearfix"> </div>
+                            <br />
+                            <div style="overflow: auto">
+                                <table id="tblpurchaserfq" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="chkselectall" /></th>
+                                            <th>Date</th>
+                                            <th>Purchase Status</th>
+                                            <th>PO No</th>
+                                            <th>Product Name</th>
+                                            <th>CAS No</th>
+                                            <th>CAT No</th>
+                                            <th>Qty</th>
+                                            <th>Batch No</th>
+                                            <th>Est. Date</th>
+                                            <th>Lead Time</th>
+                                            <th>Summary</th>
+                                            <th>Purchase Remark</th>
+                                            <th>Reason</th>
+                                            <th>Client PO Date</th>
+                                            <th>SZ PO Date</th>
+                                            <th>Expected Receipt Date</th>
+                                            <th>Current Exp Date</th>
+                                            <th>Actual Receipt Date</th>
+                                            <th>Target Dispatch Date</th>
+                                            <th>SZ PO No</th>
+                                            <th>Vendor Price</th>
+                                            <th>
+                                                @if (SessionCookieManagement.IsAdmin)
+                                                {
+                                                    <span>Price</span>
+                                                }
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    @*<tbody>
+                            @if (Model.Count > 0)
+                            {
+                                foreach (var i in Model)
+                                {
+                                    foreach (var k in i.SZ_QuotationProductModel.Where(x => x.PurchaseDDLStatus != "28" && x.ReadyToDeliverScientistStatusId != x.ScientistStatus).OrderByDescending(x => x.PurchaseDate).ToList())
+                                    {
+                                        <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" class="clsRow">
+                                            <td><input type="checkbox" class="chkrow" value="@k.QuoteDetailsId" /></td>
+                                            <td>
+                                                <label>
+                                                    @if (k.PurchaseDate.HasValue)
+                                                    {
+                                                        @k.PurchaseDate.Value.ToShortDateString()
+                                                    }
+                                                </label>
+                                            </td>
+
+                                            <td>
+                                                @Html.DropDownList("purchaseddlstatus_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.fltPurchaseStatus, "--Select--", new { @class = "allpurstat form-control", @id = "purchaseddlstatus_" + k.QuoteDetailsId, @datavalue = @k.PurchaseDDLStatus })
+                                            </td>
+                                            <td>
+                                                <input type="hidden" id="allpurchasepo_@k.QuoteDetailsId" value="@i.PONumber" />
+                                                @i.PONumber
+                                            </td>
+                                            <td><label>@k.ProductName</label></td>
+                                            <td><label>@k.CASNo</label> </td>
+                                            <td><label>@k.CATNo</label> </td>
+                                            <td><label>@k.RequiredQty</label> </td>
+                                            <td><label>@k.BatchNo</label> </td>
+                                            <td>
+                                                <input type="text" id="estDate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.EstimateCompleteDate" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purchasestatus_@k.QuoteDetailsId" value="@k.PurchaseStatus" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purchaseremark_@k.QuoteDetailsId" value="@k.PurchaseRemark" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="reason_@k.QuoteDetailsId" value="@k.Reason" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ClientPODate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurClientPODate" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="OurPODt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurOurPODt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ExpectedReceiptDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurExpectedReceiptDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="CurrentExpDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurCurrentExpDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ActualReceiptDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurActualReceiptDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="TargetDispatchDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurTargetDispatchDt" />
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+                            }
+                        </tbody>*@
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabpurchaseenquiry" class="tab-pane fade in">
+                        <!-- /.box-header -->
+                        <div style="margin: 8px 20px;box-shadow: 1px 1px 2px 2px #ececec;padding: 3px;">
+                            <div class="form-group">
+                                <div class="col-md-4" style="margin-top:6px">
+                                    <div class="radio">
+                                        <label>
+                                            Purchase Status:
+                                            @Html.DropDownList("filpurchaserfqstatus", (IEnumerable<SelectListItem>)ViewBag.fltPurchaseStatus, "--Select--", new { @class = "form-control", @onchange = "$('#tblpurchaseenquiry').DataTable().draw()" })
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-8 pull-right" style="margin-top:13px;">
+                                    <a href="/Form/ExportAllPurchaseRFQ" style="float:right;margin-right:8px;" class="btn btn-primary">Export</a>
+                                    <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="saveallpurchaserfq()">Save All</a>
+                                    <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Addnewpurchaserfq()">Add New Enquiry</a>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="box-body resizediv" style="overflow:scroll;" id="divProj">
+                            <table id="tblpurchaseenquiry" style="width:100%" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAllclsSaverow" class="clsSaverowpurchase" /></th>
+                                        <th>Purchase Status</th>
+                                        <th>RFQ No</th>
+                                        <th>Ass. Date</th>
+                                        <th>Chemical Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Comment</th>
+                                        <th>Summary</th>
+                                        <th>Est. Date</th>
+                                        <th>Purchase Remark</th>
+                                        <th>Ref By</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabsynzeal" class="tab-pane fade in">
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <table id="example2" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Data Remark</th>
+                                        <th>Est. Date</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Count > 0)
+                                    {
+                                        foreach (var i in Model)
+                                        {
+                                            foreach (var k in i.SZ_QuotationProductModel.Where(x => x.IsSynthesisLog == true && x.ReadyToDeliverScientistStatusId != x.ScientistStatus).OrderByDescending(x => x.PurchaseDate))
+                                            {
+                                                <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" class="clsRow">
+
+                                                    <td><label>@k.PurchaseDate</label> </td>
+                                                    <td><label>@k.ProductName</label></td>
+                                                    <td><label>@k.RequiredQty</label> </td>
+                                                    <td><label>@k.CASNo</label> </td>
+                                                    <td><label>@k.CATNo</label> </td>
+                                                    <td><label>@k.Remark</label> </td>
+                                                    <td>
+                                                        <input type="text" id="secestDate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.EstimateCompleteDate" />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" id="secpurchasestatus_@k.QuoteDetailsId" value="@k.PurchaseStatus" />
+                                                    </td>
+                                                    <td><a href="javascript:void(0)" onclick="savesecpurchase('@k.QuoteDetailsId')">Save</a> </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabpurchasesubmitted" class="tab-pane fade in">
+                        <!-- /.box-header -->
+                        <div style="margin: 8px 20px;box-shadow: 1px 1px 2px 2px #ececec;padding: 3px;">
+                            <div class="form-group">
+                                <div class="col-md-12 pull-right" style="margin-top:13px;">
+                                    @*<a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="saveallpurchaserfq()">Save All</a>*@
+                                    @*<a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Addnewpurchaserfq()">Add New RFQ</a>*@
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="box-body resizediv" style="overflow:scroll;" id="divProj">
+                            <table id="tblpurchaserfqsubmitted" style="width:100%" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Purchase Status</th>
+                                        <th>Ass. Date</th>
+                                        <th>Chemical Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Comment</th>
+                                        <th>Summary</th>
+                                        <th>Est. Date</th>
+                                        <th>Purchase Remark</th>
+                                        <th>Ref By</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+
+                    <div id="tabordered" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <div class="col-md-5 pull-right" style="margin-top:13px;">
+                                <a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="saveall('tblordered')">Save All</a>
+                            </div>
+                            <div class="clearfix"> </div>
+                            <br />
+                            <div style="overflow: auto">
+                                <table id="tblordered" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="chkselectall" /></th>
+                                            <th>Date</th>
+                                            <th>Purchase Status</th>
+                                            <th>PO No</th>
+                                            <th>Product Name</th>
+                                            <th>CAS No</th>
+                                            <th>CAT No</th>
+                                            <th>Qty</th>
+                                            <th>Batch No</th>
+                                            <th>Est. Date</th>
+                                            <th>Lead Time</th>
+                                            <th>Summary</th>
+                                            <th>Purchase Remark</th>
+                                            <th>Reason</th>
+                                            <th>Management Remark</th>
+                                            <th>Client PO Date</th>
+                                            <th>SZ PO Date</th>
+                                            <th>Expected Receipt Date</th>
+                                            <th>Current Exp Date</th>
+                                            <th>Actual Receipt Date</th>
+                                            <th>Target Dispatch Date</th>
+                                            <th>SZ PO No</th>
+                                            <th>Vendor Price</th>
+                                            <th>
+                                                @if (SessionCookieManagement.IsAdmin)
+                                                {
+                                                    <span>Price</span>
+                                                }
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    @*<tbody>
+                            @if (Model.Count > 0)
+                            {
+                                foreach (var i in Model)
+                                {
+                                    foreach (var k in i.SZ_QuotationProductModel.Where(x => x.PurchaseDDLStatus == "24" && x.ReadyToDeliverScientistStatusId != x.ScientistStatus).OrderByDescending(x => x.PurchaseDate).ToList())
+                                    {
+                                        <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" class="clsRow">
+                                            <td><input type="checkbox" class="chkrow" value="@k.QuoteDetailsId" /></td>
+                                            <td>
+                                                <label>
+                                                    @if (k.PurchaseDate.HasValue)
+                                                    {
+                                                        @k.PurchaseDate.Value.ToShortDateString()
+                                                    }
+                                                </label>
+                                            </td>
+
+                                            <td>
+                                                @Html.DropDownList("purchaseddlstatus_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.fltPurchaseStatus, "--Select--", new { @class = "allpurstat form-control", @id = "purchaseddlstatus_" + k.QuoteDetailsId, @datavalue = @k.PurchaseDDLStatus })
+                                            </td>
+                                            <td>
+                                                <input type="hidden" id="allpurchasepo_@k.QuoteDetailsId" value="@i.PONumber" />
+                                                @i.PONumber
+                                            </td>
+                                            <td><label>@k.ProductName</label></td>
+                                            <td><label>@k.CASNo</label> </td>
+                                            <td><label>@k.CATNo</label> </td>
+                                            <td><label>@k.RequiredQty</label> </td>
+                                            <td><label>@k.BatchNo</label> </td>
+                                            <td>
+                                                <input type="text" id="estDate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.EstimateCompleteDate" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purchasestatus_@k.QuoteDetailsId" value="@k.PurchaseStatus" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purchaseremark_@k.QuoteDetailsId" value="@k.PurchaseRemark" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="reason_@k.QuoteDetailsId" value="@k.Reason" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ClientPODate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurClientPODate" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="OurPODt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurOurPODt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ExpectedReceiptDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurExpectedReceiptDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="CurrentExpDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurCurrentExpDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ActualReceiptDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurActualReceiptDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="TargetDispatchDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurTargetDispatchDt" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        </tbody>*@
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+
+                    <div id="tabdispatched" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+
+                            <div class="col-md-5 pull-right" style="margin-top:13px;">
+                                <a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="saveall('tbldispatched')">Save All</a>
+                            </div>
+                            <div class="clearfix"> </div>
+                            <br /><div style="overflow: auto">
+                                <table id="tbldispatched" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="chkselectall" /></th>
+                                            <th>Date</th>
+                                            <th>Purchase Status</th>
+                                            <th>PO No</th>
+                                            <th>Product Name</th>
+                                            <th>CAS No</th>
+                                            <th>CAT No</th>
+                                            <th>Qty</th>
+                                            <th>Batch No</th>
+                                            <th>Est. Date</th>
+                                            <th>Lead Time</th>
+                                            <th>Summary</th>
+                                            <th>Purchase Remark</th>
+                                            <th>Reason</th>
+                                            <th>Management Remark</th>
+                                            <th>Client PO Date</th>
+                                            <th>SZ PO Date</th>
+                                            <th>Expected Receipt Date</th>
+                                            <th>Current Exp Date</th>
+                                            <th>Actual Receipt Date</th>
+                                            <th>Target Dispatch Date</th>
+                                            <th>SZ PO No</th>
+                                            <th>Vendor Price</th>
+                                            <th>
+                                                @if (SessionCookieManagement.IsAdmin)
+                                                {
+                                                    <span>Price</span>
+                                                }
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @*@if (Model.Count > 0)
+                            {
+                                foreach (var i in Model)
+                                {
+                                    foreach (var k in i.SZ_QuotationProductModel.Where(x => x.PurchaseDDLStatus == "25" && x.ReadyToDeliverScientistStatusId != x.ScientistStatus).OrderByDescending(x => x.PurchaseDate).ToList())
+                                    {
+                                        <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" class="clsRow">
+                                            <td><input type="checkbox" class="chkrow" value="@k.QuoteDetailsId" /></td>
+                                            <td>
+                                                <label>
+                                                    @if (k.PurchaseDate.HasValue)
+                                                    {
+                                                        @k.PurchaseDate.Value.ToShortDateString()
+                                                    }
+                                                </label>
+                                            </td>
+
+                                            <td>
+                                                @Html.DropDownList("purchaseddlstatus_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.fltPurchaseStatus, "--Select--", new { @class = "allpurstat form-control", @id = "purchaseddlstatus_" + k.QuoteDetailsId, @datavalue = @k.PurchaseDDLStatus })
+                                            </td>
+                                            <td>
+                                                <input type="hidden" id="allpurchasepo_@k.QuoteDetailsId" value="@i.PONumber" />
+                                                @i.PONumber
+                                            </td>
+                                            <td><label>@k.ProductName</label></td>
+                                            <td><label>@k.CASNo</label> </td>
+                                            <td><label>@k.CATNo</label> </td>
+                                            <td><label>@k.RequiredQty</label> </td>
+                                            <td><label>@k.BatchNo</label> </td>
+                                            <td>
+                                                <input type="text" id="estDate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.EstimateCompleteDate" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purchasestatus_@k.QuoteDetailsId" value="@k.PurchaseStatus" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purchaseremark_@k.QuoteDetailsId" value="@k.PurchaseRemark" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="reason_@k.QuoteDetailsId" value="@k.Reason" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ClientPODate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurClientPODate" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="OurPODt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurOurPODt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ExpectedReceiptDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurExpectedReceiptDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="CurrentExpDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurCurrentExpDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ActualReceiptDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurActualReceiptDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="TargetDispatchDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurTargetDispatchDt" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }*@
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabquoteapproval" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+
+                            <div class="col-md-5 pull-right" style="margin-top:13px;">
+                                <a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="saveall('tblquoteapproval')">Save All</a>
+                                <a href="javascript:void(0)" style="float:right; margin-right: 10px;" class="btn btn-primary" onclick="Close()">Close</a>
+                            </div>
+                            <div class="clearfix"> </div>
+                            <br />
+                            <div style="overflow: auto">
+                                <table id="tblquoteapproval" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="chkselectall" /></th>
+                                            <th>Date</th>
+                                            <th>Purchase Status</th>
+                                            <th>PO No</th>
+                                            <th>Product Name</th>
+                                            <th>CAS No</th>
+                                            <th>CAT No</th>
+                                            <th>Qty</th>
+                                            <th>Batch No</th>
+                                            <th>Est. Date</th>
+                                            <th>Lead Time</th>
+                                            <th>Summary</th>
+                                            <th>Purchase Remark</th>
+                                            <th>Reason</th>
+                                            <th>Approved Status</th>
+                                            <th>Management Remark</th>
+                                            <th>Client PO Date</th>
+                                            <th>SZ PO Date</th>
+                                            <th>Expected Receipt Date</th>
+                                            <th>Current Exp Date</th>
+                                            <th>Actual Receipt Date</th>
+                                            <th>Target Dispatch Date</th>
+                                            <th>SZ PO No</th>
+                                            <th>Vendor Price</th>
+                                            <th>
+                                                @if (SessionCookieManagement.IsAdmin)
+                                                {
+                                                    <span>Price</span>
+                                                }
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @*@if (Model.Count > 0)
+                            {
+                                foreach (var i in Model)
+                                {
+                                    foreach (var k in i.SZ_QuotationProductModel.Where(x => x.PurchaseDDLStatus == "22" && x.ReadyToDeliverScientistStatusId != x.ScientistStatus).OrderByDescending(x => x.PurchaseDate).ToList())
+                                    {
+                                        <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" class="clsRow">
+                                            <td><input type="checkbox" class="chkrow" value="@k.QuoteDetailsId" /></td>
+                                            <td>
+                                                <label>
+                                                    @if (k.PurchaseDate.HasValue)
+                                                    {
+                                                        @k.PurchaseDate.Value.ToShortDateString()
+                                                    }
+                                                </label>
+                                            </td>
+
+                                            <td>
+                                                @Html.DropDownList("purchaseddlstatus_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.fltPurchaseStatus, "--Select--", new { @class = "allpurstat form-control", @id = "purchaseddlstatus_" + k.QuoteDetailsId, @datavalue = @k.PurchaseDDLStatus })
+                                            </td>
+                                            <td>
+                                                <input type="hidden" id="allpurchasepo_@k.QuoteDetailsId" value="@i.PONumber" />
+                                                @i.PONumber
+                                            </td>
+                                            <td><label>@k.ProductName</label></td>
+                                            <td><label>@k.CASNo</label> </td>
+                                            <td><label>@k.CATNo</label> </td>
+                                            <td><label>@k.RequiredQty</label> </td>
+                                            <td><label>@k.BatchNo</label> </td>
+                                            <td>
+                                                <input type="text" id="estDate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.EstimateCompleteDate" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purchasestatus_@k.QuoteDetailsId" value="@k.PurchaseStatus" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purchaseremark_@k.QuoteDetailsId" value="@k.PurchaseRemark" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="reason_@k.QuoteDetailsId" value="@k.Reason" />
+                                            </td>
+                                            <td>
+                                                <select id="purapprovedstatus_@k.QuoteDetailsId" class="clspurapprovedstatus" data-value="@k.PurApprovedStatus">
+                                                    <option value="">--Select--</option>
+                                                    <option value="Pending">Pending</option>
+                                                    <option value="Approved">Approved</option>
+                                                    <option value="Need Action">Need Action</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purmangremark_@k.QuoteDetailsId" value="@k.PurMangRemark" />
+                                            </td>
+
+                                            <td>
+                                                <input type="text" id="ClientPODate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurClientPODate" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="OurPODt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurOurPODt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ExpectedReceiptDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurExpectedReceiptDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="CurrentExpDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurCurrentExpDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ActualReceiptDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurActualReceiptDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="TargetDispatchDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurTargetDispatchDt" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }*@
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabtransit" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+
+                            <div class="col-md-5 pull-right" style="margin-top:13px;">
+                                <a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="saveall('tbltransit')">Save All</a>
+                            </div>
+                            <div class="clearfix"> </div>
+                            <br />
+                            <div style="overflow: auto">
+                                <table id="tbltransit" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="chkselectall" /></th>
+                                            <th>Date</th>
+                                            <th>Purchase Status</th>
+                                            <th>PO No</th>
+                                            <th>Product Name</th>
+                                            <th>CAS No</th>
+                                            <th>CAT No</th>
+                                            <th>Qty</th>
+                                            <th>Batch No</th>
+                                            <th>Est. Date</th>
+                                            <th>Lead Time</th>
+                                            <th>Summary</th>
+                                            <th>Purchase Remark</th>
+                                            <th>Reason</th>
+                                            <th>Management Remark</th>
+                                            <th>Client PO Date</th>
+                                            <th>SZ PO Date</th>
+                                            <th>Expected Receipt Date</th>
+                                            <th>Current Exp Date</th>
+                                            <th>Actual Receipt Date</th>
+                                            <th>Target Dispatch Date</th>
+                                            <th>SZ PO No</th>
+                                            <th>Vendor Price</th>
+                                            <th>
+                                                @if (SessionCookieManagement.IsAdmin)
+                                                {
+                                                    <span>Price</span>
+                                                }
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @*@if (Model.Count > 0)
+                            {
+                                foreach (var i in Model)
+                                {
+                                    foreach (var k in i.SZ_QuotationProductModel.Where(x => x.PurchaseDDLStatus == "26" && x.ReadyToDeliverScientistStatusId != x.ScientistStatus).OrderByDescending(x => x.PurchaseDate).ToList())
+                                    {
+                                        <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" class="clsRow">
+                                            <td><input type="checkbox" class="chkrow" value="@k.QuoteDetailsId" /></td>
+                                            <td>
+                                                <label>
+                                                    @if (k.PurchaseDate.HasValue)
+                                                    {
+                                                        @k.PurchaseDate.Value.ToShortDateString()
+                                                    }
+                                                </label>
+                                            </td>
+
+                                            <td>
+                                                @Html.DropDownList("purchaseddlstatus_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)ViewBag.fltPurchaseStatus, "--Select--", new { @class = "allpurstat form-control", @id = "purchaseddlstatus_" + k.QuoteDetailsId, @datavalue = @k.PurchaseDDLStatus })
+                                            </td>
+                                            <td>
+                                                <input type="hidden" id="allpurchasepo_@k.QuoteDetailsId" value="@i.PONumber" />
+                                                @i.PONumber
+                                            </td>
+                                            <td><label>@k.ProductName</label></td>
+                                            <td><label>@k.CASNo</label> </td>
+                                            <td><label>@k.CATNo</label> </td>
+                                            <td><label>@k.RequiredQty</label> </td>
+                                            <td><label>@k.BatchNo</label> </td>
+                                            <td>
+                                                <input type="text" id="estDate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.EstimateCompleteDate" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purchasestatus_@k.QuoteDetailsId" value="@k.PurchaseStatus" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="purchaseremark_@k.QuoteDetailsId" value="@k.PurchaseRemark" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="reason_@k.QuoteDetailsId" value="@k.Reason" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ClientPODate_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurClientPODate" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="OurPODt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurOurPODt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ExpectedReceiptDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurExpectedReceiptDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="CurrentExpDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurCurrentExpDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="ActualReceiptDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurActualReceiptDt" />
+                                            </td>
+                                            <td>
+                                                <input type="text" id="TargetDispatchDt_@k.QuoteDetailsId" class="datepicker" style="width:100px;" data-value="@k.PurTargetDispatchDt" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }*@
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+
+                    <div id="tabpurchaseinhouse" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <div class="col-md-4" style="margin-top:6px">
+                                <div class="radio">
+                                    <label>
+                                        Purchase Status:
+                                        @Html.DropDownList("filallpurchaserfqstatus", (IEnumerable<SelectListItem>)ViewBag.fltPurchaseStatus, "--Select--", new { @class = "fltPurchaseStatus form-control", @onchange = "$('#tblpurchaseinhouse').DataTable().draw()" })
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3" style="margin-top:6px">
+                            </div>
+                            <div class="col-md-5 pull-right" style="margin-top:13px;">
+                                @*<a href="javascript:void(0)" style="float: right;margin-left: 10px;" class="btn btn-primary" onclick="MovebacktoNoAction()">Move Back</a>
+                                <a href="/Form/ExportPurchaseList" style="float:right; margin-left:10px;" class="btn btn-primary">Export</a>
+                                <a href="javascript:void(0)" style="float: right;margin-left: 10px;" class="btn btn-primary" onclick="markInstock()">Mark In-Stock</a>*@
+                                <a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="saveall('tblpurchaseinhouse')">Save All</a>
+                            </div>
+                            <div class="clearfix"> </div>
+                            <br />
+                            <div style="overflow: auto">
+                                <table id="tblpurchaseinhouse" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="chkselectall" /></th>
+                                            <th>Date</th>
+                                            <th>Purchase Status</th>
+                                            <th>PO No</th>
+                                            <th>Product Name</th>
+                                            <th>CAS No</th>
+                                            <th>CAT No</th>
+                                            <th>Qty</th>
+                                            <th>Batch No</th>
+                                            <th>Est. Date</th>
+                                            <th>Lead Time</th>
+                                            <th>Summary</th>
+                                            <th>Purchase Remark</th>
+                                            <th>Reason</th>
+                                            <th>Management Remark</th>
+                                            <th>Client PO Date</th>
+                                            <th>SZ PO Date</th>
+                                            <th>Expected Receipt Date</th>
+                                            <th>Current Exp Date</th>
+                                            <th>Actual Receipt Date</th>
+                                            <th>Target Dispatch Date</th>
+                                            <th>SZ PO No</th>
+                                            <th>Vendor Price</th>
+                                            <th>
+                                                @if (SessionCookieManagement.IsAdmin)
+                                                {
+                                                    <span>Price</span>
+                                                }
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    var purorderloaded = false;
+    function purordertab() {
+        if (purorderloaded === false) {
+            $('#tblordered').DataTable({
+                "ordering": false,
+                "processing": true,
+                "serverSide": true, 
+                "filter": true, 
+                "orderMulti": false, 
+                "pageLength": 100,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "ajax": {
+                    "url": "../Form/LoadPurchaseAllData?status=24",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        /*d.instockother = $("#filterinstock").is(":checked") + "," + $("#filterother").is(":checked")*/
+                    }
+                },
+                "fnDrawCallback": function (oSettings) {
+                    calledExtra();
+                    purorderloaded = true;
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.Id);
+                    $(row).attr('class', 'clstr');
+                },
+                "columns": [
+                    { "data": "ChkRow", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurchaseDate", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurchaseDDLStatus", "autoWidth": true, "orderable": false },
+                    { "data": "PONumber", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "autoWidth": true, "orderable": false },
+                    { "data": "RequiredQty", "autoWidth": true, "orderable": false },
+                    { "data": "BatchNo", "autoWidth": true, "orderable": false },
+                    { "data": "StrEstimateCompleteDate", "autoWidth": true, "orderable": false },
+                    { "data": "LeadTime", "autoWidth": true, "orderable": false }, 
+                    { "data": "PurchaseStatus", "autoWidth": true, "orderable": false },
+                    { "data": "PurchaseRemark", "autoWidth": true, "orderable": false },
+                    { "data": "Reason", "autoWidth": true, "orderable": false },
+                    { "data": "PurMangRemark", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurClientPODate", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurOurPODt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurExpectedReceiptDt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurCurrentExpDt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurActualReceiptDt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurTargetDispatchDt", "autoWidth": true, "orderable": false },
+                    { "data": "PurSZPONo", "autoWidth": true, "orderable": false },
+                    { "data": "PurPrice", "autoWidth": true, "orderable": false },
+                    { "data": "Price", "autoWidth": true, "orderable": false}
+                ]
+            });
+        }
+    }
+
+
+     
+    var tbldispatchedloaded = false;
+    function purdispatchedtab() {
+        if (tbldispatchedloaded === false) {
+            $('#tbldispatched').DataTable({
+                "ordering": false,
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "orderMulti": false,
+                "pageLength": 100,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "ajax": {
+                    "url": "../Form/LoadPurchaseAllData?status=25",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        /*d.instockother = $("#filterinstock").is(":checked") + "," + $("#filterother").is(":checked")*/
+                    }
+                },
+                "fnDrawCallback": function (oSettings) {
+                    calledExtra();
+                    tbldispatchedloaded = true;
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.Id);
+                    $(row).attr('class', 'clstr');
+                },
+                "columns": [
+                    { "data": "ChkRow", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurchaseDate", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurchaseDDLStatus", "autoWidth": true, "orderable": false },
+                    { "data": "PONumber", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "autoWidth": true, "orderable": false },
+                    { "data": "RequiredQty", "autoWidth": true, "orderable": false },
+                    { "data": "BatchNo", "autoWidth": true, "orderable": false },
+                    { "data": "StrEstimateCompleteDate", "autoWidth": true, "orderable": false },
+                    { "data": "LeadTime", "autoWidth": true, "orderable": false }, 
+                    { "data": "PurchaseStatus", "autoWidth": true, "orderable": false },
+                    { "data": "PurchaseRemark", "autoWidth": true, "orderable": false },
+                    { "data": "Reason", "autoWidth": true, "orderable": false },
+                    { "data": "PurMangRemark", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurClientPODate", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurOurPODt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurExpectedReceiptDt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurCurrentExpDt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurActualReceiptDt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurTargetDispatchDt", "autoWidth": true, "orderable": false },
+                    { "data": "PurSZPONo", "autoWidth": true, "orderable": false },
+                    { "data": "PurPrice", "autoWidth": true, "orderable": false },
+                    { "data": "Price", "autoWidth": true, "orderable": false }
+                ]
+            });
+        }
+    }
+
+     
+    var tblquoteapprovalloaded = false;
+    function purquoteapprovaltab() {
+        if (tblquoteapprovalloaded === false) {
+            $('#tblquoteapproval').DataTable({
+                "ordering": false,
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "orderMulti": false,
+                "pageLength": 100,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "ajax": {
+                    "url": "../Form/LoadPurchaseAllData?status=22",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        /*d.instockother = $("#filterinstock").is(":checked") + "," + $("#filterother").is(":checked")*/
+                    }
+                },
+                "fnDrawCallback": function (oSettings) {
+                    calledExtra();
+                    tblquoteapprovalloaded = true;
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.Id);
+                    $(row).attr('class', 'clstr');
+                },
+                "columns": [
+                    { "data": "ChkRow", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurchaseDate", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurchaseDDLStatus", "autoWidth": true, "orderable": false },
+                    { "data": "PONumber", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "autoWidth": true, "orderable": false },
+                    { "data": "RequiredQty", "autoWidth": true, "orderable": false },
+                    { "data": "BatchNo", "autoWidth": true, "orderable": false },
+                    { "data": "StrEstimateCompleteDate", "autoWidth": true, "orderable": false },
+                    { "data": "LeadTime", "autoWidth": true, "orderable": false }, 
+                    { "data": "PurchaseStatus", "autoWidth": true, "orderable": false },
+                    { "data": "PurchaseRemark", "autoWidth": true, "orderable": false },
+                    { "data": "Reason", "autoWidth": true, "orderable": false },
+                    { "data": "PurApprovedStatus", "autoWidth": true, "orderable": false },
+                    { "data": "PurMangRemark", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurClientPODate", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurOurPODt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurExpectedReceiptDt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurCurrentExpDt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurActualReceiptDt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurTargetDispatchDt", "autoWidth": true, "orderable": false },
+                    { "data": "PurSZPONo", "autoWidth": true, "orderable": false },
+                    { "data": "PurPrice", "autoWidth": true, "orderable": false },
+                    { "data": "Price", "autoWidth": true, "orderable": false }
+                ]
+            });
+        }
+    }
+     
+    var tbltransitloaded = false;
+    function purtransittab() {
+        if (tbltransitloaded === false) {
+            $('#tbltransit').DataTable({
+                "ordering": false,
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "orderMulti": false,
+                "pageLength": 100,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "ajax": {
+                    "url": "../Form/LoadPurchaseAllData?status=26",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        /*d.instockother = $("#filterinstock").is(":checked") + "," + $("#filterother").is(":checked")*/
+                    }
+                },
+                "fnDrawCallback": function (oSettings) {
+                    calledExtra();
+                    tbltransitloaded = true;
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.Id);
+                    $(row).attr('class', 'clstr');
+                },
+                "columns": [
+                    { "data": "ChkRow", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurchaseDate", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurchaseDDLStatus", "autoWidth": true, "orderable": false },
+                    { "data": "PONumber", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "autoWidth": true, "orderable": false },
+                    { "data": "RequiredQty", "autoWidth": true, "orderable": false },
+                    { "data": "BatchNo", "autoWidth": true, "orderable": false },
+                    { "data": "StrEstimateCompleteDate", "autoWidth": true, "orderable": false },
+                    { "data": "LeadTime", "autoWidth": true, "orderable": false }, 
+                    { "data": "PurchaseStatus", "autoWidth": true, "orderable": false },
+                    { "data": "PurchaseRemark", "autoWidth": true, "orderable": false },
+                    { "data": "Reason", "autoWidth": true, "orderable": false },
+                    { "data": "PurMangRemark", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurClientPODate", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurOurPODt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurExpectedReceiptDt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurCurrentExpDt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurActualReceiptDt", "autoWidth": true, "orderable": false },
+                    { "data": "StrPurTargetDispatchDt", "autoWidth": true, "orderable": false },
+                    { "data": "PurSZPONo", "autoWidth": true, "orderable": false },
+                    { "data": "PurPrice", "autoWidth": true, "orderable": false },
+                    { "data": "Price", "autoWidth": true, "orderable": false }
+                ]
+            });
+        }
+    }
+
+
+    function Close() {
+        var ids = [];
+        $('#tblquoteapproval').find('.chkrow').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+        var count = 1;
+        $('#tblquoteapproval').find('.chkrow').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                $.ajax({
+                    url: '/Form/UpdatePurchaseCloseStatus',
+                    data: {
+                        id: id
+                    },
+                    type: 'POST',
+                    success: function (data) {
+                    },
+                    complete: function (data) {
+                        successPurchaseAlert(count, ids.length, 'tblquoteapproval');
+                        count += 1;
+                    }
+                });
+            }
+        });
+
+    }
+
+    function saveall(tblname) {
+        var ids = [];
+        if (tblname === '' || tblname === undefined) {
+            tblname = 'example1';
+        }
+
+        $('#' + tblname).find('.chkrow').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+        var count = 1;
+        $('#' + tblname).find('.chkrow').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+
+                var reason = $('#' + tblname).find("#reason_" + id).val();
+                var purchaseddlstatus = $('#' + tblname).find("#purchaseddlstatus_" + id).val();
+                var purchasestatus = $('#' + tblname).find("#purchasestatus_" + id).val();
+                var purchaseremark = $('#' + tblname).find("#purchaseremark_" + id).val();
+                var Estdate = $('#' + tblname).find("#estDate_" + id).val();
+
+                var purapprovedstatus = $('#' + tblname).find("#purapprovedstatus_" + id).val();
+                var purmangremark = $('#' + tblname).find("#purmangremark_" + id).val();
+                var ClientPODate = $('#' + tblname).find("#ClientPODate_" + id).val();
+                var OurPODt = $('#' + tblname).find("#OurPODt_" + id).val();
+                var ExpectedReceiptDt = $('#' + tblname).find("#ExpectedReceiptDt_" + id).val();
+                var CurrentExpDt = $('#' + tblname).find("#CurrentExpDt_" + id).val();
+                var ActualReceiptDt = $('#' + tblname).find("#ActualReceiptDt_" + id).val();
+                var TargetDispatchDt = $('#' + tblname).find("#TargetDispatchDt_" + id).val();
+
+                var PurSZPONo = $('#' + tblname).find("#PurSZPONo_" + id).val();
+                var PurPrice = $('#' + tblname).find("#PurPrice_" + id).val();
+
+                $.ajax({
+                    url: '/Form/UpdateProjectPurchaseInfo',
+                    data: {
+                        QuoteDetailsId: id,
+                        PurchaseRemark: purchaseremark,
+                        Reason: reason,
+                        PurchaseDDLStatus: purchaseddlstatus,
+                        PurchaseStatus: purchasestatus,
+                        EstimateCompleteDate: Estdate,
+                        PurApprovedStatus: purapprovedstatus,
+                        PurMangRemark: purmangremark,
+                        TabName: tblname,
+                        PurClientPODate: ClientPODate,
+                        PurOurPODt: OurPODt,
+                        PurExpectedReceiptDt: ExpectedReceiptDt,
+                        PurCurrentExpDt: CurrentExpDt,
+                        PurActualReceiptDt: ActualReceiptDt,
+                        PurTargetDispatchDt: TargetDispatchDt,
+                        PurPrice: PurPrice,
+                        PurSZPONo: PurSZPONo
+                    },
+                    type: 'POST',
+                    success: function (data) {
+                    },
+                    complete: function (data) {
+                        successPurchaseAlert(count, ids.length, tblname);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function saveallpurchaserfq() {
+        var ids = [];
+        $('#tblpurchaseenquiry').find('.clsSaverow').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+        var count = 1;
+        $('#tblpurchaseenquiry').find('.clsSaverow').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                var PurchaseRemark = $('#tblpurchaseenquiry').find("#purremark_" + id).val();
+                var Comment = $('#tblpurchaseenquiry').find("#comment_" + id).val();
+                var Summary = $('#tblpurchaseenquiry').find("#summary_" + id).val();
+                var PurchaseStatus = $('#tblpurchaseenquiry').find("#PurchaseStatus_" + id).val();
+                var ChemicalName = $('#tblpurchaseenquiry').find("#chemicalName_" + id).val();
+                var CASNo = $('#tblpurchaseenquiry').find("#casno_" + id).val();
+                var CATNo = $('#tblpurchaseenquiry').find("#catno_" + id).val();
+                var Estdate = $('#tblpurchaseenquiry').find("#estDate_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateProjectPurchaseRFQInfo',
+                    data: {
+                        PurchaseRemark: PurchaseRemark,
+                        Comment: Comment,
+                        Summary: Summary,
+                        Id: id,
+                        PurchaseStatus: PurchaseStatus,
+                        ChemicalName: ChemicalName,
+                        CASNo: CASNo,
+                        CATNo: CATNo,
+                        Estdate: Estdate
+                    },
+                    type: 'POST',
+                    success: function (data) {
+                    },
+                    complete: function (data) {
+                        successPurchaseRFQAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function successPurchaseRFQAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success('You have updated purchase rfq information.');
+        }
+    }
+    function successPurchaseAlert(count, forloopcount, tblName) {
+        if (count === forloopcount) {
+            toastr.success('You have updated purchase information.');
+            /*window.location.reload(true);*/
+            if (tblName === '') {
+                tblName = 'example1';
+            }
+            $('#' + tblName).DataTable().ajax.reload(null, false);
+        }
+    }
+
+
+
+    $(".table").each(function () {
+        var tableId = $(this).attr('id');
+
+        $("#" + tableId).find("#chkselectall").click(function () {
+            if ($(this).is(":checked")) {
+                $("#" + tableId).find('.chkrow').each(function () {
+                    $(this).prop("checked", true);
+                });
+            }
+            else {
+                $("#" + tableId).find(".chkrow").each(function () {
+                    $(this).prop("checked", false);
+                });
+            }
+        });
+        
+    });
+         
+
+
+
+    //$("#chkselectall").click(function () {
+    //    debugger;
+    //    if ($(this).is(":checked")) {
+    //        $('.chkrow').each(function () {
+    //            $(this).prop("checked", true);
+    //        });
+    //    }
+    //    else {
+    //        $(".chkrow").each(function () {
+    //            $(this).prop("checked", false);
+    //        });
+    //    }
+    //});
+
+
+
+    $(function () {
+        //$('#example1').DataTable({
+        //    "pageLength": 25,
+        //    "ordering": false,
+        //});
+
+        $('#example2').DataTable({
+            "pageLength": 100,
+            "ordering": false,
+        });
+
+        //$('#tblordered').DataTable({
+        //    "pageLength": 25,
+        //    "ordering": false,
+        //});
+
+        //$('#tbldispatched').DataTable({
+        //    "pageLength": 25,
+        //    "ordering": false,
+        //});
+        //$('#tblquoteapproval').DataTable({
+        //    "pageLength": 25,
+        //    "ordering": false,
+        //});
+        //$('#tbltransit').DataTable({
+        //    "pageLength": 25,
+        //    "ordering": false,
+        //});
+    });
+    //$('#example1').on('search.dt', function () {
+    //    calledExtra();
+    //});
+    //$('#example1').on('page.dt', function () {
+    //    calledExtra();
+    //});
+
+    function calledExtra() {
+        setTimeout(function () {
+            $('.datepicker').datepicker({
+                format: 'dd/mm/yyyy'
+            });
+            $(".clsRow").each(function () {
+                var status = $(this).attr("data-status");
+                var detailsId = $(this).attr("id").replace("tr_", "");
+                $("#scientistStatus_" + detailsId).val(status);
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (status === readytodeliverId) {
+                    $(this).find('input[type=text]').hide();
+                    $(this).find('select').hide();
+                    $(this).find('label').show();
+                    $(this).find(".clsLast").hide();
+                }
+                //var dateValue = $(this).find('.datepicker').attr('data-value');
+                //if (dateValue !== '') {
+                //    dateValue = dateValue.toString().replace(' 00:00:00', '');
+                //    $(this).find('.datepicker').datepicker("setDate", dateValue);
+                //}
+                var datepickercount = $(this).find('.datepicker').length;
+                if (datepickercount > 0) {
+                    for (var i = 0; i < datepickercount; i++) {
+                        var dateValue = $(this).find('.datepicker')[i].attributes['data-value'].value;
+                        if (dateValue !== '') {
+                            dateValue = dateValue.toString().replace(' 00:00:00', '');
+                            /*$(this).find('.datepicker')[i].datepicker("setDate", dateValue);*/
+
+                            var datevalueid = $(this).find('.datepicker')[0].id;
+                            $("#" + datevalueid).datepicker("setDate", dateValue)
+                        }
+                    }
+                }
+            });
+
+            $(".secclsRow").each(function () {
+                var status = $(this).attr("data-status");
+                var detailsId = $(this).attr("id").replace("tr_", "");
+                $("#secscientistStatus_" + detailsId).val(status);
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (status === readytodeliverId) {
+                    $(this).find('input[type=text]').hide();
+                    $(this).find('select').hide();
+                    $(this).find('label').show();
+                    $(this).find(".clsLast").hide();
+                }
+                var dateValue = $(this).find('.datepicker').attr('data-value');
+                if (dateValue !== '') {
+                    dateValue = dateValue.toString().replace(' 00:00:00', '');
+                    $(this).find('.datepicker').datepicker("setDate", dateValue);
+                }
+            });
+
+            $('.datepicker').each(function () {
+                var dateValue = $(this).attr('data-value');
+                if (dateValue !== '' && dateValue !== null && dateValue !== undefined) {
+
+                    dateValue = dateValue.toString().replace(' 00:00:00', '');
+                    $(this).datepicker("setDate", dateValue);
+                }
+            });
+
+            $(".clstr").each(function () {
+                var purapprovalue = $(this).find('.clspurapprovedstatus').attr('data-value');
+                if (purapprovalue !== '') {
+                    $(this).find('.clspurapprovedstatus').val(purapprovalue);
+                }
+            });
+
+        }, 500);
+    }
+    $(document).ready(function () {
+        $('.datepicker').datepicker({
+            format: 'dd/mm/yyyy'
+        });
+        $(".clsRow").each(function () {
+            var status = $(this).attr("data-status");
+            var detailsId = $(this).attr("id").replace("tr_", "");
+            $("#scientistStatus_" + detailsId).val(status);
+            var readytodeliverId = 0;
+            $(".scientistStatusddl option").each(function () {
+                var text = $(this).text();
+                if (text === 'Ready for dispatch.') {
+                    readytodeliverId = $(this).val();
+                }
+            });
+            if (status === readytodeliverId) {
+                $(this).find('input[type=text]').hide();
+                $(this).find('select').hide();
+                $(this).find('label').show();
+                $(this).find(".clsLast").hide();
+            }
+            //var dateValue = $(this).find('.datepicker').attr('data-value');
+            //if (dateValue !== '') {
+            //    dateValue = dateValue.toString().replace(' 00:00:00', '');
+            //    $(this).find('.datepicker').datepicker("setDate", dateValue);
+            //}
+
+            var datepickercount = $(this).find('.datepicker').length;
+            if (datepickercount > 0) {
+                for (var i = 0; i < datepickercount; i++) {
+                    var dateValue = $(this).find('.datepicker')[i].attributes['data-value'].value;
+                    if (dateValue !== '') {
+                        dateValue = dateValue.toString().replace(' 00:00:00', '');
+                        /*$(this).find('.datepicker')[i].datepicker("setDate", dateValue);*/
+
+                        var datevalueid = $(this).find('.datepicker')[0].id;
+                        $("#" + datevalueid).datepicker("setDate", dateValue)
+                    }
+                }
+            }
+        });
+
+        $(".secclsRow").each(function () {
+            var status = $(this).attr("data-status");
+            var detailsId = $(this).attr("id").replace("tr_", "");
+            $("#secscientistStatus_" + detailsId).val(status);
+            var readytodeliverId = 0;
+            $(".scientistStatusddl option").each(function () {
+                var text = $(this).text();
+                if (text === 'Ready for dispatch.') {
+                    readytodeliverId = $(this).val();
+                }
+            });
+            if (status === readytodeliverId) {
+                $(this).find('input[type=text]').hide();
+                $(this).find('select').hide();
+                $(this).find('label').show();
+                $(this).find(".clsLast").hide();
+            }
+            //var dateValue = $(this).find('.datepicker').attr('data-value');
+            //if (dateValue !== '') {
+            //    dateValue = dateValue.toString().replace(' 00:00:00', '');
+            //    $(this).find('.datepicker').datepicker("setDate", dateValue);
+            //}
+
+            var datepickercount = $(this).find('.datepicker').length;
+            if (datepickercount > 0) {
+                for (var i = 0; i < datepickercount; i++) {
+                    var dateValue = $(this).find('.datepicker')[i].attributes['data-value'].value;
+                    if (dateValue !== '') {
+                        dateValue = dateValue.toString().replace(' 00:00:00', '');
+                        $(this).find('.datepicker')[i].datepicker("setDate", dateValue);
+                    }
+                }
+            }
+        });
+
+        $('.datepicker').each(function () {
+            var dateValue = $(this).attr('data-value');
+            if (dateValue !== '') {
+                dateValue = dateValue.toString().replace(' 00:00:00', '');
+                $(this).datepicker("setDate", dateValue);
+            }
+        });
+    });
+
+    function MovebacktoNoAction() {
+        var ids = [];
+        $('#example1').find('.chkrow').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        var count = 1;
+        $.ajax({
+            url: '/Form/MoveToNoActionList',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    window.location.reload();
+                }
+            }
+        });
+    }
+
+
+    function markInstock() {
+        var ids = [];
+        $('#example1').find('.chkrow').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        var count = 1;
+        $('#example1').find('.chkrow').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+
+                $.ajax({
+                    url: '/Form/MarkInstock',
+                    data: {
+                        id: id
+                    },
+                    type: 'POST',
+                    success: function (data) {
+                    },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function successAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success('You have marked product as a In-Stock.');
+            setTimeout(function () { window.location.reload(true); }, 2000);
+        }
+    }
+    function savepurchase(id) {
+        var status = $("#purchasestatus_" + id).val();
+        var date = $("#estDate_" + id).val();
+        $("#estDate_" + id).css('border', '');
+        if ($("#estDate_" + id).val() == '') {
+            $("#estDate_" + id).css('border', '1px solid red');
+            return false;
+        }
+        $.ajax({
+            url: '/Form/UpdatePurchaseStatus?status=' + status + '&id=' + id + '&date=' + date,
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have updated product information.");
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (scStatus === readytodeliverId) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+    function savesecpurchase(id) {
+        var status = $("#secpurchasestatus_" + id).val();
+        var date = $("#secestDate_" + id).val();
+        $("#secestDate_" + id).css('border', '');
+        if ($("#secestDate_" + id).val() == '') {
+            $("#secestDate_" + id).css('border', '1px solid red');
+            return false;
+        }
+        $.ajax({
+            url: '/Form/UpdatePurchaseStatus?status=' + status + '&id=' + id + '&date=' + date,
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have updated product information.");
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (scStatus === readytodeliverId) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+    function SaveScientistProductDetails(id) {
+        var scStatus = $("#scientistStatus_" + id).val();
+        var batchcode1 = $("#batchcode1_" + id).val();
+        var qty1 = $("#qty1_" + id).val();
+        var batchcode2 = "";
+        var qty2 = "";
+        var esticompleteDate = $("#esticompleteDate_" + id).val();
+        $.ajax({
+            url: '/Form/UpdateScientistProjectInfo',
+            data: {
+                scStatus: scStatus,
+                batchcode1: batchcode1,
+                qty1: qty1,
+                batchcode2: batchcode2,
+                qty2: qty2,
+                id: id,
+                esticompleteDate: esticompleteDate
+            },
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have updated product information.");
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (scStatus === readytodeliverId) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+    function Addnewpurchaserfq() {
+        $.ajax({
+            url: '/Form/AddNewRfq',
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+                // $("#invoiceQueryModal .modal-content").css("width", "1080px");
+            }
+        });
+    }
+
+    function purchaseallchange() {
+        calledExtra();
+        //var value = $("#filallpurchaserfqstatus").val();
+        //var po = $("#filallpo").val();
+        //$("#example1 tbody tr").filter(function () {
+        //    debugger;
+        //    var valueofrow = $(this).find('.chkrow').val();
+        //    var selectedvalue = $('#purchaseddlstatus_' + valueofrow).val();
+        //    var valueofpo = $('#allpurchasepo_' + valueofrow).val();
+        //    $(this).toggle(selectedvalue.toLowerCase().indexOf(value.toLowerCase()) > -1)
+        //    $(this).toggle(valueofpo.toLowerCase().indexOf(po.toLowerCase()) > -1)
+        //});
+    }
+
+    $(".allpurstat").each(function () {
+        var val = $(this).attr("datavalue");
+        if (val != "") {
+            $(this).val(val);
+        }
+    });
+
+
+    $(".clspurapprovedstatus").each(function () {
+        var val = $(this).attr("data-value");
+        if (val != "") {
+            $(this).val(val);
+        }
+    });
+
+
+    $('#example1').DataTable({
+        //"fixedHeader": {
+        //    header: true
+        //},
+        "ordering": false,
+        "processing": true, // for show progress bar
+        "serverSide": true, // for process server side
+        "filter": true, // this is for disable filter (search box)
+        "orderMulti": false, // for disable multiple column at once
+        "pageLength": 100,
+        "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+        "ajax": {
+            "url": "../Form/LoadPurchaseAllData",
+            "type": "POST",
+            "datatype": "json",
+            "data": function (d) {
+                /*d.instockother = $("#filterinstock").is(":checked") + "," + $("#filterother").is(":checked")*/
+                d.purchasestatusddl = $('#filallpurchaserfqstatus').val()
+            }
+        },
+        "fnDrawCallback": function (oSettings) {
+            calledExtra();
+        },
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            if (aData.PurchaseDDLStatus == "" || aData.PurchaseDDLStatus == undefined) {
+                $('td', nRow).css('background-color', 'rgb(249 210 210)');
+            }
+            //$('td:eq(2)', nRow).addClass("imgclshover");
+
+        },
+        "createdRow": function (row, data, dataIndex) {
+            // Set the data-status attribute, and add a class
+            $(row).attr('id', 'tr_' + data.Id);
+            $(row).attr('class', 'clstr');
+        },
+        "columns": [
+            { "data": "ChkRow", "autoWidth": true, "orderable": false },
+            { "data": "StrPurchaseDate", "autoWidth": true, "orderable": false },
+            { "data": "StrPurchaseDDLStatus", "autoWidth": true, "orderable": false },
+            { "data": "PONumber", "autoWidth": true, "orderable": false },
+            { "data": "ProductName", "autoWidth": true, "orderable": false },
+            { "data": "CASNo", "autoWidth": true, "orderable": false },
+            { "data": "CATNo", "autoWidth": true, "orderable": false },
+            { "data": "RequiredQty", "autoWidth": true, "orderable": false },
+            { "data": "BatchNo", "autoWidth": true, "orderable": false },
+            { "data": "StrEstimateCompleteDate", "autoWidth": true, "orderable": false },
+            { "data": "LeadTime", "autoWidth": true, "orderable": false }, 
+            { "data": "PurchaseStatus", "autoWidth": true, "orderable": false },
+            { "data": "PurchaseRemark", "autoWidth": true, "orderable": false },
+            { "data": "Reason", "autoWidth": true, "orderable": false },
+            { "data": "PurMangRemark", "autoWidth": true, "orderable": false },
+            { "data": "StrPurClientPODate", "autoWidth": true, "orderable": false },
+            { "data": "StrPurOurPODt", "autoWidth": true, "orderable": false },
+            { "data": "StrPurExpectedReceiptDt", "autoWidth": true, "orderable": false },
+            { "data": "StrPurCurrentExpDt", "autoWidth": true, "orderable": false },
+            { "data": "StrPurActualReceiptDt", "autoWidth": true, "orderable": false },
+            { "data": "StrPurTargetDispatchDt", "autoWidth": true, "orderable": false },
+            { "data": "PurSZPONo", "autoWidth": true, "orderable": false },
+            { "data": "PurPrice", "autoWidth": true, "orderable": false },
+            { "data": "Price", "autoWidth": true, "orderable": false }
+        ]
+    });
+
+
+    
+
+    function PurchaseremarkGenerate(id) {
+        $.ajax({
+            url: '/Form/AddPurchaseRemark?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+            }
+        });
+    } 
+
+    function PurchaseManagementremarkGenerate(id) {
+        $.ajax({
+            url: '/Form/AddPurchaseManagementRemark?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                debugger;
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+            }
+        });
+    }
+
+    $(document).on("click", ".clstr", function () {
+        $(".clstr").css('background', '');
+        $(this).css('background', '#bce1f7');
+    }); 
+</script>

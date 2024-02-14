@@ -1,0 +1,519 @@
+﻿@{
+    ViewBag.Title = "BDDashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using Synzeal_Inventory.Models;
+@using Synzeal_Inventory.Entity;
+
+
+@model BDDashboardModel
+@{
+    var rFQQuoteData = Model.RFQQuoteData;
+    var synthesiscatno = Model.SynthesisCatNo;
+    SynzealLiveEntities db = new SynzealLiveEntities();
+}
+<section class="content-header">
+    <h1>My Dashboard - Welcome @SessionCookieManagement.UserName</h1>
+</section>
+<section class="content" style="margin-top: 10px">
+    <div class="row">
+        @*<div class="col-md-6">
+                <div class="col-lg-6 col-6">
+                    <div class="small-box bg-info" style="background: #4ba69f">
+                        <div class="inner">
+                            <h3>@Model.TodayQuotation</h3>
+                            <p>Today's Quotation</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-6">
+                    <div class="small-box bg-info" style="background: #616bcd">
+                        <div class="inner">
+                            <h3>@Model.TodayApproved</h3>
+                            <p>Today's Approved</p>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+        <div class="col-md-6">
+            <div class="box  clsCustomSynthesis ">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Under Correction</h3>
+
+                    @*<div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="expand" data-toggle="tooltip" title="" data-original-title="expand">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>*@
+                </div>
+                <form role="form">
+                    <div class="box-body">
+                        @if (Model.UnderCorrection != null && Model.UnderCorrection.Count > 0)
+                        {
+                            <div class="col-md-6">
+                                <b>Domestic</b>
+                                @foreach (var item in Model.UnderCorrection.Where(x => x.CountryType == "Domestic"))
+                                {
+                                    var cls = "";
+                                    if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                    {
+                                        cls = "clsorange";
+                                    }
+                                    if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                    {
+                                        cls = "clsblue";
+                                    }
+                                    if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                    {
+                                        cls = "clslightgreen";
+                                    }
+                                    var catnolist = item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.CATNo)).Select(x => x.CATNo).ToList();
+                                    var anyavailable = catnolist.Where(x => synthesiscatno.Contains(x)).Any();
+                                    var underline = "";
+                                    if (anyavailable)
+                                    {
+                                        underline = "text-decoration:underline";
+                                    }
+                                    <div class="col-md-12">
+                                        <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                        <a href="/Form/Quote/@item.Id" class="@cls" style="@underline">
+                                            @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                            @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                            {
+                                                try
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                catch
+                                                {
+                                                }
+                                            }
+                                            @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                            {
+                                                <img src="~/img/star.png" width="14px" height="14px" />
+                                            }
+                                        </a> <i class="fa fa-copy" onclick="copy('@item.Ref')"></i>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <b>Export</b>
+                                @foreach (var item in Model.UnderCorrection.Where(x => x.CountryType == "Export"))
+                                {
+                                    if (item.CompanyName == null || item.SZ_QuotationDetail == null || item.SZ_QuotationDetail.Count == 0)
+                                    {
+                                        continue;
+                                    }
+                                    var cls = "";
+                                    if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                    {
+                                        cls = "clsorange";
+                                    }
+                                    if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                    {
+                                        cls = "clsblue";
+                                    }
+                                    if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                    {
+                                        cls = "clslightgreen";
+                                    }
+                                    var catnolist = item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.CATNo)).Select(x => x.CATNo).ToList();
+                                    var anyavailable = catnolist.Where(x => synthesiscatno.Contains(x)).Any();
+                                    var underline = "";
+                                    if (anyavailable)
+                                    {
+                                        underline = "text-decoration:underline";
+                                    }
+
+                                    <div class="col-md-12">
+                                        <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                        <a href="/Form/Quote/@item.Id" class="@cls" style="@underline">
+                                            @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                            @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                            {
+                                                try
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                catch
+                                                {
+                                                }
+                                            }
+                                            @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                            {
+                                                <img src="~/img/star.png" width="14px" height="14px" />
+                                            }
+                                        </a> <i class="fa fa-copy" onclick="copy('@item.Ref')"></i>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="box  clsCustomSynthesis ">
+                <div class="box-header with-border">
+                    <h3 class="box-title">RFQ <span style="color: red">(@rFQQuoteData.Count)</span></h3>
+
+                    @*<div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="expand" data-toggle="tooltip" title="" data-original-title="expand">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>*@
+                </div>
+                <form role="form">
+                    <div class="box-body">
+                        @if (rFQQuoteData != null && rFQQuoteData.Count > 0)
+                        {
+                            DateTime startdate = DateTime.Now.AddDays(-2);
+                            DateTime enddate = DateTime.Now;
+                            <div class="col-md-6">
+                                <b>Domestic</b>
+                                @foreach (var item in rFQQuoteData.Where(x => x.CountryType == "Domestic"))
+                                {
+                                    var cls = "";
+                                    if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                    {
+                                        cls = "clsorange";
+                                    }
+                                    if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                    {
+                                        cls = "clsblue";
+                                    }
+                                    if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                    {
+                                        cls = "clslightgreen";
+                                    }
+                                    var catnolist = item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.CATNo)).Select(x => x.CATNo).ToList();
+                                    var anyavailable = catnolist.Where(x => synthesiscatno.Contains(x)).Any();
+                                    var underline = "";
+                                    if (anyavailable)
+                                    {
+                                        underline = "text-decoration:underline";
+                                    }
+                                    <div class="col-md-12">
+                                        <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                        <a href="/Form/Quote/@item.Id" class="@cls" style="@underline">
+                                            @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                            @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                            {
+                                                try
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                catch
+                                                {
+                                                }
+                                            }
+                                            @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                            {
+                                                <img src="~/img/star.png" width="14px" height="14px" />
+                                            }
+                                        </a> <i class="fa fa-copy" onclick="copy('@item.Ref')"></i>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <b>Export</b>
+                                @foreach (var item in rFQQuoteData.Where(x => x.CountryType == "Export"))
+                                {
+                                    if (item.CompanyName == null || item.SZ_QuotationDetail == null || item.SZ_QuotationDetail.Count == 0)
+                                    {
+                                        continue;
+                                    }
+                                    var cls = "";
+                                    if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                    {
+                                        cls = "clsorange";
+                                    }
+                                    if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                    {
+                                        cls = "clsblue";
+                                    }
+                                    if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                    {
+                                        cls = "clslightgreen";
+                                    }
+                                    var catnolist = item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.CATNo)).Select(x => x.CATNo).ToList();
+                                    var anyavailable = catnolist.Where(x => synthesiscatno.Contains(x)).Any();
+                                    var underline = "";
+                                    if (anyavailable)
+                                    {
+                                        underline = "text-decoration:underline";
+                                    }
+
+                                    <div class="col-md-12">
+                                        <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                        <a href="/Form/Quote/@item.Id" class="@cls" style="@underline">
+                                            @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                            @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                            {
+                                                try
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                catch
+                                                {
+                                                }
+                                            }
+                                            @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                            {
+                                                <img src="~/img/star.png" width="14px" height="14px" />
+                                            }
+                                        </a> <i class="fa fa-copy" onclick="copy('@item.Ref')"></i>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Assigned</h3>
+                </div>
+                <form role="form">
+                    <div class="box-body">
+                        @if (Model.AssignQuoteDetails != null)
+                        {
+                            int loopassigned = 1;
+                            <div class="table-responsive">
+                                <table class="table" id="tblassigned">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Quotation ID</th>
+                                            <th>Product Name / CAS No / CAT No</th>
+                                            <th>
+                                                Qty
+                                            </th>
+                                            <th>Lead time</th>
+                                            <th>Product Remarks</th>
+                                            <th>Company</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.AssignQuoteDetails)
+                                        {
+                                            bool ischanged = false;
+                                            var lesslogdata = db.SZ_QuotationDetailLog.Where(x => x.QuoteDetailsId == item.Id && x.FieldName == "Price").OrderByDescending(x => x.Datetime).FirstOrDefault();
+                                            if (lesslogdata == null)
+                                            {
+                                                lesslogdata = new SZ_QuotationDetailLog();
+                                                lesslogdata.Before = item.Price;
+                                                lesslogdata.After = item.Price;
+                                            }
+                                            else
+                                            {
+                                                if (!lesslogdata.Before.Contains("mg"))
+                                                {
+                                                    var splt = lesslogdata.Before.Split(',');
+                                                    if (splt != null && splt.Count() > 0)
+                                                    {
+                                                        foreach (var itemss in splt)
+                                                        {
+                                                            var s = itemss.Replace("@", "mg@");
+                                                            if (s != lesslogdata.After)
+                                                            {
+                                                                ischanged = true;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ischanged = true;
+                                                }
+
+                                            }
+                                            <tr>
+                                                <td>@loopassigned</td>
+                                                <td>
+                                                    <a href="/Form/Quote/@item.QuoteId" target="_blank">
+                                                        @item.SZ_Quotation.Ref
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    @item.ProductName <br>
+                                                    @item.CASNo<br>
+                                                    @item.CATNo
+                                                </td>
+                                                <td>
+                                                    <table style="width: 100%" cellpadding="5" cellspacing="5">
+                                                        @if (lesslogdata != null)
+                                                        {
+                                                            var data = SZ_Helper.PreparePriceModel(lesslogdata.Before);
+                                                            <tr>
+                                                                @foreach (var datapri in data)
+                                                                {
+                                                                    <td width="25%">
+                                                                        @datapri.MG <br />
+                                                                        @datapri.Price
+                                                                    </td>
+
+                                                                }
+                                                                @if (data.Count < 4)
+                                                                {
+                                                                    var loopcnt = 4 - data.Count;
+                                                                    for (int i = 0; i < loopcnt; i++)
+                                                                    {
+                                                                        <td width="25%"></td>
+                                                                    }
+                                                                }
+                                                            </tr>
+                                                        }
+                                                        @if (lesslogdata != null)
+                                                        {
+                                                            string claschanged = "";
+                                                            if (ischanged)
+                                                            {
+                                                                claschanged = "clspricechanged";
+                                                            }
+                                                            var data = SZ_Helper.PreparePriceModel(lesslogdata.After);
+                                                            <tr class="@claschanged" style="border-top:1px solid #ececec">
+                                                                @foreach (var datapri in data)
+                                                                {
+                                                                    <td>
+                                                                        @datapri.MG <br />
+                                                                        @datapri.Price
+                                                                    </td>
+                                                                }
+                                                                @if (data.Count < 4)
+                                                                {
+                                                                    var loopcnt = 4 - data.Count;
+                                                                    for (int i = 0; i < loopcnt; i++)
+                                                                    {
+                                                                        <td></td>
+                                                                    }
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    </table>
+                                                </td>
+                                                <td>@item.LeadTime</td>
+                                                <td>@item.ProductRemark</td>
+                                                <td>@item.SZ_Quotation.CompanyName</td>
+                                            </tr>
+                                            loopassigned += 1;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Correction Log</h3>
+                </div>
+                <form role="form">
+                    <div class="box-body">
+                        @if (Model.ConversionData != null)
+                        {
+                            int loopassigned = 1;
+                            <div class="table-responsive">
+                                <table class="table" id="tblconversion">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Quotation ID</th>
+                                            <th>Product Name</th>
+                                            <th>CAT No</th>
+                                            <th>CAS No</th>
+                                            <th>Lead time</th>
+                                            <th>Correction Log</th>
+                                            <th>Product Remarks</th>
+                                            <th>Company</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.ConversionData)
+                                        {
+                                            <tr>
+                                                <td>@loopassigned</td>
+                                                <td>
+                                                    <a href="/Form/Quote/@item.QuoteId" target="_blank">
+                                                        @item.SZ_QuotationDetail.SZ_Quotation.Ref
+                                                    </a>
+                                                </td>
+                                                <td>@item.SZ_QuotationDetail.ProductName</td>
+                                                <td>@item.SZ_QuotationDetail.CATNo</td>
+                                                <td>@item.SZ_QuotationDetail.CASNo</td>
+                                                <td>@item.SZ_QuotationDetail.LeadTime</td>
+                                                <td>@item.Remark</td>
+                                                <td>@item.SZ_QuotationDetail.ProductRemark</td>
+                                                <td>@item.SZ_QuotationDetail.SZ_Quotation.CompanyName</td>
+                                                <td>
+                                                    <a href="javascript:void(0)" class="btn btn-danger" onclick="deletequotecorrectionlog(@item.Id)">
+                                                        Close
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            loopassigned += 1;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+</section>
+<script type="text/javascript">
+    $('#tblassigned').DataTable();
+    $('#tblconversion').DataTable();
+
+    function deletequotecorrectionlog(id) {
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this log!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Form/CloseCorrectionlogForQuote?id=" + id,
+                        data: {},
+                        success: function (results) {
+                            window.location.reload(true);
+                        }
+                    });
+
+                } else {
+                    toastr.error("Your added product is safe :)");
+                }
+            });
+    }
+</script>
+<style>
+    .clspricechanged {
+        color: red !important;
+    }
+</style>

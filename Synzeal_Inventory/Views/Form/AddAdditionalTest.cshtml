@@ -1,0 +1,63 @@
+﻿@{
+    ViewBag.Title = "Company";
+    Layout = null;
+}
+@model  Synzeal_Inventory.Entity.SZ_AdditionalTest
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Add New Additional Test</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Test Name</label>
+                    <input type="text" class="form-control" id="Test" name="Test" placeholder="Test Name" required value="@Model.Test">
+                    <input type="hidden" id="testid" name="testid" value="@Model.Id" />
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">INR</label>
+                    <input type="text" class="form-control" id="INR" name="INR" placeholder="INR" required value="@Model.INR">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">USD</label>
+                    <input type="text" class="form-control" id="USD" name="USD" placeholder="USD" required value="@Model.USD">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">GBP</label>
+                    <input type="text" class="form-control" id="GBP" name="GBP" placeholder="GBP" required value="@Model.GBP">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">EURO</label>
+                    <input type="text" class="form-control" id="EURO" name="EURO" placeholder="EURO" required value="@Model.EURO">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Display Order</label>
+                    <input type="text" class="form-control" id="DisplayOrder" name="DisplayOrder" placeholder="DisplayOrder" required value="@Model.DisplayOrder">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Make Default</label>
+                    <input type="checkbox" id="MakeDefault" name="MakeDefault" value="@Model.MakeDefault">
+                </div>
+                <div class="form-group" style="text-align:right">
+                    <button type="button" onclick="Quote.addAdditionalData()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@if (Model.Id > 0)
+{
+    <text>
+    <script>
+        if ('@Model.MakeDefault' === "True") {
+            $("#MakeDefault").attr("checked", true);
+        }
+        
+    </script>
+    </text>
+}

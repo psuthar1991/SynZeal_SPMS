@@ -1,0 +1,308 @@
+﻿@model List<Synzeal_Inventory.Models.QuotationListModel>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    decimal totalRecord = 0;
+    int withoutcatno = 0;
+    string emailcc = ViewBag.QuoteEmailAddress as string;
+    if (!string.IsNullOrEmpty(emailcc))
+    {
+        emailcc = emailcc + ";";
+    }
+    //List<string> catnos = new List<string>();
+    int loop = 1;
+}
+@using Synzeal_Inventory.Models
+<div class="box-body form-horizontal">
+    <div class="form-group">
+        <label class="col-md-3" style=" margin-top: 7px;">To<i> (Use comma(;) for other email)</i>:</label>
+        <div class="col-md-9">
+            <input type="text" id="emailpopup" name="popuptoemail" class="form-control" value="@ViewBag.EmailAddress" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3" style=" margin-top: 7px;">Cc<i> (Use comma(;) for other email)</i>:</label>
+        <div class="col-md-9">
+            <input type="text" id="emailccpopup" name="popupccemail" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+
+        <div class="col-md-5">
+            <input type="checkbox" class="chkemail" value="exports@synzeal.com" />&nbsp; Export &nbsp; &nbsp;
+            <input type="checkbox" class="chkemail" value="sales@synzeal.com" />&nbsp; Sales &nbsp; &nbsp;
+            <input type="checkbox" class="chkemail" value="support@synzeal.com" />&nbsp; Support &nbsp; &nbsp;
+            <input type="checkbox" class="chkemail" value="projects@synzeal.com" />&nbsp; Project &nbsp; &nbsp;
+            <input type="checkbox" id="IsShippedCharge" name="IsShippedCharge" /> &nbsp; Is Shipped Charge?
+        </div>
+        <label class="col-md-2" style="margin-top: 7px;width: 11%;">Payment Terms</label>
+        <div class="col-md-1" style="width: 13%;">
+            @Html.DropDownList("PaymentTerm", (IEnumerable<SelectListItem>)ViewBag.listPaymentTermsItems, new { @class = "form-control", @style = "width:100%; float:left" })
+        </div>
+        <label class="col-md-2" style="margin-top: 7px;width: 11%;">Final Discount</label>
+        <div class="col-md-1">
+            <input type="number" class="form-control" id="txtfinaldiscount" />
+        </div>
+        <div class="col-md-1" style="width: 13%;">
+            <a href="javascript:void(0)" onclick="finaldiscountcall()" class="btn btn-primary">Calculate</a>
+            <a href="javascript:void(0)" onclick="downloadorderconfirmation()" class="btn btn-primary"><i class="fa fa-download"></i></a>
+        </div>
+    </div>
+    <div class="form-group">
+        <style>
+            .ms-options-wrap {
+                float: left;
+            }
+        </style>
+        <label class="col-md-2" style="margin-top: 7px;width: 11%;float:left;">Company : </label>
+        @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.listCompItems, new { @class = "form-control", @style = "width:30%; float:left" })
+
+        <label class="col-md-1" style="margin-top: 7px;width: 11%;">PO No. : </label>
+        <div class="col-md-2" style="margin-top: 7px;">@Model[0].PONumber</div>
+        <label class="col-md-1" style="margin-top: 7px;width: 11%;">PO Date : </label>
+        <div class="col-md-2" style="margin-top: 7px;">
+            @if (Model[0].PODate.HasValue)
+            {
+                @Model[0].PODate.Value.GetOrdinalDate()
+            }
+        </div>
+    </div>
+    <div class="form-group">
+    </div>
+    <table width="100%" class="table table-bordered table-striped" id="tblorderconf">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Product Name</th>
+                <th>CAS No</th>
+                <th>CAT No</th>
+                <th>QTY. (mg)</th>
+                <th>Pack Size</th>
+                <th>Batch No</th>
+                <th>Lead Time</th>
+                <th>Estimate Comp. Date </th>
+                <th>Final Price</th>
+                <th>Discount</th>
+                <th>Technical Contact</th>
+            </tr>
+        </thead>
+        @foreach (var k in Model)
+        {
+            if (string.IsNullOrEmpty(k.CATNo))
+            {
+                withoutcatno += 1;
+            }
+            <tr>
+                <td>@loop</td>
+                <td>@k.ProductName</td>
+                <td>@k.CASNo</td>
+                <td>@k.CATNo</td>
+                <td>
+                    @k.RequiredQty
+                </td>
+                <td>
+                    <input type="text" class="clsleadtime" id="orderremark_@k.QuoteDetailsId" data-quotedetailid="@k.QuoteDetailsId" value="@k.OrderRemark" />
+                </td>
+                <td>@k.BatchNo</td>
+                <td>
+                    <input type="text" class="clsleadtime" id="leadtime_@k.QuoteDetailsId" data-quotedetailid="@k.QuoteDetailsId" value="@k.LeadTime" />
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(k.EstimateDispatchDateStr))
+                    {
+                        DateTime estdate = Convert.ToDateTime(k.EstimateDispatchDateStr);
+                        @estdate.GetOrdinalDate()
+                    }
+                </td>
+                <td>
+                    @{
+                        if (!string.IsNullOrEmpty(k.FinalPrice))
+                        {
+                            try
+                            {
+                                string resultString = System.Text.RegularExpressions.Regex.Match(k.FinalPrice, @"\d+").Value;
+                                totalRecord += Convert.ToDecimal(resultString);
+                            }
+                            catch (Exception)
+                            {
+
+                            }
+                        }
+                    }
+                    <input type="text" style="width: 100px" id="finalprice_@k.QuoteDetailsId" data-qty="@k.RequiredQty" data-quotedetailid="@k.QuoteDetailsId" data-price="@k.Price" class="clsfinalprice finalprice_@k.QuoteDetailsId" data-TracebilityCost="@k.TracebilityCost" data-AddTestCost="@k.AddTestCost" data-ColdShipCost="@k.ColdShipCost" value="@k.FinalPrice" />
+                </td>
+                <td>
+                    <input type="text" style="width: 100px" id="itemdiscount_@k.QuoteDetailsId" data-qty="@k.RequiredQty" data-quotedetailid="@k.QuoteDetailsId" data-price="@k.Price" class="clsdiscount discount_@k.QuoteDetailsId" data-TracebilityCost="@k.TracebilityCost" data-AddTestCost="@k.AddTestCost" data-ColdShipCost="@k.ColdShipCost" value="@k.ItemDiscount" />
+                </td>
+                <td>
+                    @k.TechnicalEmail
+                </td>
+            </tr>
+            loop += 1;
+        }
+    </table>
+</div>
+<div>
+    <a href="javascript:void(0)" class="btn btn-primary" onclick="sendemailconfirmation()">Send Email</a>
+    <label id="totalrecordcount" style="float:right;margin-right:3%;">Total : @totalRecord</label>
+</div>
+
+
+<script>
+    if ('@ViewBag.PaymentTerms' !== "") {
+        $("#myModal").find('#PaymentTerm').val('@ViewBag.PaymentTerms');
+    }
+    if ('@ViewBag.IsShippedCharge' !== "" && '@ViewBag.IsShippedCharge' != 'False') {
+        $("#myModal").find('#IsShippedCharge').attr('checked',true);
+    }
+
+    function downloadorderconfirmation() {
+        var toEmailaddress = $("#myModal").find('#emailpopup').val();
+        var cctoEmailaddress = $("#myModal").find('#emailccpopup').val();
+        var discount = $("#myModal").find('#txtfinaldiscount').val();
+        var ids = JSON.parse('@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Ids))');
+        var paymentTerms = $("#myModal").find('#PaymentTerm').val();
+        var IsShippedCharge = $("#myModal").find('#IsShippedCharge').is(":checked");
+        var companyId = $("#myModal").find('#CompanyId').val();
+        var paramData = [];
+        $(ids).each(function (i, v) {
+            var number = discount;
+            var itemdis = $("#myModal").find("#itemdiscount_" + v).val();
+            if (itemdis !== 0 && itemdis !== '') {
+                number = parseFloat(itemdis);
+            }
+
+            var obj = {
+                    "QuoteDetailsId" : v,
+                    "FinalPrice": $("#myModal").find(".finalprice_" + v).val(),
+                    "LeadTime": $("#myModal").find("#leadtime_" + v).val(),
+                    "OrderRemark": $("#myModal").find("#orderremark_" + v).val(),
+                    "ItemDiscount": number,
+            };
+            paramData.push(obj)
+        });
+
+        var data = JSON.stringify({
+            "id": paramData,
+            "isDownload": true,
+            "toEmail": toEmailaddress,
+            "cctoEmail": cctoEmailaddress,
+            "discount": discount,
+            "paymentTerms": paymentTerms,
+            "IsShippedCharge": IsShippedCharge,
+            "CompanyId": companyId
+        });
+        $.ajax({
+            url: '/Form/SendEmailOrderConfirmationAction',
+            data: data,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: 'POST',
+            traditional: true, // add this
+            success: function (data) {
+                if (data.success) {
+                    //window.location.href = data.message;
+                    window.open("http://spms.synzeal.com/" + data.message, '_blank')
+                }
+                else {
+                    toastr.error(data.message);
+                    return false;
+                }
+            }
+        });
+    }
+    function sendemailconfirmation() {
+        if ('@withoutcatno' != '0') {
+            toastr.error("CAT no is missing. You can not send order confirmation.");
+            return false;
+        }
+
+        var toEmailaddress = $("#myModal").find('#emailpopup').val();
+        var cctoEmailaddress = $("#myModal").find('#emailccpopup').val();
+        var discount = $("#myModal").find('#txtfinaldiscount').val();
+        var paymentTerms = $("#myModal").find('#PaymentTerm').val();
+        var ids = JSON.parse('@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Ids))');
+        var IsShippedCharge = $("#myModal").find('#IsShippedCharge').is(":checked");
+        var CompanyId = $("#myModal").find('#CompanyId').val();
+        var paramData = [];
+        $(ids).each(function (i, v) {
+            var number = discount;
+            var itemdis = $("#myModal").find("#itemdiscount_" + v).val();
+            if (itemdis !== 0 && itemdis !== '') {
+                number = parseFloat(itemdis);
+            }
+            var obj = {
+                "QuoteDetailsId" : v,
+                "FinalPrice": $("#myModal").find(".finalprice_" + v).val(),
+                "LeadTime": $("#myModal").find("#leadtime_" + v).val(),
+                "OrderRemark": $("#myModal").find("#orderremark_" + v).val(),
+                "ItemDiscount": number,
+            };
+            paramData.push(obj)
+        });
+
+        var data = JSON.stringify({ "id": paramData, "toEmail": toEmailaddress, "cctoEmail": cctoEmailaddress, "discount": discount, "paymentTerms": paymentTerms, "IsShippedCharge": IsShippedCharge, "CompanyId": CompanyId });
+    $.ajax({
+        url: '/Form/SendEmailOrderConfirmationAction',
+        data: data,
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        type: 'POST',
+        traditional: true, // add this
+        success: function (data) {
+            if (data.success) {
+                toastr.success("Send mail successfully");
+                $('#myModal').modal('hide');
+            }
+            else {
+                toastr.error(data.message);
+                return false;
+            }
+        }
+    });
+}
+
+    var emailcc = "@emailcc standards@synzeal.com; support@synzeal.com; ";
+    $("#myModal").find("#emailccpopup").val(emailcc);
+
+    $(".chkemail").click(function () {
+        var value = $(this).val();
+        var isChecked = $(this).is(":checked");
+        if (isChecked) {
+            var str = $("#myModal").find("#emailccpopup").val() +""+ value +";";
+            $("#myModal").find("#emailccpopup").val(str)
+        }
+        else {
+            var datas = $("#myModal").find("#emailccpopup").val().split(';');
+            var index = datas.indexOf(value);
+            datas.splice(index, 1);
+             $("#myModal").find("#emailccpopup").val(datas.join(';'))
+        }
+    });
+
+    $("#myModal").find(".chkemail").each(function () {
+        if ($(this).val() == "projects@synzeal.com") {
+            $(this).prop('checked', true);
+            var str = $("#myModal").find("#emailccpopup").val() + "" + $(this).val() + ";";
+            $("#myModal").find("#emailccpopup").val(str)
+        }
+    });
+
+    if ("Domestic" == "@ViewBag.CountryType") {
+        $("#myModal").find(".chkemail").each(function () {
+            if ($(this).val() == "sales@synzeal.com") {
+                $(this).prop('checked', true);
+                var str = $("#myModal").find("#emailccpopup").val() + "" + $(this).val() + ";";
+                $("#myModal").find("#emailccpopup").val(str)
+            }
+        });
+    }
+    else {
+        $("#myModal").find(".chkemail").each(function () {
+        if ($(this).val() == "exports@synzeal.com") {
+            $(this).prop('checked', true);
+            var str = $("#myModal").find("#emailccpopup").val() + "" + $(this).val() + ";";
+            $("#myModal").find("#emailccpopup").val(str)
+            }
+        });
+    }
+</script>

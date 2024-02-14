@@ -1,0 +1,230 @@
+﻿@model Synzeal_Inventory.Entity.SZ_QueryModule
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    Synzeal_Inventory.Entity.SZ_SolutionModule solution = db.SZ_SolutionModule.Where(x => x.Id == Model.SolutionId).FirstOrDefault();
+
+}
+@using Newtonsoft.Json
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+
+<div style="margin:5% 33%;float:left;box-shadow:0 0 3px #aaa; height:auto;color:gray;">
+    <table width="100%">
+        <tr>
+            <td valign="top">
+                <img src="http://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" width="200px" />
+            </td>
+            <td style="float:right">
+                <span style="font-size:9px;float:right;padding:10px; text-align:right;color:gray">
+                    <b style="color:#000">Syn</b><b style="color: #00659e;">Zeal</b><b style="color:#000"> Research Pvt Ltd</b><br />
+                    Plot No. F, Shree Ganesh Industrial Estate,<br />
+                    423/24/8, Mahagujarat Industrial Estate,<br />
+                    Sarkhej-Bavla Road , Moraiya , India-382213<br />
+                    <b>Email:-</b> standards@synzeal.com<br />
+                    <b>Phone:-</b> +91-757-500-2050<br />
+                </span>
+            </td>
+        </tr>
+    </table>
+
+    <div style="width:100%; border-bottom:1px solid rgba(0,0,0,0.2);float:left;border-top:1px solid #000;margin-bottom:15px;color:#000;">
+        <table width="100%">
+            <tr>
+                <td style="font-size:9px;">
+                    <b style="color:#000;">Query ID :</b> @Model.QueryNo
+                </td>
+                <td>
+                    <span style="font-size:9px;float:right;padding:10px; text-align:right;">
+                        <b style="color:#000;">Date :</b> @Model.CreatedDate.Value.Day<sup>@GetDaySuffix(Model.CreatedDate.Value.Day)</sup> @Model.CreatedDate.Value.ToString("MMMM yy")
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <span style="font-size:9px;float:right;padding:10px; text-align:right;">
+                        @if (Model.ClosingDate.HasValue)
+                        {
+                            <b style="color:#000;">Closing Date :</b> @Model.ClosingDate.Value.Day<sup>@GetDaySuffix(Model.ClosingDate.Value.Day)</sup> @Model.ClosingDate.Value.ToString("MMMM yy")
+
+                        }
+                    </span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <hrline />
+    <div style="color: #000;
+        font-size: 9px;
+        width: 100%;
+        padding-top: 10px;">
+        <b>Subject: @Model.QuerySubject</b>
+    </div>
+    <hrline />
+    <div style="width:100%; padding:0px; padding-top:5px;">
+        <b style="font-size:11px;color:#000">Product Details</b>
+        <table style="width:100%">
+            <tbody>
+                @{
+                    string imagePath = string.Empty;
+                    bool exists = false;
+                    if (!string.IsNullOrEmpty(Model.CATNo))
+                    {
+                        string uri = "https://synzeal.com/api/RestAPI/ProductDetailsBySku?sku=" + Model.CATNo.Trim();
+                        HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                        request.Method = "GET";
+                        request.ContentType = "application/json";
+
+                        try
+                        {
+                            WebResponse response = request.GetResponse();
+                            using (var reader = new StreamReader(response.GetResponseStream()))
+                            {
+                                var ApiStatus = reader.ReadToEnd();
+                                string productModel = JsonConvert.DeserializeObject<string>(ApiStatus);
+                                var product = JsonConvert.DeserializeObject<Synzeal_Inventory.Models.ProductDetailsModel>(productModel);
+                                if (product != null && product.DefaultPictureModel != null)
+                                {
+                                    imagePath = product.DefaultPictureModel.FullSizeImageUrl;
+                                }
+                                else
+                                {
+                                    imagePath = string.Empty;
+                                }
+                            }
+                            exists = true;
+                        }
+                        catch
+                        {
+                            exists = false;
+                        }
+                    }
+
+                    <tr style="color:#000;">
+                        <td style="font-size:9px;" width="60%">
+                            <table width="100%">
+                                <tr>
+                                    <td>
+                                        <table width="100%">
+                                            <tr>
+                                                <td width="28%">
+                                                    <b>Product Name</b>
+                                                </td>
+                                                <td>
+                                                    @Model.ProductName
+                                                </td>
+                                            </tr>
+                                            @if (!string.IsNullOrEmpty(Model.CATNo))
+                                            {
+                                                <tr>
+                                                    <td width="28%">
+                                                        <b>CAT No</b>
+                                                    </td>
+                                                    <td>
+                                                        @Model.CATNo
+                                                    </td>
+                                                </tr>
+                                            }
+                                            <tr>
+                                                <td width="28%">
+                                                    <b>CAS No</b>
+                                                </td>
+                                                <td>
+                                                    @Model.CASNo
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="28%">
+                                                    <b>Batch Code</b>
+                                                </td>
+                                                <td>
+                                                    @Model.BatchNo
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td width="28%">
+                                                    <b>Qty</b>
+                                                </td>
+                                                <td>
+                                                    @Model.Qty
+                                                </td>
+                                            </tr>
+                                            @*<tr>
+                                                    <td width="28%">
+                                                        <b>Team Leader</b>
+                                                    </td>
+                                                    <td>
+                                                        @Model.TeamLeader
+                                                    </td>
+                                                </tr>*@
+                                        </table>
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="font-size:9px;text-align:center;">
+                            @if (!string.IsNullOrEmpty(imagePath) && exists)
+                            {
+                                <img src="@imagePath" width="200px" />
+                            }
+                            else
+                            {
+                                <img src="https://www.synzeal.com/content/images/thumbs/default-image_500.png" width="200px" />
+                            }
+                        </td>
+
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+    </div>
+    <hrline />
+    <div style="width: 100%;padding: 0px;padding-top: 5px;font-size: 9px;color: #000">
+        <b style="font-size:11px;color:#000">Query Details</b>
+        <br />
+        <div class="form-group">
+            @Model.ClientRemark
+        </div>
+    </div>
+
+    @if (solution != null)
+    {
+        <hrline />
+        <div style="width: 100%;padding: 0px;padding-top: 5px;font-size: 9px;color: #000">
+            <b style="font-size:11px;color:#000">Query Solution</b>
+            <br />
+            <div class="form-group">
+                <b>Solution # </b>@solution.Id
+            </div>
+            <div class="form-group">
+                <b>Analytic/Technical View: </b>@solution.Solution
+            </div>
+            <div class="form-group">
+                <b>Query Understanding: </b>@solution.Cause
+            </div>
+            <div class="form-group">
+                <b>Final Solution: </b>@solution.Remark
+            </div>
+        </div><hrline />
+    }
+
+</div>

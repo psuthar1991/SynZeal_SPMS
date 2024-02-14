@@ -1,0 +1,83 @@
+﻿
+
+@model List<Synzeal_Inventory.Entity.SZ_QuotationDetail>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    int loop = 1;
+}
+@using Synzeal_Inventory.Models
+@using Newtonsoft.Json
+
+<div class="box-body form-horizontal">
+
+    <p>Dear Sir,</p>
+
+    <p> Please find below SPMS sheet for your reference & approval.</p>
+    <table width="100%" class="table table-bordered table-striped" cellpadding="7" border="1">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Purchase Status</th>
+                <th>PO No</th>
+                <th>Product Name</th>
+                <th>CAS No</th>
+                <th>CAT No</th>
+                <th>QTY. (mg)</th>
+                <th>Summary</th>
+                <th>Product Remark</th>
+            </tr>
+        </thead>
+        @foreach (var k in Model)
+        {
+            if (string.IsNullOrEmpty(k.PurchaseStatus))
+            {
+                continue;
+            }
+            if (string.IsNullOrEmpty(k.SZ_Quotation.PONo))
+            {
+                continue;
+            }
+            if (!k.PurchaseDate.HasValue)
+            {
+                continue;
+            }
+            <tr>
+                <td>@loop</td>
+                <td>
+                    @if (k.PurchaseDate.HasValue)
+                    {
+                        @k.PurchaseDate.Value.ToShortDateString()
+                    }
+                </td>
+                <td>@k.PurchaseDDLStatus</td>
+                <td>@k.SZ_Quotation.PONo</td>
+                <td>@k.ProductName</td>
+                <td>@k.CASNo</td>
+                <td>@k.CATNo</td>
+                <td>@k.RequiredQty</td>
+                <td>@k.PurchaseStatus</td>
+                <td>
+                    @k.PurchaseRemark
+                </td>
+            </tr>
+
+            loop += 1;
+        }
+    </table>
+    <br />
+    <p>
+        Sincerely,
+    </p>
+    <p>
+        SynZeal Research Pvt Ltd <br />
+        http://www.synzeal.com
+    </p>
+</div>
+<style>
+    
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+</style>

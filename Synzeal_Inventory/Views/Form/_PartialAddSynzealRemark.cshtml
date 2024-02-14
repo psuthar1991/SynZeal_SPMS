@@ -1,0 +1,66 @@
+﻿@model Synzeal_Inventory.Entity.SZ_QueryModule
+@using Synzeal_Inventory.Entity;
+@{
+    int loopCnt = 1;
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    //string synthesis = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProjectType.Synthesis);
+    //string pursynthesis = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProjectType.PurSynthesis);
+    //string purchase = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProjectType.Purchase);
+}
+<div class="box-body form-horizontal" id="divaddsolution">
+    <div class="col-md-12">
+        <div class="single-form-block">
+            <div class="general-tab">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="row">
+                            <input type="hidden" id="QuoteDetailsId" name="QuoteDetailsId" value="@Model.QuoteDetailsId" />
+                            <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+                            <div class="form-group col-md-12 col-sm-12">
+                                <label>Remark</label>
+                                <textarea class="form-control" id="Remark" name="Remark" rows="3"> @Model.SynzealRemark</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="row">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th style="width:50%">Product Name</th>
+                                        <td>@Model.ProductName</td>
+                                    </tr>
+                                    <tr>
+                                        <th>CAT No</th>
+                                        <td>@Model.CATNo</td>
+                                    </tr>
+                                    <tr>
+                                        <th>CAS No:</th>
+                                        <td>@Model.CASNo</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Batch Code:</th>
+                                        <td>@Model.BatchNo</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12">
+                        <div class="submit-button">
+                            <input type="button"  onclick="savesynzealremark(@Model.Id)" value="Submit" class="btn btn-primary">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.Id != 0)
+{
+    <text>
+        <script type="text/javascript">
+            
+        </script>
+    </text>
+}

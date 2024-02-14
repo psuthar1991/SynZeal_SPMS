@@ -1,0 +1,198 @@
+﻿@{
+    ViewBag.Title = "NewSampleRequestList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model List<SZ_Bug>
+@using Synzeal_Inventory.Entity
+@{ 
+    SynzealLiveEntities db = new SynzealLiveEntities();
+}
+
+<section class="content-header">
+    <h1>
+        Bug List
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#home" data-tabname="all">OPEN</a></li>
+                    <li><a data-toggle="tab" href="#tabclosed" onclick="closedtab()" data-tabname="closed">CLOSED</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="home" class="tab-pane fade in active">
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote">
+                            <a href="/Form/Bug" style="float:right;margin-right:8px;margin-bottom:15px;" class="btn btn-primary">New Bug</a>
+                            <div class="clearfix"></div>
+                            <table id="example1" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Ticket #</th>
+                                        <th>Date</th>
+                                        <th>Subject</th>
+                                        <th>Created By</th>
+                                        <th style="text-align:center">Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                
+                    <div id="tabclosed" class="tab-pane fade in ">
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote">
+                             <table id="tblclosed" style="width: 100%" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Ticket #</th>
+                                        <th>Date</th>
+                                        <th>Subject</th>
+                                        <th>Created By</th>
+                                        <th style="text-align:center">Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<script type="text/javascript">
+    var alltbl = $('#example1').DataTable({
+        "searching": false,
+        "ordering": false,
+        "processing": true, // for show progress bar
+        "serverSide": true, // for process server side
+        "filter": true, // this is for disable filter (search box)
+        "orderMulti": false, // for disable multiple column at once
+        "pageLength": 25,
+        //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+        "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+        "ajax": {
+            "url": "../Form/LoadBugData?status=all",
+            "type": "POST",
+            "datatype": "json",
+            "data": function (d) {
+            }
+        },
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+            }
+
+            if (aData.Status == 'OPEN') {
+                $(nRow).find('td:eq(4)').css('background-color', '#3c8dbc').css('text-align', 'center').css('font-weight', 'bold');
+            }
+            if (aData.Status == 'IN PROCESS') {
+                $(nRow).find('td:eq(4)').css('background-color', '#28E541').css('text-align', 'center').css('font-weight', 'bold');
+            }
+            if (aData.Status == 'HOLD') {
+                $(nRow).find('td:eq(4)').css('background-color', '#E9FF2E').css('text-align', 'center').css('font-weight', 'bold');
+            }
+            if (aData.Status == 'CLOSED') {
+                $(nRow).find('td:eq(4)').css('background-color', '#E54627').css('text-align', 'center').css('font-weight', 'bold');
+            }
+            $(nRow).find('td:eq(5)').css('text-align', 'center');
+        },
+        "fnDrawCallback": function (oSettings) {
+            setTimeout(function () {
+                alltbl.columns.adjust();
+            }, 2000);
+
+        },
+        "columnDefs":
+            [
+
+            ],
+        "createdRow": function (row, data, dataIndex) {
+        },
+        "columns": [
+            { "data": "BugNo", "name": "FinalPrice", "width": "250px" },
+            { "data": "URL", "name": "LeadTime", "autoWidth": true },
+            { "data": "Subject", "name": "AdditionalBatchNoText" },
+            { "data": "CreatedBy", "orderable": false, "width": "100px" },
+            { "data": "Status", "orderable": false, "width": "100px" },
+            { "data": "Description", "orderable": false, "swidth": "300px" }
+
+        ]
+    });
+
+
+    var closedload = false;
+    function closedtab() {
+        if (closedload === false) {
+            var closedtbl = $('#tblclosed').DataTable({
+                "searching": false,
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadBugData?status=closed",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                    }
+                    if (aData.Status == 'OPEN') {
+                        $(nRow).find('td:eq(4)').css('background-color', '#3c8dbc').css('text-align', 'center').css('font-weight', 'bold');
+                    }
+                    if (aData.Status == 'IN PROCESS') {
+                        $(nRow).find('td:eq(4)').css('background-color', '#28E541').css('text-align', 'center').css('font-weight', 'bold');
+                    }
+                    if (aData.Status == 'HOLD') {
+                        $(nRow).find('td:eq(4)').css('background-color', '#E9FF2E').css('text-align', 'center').css('font-weight', 'bold');
+                    }
+                    if (aData.Status == 'CLOSED') {
+                        $(nRow).find('td:eq(4)').css('background-color', '#E54627').css('text-align', 'center').css('font-weight', 'bold');
+                    }
+                    $(nRow).find('td:eq(5)').css('text-align', 'center');
+                },
+                "fnDrawCallback": function (oSettings) {
+                    setTimeout(function () {
+                        closedtbl.columns.adjust();
+                    }, 1000);
+
+                    closedload = true;
+                },
+                "columnDefs":
+                    [
+
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                },
+                "columns": [
+                    { "data": "BugNo", "name": "FinalPrice", "width": "250px" },
+                    { "data": "URL", "name": "LeadTime", "autoWidth": true },
+                    { "data": "Subject", "name": "AdditionalBatchNoText" },
+                    { "data": "CreatedBy", "orderable": false, "width": "100px" },
+                    { "data": "Status", "orderable": false, "width": "100px" },
+                    { "data": "Description", "orderable": false, "swidth": "300px" }
+
+                ]
+            });
+        }
+    }
+</script>

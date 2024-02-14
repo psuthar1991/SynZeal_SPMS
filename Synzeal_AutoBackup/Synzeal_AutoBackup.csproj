@@ -1,0 +1,527 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4386D3A3-8310-4678-87DD-3102F3636C2B}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Synzeal_AutoBackup</RootNamespace>
+    <AssemblyName>Synzeal_AutoBackup</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Entity\AclRecord.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ActivityLog.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ActivityLogType.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Address.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\AddressAttribute.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\AddressAttributeValue.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Affiliate.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\BackInStockSubscription.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\BlogComment.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\BlogPost.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Campaign.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Category.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\CategoryTemplate.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\CheckoutAttribute.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\CheckoutAttributeValue.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Country.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\CrossSellProduct.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Currency.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Customer.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\CustomerAttribute.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\CustomerAttributeValue.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\CustomerRole.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Dashboard_Result.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\DeliveryDate.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Discount.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\DiscountRequirement.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\DiscountUsageHistory.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Download.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\EmailAccount.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ExternalAuthenticationRecord.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Forums_Forum.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Forums_Group.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Forums_Post.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Forums_PrivateMessage.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Forums_Subscription.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Forums_Topic.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\GenericAttribute.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\GiftCard.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\GiftCardUsageHistory.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\GoogleProduct.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Group.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Group_Newsletter_Map.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\InvoiceList_Result.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Language.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\LocaleStringResource.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\LocalizedProperty.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Log.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Manufacturer.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ManufacturerTemplate.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\MeasureDimension.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\MeasureWeight.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\MessageTemplate.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\MessageTemplateNewsLetter.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\News.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\NewsComment.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Newsletter.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\NewsLetterSubscription.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\nop_splitstring_to_table_Result.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Order.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\OrderItem.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\OrderNote.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\PermissionRecord.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Picture.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Poll.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\PollAnswer.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\PollVotingRecord.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\PredefinedProductAttributeValue.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Product.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ProductAttribute.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ProductAttributeCombination.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ProductAttributeValue.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ProductReview.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ProductReviewHelpfulness.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ProductTag.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ProductTagCountLoadAll_Result.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ProductTemplate.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ProductWarehouseInventory.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Product_Category_Mapping.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Product_Manufacturer_Mapping.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Product_Picture_Mapping.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Product_ProductAttribute_Mapping.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Product_SpecificationAttribute_Mapping.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\QueuedEmail.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\QuotationList_Result.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\RecurringPayment.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\RecurringPaymentHistory.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\RelatedProduct.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ReturnRequest.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\RewardPointsHistory.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Rfq.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ScheduleTask.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SearchTerm.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Setting.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Shipment.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ShipmentItem.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ShippingByWeight.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ShippingMethod.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\ShoppingCartItem.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SpecificationAttribute.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SpecificationAttributeOption.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\StateProvince.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Store.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\StoreMapping.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SynthesisLog_Result.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Synzeal.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Synzeal.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Synzeal.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Synzeal.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Synzeal.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_CartRfq.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_CartRFQ_Product.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_Category_Price.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_ChildCOA.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_ClubQuote.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_CompanyList.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_Courier.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Sz_DatabaseBackup.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_EmailSuggestion.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_Inventory.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_InventoryLog.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_Invoice.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_Log.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_MasterCOA.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_NameMaster.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_Notification.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_Physicalstate.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_Price.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_PriceList.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_Project.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_ProjectDetail.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_Query.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_Quotation.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_QuotationDetail.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_QuoteDetailForm.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_ScientistStatus.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_TempQuickAdd.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_TempQuotationDetail.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\SZ_Terms.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\TaxCategory.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\TaxRate.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\TierPrice.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Topic.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\TopicTemplate.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\UrlRecord.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Vendor.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entity\Warehouse.cs">
+      <DependentUpon>Synzeal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <EntityDeploy Include="Entity\Synzeal.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Synzeal.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="Entity\Synzeal.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Synzeal.Context.cs</LastGenOutput>
+      <DependentUpon>Synzeal.edmx</DependentUpon>
+    </None>
+    <None Include="Entity\Synzeal.edmx.diagram">
+      <DependentUpon>Synzeal.edmx</DependentUpon>
+    </None>
+    <None Include="Entity\Synzeal.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Synzeal.edmx</DependentUpon>
+      <LastGenOutput>Synzeal.cs</LastGenOutput>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

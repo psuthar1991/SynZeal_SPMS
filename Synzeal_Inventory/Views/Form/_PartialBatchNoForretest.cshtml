@@ -1,0 +1,196 @@
+﻿@model  List<Synzeal_Inventory.Entity.SZ_Inventory>
+@using Synzeal_Inventory.Entity;
+@{
+    ViewBag.Title = "Batch No List";
+    Layout = null;
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    var formList = ViewBag.FormList as List<SZ_QuoteDetailForm>;
+    bool formDownload = Convert.ToBoolean(ViewBag.visibleFormDownload);
+}
+<div class="col-md-12">
+    <!-- general form elements -->
+    <!-- /.box-header -->
+    <div class="box">
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body">
+                <div class="form-group">
+                    <h2>CAT No: @ViewBag.CatNo</h2>
+                </div>
+                @if (Model.Count > 0)
+                {
+                    <input type="hidden" id="catproductId" value="@Model[0].ProductId" />
+                    <input type="hidden" id="catquotedetaid" value="@ViewBag.QuoteDetailsId" />
+
+                    <table id="tblbatchlist" class="table table-bordered table-striped" width="100%">
+                        <thead>
+                            <tr>
+                                @if (ViewBag.action != "project")
+                                {
+                                    <th></th>
+                                }
+                                <th>Batch No</th>
+                                <th>Qty</th>
+                                <th>Purity</th>
+                                <th>TGA</th>
+                                <th>13C NMR</th>
+                                <th>ROI</th>
+                                <th>qNMR</th>
+                                <th>Appreance</th>
+                                <th>Analysis Date</th>
+                                <th>Re-Test Date</th>
+                                <th>Submission Date</th>
+                                <th>Data</th>
+                                @if (ViewBag.action == "project")
+                                {
+                                    <th></th>
+                                }
+                                @if (formDownload)
+                                {
+                                    <th>Download</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                var productdata = db.Products.Where(x => x.Id == item.ProductId).FirstOrDefault();
+                                var queryData = new List<SZ_QueryModule>();
+                                string queryString = "";
+                                if (productdata != null)
+                                {
+                                    queryData = db.SZ_QueryModule.Where(x => x.BatchNo == item.BatchNo && x.CATNo.Trim() == productdata.Sku.Trim()).OrderByDescending(x => x.Id).ToList();
+                                    if (queryData != null && queryData.Count > 0)
+                                    {
+                                        var qlist = queryData.Select(x => x.QueryNo).ToArray();
+                                        if (queryData.Select(x => x.Status.ToLower()).FirstOrDefault() == "solved" ||
+                                            queryData.Select(x => x.Status.ToLower()).FirstOrDefault() == "close" ||
+                                            queryData.Select(x => x.Status.ToLower()).FirstOrDefault() == "completed")
+                                        {
+                                            queryString = "<i class='clstooltip fa fa-info-circle' title='" + string.Join(", ", qlist) + "' style ='float:right; color: green' ></i>";
+                                        }
+                                        else
+                                        {
+                                            queryString = "<i class='clstooltip fa fa-info-circle' title='" + string.Join(", ", qlist) + "' style ='float:right' ></i>";
+                                        }
+                                    }
+                                }
+
+                                var masterCOA = db.SZ_MasterCOA.Where(x => x.BatchId == item.Id).FirstOrDefault();
+                                if (masterCOA == null)
+                                {
+                                    masterCOA = new SZ_MasterCOA();
+                                }
+                            <tr>
+                                @if (ViewBag.action != "project")
+                                {
+                                    <td><input type="checkbox" class="selectretest" value="@item.Id" /></td>
+                                }
+
+                                <td>@item.BatchNo @Html.Raw(queryString)</td>
+                                <td>@item.Qty</td>
+                                <td>@masterCOA.HPLCGCELSD</td>
+                                <td>@masterCOA.TGALoss</td>
+                                <td>@masterCOA.CMR</td>
+                                <td>@masterCOA.ResidueOnIgnition</td>
+                                <td>@masterCOA.qNMR</td>
+                                <td>@masterCOA.AppearanceProduct</td>
+                                <td>
+                                    @if (masterCOA.AnalysisDate.HasValue)
+                                    {
+                                        @masterCOA.AnalysisDate.Value.ToShortDateString()
+                                    }
+                                </td>
+                                <td>
+                                    @if (masterCOA.ReTestDate.HasValue)
+                                    {
+                                        @masterCOA.ReTestDate.Value.ToShortDateString()
+                                    }
+                                </td>
+                                <td>
+                                    @if (masterCOA.CreatedDate.HasValue)
+                                    {
+                                        @masterCOA.CreatedDate.Value.ToShortDateString()
+                                    }
+                                </td>
+                                <td>@masterCOA.Attachment</td>
+                                @if (ViewBag.action == "project")
+                                {
+                                    <td>
+                                        @if (formList != null && formList.Count > 0)
+                                        {
+                                            var pform = formList.Where(x => x.BatchCode == masterCOA.BatchNo).FirstOrDefault();
+                                            if (pform != null)
+                                            {
+                                                <a href="/Form/PrintForm/@pform.Id"><i class="fa fa-download"></i></a>
+                                            }
+                                        }
+                                    </td>
+
+                                }
+                                @if (formDownload)
+                                {
+                                    <td>
+                                        @{
+                                            var pform = db.SZ_QuoteDetailForm.Where(x => x.BatchCode == masterCOA.BatchNo).OrderByDescending(x => x.Id).FirstOrDefault();
+                                            if (pform != null)
+                                            {
+                                                <a href="/Form/DownloadSubmittedForm/@pform.Id" download=""><i class="fa fa-download"></i></a>
+                                            }
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    if (ViewBag.action == "quote")
+                    {
+                        <div class="form-group" style="text-align: right">
+                            <button type="button" onclick="Quote.addRetest()" class="btn btn-primary">Save</button>
+                        </div>
+                    }
+                    else if (ViewBag.action == "project")
+                    {
+                        <div class="form-group" style="text-align: right;margin-top: 10px;">
+                            <button type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group" style="text-align: right">
+                            <button type="button" onclick="Quote.updateBatchnoInQuotation()" class="btn btn-primary">Save</button>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div style="text-align:center;font-size:40px">
+                        <i class="fa fa-database"></i>
+                        <p>No Data Found</p>
+                    </div>
+                    <div class="form-group" style="text-align: right">
+                        <button type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
+                    </div>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (ViewBag.action != "quote")
+{
+    <text>
+        <script type="text/javascript">
+            $(".selectretest").change(function () {
+                var ischecked = $(this).is(":checked");
+                $(".selectretest").prop('checked', false);
+                if (ischecked) {
+                    $(this).prop('checked', true);
+                }
+            });
+            $('.clstooltip').tooltip();
+        </script>
+    </text>
+}

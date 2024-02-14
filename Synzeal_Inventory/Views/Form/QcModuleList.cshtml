@@ -1,0 +1,1919 @@
+﻿@{
+    ViewBag.Title = "QcModuleList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string approvedStatus = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ApprovedStatus.QCApproved);
+
+}
+@using Synzeal_Inventory.Models;
+
+<section class="content-header">
+    <h1>
+        QC Module List
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <ul class="nav nav-tabs" id="tabullist">
+                    <li class="active"><a data-toggle="tab" href="#home" data-tabname="all">NEW SUBMISSION</a></li>
+                    <li><a data-toggle="tab" href="#tabinventory" onclick="inventorytab()" data-tabname="inventory">PROCURED INVENTORY</a></li>
+                    <li><a data-toggle="tab" href="#tabapprovedform" onclick="approvedFormtab()" data-tabname="approvedform">APPROVED FORM</a></li>
+
+
+                    <li><a data-toggle="tab" href="#tabdispatch" onclick="dispatchedInstocktab()" data-tabname="dispatch">DISPATCH - IN STOCK</a></li>
+                    @*<li><a data-toggle="tab" href="#tabworkingstandard" onclick="WorkingStandardtab()" data-tabname="workingstandard">WORKING STANDARDS - LOG</a></li>*@
+
+                    <li><a data-toggle="tab" href="#tabapproved" onclick="approvedtab()" data-tabname="approved">APPROVED</a></li>
+
+                    <li><a data-toggle="tab" href="#taballinstock" onclick="allinstocktab()" data-tabname="allinstock">ALL INSTOCK</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="home" class="tab-pane fade in active">
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote">
+
+                            <div class="col-md-2" style="margin-top:6px">
+                                <label>Status : </label>
+                                <select class="form-control" id="fltapprovalstatus" onchange="$('#example1').DataTable().draw()">
+                                    <option value="">-Select-</option>
+                                    @foreach (EnumList.ApprovedStatus r in Enum.GetValues(typeof(EnumList.ApprovedStatus)))
+                                    {
+                                        var item = Enum.GetName(typeof(EnumList.ApprovedStatus), r);
+                                        var test = r.ToString();
+                                        string text = SZ_Helper.GetEnumDescription((EnumList.ApprovedStatus)(int)r);
+                                        int val = (int)r;
+                                        string selected = "";
+                                        if(text == "QC Approval")
+                                        {
+                                            selected = "selected";
+                                        }
+                                        <option value="@val" @selected>@text</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom:15px;" class="btn btn-primary" onclick="ChangeAvailableData('example1')">Change Data</a>
+                            <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom:15px;" class="btn btn-primary" onclick="SaveAll('example1')">Save</a>
+                            <div class="clearfix"></div>
+                            <table id="example1" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th></th>
+                                        <th>Approval Status</th>
+                                        <th>Approved As</th>
+                                        <th></th>
+                                        <th>Team leader</th>
+                                        <th>Scientist</th>
+                                        <th>Project</th>
+                                        <th>Product Name</th>
+                                        <th>Batch No</th>
+                                        <th></th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>
+                                            Re-test Time
+                                        </th>
+                                        <th>Salt/Free base</th>
+                                        <th>Physical State</th>
+                                        <th>
+                                            Appearance
+                                        </th>
+                                        <th>Qty (in mg)</th>
+                                        <th>Sub. Qty (in mg)</th>
+                                        <th>Stability</th>
+                                        <th>Stability – Solution</th>
+                                        <th>
+                                            Stability – RT
+                                        </th>
+                                        <th>Photostability</th>
+                                        <th>
+                                            Hygroscopic
+                                        </th>
+                                        <th>
+                                            Temp
+                                            Sensitive
+                                        </th>
+                                        <th>Lacrymatory</th>
+                                        <th>Stability Related Comment</th>
+                                        <th>Special storage condition</th>
+                                        <th>NMR Last 3 step</th>
+                                        <th>Crystallization – 2 Steps</th>
+                                        <th>Available Data</th>
+                                        <th>COA</th>
+                                        <th>Data Remark</th>
+                                        <th>Chromatographic  Purity</th>
+                                        <th>IR</th>
+                                        <th>Mass</th>
+                                        <th>HPLC/GC/ELSD</th>
+                                        <th>1H NMR</th>
+                                        <th>qNMR</th>
+                                        <th>TGA/KF</th>
+                                        <th>13C NMR</th>
+                                        <th>DEPT</th>
+                                        <th>HRMS</th>
+                                        <th>ROI</th>
+                                        <th>Elemental</th>
+                                        <th>CMR Assign</th>
+                                        <th>MASS Assign</th>
+                                        <th>NMR Assign</th>
+                                        <th>2D NMR</th>
+                                        <th>COSY</th>
+                                        <th>CHNS</th>
+                                        <th>Stability Data</th>
+                                        <th>Chemdraw</th>
+                                        <th>N1-NMR</th>
+
+                                        <th>Assign Date</th>
+                                        <th>Draft Submission Form</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div><div class="clearfix"></div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabdispatch" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote">
+                            <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom:15px;" class="btn btn-primary" onclick="SaveAll('tbldispatch')">Save</a>
+                            <div class="clearfix"></div>
+                            <table id="tbldispatch" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th></th>
+                                        <th>Approval Status</th>
+                                        <th>Approved As</th>
+                                        <th></th>
+                                        <th>Team leader</th>
+                                        <th>Scientist</th>
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Diff</th>
+                                        <th>Qty (in mg)</th>
+                                        <th>Sub. Qty (in mg)</th>
+                                        <th>Sub. Date</th>
+                                        <th>Assign Date</th>
+                                        <th>Batch No</th>
+                                        <th></th>
+                                        <th>Data Remark</th>
+                                        <th>Draft Submission Form</th>
+                                        <th>Available Data</th>
+                                        <th>Physical State</th>
+                                        <th>
+                                            Appearance
+                                        </th>
+                                        <th>
+                                            Hygroscopic
+                                        </th>
+                                        <th>
+                                            Temp
+                                            Sensitive
+                                        </th>
+                                        <th>Lacrymatory</th>
+                                        <th>Stability Related Comment</th>
+                                        <th>Stability</th>
+                                        <th>Salt/Free base</th>
+                                        <th>COA</th>
+                                        <th>HPLC</th>
+                                        <th>IR</th>
+                                        <th>Mass</th>
+                                        <th>HPLC/GC/ELSD</th>
+                                        <th>1H NMR</th>
+                                        <th>qNMR</th>
+                                        <th>TGA</th>
+                                        <th>13C NMR</th>
+                                        <th>DEPT</th>
+                                        <th>HRMS</th>
+                                        <th>ROI</th>
+                                        <th>Elemental</th>
+                                        <th>CMR Assign</th>
+                                        <th>MASS Assign</th>
+                                        <th>
+                                            Recommended
+                                            Re-test Period(In month)
+                                        </th>
+                                        <th>Project</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="clearfix"></div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabworkingstandard" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote">
+                            <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom:15px;" class="btn btn-primary" onclick="SaveAll('tblworkingstandard')">Save</a>
+                            <div class="clearfix"></div>
+                            <table id="tblworkingstandard" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th> </th>
+                                        <th>Approval Status</th>
+                                        <th>Approved As</th>
+                                        <th></th>
+                                        <th>Quotation ID</th>
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Qty (in mg)</th>
+                                        <th>Batch No</th>
+                                        <th></th>
+                                        <th>Available Quantity</th>
+                                        <th>Sub. Date</th>
+                                        <th>Sub. By</th>
+                                        <th>Data Remark</th>
+
+                                        <th>Draft Submission Form</th>
+                                        <th>Available Data</th>
+                                        <th>Physical State</th>
+                                        <th>
+                                            Appearance
+                                        </th>
+                                        <th>
+                                            Hygroscopic
+                                        </th>
+                                        <th>
+                                            Temp
+                                            Sensitive
+                                        </th>
+                                        <th>Stability Related Comment</th>
+                                        <th>Stability</th>
+                                        <th>Salt/Free base</th>
+                                        <th>COA</th>
+                                        <th>HPLC</th>
+                                        <th>IR</th>
+                                        <th>Mass</th>
+                                        <th>HPLC/GC/ELSD</th>
+                                        <th>1H NMR</th>
+                                        <th>qNMR</th>
+                                        <th>TGA</th>
+                                        <th>13C NMR</th>
+                                        <th>DEPT</th>
+                                        <th>HRMS</th>
+                                        <th>ROI</th>
+                                        <th>Elemental</th>
+                                        <th>CMR Assign</th>
+                                        <th>MASS Assign</th>
+                                        <th>Primary Std Ordered</th>
+
+                                        <th>
+                                            Recommended
+                                            Re-test Period(In month)
+                                        </th>
+                                        <th>Project</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div id="tabinventory" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote">
+                            <div class="col-md-2" style="margin-top:6px">
+                                <label>Status : </label>
+                                <select class="form-control" id="fltapprovalstatus" onchange="$('#tblinventory').DataTable().draw()">
+                                    <option value="">-Select-</option>
+                                    @foreach (EnumList.ApprovedStatus r in Enum.GetValues(typeof(EnumList.ApprovedStatus)))
+                                    {
+                                        var item = Enum.GetName(typeof(EnumList.ApprovedStatus), r);
+                                        var test = r.ToString();
+                                        string text = SZ_Helper.GetEnumDescription((EnumList.ApprovedStatus)(int)r);
+                                        int val = (int)r;
+                                        string selected = "";
+                                        if (text == "QC Approval")
+                                        {
+                                            selected = "selected";
+                                        }
+                                        <option value="@val" @selected>@text</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom:15px;" class="btn btn-primary" onclick="SaveAll('tblinventory')">Save</a>
+                            <div class="clearfix"></div>
+                            <table id="tblinventory" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th> </th>
+                                        <th>Approval Status</th>
+                                        <th>Approved As</th>
+                                        <th></th>
+                                        <th>Team leader</th>
+                                        <th>Scientist</th>
+                                        <th>Project</th>
+                                        <th>Product Name</th>
+                                        <th>Batch No</th>
+                                        <th></th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Diff</th>
+                                        <th>Salt/Free base</th>
+                                        <th>Physical State</th>
+                                        <th>
+                                            Appearance
+                                        </th>
+                                        <th>Qty (in mg)</th>
+                                        <th>Sub. Qty (in mg)</th>
+                                        <th>Stability</th>
+                                        <th>Stability – Solution</th>
+                                        <th>
+                                            Stability – RT
+                                        </th>
+                                        <th>Photostability</th>
+                                        <th>
+                                            Hygroscopic
+                                        </th>
+                                        <th>
+                                            Temp
+                                            Sensitive
+                                        </th>
+                                        <th>Lacrymatory</th>
+                                        <th>Stability Related Comment</th>
+                                        <th>Special storage condition</th>
+                                        <th>NMR Last 3 step</th>
+                                        <th>Crystallization – 2 Steps</th>
+                                        <th>Available Data</th>
+                                        <th>COA</th>
+                                        <th>Data Remark</th>
+                                        <th>Chromatographic  Purity</th>
+                                        <th>IR</th>
+                                        <th>Mass</th>
+                                        <th>HPLC/GC/ELSD</th>
+                                        <th>1H NMR</th>
+                                        <th>qNMR</th>
+                                        <th>TGA/KF</th>
+                                        <th>13C NMR</th>
+                                        <th>DEPT</th>
+                                        <th>HRMS</th>
+                                        <th>ROI</th>
+                                        <th>Elemental</th>
+                                        <th>CMR Assign</th>
+                                        <th>MASS Assign</th>
+                                        <th>NMR Assign</th>
+                                        <th>Chemdraw</th>
+                                        <th>N1-NMR</th>
+                                        <th>
+                                            Recommended
+                                            Re-test Period(In month)
+                                        </th>
+                                        <th>Assign Date</th>
+                                        <th>Draft Submission Form</th>
+                                        <th>Sub. Date</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div id="tabapproved" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote">
+                            <table id="tblapproved" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Approval Status</th>
+                                        <th>Approved As</th>
+                                        <th></th>
+                                        <th>Team leader</th>
+                                        <th>Scientist</th>
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Diff</th>
+                                        <th>Qty (in mg)</th>
+                                        <th>Sub. Qty (in mg)</th>
+                                        <th>Sub. Date</th>
+                                        @*<th>Review Status</th>*@
+                                        <th>Approved Date</th>
+                                        <th>Batch No</th>
+                                        <th></th>
+                                        <th>Data Remark</th>
+                                        <th>Draft Submission Form</th>
+                                        <th>QC App. Date</th>
+                                        <th>Available Data</th>
+                                        <th>Physical State</th>
+                                        <th>
+                                            Appearance
+                                        </th>
+                                        <th>
+                                            Hygroscopic
+                                        </th>
+                                        <th>
+                                            Temp
+                                            Sensitive
+                                        </th>
+                                        <th>Lacrymatory</th>
+                                        <th>Stability Related Comment</th>
+                                        <th>Stability</th>
+                                        <th>Salt/Free base</th>
+                                        <th>COA</th>
+                                        <th>HPLC</th>
+                                        <th>IR</th>
+                                        <th>Mass</th>
+                                        <th>HPLC/GC/ELSD</th>
+                                        <th>1H NMR</th>
+                                        <th>qNMR</th>
+                                        <th>TGA</th>
+                                        <th>13C NMR</th>
+                                        <th>DEPT</th>
+                                        <th>HRMS</th>
+                                        <th>ROI</th>
+                                        <th>Elemental</th>
+                                        <th>CMR Assign</th>
+                                        <th>
+                                            Recommended
+                                            Re-test Period(In month)
+                                        </th>
+                                        <th>Project</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div id="tabapprovedform" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote">
+                            <table id="tblapprovedform" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Approval Status</th>
+                                        <th>Approved As</th>
+                                        <th></th>
+                                        <th>Team leader</th>
+                                        <th>Scientist</th>
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Diff</th>
+                                        <th>Qty (in mg)</th>
+                                        <th>Sub. Qty (in mg)</th>
+                                        <th>Sub. Date</th>
+                                        @*<th>Review Status</th>*@
+                                        <th>Assign Date</th>
+                                        <th>Batch No</th>
+                                        <th></th>
+                                        <th>Data Remark</th>
+                                        <th>Draft Submission Form</th>
+                                        <th>QC App. Date</th>
+                                        <th>Available Data</th>
+                                        <th>Physical State</th>
+                                        <th>
+                                            Appearance
+                                        </th>
+                                        <th>
+                                            Hygroscopic
+                                        </th>
+                                        <th>
+                                            Temp
+                                            Sensitive
+                                        </th>
+                                        <th>Lacrymatory</th>
+                                        <th>Stability Related Comment</th>
+                                        <th>Stability</th>
+                                        <th>Salt/Free base</th>
+                                        <th>COA</th>
+                                        <th>HPLC</th>
+                                        <th>IR</th>
+                                        <th>Mass</th>
+                                        <th>HPLC/GC/ELSD</th>
+                                        <th>1H NMR</th>
+                                        <th>qNMR</th>
+                                        <th>TGA</th>
+                                        <th>13C NMR</th>
+                                        <th>DEPT</th>
+                                        <th>HRMS</th>
+                                        <th>ROI</th>
+                                        <th>Elemental</th>
+                                        <th>CMR Assign</th>
+                                        <th>MASS Assign</th>
+                                        <th>NMR Assign</th>
+                                        <th>N1-NMR</th>
+                                        <th>
+                                            Recommended
+                                            Re-test Period(In month)
+                                        </th>
+                                        <th>Project</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                        <div class="clearfix"></div>
+                    </div>
+
+                    <div id="taballinstock" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body " id="divProj">
+                            <div style="margin: 8px 20px;box-shadow: 1px 1px 2px 2px #ececec;padding: 3px;">
+                                <div class="form-group" style="margin-bottom:0">
+                                    <div class="col-md-5" style="margin-top:6px">
+                                        <div class="radio">
+                                            @*<label>
+                                                <input type="radio" name="filterAll" id="optionsRadios2" value="ponumber">
+                                                        PO #
+                                                    </label>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <label>
+                                                        <input type="radio" name="filterAll" id="optionsRadios2" value="company">
+                                                        Company
+                                                    </label>&nbsp;&nbsp;&nbsp;&nbsp;*@
+                                            <label>
+                                                @Html.Raw(ViewBag.fltapprovestatus)
+                                                @*@Html.DropDownList("fltApprovalStatus", (IEnumerable<SelectListItem>)ViewBag.fltapprovestatus, new { @class = "form-control" })*@
+                                            </label>&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <label>
+                                                <input type="radio" name="filterAll" id="optionsRadios2" value="productname">
+                                                Product
+                                            </label>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <label>
+                                                <input type="radio" name="filterAll" id="optionsRadios2" value="cas">
+                                                CAS #
+                                            </label>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <label>
+                                                <input type="radio" name="filterAll" id="optionsRadios2" value="cat">
+                                                CAT #
+                                            </label>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <label>
+                                                <input type="radio" name="filterAll" id="optionsRadios2" value="batchno">
+                                                Batch #
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-7" style="margin-top:9px">
+                                        <div>
+                                            <input class="form-control" id="allsearchbox" type="text" placeholder="Enter search string" style="width:300px; float:left">
+                                            <a href="javascript:void(0)" style="float:left;margin-left:8px;" class="btn btn-primary" onclick="$('#tblallinstock').DataTable().draw()">Search</a>
+                                            <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom:15px;" class="btn btn-primary" onclick="SaveAll('tblallinstock')">Save</a>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br />
+                            <table id="tblallinstock" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th></th>
+                                        <th>Approval Status</th>
+                                        <th>Approved As</th>
+                                        <th></th>
+                                        @*<th>Team leader</th>
+                                            <th>Scientist</th>*@
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Diff</th>
+                                        <th>Qty (in mg)</th>
+                                        <th>Sub. Qty (in mg)</th>
+                                        <th>Sub. Date</th>
+                                        <th>Approval Date</th>
+                                        <th>Last Approval Date</th>
+                                        <th>Assign Date</th>
+                                        <th>Batch No</th>
+                                        <th></th>
+                                        <th>Data Remark</th>
+                                        <th>Draft Submission Form</th>
+                                        <th>Available Data</th>
+                                        <th>Physical State</th>
+                                        <th>
+                                            Appearance
+                                        </th>
+                                        <th>
+                                            Hygroscopic
+                                        </th>
+                                        <th>
+                                            Temp
+                                            Sensitive
+                                        </th>
+                                        <th>Lacrymatory</th>
+                                        <th>Stability Related Comment</th>
+                                        <th>Stability</th>
+                                        <th>Salt/Free base</th>
+                                        <th>COA</th>
+                                        <th>HPLC</th>
+                                        <th>IR</th>
+                                        <th>Mass</th>
+                                        <th>HPLC/GC/ELSD</th>
+                                        <th>1H NMR</th>
+                                        <th>qNMR</th>
+                                        <th>TGA</th>
+                                        <th>13C NMR</th>
+                                        <th>DEPT</th>
+                                        <th>HRMS</th>
+                                        <th>ROI</th>
+                                        <th>Elemental</th>
+                                        <th>CMR Assign</th>
+                                        <th>MASS Assign</th>
+                                        <th>
+                                            Recommended
+                                            Re-test Period(In month)
+                                        </th>
+                                        <th>Project</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    $(".divQuote").css('height', window.innerHeight - 200);
+    var alltbl = $('#example1').DataTable({
+        "ordering": false,
+        "scrollX": true,
+        "scrollY": "550px",
+        "processing": true, // for show progress bar
+        "serverSide": true, // for process server side
+        "filter": true, // this is for disable filter (search box)
+        "pageLength": 25,
+        "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+        "ajax": {
+            "url": "../Form/LoadQCNewSubmissionData",
+            "type": "POST",
+            "datatype": "json",
+            "data": function (d) {
+                d.fltapprovalstatus = $("#home").find("#fltapprovalstatus").val();
+            }
+        },
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            if (aData.AvailableData !== "") {
+                if (aData.AvailableData.indexOf("IR") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsIR") !== -1) {
+                            if ($(this)[0].innerHTML !== "" && $(this)[0].innerHTML !== undefined) {
+                                $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                            }
+                        }
+                    });
+                }
+                if (aData.AvailableData.indexOf("Mass") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsMass") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+                if (aData.AvailableData.indexOf("HPLC/GC/ELSD") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsHPLCGCELSD") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+                if (aData.AvailableData.indexOf("NMR") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsNMR") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+
+                if (aData.AvailableData.indexOf("qNMR") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsqNMR") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+                if (aData.AvailableData.indexOf("TGA") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsTGA") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+                if (aData.AvailableData.indexOf("CMR") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsCMR") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+                if (aData.AvailableData.indexOf("DEPT") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsDEPT") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+
+                if (aData.AvailableData.indexOf("HRMS") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsHRMS") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+                if (aData.AvailableData.indexOf("ROI") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsROI") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+                if (aData.AvailableData.indexOf("Elemental") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsElemental") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+                if (aData.AvailableData.indexOf("CMR Interpretaion") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsSER") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+                if (aData.AvailableData.indexOf("APCI Mass") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsAPCIMass") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+                if (aData.AvailableData.indexOf("NMR Interpretaion") !== -1) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clsNMRInterpretaion") !== -1) {
+                            $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                        }
+                    });
+                }
+
+            }
+        },
+        "fnDrawCallback": function (oSettings) {
+
+            setTimeout(function () {
+                alltbl.columns.adjust();
+            }, 2000);
+
+        },
+        "columnDefs":
+            [
+            ],
+        "createdRow": function (row, data, dataIndex) {
+            $(row).attr('id', 'tr_' + data.FormId);
+        },
+        "columns": [
+            { "data": null },
+            { "data": "ChkSaveRow", "autoWidth": true, "orderable": false },
+            { "data": "ApprovedStatusText", "orderable": false },
+            { "data": "ApprovedAsText", "orderable": false },
+            { "data": "ApprovalCommentsText", "orderable": false },
+            { "data": "ScientistName",  "width": "100px", "orderable": false },
+            { "data": "Chemist", "orderable": false, "width": "100px", },
+            { "data": "APIName", "orderable": false },
+            { "data": "ProductName", "orderable": false, "width": "18%", },
+            { "data": "BatchNo", "name": "Price" },
+            { "data": "GetAllBatch", "name": "GetAllBatch" },
+            { "data": "CASNo", "width": "100px",  "orderable": false },
+            { "data": "CATNo", "name": "Ref", "width": "100px" },
+            { "data": "RecommondationRetestText", "orderable": false },
+            //{ "data": "Diff", "name": "Diff", "width": "100px", },
+            { "data": "SaltFreeBase", "orderable": false },
+            { "data": "PhysicalState", "orderable": false },
+            { "data": "Appearance", "orderable": false },
+            { "data": "Qty", "name": "CompanyName", "width": "100px", },
+            { "data": "SubmittedQty", "name": "PONumber", "width": "100px", },
+            { "data": "Stability", "orderable": false },
+            { "data": "StabilitySolution", "name": "ProductName", "width": "100px", },
+            { "data": "StabilityRT", "name": "ProductName", "width": "100px", },
+            { "data": "TextPhotostability", "name": "Photostability", "width": "100px", },
+            { "data": "TextHygroscopic", "orderable": false },
+            { "data": "TextTempSensitive", "orderable": false },
+            { "data": "TextLacrymatory", "orderable": false },
+            { "data": "StabilityRelatedComment", "orderable": false },
+            { "data": "SpecialStorageCondition", "orderable": false },
+            { "data": "chkNMRDoneText", "name": "ProductName", "width": "100px", },
+            { "data": "chkCrystallizationDoneText", "name": "ProductName", "width": "100px", },
+            { "data": "AvailableData", "name": "AdditionalBatchNoText" },
+            { "data": "COA", "orderable": false },
+            { "data": "DataRemark", "name": "FinalPrice" },
+            { "data": "HPLC", "orderable": false },
+            { "data": "IR", "orderable": false, "className": "clsIR" },
+            { "data": "Mass", "orderable": false, "className": "clsMass" },
+            { "data": "HPLCGCELSD", "orderable": false, "className": "clsHPLCGCELSD" },
+            { "data": "NMR", "orderable": false, "className": "clsNMR" },
+            { "data": "qNMR", "orderable": false, "className": "clsqNMR" },
+            { "data": "TGA", "orderable": false, "className": "clsTGA" },
+            { "data": "CMR", "orderable": false, "className": "clsCMR" },
+            { "data": "DEPT", "orderable": false, "className": "clsDEPT" },
+            { "data": "HRMS", "orderable": false, "className": "clsHRMS" },
+            { "data": "ROI", "orderable": false, "className": "clsROI" },
+            { "data": "Elemental", "orderable": false, "className": "clsElemental" },
+            { "data": "SER", "orderable": false, "className": "clsSER" },
+            { "data": "APCIMass", "orderable": false, "className": "clsAPCIMass" },
+            { "data": "NMRInterpretaion", "orderable": false, "className": "clsNMRInterpretaion" },
+            { "data": "TwoDNmr", "orderable": false, "className": "clsTwoDNmr" },
+            { "data": "COSY", "orderable": false, "className": "clsCOSY" },
+            { "data": "CHNS", "orderable": false, "className": "clsCHNS" },
+            { "data": "Stabilitydata", "orderable": false, "className": "clsStabilitydata" },
+            { "data": "ChemDrawFile", "orderable": false, "className": "ChemDrawFile" },
+            { "data": "N1NMRAttachment", "orderable": false, "className": "N1NMRAttachment" },
+            { "data": "AssignDatestr", "name": "CATNo" },
+            { "data": "DraftSubmissionForm", "name": "LeadTime", "autoWidth": true },
+            //{ "data": "SubmissionDatestr", "name": "ProductName", "width": "100px", },
+        ]
+    });
+    alltbl.on('draw.dt', function () {
+        var info = alltbl.page.info();
+        alltbl.column(0, { search: 'applied', order: 'applied', page: 'applied' }).nodes().each(function (cell, i) {
+            cell.innerHTML = i + 1 + info.start;
+        });
+    });
+
+    var dispatchedInstocktabload = false;
+    var workingStandardtabload = false;
+    var inventorytabload = false;
+    var approvedtabload = false;
+    var approvedFormload = false;
+    var instockallload = false;
+
+
+    function allinstocktab() {
+        if (instockallload == false) {
+            var allinstocktbl = $('#tblallinstock').DataTable({
+                "searching": false,
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    $("#selectAllclsMoveDispatch").click(function () {
+                        if ($(this).is(":checked")) {
+                            $('.clsMoveDispatch').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $(".clsMoveDispatch").each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+
+                    $("#selectAllclsSaverow").click(function () {
+                        if ($(this).is(":checked")) {
+                            $('.clsSaverow').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $(".clsSaverow").each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+                    $('.datepicker').datepicker({
+                        format: 'dd/mm/yyyy'
+                    });
+
+                    $('.datepicker').each(function () {
+                        var dateValue = $(this).attr('data-value');
+                        if (dateValue !== '') {
+                            dateValue = dateValue.toString().replace(' 00:00:00', '');
+                            $(this).datepicker("setDate", dateValue);
+                        }
+                    });
+
+                    //var api = this.api();
+                    //var rows = api.rows({ page: 'current' }).nodes();
+                    //var last = null;
+                    //var groupingCounts = [];
+                    //var counter = 1;
+                    //api.column(7, { page: 'current' }).data().each(function (group, i) {
+                    //    if (last !== group) {
+                    //        if (last !== undefined) {
+                    //            groupingCounts[last] = counter;
+                    //        }
+                    //        $(rows).eq(i).before(
+                    //            //'<td class="group" colspan="26" style="color:#fff;font-weight:700;padding:10px;' + (rows[i].attributes["data-IsPaymentPending"].value === "true" ? "BACKGROUND-COLOR:#e25b5b;" : "BACKGROUND-COLOR:#3c8dbc;") + '"><a style="color: #fff; text-decoration: underline;" target="_blank" href="/Form/Quote/' + rows[i].attributes["data-QuoteId"].value + '">' + group + "</a> | " + rows[i].attributes["data-company"].value + ' | ' + rows[i].attributes["data-podate"].value + ' ' + (rows[i].attributes["data-IsPaymentPending"].value === "true" ? "(Payment Pending)" : "") + " " + (rows[i].attributes["data-PaymentTerms"] === undefined || rows[i].attributes["data-PaymentTerms"].value === "" ? "" : " | Payment Terms : " + rows[i].attributes["data-PaymentTerms"].value)
+                    //            '<td class="group" id="grouping_' + group.trim() + '" data-groupname="' + group + '" colspan="26" style="color:#fff;font-weight:700;padding:10px;' + (rows[i].attributes["data-IsPaymentPending"].value === "true" ? "BACKGROUND-COLOR:#e25b5b;" : "BACKGROUND-COLOR:#3c8dbc;") + '">'
+                    //            + ' </td>'
+                    //        );
+
+                    //        last = group;
+                    //        counter = 1;
+                    //    } else {
+                    //        counter++;
+                    //    }
+                    //});
+
+                    allinstocktbl.columns.adjust();
+                    $('.clstooltip').tooltip();
+                    instockallload = true;
+                    //groupingCounts[last] = counter;
+                    //CountRows(groupingCounts, 'example1');
+                },
+                "columnDefs":
+                    [
+                        //{ targets: 3, visible: false },
+                        //{ targets: 7, visible: false },
+                        //{ targets: 8, visible: false }
+                    ],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadProductDataQCAllInstock",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.sciname = $("#taballinstock").find("#ScientistListItem").val();
+                        d.subsciname = $("#taballinstock").find("#SubScientistListItem").val();
+                        d.fltprostatusItem = $("#taballinstock").find("#fltprostatusItem").val();
+                        d.fltactivity = $("#taballinstock").find("#fltactivity").val();
+                        d.radiobuton = $("#taballinstock").find('input[name="filterAll"]:checked').val();
+                        d.searchbox = $("#taballinstock").find("#allsearchbox").val();
+                        d.fltapprovestatus = $("#taballinstock").find("#fltapprovestatus").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.SelectedProjectType === "In-Stock" && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                    }
+                    if (aData.ReadyToDeliverScientistStatusId === aData.ScientistStatus) {
+                        $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                    }
+                    if (aData.MoveToDispatch && (aData.DispatchedStatus == "0" || aData.DispatchedStatus == null)) {
+                        $('td', nRow).css('background-color', '#ffe6b3');
+                    }
+                    if (aData.MoveToDispatch && aData.DispatchedStatus == "1") {
+                        $('td', nRow).css('background-color', 'rgb(250, 209, 255)');
+                    }
+                    if (aData.MoveToInvoice) {
+                        $('td', nRow).css('background-color', '#ff9999');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-email', data.EmailAddress);
+                    $(row).attr('data-company', data.CompanyName);
+                    $(row).attr('data-companyId', data.CompanyId);
+                    $(row).attr('data-podate', data.MoveProjectDateText);
+                    $(row).attr('data-pono', data.PONumber);
+                    $(row).attr('data-ProductCount', data.ProductCount);
+                    $(row).attr('data-PaymentTerms', data.PaymentTerms);
+                    $(row).attr('data-QuoteId', data.QuoteId);
+                    $(row).attr('data-IsPaymentPending', (data.IsPaymentPending == null ? false : data.IsPaymentPending));
+                },
+                "columns": [
+                    { "data": null },
+                    { "data": "ChkSaveRow", "orderable": false },
+                    { "data": "ApprovedStatusText", "orderable": false },
+                    { "data": "ApprovedAsText", "orderable": false },
+                    { "data": "ApprovalCommentsText", "orderable": false },
+                    //{ "data": "ScientistName", "orderable": false },
+                  //  { "data": "Chemist", "orderable": false },
+                    { "data": "ProductName", "orderable": false },
+                    { "data": "CASNo", "orderable": false },
+                    { "data": "CATNo", "name": "Ref" },
+                    { "data": "Diff", "name": "Diff" },
+                    { "data": "Qty", "name": "CompanyName" },
+                    { "data": "SubmittedQty", "name": "PONumber" },
+                    { "data": "SubmissionDatestr", "name": "ProductName" },
+                    { "data": "QcApprovalStr", "name": "QcApprovalDate" },
+                    { "data": "QcLastApprovalStr", "name": "QcLastApprovalStr" },
+                    //{ "data": "ReviewStatus", "name": "CASNo"},
+                    { "data": "AssignDatestr", "name": "CATNo" },
+                    { "data": "AdditionalBatchNoText", "name": "Price" },
+                    { "data": "GetAllBatch", "name": "GetAllBatch" },
+                    { "data": "DataRemark", "name": "FinalPrice" },
+                    { "data": "DraftSubmissionForm", "name": "LeadTime" },
+                    { "data": "AvailableData", "name": "AdditionalBatchNoText" },
+                    { "data": "PhysicalState", "orderable": false },
+                    { "data": "Appearance", "orderable": false },
+                    { "data": "TextHygroscopic", "orderable": false },
+                    { "data": "TextTempSensitive", "orderable": false },
+                    { "data": "TextLacrymatory", "orderable": false },
+                    { "data": "StabilityRelatedComment", "orderable": false },
+                    { "data": "Stability", "orderable": false },
+                    { "data": "SaltFreeBase", "orderable": false },
+                    { "data": "COA", "orderable": false },
+                    { "data": "HPLC", "orderable": false },
+                    { "data": "IR", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "Mass", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "HPLCGCELSD", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "NMR", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "qNMR", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "TGA", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "CMR", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "DEPT", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "HRMS", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "ROI", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "Elemental", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "SER", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "APCIMass", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "RecommondationRetestText", "orderable": false },
+                    { "data": "APIName", "orderable": false }
+                ]
+            });
+            allinstocktbl.on('draw.dt', function () {
+                var info = allinstocktbl.page.info();
+                allinstocktbl.column(0, { search: 'applied', order: 'applied', page: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1 + info.start;
+                });
+            });
+        }
+    }
+
+    function dispatchedInstocktab() {
+        if (dispatchedInstocktabload === false) {
+            var tobetbl = $('#tbldispatch').DataTable({
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                //"ordering": false,
+                //"processing": true,
+                //"serverSide": true,
+                //"filter": true,
+                //"orderMulti": false,
+                //"pageLength": 25,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "ajax": {
+                    "url": "../Form/LoadQCDispatchedInstockData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clscolor") !== -1) {
+                            if ($(this)[0].innerHTML !== "" && $(this)[0].innerHTML !== undefined) {
+                                console.log($(this)[0].innerHTML);
+                                if ($(this)[0].innerHTML.indexOf("fa-close") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(255 192 163)';
+                                }
+                                else {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+
+                            }
+                        }
+                    });
+                },
+                "fnDrawCallback": function (oSettings) {
+                    dispatchedInstocktabload = true;
+                    setTimeout(function () {
+                        tobetbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    $(row).attr('id', 'tr_' + data.FormId);
+                },
+                "columns": [
+                    { "data": null },
+                    { "data": "ChkSaveRow",  "orderable": false },
+                    { "data": "ApprovedStatusText", "orderable": false },
+                    { "data": "ApprovedAsText", "orderable": false },
+                    { "data": "ApprovalCommentsText", "orderable": false },
+                    { "data": "ScientistName", "orderable": false },
+                    { "data": "Chemist", "orderable": false },
+                    { "data": "ProductName", "orderable": false },
+                    { "data": "CASNo", "orderable": false },
+                    { "data": "CATNo", "name": "Ref" },
+                    { "data": "Diff", "name": "Diff" },
+                    { "data": "Qty", "name": "CompanyName" },
+                    { "data": "SubmittedQty", "name": "PONumber" },
+                    { "data": "SubmissionDatestr", "name": "ProductName" },
+                    //{ "data": "ReviewStatus", "name": "CASNo"},
+                    { "data": "AssignDatestr", "name": "CATNo" },
+                    { "data": "AdditionalBatchNoText", "name": "Price" },
+                    { "data": "GetAllBatch", "name": "GetAllBatch" },
+                    { "data": "DataRemark", "name": "FinalPrice" },
+                    { "data": "DraftSubmissionForm", "name": "LeadTime"},
+                    { "data": "AvailableData", "name": "AdditionalBatchNoText" },
+                    { "data": "PhysicalState", "orderable": false },
+                    { "data": "Appearance", "orderable": false },
+                    { "data": "TextHygroscopic", "orderable": false },
+                    { "data": "TextTempSensitive", "orderable": false },
+                    { "data": "TextLacrymatory", "orderable": false },
+                    { "data": "StabilityRelatedComment", "orderable": false },
+                    { "data": "Stability", "orderable": false },
+                    { "data": "SaltFreeBase", "orderable": false },
+                    { "data": "COA", "orderable": false },
+                    { "data": "HPLC", "orderable": false },
+                    { "data": "IR", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "Mass", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "HPLCGCELSD", "orderable": false, "className": "clscolor dt-center"},
+                    { "data": "NMR", "orderable": false, "className": "clscolor dt-center"},
+                    { "data": "qNMR", "orderable": false, "className": "clscolor dt-center"},
+                    { "data": "TGA", "orderable": false, "className": "clscolor dt-center"},
+                    { "data": "CMR", "orderable": false, "className": "clscolor dt-center"},
+                    { "data": "DEPT", "orderable": false, "className": "clscolor dt-center"},
+                    { "data": "HRMS", "orderable": false, "className": "clscolor dt-center"},
+                    { "data": "ROI", "orderable": false, "className": "clscolor dt-center"},
+                    { "data": "Elemental", "orderable": false, "className": "clscolor dt-center"},
+                    { "data": "SER", "orderable": false, "className": "clscolor dt-center"},
+                    { "data": "APCIMass", "orderable": false, "className": "clscolor dt-center" },
+                    //{ "data": "NMRInterpretaion", "orderable": false, "className": "clsNMRInterpretaion" },
+                    //{ "data": "ChemDrawFile", "orderable": false, "className": "ChemDrawFile" },
+                    { "data": "RecommondationRetestText", "orderable": false },
+                    { "data": "APIName", "orderable": false }
+                ]
+            });
+            tobetbl.on('draw.dt', function () {
+                var info = tobetbl.page.info();
+                tobetbl.column(0, { search: 'applied', order: 'applied', page: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1 + info.start;
+                });
+            });
+        }
+    }
+
+    function WorkingStandardtab() {
+        if (workingStandardtabload === false) {
+            var workingstandardtbl = $('#tblworkingstandard').DataTable({
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "ajax": {
+                    "url": "../Form/LoadQCWorkingStandardData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    $('td', nRow).each(function () {
+                        if ($(this)[0].className.indexOf("clscolor") !== -1) {
+                            if ($(this)[0].innerHTML !== "" && $(this)[0].innerHTML !== undefined) {
+                                console.log($(this)[0].innerHTML);
+                                if ($(this)[0].innerHTML.indexOf("fa-close") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(255 192 163)';
+                                }
+                                else {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+
+                            }
+                        }
+                    });
+                },
+                "fnDrawCallback": function (oSettings) {
+                    workingStandardtabload = true;
+                    setTimeout(function () {
+                        workingstandardtbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    $(row).attr('id', 'tr_' + data.FormId);
+                },
+                "columns": [
+                    { "data": null },
+                    { "data": "ChkSaveRow", "autoWidth": true, "orderable": false },
+                    { "data": "ApprovedStatusText", "orderable": false },
+                    { "data": "ApprovedAsText", "orderable": false, },
+                    { "data": "ApprovalCommentsText", "orderable": false },
+                    { "data": "QuoteRefNo", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "name": "Ref" },
+                    { "data": "Qty", "name": "CompanyName" },
+                    { "data": "AdditionalBatchNoText", "name": "Price" },
+                    { "data": "GetAllBatch", "name": "GetAllBatch" },
+                    { "data": "SubmittedQty", "name": "PONumber" },
+                    { "data": "SubmissionDatestr", "name": "PONumber" },
+                    { "data": "ScientistName", "autoWidth": true, "orderable": false },
+                    { "data": "DataRemark", "autoWidth": true, "orderable": false },
+                    { "data": "PhysicalState", "name": "AdditionalBatchNoText" },
+                    { "data": "AvailableData", "name": "AdditionalBatchNoText" },
+                    { "data": "PhysicalState", "orderable": false },
+                    { "data": "Appearance", "orderable": false },
+                    { "data": "TextHygroscopic", "orderable": false },
+                    { "data": "TextTempSensitive", "orderable": false },
+                    { "data": "StabilityRelatedComment", "orderable": false },
+                    { "data": "SaltFreeBase", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "COA", "orderable": false, "className": "clscolor dt-center"  },
+                    { "data": "HPLC", "orderable": false, "className": "clscolor dt-center"  },
+                    { "data": "IR", "orderable": false, "className": "clscolor dt-center"  },
+                    { "data": "Mass", "orderable": false, "className": "clscolor dt-center"  },
+                    { "data": "HPLCGCELSD", "orderable": false, "className": "clscolor dt-center"  },
+                    { "data": "NMR", "orderable": false, "className": "clscolor dt-center"  },
+                    { "data": "qNMR", "orderable": false, "className": "clscolor dt-center"  },
+                    { "data": "TGA", "orderable": false, "className": "clscolor dt-center"  },
+                    { "data": "CMR", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "DEPT", "orderable": false, "className": "clscolor dt-center"  },
+                    { "data": "HRMS", "orderable": false, "className": "clscolor dt-center"  },
+                    { "data": "ROI", "orderable": false, "className": "clscolor dt-center" },
+                    { "data": "Elemental", "orderable": false, "className": "clscolor dt-center"  },
+                    { "data": "SER", "orderable": false, "className": "clscolor dt-center"  },
+                    { "data": "PrimaryStdOrderedText", "name": "Diff" },
+                    { "data": "ColumnOrderText", "name": "Diff" },
+                    { "data": "SystemSuitabilityText", "name": "Diff"},
+                    { "data": "RecommondationRetestText", "orderable": false },
+                    { "data": "APIName", "orderable": false }
+                ]
+            });
+            workingstandardtbl.on('draw.dt', function () {
+                var info = workingstandardtbl.page.info();
+                workingstandardtbl.column(0, { search: 'applied', order: 'applied', page: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1 + info.start;
+                });
+            });
+        }
+    }
+
+    function inventorytab() {
+        if (inventorytabload === false) {
+            var inventorytbl = $('#tblinventory').DataTable({
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "ajax": {
+                    "url": "../Form/LoadQCInventoryData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.fltapprovalstatus = $("#tabinventory").find("#fltapprovalstatus").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.AvailableData !== "") {
+                        if (aData.AvailableData.indexOf("IR") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsIR") !== -1) {
+                                    if ($(this)[0].innerHTML !== "" && $(this)[0].innerHTML !== undefined) {
+                                        $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                    }
+                                }
+                            });
+                        }
+                        if (aData.AvailableData.indexOf("Mass") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsMass") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+                        if (aData.AvailableData.indexOf("HPLC/GC/ELSD") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsHPLCGCELSD") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+                        if (aData.AvailableData.indexOf("NMR") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsNMR") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+
+                        if (aData.AvailableData.indexOf("qNMR") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsqNMR") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+                        if (aData.AvailableData.indexOf("TGA") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsTGA") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+                        if (aData.AvailableData.indexOf("CMR") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsCMR") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+                        if (aData.AvailableData.indexOf("DEPT") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsDEPT") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+
+                        if (aData.AvailableData.indexOf("HRMS") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsHRMS") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+                        if (aData.AvailableData.indexOf("ROI") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsROI") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+                        if (aData.AvailableData.indexOf("Elemental") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsElemental") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+                        if (aData.AvailableData.indexOf("CMR Interpretaion") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsSER") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+                        if (aData.AvailableData.indexOf("APCI Mass") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsAPCIMass") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+                        if (aData.AvailableData.indexOf("NMR Interpretaion") !== -1) {
+                            $('td', nRow).each(function () {
+                                if ($(this)[0].className.indexOf("clsNMRInterpretaion") !== -1) {
+                                    $(this)[0].style.backgroundColor = 'rgb(202, 251, 217)';
+                                }
+                            });
+                        }
+                    }
+                },
+                "fnDrawCallback": function (oSettings) {
+                    inventorytabload = true;
+                    setTimeout(function () {
+                        inventorytbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    $(row).attr('id', 'tr_' + data.FormId);
+                },
+                "columns": [
+                    { "data": null },
+                    { "data": "ChkSaveRow", "autoWidth": true, "orderable": false },
+                    { "data": "ApprovedStatusText", "orderable": false },
+                    { "data": "ApprovedAsText", "orderable": false },
+                    { "data": "ApprovalCommentsText", "orderable": false },
+                    { "data": "ScientistName", "width": "100px", "orderable": false },
+                    { "data": "Chemist", "orderable": false, "width": "100px", },
+                    { "data": "APIName", "orderable": false },
+                    { "data": "ProductName", "orderable": false, "width": "18%", },
+                    { "data": "BatchNo", "name": "Price" },
+                    { "data": "GetAllBatch", "name": "GetAllBatch" },
+                    { "data": "CASNo", "width": "100px", "orderable": false },
+                    { "data": "CATNo", "name": "Ref", "width": "100px" },
+                    { "data": "Diff", "name": "Diff", "width": "100px", },
+                    { "data": "SaltFreeBase", "orderable": false },
+                    { "data": "PhysicalState", "orderable": false },
+                    { "data": "Appearance", "orderable": false },
+                    { "data": "Qty", "name": "CompanyName", "width": "100px", },
+                    { "data": "SubmittedQty", "name": "PONumber", "width": "100px", },
+                    { "data": "Stability", "orderable": false },
+                    { "data": "StabilitySolution", "name": "ProductName", "width": "100px", },
+                    { "data": "StabilityRT", "name": "ProductName", "width": "100px", },
+                    { "data": "TextPhotostability", "name": "Photostability", "width": "100px", },
+                    { "data": "TextHygroscopic", "orderable": false },
+                    { "data": "TextTempSensitive", "orderable": false },
+                    { "data": "TextLacrymatory", "orderable": false },
+                    { "data": "StabilityRelatedComment", "orderable": false },
+                    { "data": "SpecialStorageCondition", "orderable": false },
+                    { "data": "chkNMRDoneText", "name": "ProductName", "width": "100px", },
+                    { "data": "chkCrystallizationDoneText", "name": "ProductName", "width": "100px", },
+                    { "data": "AvailableData", "name": "AdditionalBatchNoText" },
+                    { "data": "COA", "orderable": false },
+                    { "data": "DataRemark", "name": "FinalPrice" },
+                    { "data": "HPLC", "orderable": false },
+                    { "data": "IR", "orderable": false, "className": "clsIR" },
+                    { "data": "Mass", "orderable": false, "className": "clsMass" },
+                    { "data": "HPLCGCELSD", "orderable": false, "className": "clsHPLCGCELSD" },
+                    { "data": "NMR", "orderable": false, "className": "clsNMR" },
+                    { "data": "qNMR", "orderable": false, "className": "clsqNMR" },
+                    { "data": "TGA", "orderable": false, "className": "clsTGA" },
+                    { "data": "CMR", "orderable": false, "className": "clsCMR" },
+                    { "data": "DEPT", "orderable": false, "className": "clsDEPT" },
+                    { "data": "HRMS", "orderable": false, "className": "clsHRMS" },
+                    { "data": "ROI", "orderable": false, "className": "clsROI" },
+                    { "data": "Elemental", "orderable": false, "className": "clsElemental" },
+                    { "data": "SER", "orderable": false, "className": "clsSER" },
+                    { "data": "APCIMass", "orderable": false, "className": "clsAPCIMass" },
+                    { "data": "NMRInterpretaion", "orderable": false, "className": "clsNMRInterpretaion" },
+                    { "data": "ChemDrawFile", "orderable": false, "className": "ChemDrawFile" },
+                    { "data": "N1NMRAttachment", "orderable": false, "className": "N1NMRAttachment" },
+
+                    { "data": "RecommondationRetestText", "orderable": false },
+                    { "data": "AssignDatestr", "name": "CATNo" },
+                    { "data": "DraftSubmissionForm", "name": "LeadTime", "autoWidth": true },
+                    { "data": "SubmissionDatestr", "name": "ProductName", "width": "100px", },
+                ]
+            });
+            inventorytbl.on('draw.dt', function () {
+                var info = inventorytbl.page.info();
+                inventorytbl.column(0, { search: 'applied', order: 'applied', page: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1 + info.start;
+                });
+            });
+        }
+    }
+
+    function approvedtab() {
+        if (approvedtabload === false) {
+            var approvedtbl = $('#tblapproved').DataTable({
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "ajax": {
+                    "url": "../Form/LoadQCApprovedData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                },
+                "fnDrawCallback": function (oSettings) {
+                    approvedtabload = true;
+                    setTimeout(function () {
+                        approvedtbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    $(row).attr('id', 'tr_' + data.FormId);
+                },
+                "columns": [
+                    { "data": null },
+                    { "data": "ApprovedStatusText", "orderable": false, "width": "130px" },
+                    { "data": "ApprovedAsText", "orderable": false, "width": "130px" },
+                    { "data": "ApprovalCommentsText", "orderable": false, "width": "130px" },
+                    { "data": "ScientistName", "autoWidth": true, "orderable": false },
+                    { "data": "Chemist", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "name": "Ref", "width": "100px" },
+                    { "data": "Diff", "name": "Diff", "width": "100px" },
+                    { "data": "Qty", "name": "CompanyName", "width": "200px" },
+                    { "data": "SubmittedQty", "name": "PONumber", "width": "100px" },
+                    { "data": "SubmissionDatestr", "name": "ProductName", "width": "18%" },
+                    { "data": "QCApprovedDateStr", "name": "QCApprovedDateStr", "width": "18%" },
+                    //{ "data": "ReviewStatus", "name": "CASNo", "width": "6%" },
+                    { "data": "AssignDatestr", "name": "CATNo", "width": "6%" },
+                    { "data": "AdditionalBatchNoText", "name": "Price", "width": "250px" },
+                    { "data": "GetAllBatch", "name": "GetAllBatch" },
+                    { "data": "DataRemark", "name": "FinalPrice", "width": "250px" },
+                    { "data": "DraftSubmissionForm", "name": "LeadTime", "autoWidth": true },
+                    { "data": "AvailableData", "name": "AdditionalBatchNoText" },
+                    { "data": "PhysicalState", "orderable": false, "width": "100px" },
+                    { "data": "Appearance", "orderable": false, "swidth": "300px" },
+                    { "data": "TextHygroscopic", "orderable": false, "width": "130px" },
+                    { "data": "TextTempSensitive", "orderable": false, "width": "130px" },
+                    { "data": "TextLacrymatory", "orderable": false, "width": "130px" },
+                    { "data": "StabilityRelatedComment", "orderable": false, "width": "130px" },
+                    { "data": "Stability", "orderable": false, "width": "130px" },
+                    { "data": "SaltFreeBase", "orderable": false, "width": "130px" },
+                    { "data": "COA", "orderable": false, "width": "130px" },
+                    { "data": "HPLC", "orderable": false, "width": "130px" },
+                    { "data": "IR", "orderable": false, "width": "130px" },
+                    { "data": "Mass", "orderable": false, "width": "130px" },
+                    { "data": "HPLCGCELSD", "orderable": false, "width": "130px" },
+                    { "data": "NMR", "orderable": false, "width": "130px" },
+                    { "data": "qNMR", "orderable": false, "width": "130px" },
+                    { "data": "TGA", "orderable": false, "width": "130px" },
+                    { "data": "CMR", "orderable": false, "width": "130px" },
+                    { "data": "DEPT", "orderable": false, "width": "130px" },
+                    { "data": "HRMS", "orderable": false, "width": "130px" },
+                    { "data": "ROI", "orderable": false, "width": "130px" },
+                    { "data": "Elemental", "orderable": false, "width": "130px" },
+                    { "data": "SER", "orderable": false, "width": "130px" },
+                    //{ "data": "GC", "orderable": false, "width": "130px" },
+                    //{ "data": "ELSD", "orderable": false, "width": "130px" },
+                    //{ "data": "Chairal", "orderable": false, "width": "130px" },
+
+                    { "data": "RecommondationRetestText", "orderable": false, "width": "130px" },
+                    { "data": "APIName", "orderable": false, "width": "130px" }
+                ]
+            });
+            approvedtbl.on('draw.dt', function () {
+                var info = approvedtbl.page.info();
+                approvedtbl.column(0, { search: 'applied', order: 'applied', page: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1 + info.start;
+                });
+            });
+        }
+    }
+
+    function approvedFormtab() {
+        if (approvedFormload === false) {
+            var approvedformtbl = $('#tblapprovedform').DataTable({
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "ajax": {
+                    "url": "../Form/LoadQCFormApprovedData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                },
+                "fnDrawCallback": function (oSettings) {
+                    approvedFormload = true;
+                    setTimeout(function () {
+                        approvedformtbl.columns.adjust();
+                    }, 2000);
+                },
+                "columnDefs":
+                    [
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    $(row).attr('id', 'tr_' + data.FormId);
+                },
+                "columns": [
+                    { "data": null },
+                    { "data": "ApprovedStatusText", "orderable": false, "width": "130px" },
+                    { "data": "ApprovedAsText", "orderable": false, "width": "130px" },
+                    { "data": "ApprovalCommentsText", "orderable": false, "width": "130px" },
+                    { "data": "ScientistName", "autoWidth": true, "orderable": false },
+                    { "data": "Chemist", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "name": "Ref", "width": "100px" },
+                    { "data": "Diff", "name": "Diff", "width": "100px" },
+                    { "data": "Qty", "name": "CompanyName", "width": "200px" },
+                    { "data": "SubmittedQty", "name": "PONumber", "width": "100px" },
+                    { "data": "SubmissionDatestr", "name": "ProductName", "width": "18%" },
+                    { "data": "AssignDatestr", "name": "CATNo", "width": "6%" },
+                    { "data": "BatchNo", "name": "Price", "width": "250px" },
+                    { "data": "GetAllBatch", "name": "GetAllBatch" },
+                    { "data": "DataRemark", "name": "FinalPrice", "width": "250px" },
+                    { "data": "DraftSubmissionForm", "name": "LeadTime", "autoWidth": true },
+                    { "data": "QCApprovedDateStr", "name": "QCApprovedDateStr", "width": "18%" },
+                    { "data": "AvailableData", "name": "AdditionalBatchNoText" },
+                    { "data": "PhysicalState", "orderable": false, "width": "100px" },
+                    { "data": "Appearance", "orderable": false, "swidth": "300px" },
+                    { "data": "TextHygroscopic", "orderable": false, "width": "130px" },
+                    { "data": "TextTempSensitive", "orderable": false, "width": "130px" },
+                    { "data": "TextLacrymatory", "orderable": false, "width": "130px" },
+                    { "data": "StabilityRelatedComment", "orderable": false, "width": "130px" },
+                    { "data": "Stability", "orderable": false, "width": "130px" },
+                    { "data": "SaltFreeBase", "orderable": false, "width": "130px" },
+                    { "data": "COA", "orderable": false, "width": "130px" },
+                    { "data": "HPLC", "orderable": false, "width": "130px" },
+                    { "data": "IR", "orderable": false, "width": "130px" },
+                    { "data": "Mass", "orderable": false, "width": "130px" },
+                    { "data": "HPLCGCELSD", "orderable": false, "width": "130px" },
+                    { "data": "NMR", "orderable": false, "width": "130px" },
+                    { "data": "qNMR", "orderable": false, "width": "130px" },
+                    { "data": "TGA", "orderable": false, "width": "130px" },
+                    { "data": "CMR", "orderable": false, "width": "130px" },
+                    { "data": "DEPT", "orderable": false, "width": "130px" },
+                    { "data": "HRMS", "orderable": false, "width": "130px" },
+                    { "data": "ROI", "orderable": false, "width": "130px" },
+                    { "data": "Elemental", "orderable": false, "width": "130px" },
+                    { "data": "SER", "orderable": false, "className": "clsSER" },
+                    { "data": "APCIMass", "orderable": false, "className": "clsAPCIMass" },
+                    { "data": "NMRInterpretaion", "orderable": false, "className": "clsNMRInterpretaion" },
+                    { "data": "N1NMRAttachment", "orderable": false, "width": "130px" },
+                    { "data": "RecommondationRetestText", "orderable": false, "width": "130px" },
+                    { "data": "APIName", "orderable": false, "width": "130px" }
+                ]
+            });
+            approvedformtbl.on('draw.dt', function () {
+                var info = approvedformtbl.page.info();
+                approvedformtbl.column(0, { search: 'applied', order: 'applied', page: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1 + info.start;
+                });
+            });
+        }
+    }
+
+    function ChangeAvailableData(tableId) {
+        var ids = [];
+
+        $('#' + tableId).find('.clsSaverow').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).attr("data-formid"));
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+        if (ids.length > 1) {
+            toastr.error("Please select one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/ChangeAvailableData?id=' + ids[0],
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+                $("#invoiceQueryModal .modal-content").css("width", "90%");
+                $("#invoiceQueryModal .modal-dialog").css("width", "90%");
+            }
+        });
+    }
+
+    function SaveAll(tableId) {
+        var ids = [];
+        var formids = [];
+        var url = '/Form/UpdateQCRecord';
+        if (tableId == "example1" || tableId == "tblinventory") {
+            url = '/Form/UpdateQCFormRecord';
+        }
+
+        $('#' + tableId).find('.clsSaverow').each(function () {
+            if ($(this).is(':checked')) {
+                formids.push($(this).attr("data-formid"));
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+        var count = 1;
+        var errrcnt = 0;
+        $(ids).each(function (i, v) {
+            errrcnt = 0;
+            if ('@approvedStatus' == $('#' + tableId).find("#approvestatus_" + v).val()) {
+                var apas = $('#' + tableId).find("#approveas_" + v).val();
+                if (apas == null || apas == undefined || apas == '') {
+                    errrcnt += 1;
+                    toastr.error("Please select Approved As field.");
+                }
+            }
+            if (errrcnt === 0) {
+                $.ajax({
+                    url: url,
+                    data: {
+                        formId: formids[i],
+                        QuotationDetailsId: v,
+                        ApprovalComments: $('#' + tableId).find("#approvalcomment_" + v).val(),
+                        ApprovedAs: $('#' + tableId).find("#approveas_" + v).val(),
+                        ApprovedStatus: $('#' + tableId).find("#approvestatus_" + v).val(),
+                        RecommondationRetest: $('#' + tableId).find("#recommondationretest_" + v).val(),
+                        PrimaryStdOrdered: $('#' + tableId).find("#PrimaryStdOrdered_" + v).val(),
+                        ColumnOrder: $('#' + tableId).find("#ColumnOrderText_" + v).val(),
+                        SystemSuitability: $('#' + tableId).find("#SystemSuitability_" + v).val(),
+                        BatchId: $('#' + tableId).find("#additionalBatch_" + v).val(),
+                        TableId: tableId
+                    },
+                type: 'POST',
+                success: function (data) {
+                },
+                complete: function (data) {
+                    successAlert(count, ids.length, tableId);
+                    count += 1;
+                }
+            });
+            }
+        });
+    }
+
+    function successAlert(count, forloopcount, tableId) {
+        if (count === forloopcount) {
+            toastr.success('You have updated QC information.');
+            $('#' + tableId).DataTable().ajax.reload(null, false);
+        }
+    }
+
+    function approCommentGenerate(id) {
+        $.ajax({
+            url: '/Form/AddApprovComment?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+                // $("#invoiceQueryModal .modal-content").css("width", "1080px");
+            }
+        });
+    }
+
+    $(document).on("change", '.dddladditionalbatch', function () {
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'all') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'dispatch') {
+            tableId = 'tbldispatch';
+        }
+        else if (menulink === 'workingstandard') {
+            tableId = 'tblworkingstandard';
+        }
+        else if (menulink === 'inventory') {
+            tableId = 'tblinventory';
+        }
+        else if (menulink === 'approved') {
+            tableId = 'tblapproved';
+        }
+        var quotedetailsid = $(this).attr("data-quotationdetailsid");
+        $("#" + tableId).find("#availableqty_" + quotedetailsid).text("");
+        $("#" + tableId).find("#availabledata_" + quotedetailsid).text("");
+        $("#" + tableId).find("#physicalstate_" + quotedetailsid).text("");
+        $("#" + tableId).find("#appearance_" + quotedetailsid).text("");
+        $("#" + tableId).find("#hplc_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+        $("#" + tableId).find("#mass_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+        $("#" + tableId).find("#nmr_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+        $("#" + tableId).find("#ir_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+        $("#" + tableId).find("#tga_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+        $("#" + tableId).find("#cmr_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+        $("#" + tableId).find("#dept_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+        $("#" + tableId).find("#roi_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+        $("#" + tableId).find("#ser_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+        $.ajax({
+            url: '/Form/GetCOADataFromBatchId?id=' + $(this).val(),
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    $("#" + tableId).find("#availabledata_" + quotedetailsid).text(data.data.Attachment);
+                    $("#" + tableId).find("#physicalstate_" + quotedetailsid).text(data.data.PhysicalState);
+                    $("#" + tableId).find("#appearance_" + quotedetailsid).text(data.data.AppearanceProduct);
+                    $("#" + tableId).find("#availableqty_" + quotedetailsid).text(data.data.QuantityAvailable);
+                    if (data.data.Attachment !== "") {
+                        if (data.data.Attachment.indexOf("HPLC") != -1) {
+                            $("#" + tableId).find("#hplc_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-check");
+                        }
+                        else {
+                            $("#" + tableId).find("#hplc_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+                        }
+                        if (data.data.Attachment.indexOf("Mass") != -1) {
+                            $("#" + tableId).find("#mass_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-check");
+                        }
+                        else {
+                            $("#" + tableId).find("#mass_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+                        }
+
+                        if (data.data.Attachment.indexOf("NMR") != -1) {
+                            $("#" + tableId).find("#nmr_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-check");
+                        }
+                        else {
+                            $("#" + tableId).find("#nmr_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+                        }
+
+                        if (data.data.Attachment.indexOf("IR") != -1) {
+                            $("#" + tableId).find("#ir_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-check");
+                        }
+                        else {
+                            $("#" + tableId).find("#ir_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+                        }
+
+                        if (data.data.Attachment.indexOf("TGA") != -1) {
+                            $("#" + tableId).find("#tga_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-check");
+                        }
+                        else {
+                            $("#" + tableId).find("#tga_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+                        }
+
+                        if (data.data.Attachment.indexOf("CMR") != -1) {
+                            $("#" + tableId).find("#cmr_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-check");
+                        }
+                        else {
+                            $("#" + tableId).find("#cmr_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+                        }
+
+                        if (data.data.Attachment.indexOf("DEPT") != -1) {
+                            $("#" + tableId).find("#dept_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-check");
+                        }
+                        else {
+                            $("#" + tableId).find("#dept_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+                        }
+
+                        if (data.data.Attachment.indexOf("ROI") != -1) {
+                            $("#" + tableId).find("#roi_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-check");
+                        }
+                        else {
+                            $("#" + tableId).find("#roi_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+                        }
+
+                        if (data.data.Attachment.indexOf("CMR Interpretaion") != -1) {
+                            $("#" + tableId).find("#ser_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-check");
+                        }
+                        else {
+                            $("#" + tableId).find("#ser_" + quotedetailsid).removeClass("fa fa-check").removeClass("fa fa-close").addClass("fa fa-close");
+                        }
+                    }
+                }
+                else {
+                    $("#" + tableId).find("#availableqty_" + quotedetailsid).text("");
+                    $("#" + tableId).find("#availabledata_" + quotedetailsid).html("");
+                    $("#" + tableId).find("#physicalstate_" + quotedetailsid).html("");
+                    $("#" + tableId).find("#appearance_" + quotedetailsid).html("");
+                }
+            }
+        });
+    });
+
+
+
+    $(document).on("click", ".clsappropro", function () {
+
+        
+        $("#tblinventory").find("select option[value*='31']").prop('disabled', true);
+        $("#tblinventory").find("select option[value*='40']").prop('disabled', true);
+        
+        $("#example1").find("select option[value*='31']").prop('disabled', true);
+        $("#example1").find("select option[value*='40']").prop('disabled', true);
+        
+        $("#tblapprovedform").find("select option[value*='31']").prop('disabled', true);
+        $("#tblapprovedform").find("select option[value*='40']").prop('disabled', true);
+        
+        $("#tbldispatch").find("select option[value*='31']").prop('disabled', true);
+        $("#tbldispatch").find("select option[value*='40']").prop('disabled', true);
+        
+        $("#tblapproved").find("select option[value*='31']").prop('disabled', true);
+        $("#tblapproved").find("select option[value*='40']").prop('disabled', true);
+
+        $("#tblallinstock").find("select option[value*='31']").prop('disabled', true);
+        $("#tblallinstock").find("select option[value*='40']").prop('disabled', true);
+    });
+</script>
+<style>
+    .dt-center {
+        text-align: center
+    }
+</style>

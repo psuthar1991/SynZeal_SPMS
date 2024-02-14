@@ -1,0 +1,507 @@
+﻿j@{
+    ViewBag.Title = "QueryModule";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!-- start -->
+
+<section class="content-header">
+    <h1>
+        <div style="float:left">
+            Query Module
+        </div>
+        <div class="clsblue" style="height: 20px;width: 20px;float: left; margin-left:10px;margin-top:4px;"></div>
+        <div style="float: left; margin-left: 5px; font-size: 17px; margin-top: 4px;">Upcomming Deadline</div>
+        <div class="clsorange" style="height: 20px;width: 20px;float: left;margin-top: 4px;margin-left: 10px;"></div>
+        <div style="float: left; margin-left: 5px; font-size: 17px; margin-top: 4px;">Due Deadline</div>
+        <div class="form-control"></div>
+        <a href="javascript:void(0)" style="float: right;margin-right: 8px;" class="btn btn-primary" onclick="ExportAllTab()">Export</a>
+        <a href="javascript:void(0)" style="float: right;margin-right: 8px;" class="btn btn-primary" onclick="PDFExport()">PDF Export</a>
+    </h1>
+    <div class="clearfix"></div>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#home" data-tabname="open" onclick="QueryModule.LoadOpenQuery()">OPEN (<span id="txtopenCount"></span>)</a></li>
+                    <li><a data-toggle="tab" href="#tabinprocess" onclick="QueryModule.LoadInProcessQuery()" data-tabname="inprocess">IN PROCESS (<span id="txtinprocessCount"></span>)</a></li>
+                    <li><a data-toggle="tab" href="#tabsolved" onclick="QueryModule.LoadSolvedQuery()" data-tabname="solved">SOLVED (<span id="txtsolveCount"></span>)</a></li>
+                    <li><a data-toggle="tab" href="#tabclose" onclick="QueryModule.LoadCloseQuery()" data-tabname="close">CLOSE (<span id="txtcompleteCount"></span>)</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="home" class="tab-pane fade in active">
+
+                        <div class="clearfix"></div>
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote resizediv" style="overflow:scroll;">
+                            <table id="example1" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th width="1%">
+
+                                        </th>
+                                        <th width="1%">
+                                            #
+                                        </th>
+                                        <th>
+                                            Query Date
+                                        </th>
+                                        <th>
+                                            Query No
+                                        </th>
+
+                                        <th>
+                                            Company Name
+                                        </th>
+                                        @*<th>
+                                            PO Date
+                                        </th>*@
+                                        <th>
+                                            PO Number
+                                        </th>
+                                        <th>
+                                            Product Name
+                                        </th>
+                                        <th>
+                                            CAS #
+                                        </th>
+                                        <th>
+                                            CAT #
+                                        </th>
+                                        <th>
+                                            Qty
+                                        </th>
+                                        <th>
+                                            Batch #
+                                        </th>
+                                        <th>
+                                            Query Subject
+                                        </th>
+                                        @*<th>SZ Remark</th>*@
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabinprocess" class="tab-pane fade in">
+                        <div class="clearfix"></div>
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote resizediv" style="overflow:scroll;">
+                            <table id="example2" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th width="1%">
+                                        </th>
+                                        <th width="1%">
+                                            #
+                                        </th>
+                                        <th>
+                                            Query Date
+                                        </th>
+                                        <th>
+                                            Query No
+                                        </th>
+                                        <th>
+                                            Sub Status
+                                        </th>
+                                        <th>
+                                            Company Name
+                                        </th>
+                                        @*<th>
+                                            PO Date
+                                        </th>*@
+                                        <th>
+                                            PO Number
+                                        </th>
+                                        <th>
+                                            Product Name
+                                        </th>
+                                        <th>
+                                            CAS #
+                                        </th>
+                                        <th>
+                                            CAT #
+                                        </th>
+                                        <th>
+                                            Qty
+                                        </th>
+                                        <th>
+                                            Batch #
+                                        </th>
+                                        <th>
+                                            Query Subject
+                                        </th>
+
+                                        @*<th>SZ Remark</th>*@
+                                        <th>Est. Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabsolved" class="tab-pane fade in">
+                        <div class="clearfix"></div>
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote resizediv" style="overflow:scroll;">
+                            <table id="example3" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th width="1%">
+                                            #
+                                        </th>
+                                        <th width="1%">
+                                        </th>
+                                        <th>
+                                            Query Date
+                                        </th>
+                                        <th>
+                                            Query No
+                                        </th>
+                                        <th>
+                                            Sub Status
+                                        </th>
+                                        <th>
+                                            Company Name
+                                        </th>
+                                        @*<th>
+                                            PO Date
+                                        </th>*@
+                                        <th>
+                                            PO Number
+                                        </th>
+                                        <th>
+                                            Product Name
+                                        </th>
+                                        <th>
+                                            CAS #
+                                        </th>
+                                        <th>
+                                            CAT #
+                                        </th>
+                                        <th>
+                                            Qty
+                                        </th>
+                                        <th>
+                                            Batch #
+                                        </th>
+                                        <th>
+                                            Query Subject
+                                        </th>
+                                        @*<th>SZ Remark</th>*@
+                                        <th>Est. Date</th>
+
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabclose" class="tab-pane fade in">
+
+                        <div class="clearfix"></div>
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote resizediv" style="overflow:scroll;">
+                            <div class="pull-right">
+                                <a href="javascript:void(0)" class="btn btn-primary" onclick="replacement()">Replacement</a>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br />
+                            <table id="example4" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th width="1%">
+                                        </th>
+                                        <th width="1%">
+                                            #
+                                        </th>
+                                        <th>
+                                            Query Date
+                                        </th>
+                                        <th>
+                                            Query No
+                                        </th>
+                                        <th>
+                                            Sub Status
+                                        </th>
+                                        <th>
+                                            Company Name
+                                        </th>
+                                        @*<th>
+                                            PO Date
+                                        </th>*@
+                                        <th>
+                                            PO Number
+                                        </th>
+                                        <th>
+                                            Product Name
+                                        </th>
+                                        <th>
+                                            CAS #
+                                        </th>
+                                        <th>
+                                            CAT #
+                                        </th>
+                                        <th>
+                                            Qty
+                                        </th>
+                                        <th>
+                                            Batch #
+                                        </th>
+                                        <th>
+                                            Query Subject
+                                        </th>
+                                        @*<th>SZ Remark</th>*@
+                                        <th>Est. Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+
+    function PDFExport() {
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+        var tablename = '';
+        if (menulink === 'open') {
+            tablename = 'example1';
+        }
+        if (menulink === 'inprocess') {
+            tablename = 'example2';
+        }
+        if (menulink === 'solved') {
+            tablename = 'example3';
+        }
+        if (menulink === 'close') {
+            tablename = 'example4';
+        }
+        var ids = [];
+        $("#" + tablename).find(".clsrow").each(function () {
+            if ($(this).is(":checked")) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select one query.");
+            return false;
+        }
+        //if (ids.length > 1) {
+        //    toastr.error("You can select only one query.");
+        //    return false;
+        //}
+
+        window.open("/Form/ExportQueryPDF?id=" + ids.join(','));
+
+    }
+
+    function ExportAllTab() {
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'open') {
+            window.location.href = "/Form/ExportQueryModuleOpenTab?parameter=" + $("#example1_filter").find('input[type="search"]').val();
+        }
+        if (menulink === 'inprocess') {
+            window.location.href = "/Form/ExportQueryModuleInProcessTab?parameter=" + $("#example1_filter").find('input[type="search"]').val();
+        }
+        if (menulink === 'solved') {
+            window.location.href = "/Form/ExportQueryModuleSolvedTab?parameter=" + $("#example1_filter").find('input[type="search"]').val();
+        }
+        if (menulink === 'close') {
+            window.location.href = "/Form/ExportQueryModuleCloseTab?parameter=" + $("#example1_filter").find('input[type="search"]').val();
+        }
+    }
+    function savesynzealremark(id) {
+        $.ajax({
+            url: '/Form/saveSynzealRemark?id=' + id + '&Remark=' + $("textarea[name='Remark']")[0].value,
+            type: "GET",
+            success: function (result) {
+                $('#myModal').modal('hide');
+                getemailrecords(mainemail, mainstatus);
+            },
+            error: function (err) {
+                alert(err.statusText);
+            }
+        });
+
+    }
+
+    GetCount();
+    var querystring = getUrlVars();
+    if (querystring["view"] === '' || querystring["view"] === undefined) {
+        QueryModule.LoadOpenQuery();
+    }
+    else {
+        $(".nav-tabs").find('a').each(function () {
+            if (querystring["view"].toLowerCase() === $(this).attr("data-tabname")) {
+                $(this).click();
+            }
+        });
+    }
+    $(".resizediv").css('height', window.innerHeight - 200);
+    function GetCount() {
+        $.ajax({
+            url: '/Form/GetCountOfQueryModule',
+            data: {},
+            async: true,
+            type: 'GET',
+            success: function (data) {
+                $("#txtopenCount").text(data.openCount);
+                $("#txtinprocessCount").text(data.inprocessCount);
+                $("#txtcompleteCount").text(data.completeCount);
+                $("#txtsolveCount").text(data.solveCount);
+            }
+        });
+    }
+
+    function synzealremarkpopup(id) {
+        $.ajax({
+            url: '/Form/AddSynzealRemarkById/' + id,
+            data: {},
+            async: true,
+            type: 'GET',
+            success: function (data) {
+                if ($('#myModal').find('.modal-body').length == 0) {
+                    $('#myModal').find('.modal-body').innerHTML = data;
+                }
+                else {
+                    $('#myModal').find('.modal-body')[0].innerHTML = data;
+                }
+                //$('#myModal').find('.modal-body').html(data);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1080px");
+            }
+        });
+    }
+
+    function GetQueryData(status) {
+        getemailrecords('', status);
+    }
+
+    var mainemail = '';
+    var mainstatus = '';
+    function getemailrecords(email, status) {
+        mainemail = email;
+        mainstatus = status;
+        $.ajax({
+            url: '/Form/getQueryModuleRecordByEmailandStatus?email=' + email + '&status=' + status,
+            data: {},
+            type: 'GET',
+            success: function (data) {
+                $("#divoverview").hide();
+                $("#divoverviewdetails").show();
+                $("#divoddata").html(data);
+                $("#tblalready").dataTable();
+            }
+        });
+    }
+
+    function queryaction(id) {
+        window.location.href = "/Form/QueryDetails/" + id;
+    }
+
+    function replacement() {
+        var ids = [];
+
+        $('.clsreplacement').each(function () {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                ids.push(id);
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product.");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/replacementProducts',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    toastr.success("You have moved product for replacement.");
+                }
+            }
+        });
+    }
+
+    function queryDelete(id) {
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this query!",
+            type: "input",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: false,
+            closeOnCancel: true,
+            inputPlaceholder: "Write something"
+        },
+            function (isConfirm) {
+                if (isConfirm === false) {
+                    toastr.error("Your added product is safe :)");
+                }
+                if (isConfirm === "") {
+                    swal.showInputError("You need to write something!");
+                    return false
+                }
+                if (isConfirm === delpw) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Form/DeleteQuery?id=" + id,
+                        data: {},
+                        success: function (results) {
+                            if (results.success) {
+                                $('#example1').DataTable().ajax.reload(null, false);
+                                toastr.success(results.message);
+                                swal.close();
+                            }
+                        }
+                    });
+                }
+                else {
+                    swal.showInputError("Please enter correct password.");
+                }
+            });
+    }
+</script>
+<style>
+    .clsorange {
+        background: #fed8b1;
+    }
+
+    .clsblue {
+        background: #00c0ef3b;
+    }
+</style>

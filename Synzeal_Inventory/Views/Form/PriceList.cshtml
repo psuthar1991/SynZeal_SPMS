@@ -1,0 +1,1272 @@
+﻿@{
+    ViewBag.Title = "Price List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<SZ_QuotationModel>
+@using Synzeal_Inventory.Models
+<section class="content-header">
+    <h1>
+        Price List
+    </h1>
+</section>
+<input type="hidden" id="UniqueId" name="UniqueId" value="@Guid.NewGuid()" />
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12" style="text-align:center">
+            @for (char c = 'A'; c <= 'Z'; c++)
+            {
+                <div class="letter " data-letter="@c" onclick="SelectInventoryChar('@c')">@c</div>
+            }
+        </div>
+        <div class="col-md-12" style="margin: 10px;">
+            <div class="form-group">
+                <label class="col-md-1" style="padding-top: 6px;">Select API :</label>
+                <div class="col-md-2">
+                    <select id="loadapiselect" class="form-control">
+                        <option value="0">--Select--</option>
+                    </select>
+                </div>
+                <div class="col-md-1" style="text-align: center;padding-top: 6px;">
+                    OR
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="txtsearch" name="txtsearch" class="form-control" />
+                </div>
+                <div class="col-md-1">
+                    <input type="button" value="Search" class="btn btn-primary" onclick="searchinventory()" />
+                </div>
+                <div class="col-md-4">
+                </div>
+                <div class="col-md-1">
+                    <input type="button" value="Save All" class="btn btn-primary" onclick="saveAll()" />
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="col-xs-12">
+            @*<div class="panel-group" id="accordion" style="margin-top:20px;">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"><span class="glyphicon glyphicon-menu-right"></span> Price Dashboard</a>
+                            </h4>
+                        </div>
+                        <div id="collapseOne" class="panel-collapse collapse">
+                            <div class="panel-body" id="dashboardvalue">
+                                <p>Please click on alphabet for more information</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>*@
+            <div class="panel-group" id="accordion" style="margin-top:20px;">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"><span class="glyphicon glyphicon-menu-right"></span> Product Information</a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse">
+                        <div class="panel-body" id="productdashboardvalue">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="col-md-3">
+                                        <label>Product Name: </label><span id="lblproductname"></span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label>CAT No: </label><span id="lblcatno"></span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label>CAS No: </label><span id="lblcasno"></span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label>M.W.: </label><span id="lblmolweight"></span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label>M.F.: </label><span id="lblmolformula"></span>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="col-md-3">
+                                        <img src="https://makitweb.com/demo/broken_image/images/noimage.png" style="width:100%" id="lblimgurl" />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <table width="100%" id="tblpricemasterdata">
+                                            <tr>
+                                                <th> Category </th>
+                                                <th> Currency </th>
+                                                <th> 10 </th>
+                                                <th> 25 </th>
+                                                <th> 50 </th>
+                                                <th> 100 </th>
+                                                <th> Lead Time </th>
+                                                <th> Product Remark </th>
+                                            </tr>
+                                            <tr>
+                                                <td rowspan="2">
+                                                    @Html.DropDownList("ddlcategory", (IEnumerable<SelectListItem>)ViewBag.categorymasterlist, new { @class = "form-control addusdcategorymastermain", @onchange = "$('#alltbl').DataTable().draw()" })
+                                                </td>
+                                                <td>
+                                                    USD
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="clsmainpriceusdone" class="form-control" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="clsmainpriceusdtwo" class="form-control" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="clsmainpriceusdthree" class="form-control" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="clsmainpriceusdfour" class="form-control" />
+                                                </td>
+                                                <td rowspan="2">
+                                                    <input type="text" id="clsmainleadtime" class="form-control" />
+                                                </td>
+                                                <td rowspan="2">
+                                                    <input type="text" id="clsmainproductremark" class="form-control" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    INR
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="clsmainpriceone" class="form-control" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="clsmainpricetwo" class="form-control" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="clsmainpricethree" class="form-control" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="clsmainpricefour" class="form-control" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <label>Is Approved : </label><input type="checkbox" id="clsmainapproved" />
+                                        <div>
+                                            <label>Chemical Name : </label> <span id="lblChemicalname"></span> <br />
+                                            <label>Synonym : </label> <span id="lblSynonym"></span>
+                                        </div>
+                                        <div>
+                                            <input type="button" onclick="savemasterprice()" value="Save Master" class="btn btn-primary"/>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#usd" data-tabname="usd">Price List</a></li>
+                    <li><a data-toggle="tab" href="#inr" data-tabname="inr">Quote History</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="inr" class="tab-pane fade in">
+                        <div class="box-body" style="overflow:scroll;" id="dvPreviousProductList">
+                        </div>
+                    </div>
+                    <div id="usd" class="tab-pane fade in active">
+                        <div class="box-body" style="overflow:scroll;" id="divQuote">
+                            <div class="row " style="padding-bottom:10px">
+                                <div class="form-group">
+
+                                    <div class="col-md-1">
+                                        <label style="padding-top: 6px;">In-Stock:</label>
+                                        <input type="checkbox" id="filterinstock" name="instock" value="Instock" checked class="filterstatus" />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label style="padding-top: 6px;">Custom Synthesis:</label>
+                                        <input type="checkbox" id="filterother" name="other" value="Custom Synthesis" checked class="filterstatus" />
+                                    </div>
+                                    <div class="col-md-1">
+                                        <a href="javascript:void(0)" onclick="$('#example1').DataTable().draw()" class="btn btn-primary">Search</a>
+                                    </div>
+                                    <div class="col-md-8" style="text-align:right">
+
+                                        <a href="javascript:void(0)" class="btn btn-primary" onclick="LoadAllCategoryPrice()">All Category Price</a>
+                                        <a href="javascript:void(0)" onclick="priceclubquote()" class="btn btn-primary">Club Quote</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" onclick="OpepCategorymasterpopup()" id="btncatmaster">API Completion</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+
+                            </div>
+                            <table id="example1" class="table table-bordered table-striped" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th><input type="checkbox" id="selectallchk" /></th>
+
+                                        <th width="10%">Product Name</th>
+                                        <th width="6%">CAS No</th>
+                                        <th width="6%">CAT No</th>
+                                        <th width="6%">Batch No</th>
+                                        <th><input type="checkbox" id="selectallapprovedchk" /></th>
+                                        <th width="10%">Category</th>
+                                        <th>Copy / Paste</th>
+                                        <th width="7%"> <input type="checkbox" value="10" class="clschk" /> 10 MG (USD / INR)</th>
+                                        <th width="7%"><input type="checkbox" value="25" class="clschk" /> 25 MG (USD / INR)</th>
+                                        <th width="7%"><input type="checkbox" value="50" class="clschk" /> 50 MG (USD / INR)</th>
+                                        <th width="7%"><input type="checkbox" value="100" class="clschk" /> 100 MG (USD / INR)</th>
+                                        <th width="7%"><input type="checkbox" value="250" class="clschk" /> 250 MG (USD / INR)</th>
+                                        <th width="7%"><input type="checkbox" value="500" class="clschk" /> 500 MG (USD / INR)</th>
+                                        <th width="7%"><input type="checkbox" value="1000" class="clschk" /> 1000 MG (USD / INR)</th>
+                                        <th width="6%">Discount (USD / INR)</th>
+                                        <th width="6%">Lead Time</th>
+                                        <th width="6%">Product Remarks</th>
+                                        <th>Details</th>
+                                        @*<th width="7%"></th>*@
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+</section>
+<div id="mypriceModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Select Price</h4>
+            </div>
+            <div class="modal-body">
+                @{
+                    for (int i = 1000; i < 251000; i += 1000)
+                    {
+                        <div class="col-md-1 clsppop" data-value="@i">@i</div>
+                    }
+                }
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<style type="text/css">
+    .clsppop:hover {
+        color: red;
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .clsppop {
+        width: 10%;
+        padding: 3px 0;
+    }
+
+    .modal-footer {
+        border: 0;
+    }
+</style>
+<script>
+    // Load usd price
+    //LoadUsdInrPrice();
+
+    $('#selectallchk').change(function () {
+
+        if ($(this).is(':checked')) {
+            $('.clsSaverow').each(function () {
+                $(this).prop('checked', true);
+            });
+        }
+        else {
+            $('.clsSaverow').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    $('#selectallapprovedchk').change(function () {
+
+        if ($(this).is(':checked')) {
+            $('.clsApprovedrow').each(function () {
+                $(this).prop('checked', true);
+            });
+        }
+        else {
+            $('.clsApprovedrow').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+    var prevPricevalue = '';
+    var prevPricevalueInr = '';
+    $(document).on('change', '.addusdcategorymastermain', function () {
+        var $this = $(this);
+        
+            swal({
+                title: "Are you sure want to change price?",
+                text: "",
+                html: true,
+                type: "warning",
+                customClass: 'swalwide',
+                showCancelButton: true,
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes, Change it!",
+                cancelButtonText: "No, cancel!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        var id = $this.attr('id');
+                        var value = $this.val();
+                        
+                        $.ajax({
+                            type: "GET",
+                            url: "/Form/GetCategoryMasterByCategoryMasterName/",
+                            data: { 'id': value },
+                            dataType: "json",
+                            success: function (response) {
+
+                                $("#clsmainpriceusdone").val(response.TenUSD).attr('readonly', false);
+                                $("#clsmainpriceusdtwo").val(response.TwentyfiveUSD).attr('readonly', false);
+                                $("#clsmainpriceusdthree").val(response.FiftyUSD).attr('readonly', false);
+                                $("#clsmainpriceusdfour").val(response.OnehundredUSD).attr('readonly', false);
+                                $("#clsmainpriceone").val(response.Ten).attr('readonly', false);
+                                $("#clsmainpricetwo").val(response.Twentyfive).attr('readonly', false);
+                                $("#clsmainpricethree").val(response.Fifty).attr('readonly', false);
+                                $("#clsmainpricefour").val(response.Onehundred).attr('readonly', false);
+                            },
+                            error: function (response) {
+                                alert("Error:" + response);
+                            }
+                        });
+                    } else {
+                        toastr.error("Your price is safe :)");
+                    }
+                });
+        
+        prevPricevalue = this.value;
+    });
+
+    $(document).on('focus', '.addusdcategorymaster', function () {
+        prevPricevalue = this.value;
+    })
+    $(document).on('change', '.addusdcategorymaster', function () {
+        var returnprevalue = prevPricevalue;
+        var $this = $(this);
+        if (prevPricevalue === '') {
+            var id = $(this).attr('id').replace('categorymasterUSD_', '');
+            var value = $(this).val();
+            if (value === "") {
+                $("#TenUSD_" + id).val("").attr('readonly', true);
+                $("#TwentyfiveUSD_" + id).val("").attr('readonly', true);
+                $("#FiftyUSD_" + id).val("").attr('readonly', true);
+                $("#OnehundredUSD_" + id).val("").attr('readonly', true);
+                $("#TwohundredFiftyUSD_" + id).val("").attr('readonly', true);
+                $("#FivehundredUSD_" + id).val("").attr('readonly', true);
+                $("#OneThousandUSD_" + id).val("").attr('readonly', true);
+                $("#DiscountUSD_" + id).val("").attr('readonly', true);
+                //$("#TenPrice_" + id).val("").attr('readonly', true);
+                //$("#TwentyFivePrice_" + id).val("").attr('readonly', true);
+                //$("#FiftyPrice_" + id).val("").attr('readonly', true);
+                //$("#HundredPrice_" + id).val("").attr('readonly', true);
+                //$("#TwoHundredPrice_" + id).val("").attr('readonly', true);
+                //$("#FivehundredPrice_" + id).val("").attr('readonly', true);
+                //$("#OneThousandPrice_" + id).val("").attr('readonly', true);
+                //$("#DiscountINR_" + id).val("").attr('readonly', true);
+                return false;
+            }
+            $.ajax({
+                type: "GET",
+                url: "/Form/GetCategoryMasterByCategoryMasterName/",
+                data: { 'id': value },
+                dataType: "json",
+                success: function (response) {
+
+                    $("#TenUSD_" + id).val(response.TenUSD).attr('readonly', false);
+                    $("#TwentyfiveUSD_" + id).val(response.TwentyfiveUSD).attr('readonly', false);
+                    $("#FiftyUSD_" + id).val(response.FiftyUSD).attr('readonly', false);
+                    $("#OnehundredUSD_" + id).val(response.OnehundredUSD).attr('readonly', false);
+                    $("#TwohundredFiftyUSD_" + id).val(response.TwohundredFiftyUSD).attr('readonly', false);
+                    $("#FivehundredUSD_" + id).val(response.FivehundredUSD).attr('readonly', false);
+                    $("#OneThousandUSD_" + id).val(response.OneThousandUSD).attr('readonly', false);
+                    $("#DiscountUSD_" + id).val(response.DiscountUSD).attr('readonly', false);
+                    //$("#TenPrice_" + id).val(response.Ten).attr('readonly', false);
+                    //$("#TwentyFivePrice_" + id).val(response.Twentyfive).attr('readonly', false);
+                    //$("#FiftyPrice_" + id).val(response.Fifty).attr('readonly', false);
+                    //$("#HundredPrice_" + id).val(response.Onehundred).attr('readonly', false);
+                    //$("#TwoHundredPrice_" + id).val(response.TwohundredFifty).attr('readonly', false);
+                    //$("#FivehundredPrice_" + id).val(response.Fivehundred).attr('readonly', false);
+                    //$("#OneThousandPrice_" + id).val(response.OneThousand).attr('readonly', false);
+                    //$("#DiscountINR_" + id).val(response.DiscountINR).attr('readonly', false);
+                },
+                error: function (response) {
+                    alert("Error:" + response);
+                }
+            });
+        }
+        else {
+            swal({
+                title: "Are you sure want to change price?",
+                text: "",
+                html: true,
+                type: "warning",
+                customClass: 'swalwide',
+                showCancelButton: true,
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes, Change it!",
+                cancelButtonText: "No, cancel!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        debugger;
+                        var id = $this.attr('id').replace('categorymasterUSD_', '');
+                        var value = $this.val();
+                        if (value === "") {
+                            $("#TenUSD_" + id).val("").attr('readonly', true);
+                            $("#TwentyfiveUSD_" + id).val("").attr('readonly', true);
+                            $("#FiftyUSD_" + id).val("").attr('readonly', true);
+                            $("#OnehundredUSD_" + id).val("").attr('readonly', true);
+                            $("#TwohundredFiftyUSD_" + id).val("").attr('readonly', true);
+                            $("#FivehundredUSD_" + id).val("").attr('readonly', true);
+                            $("#OneThousandUSD_" + id).val("").attr('readonly', true);
+                            $("#DiscountUSD_" + id).val("").attr('readonly', true);
+                            //$("#TenPrice_" + id).val("").attr('readonly', true);
+                            //$("#TwentyFivePrice_" + id).val("").attr('readonly', true);
+                            //$("#FiftyPrice_" + id).val("").attr('readonly', true);
+                            //$("#HundredPrice_" + id).val("").attr('readonly', true);
+                            //$("#TwoHundredPrice_" + id).val("").attr('readonly', true);
+                            //$("#FivehundredPrice_" + id).val("").attr('readonly', true);
+                            //$("#OneThousandPrice_" + id).val("").attr('readonly', true);
+                            //$("#DiscountINR_" + id).val("").attr('readonly', true);
+                            return false;
+                        }
+                        $.ajax({
+                            type: "GET",
+                            url: "/Form/GetCategoryMasterByCategoryMasterName/",
+                            data: { 'id': value },
+                            dataType: "json",
+                            success: function (response) {
+
+                                $("#TenUSD_" + id).val(response.TenUSD).attr('readonly', false);
+                                $("#TwentyfiveUSD_" + id).val(response.TwentyfiveUSD).attr('readonly', false);
+                                $("#FiftyUSD_" + id).val(response.FiftyUSD).attr('readonly', false);
+                                $("#OnehundredUSD_" + id).val(response.OnehundredUSD).attr('readonly', false);
+                                $("#TwohundredFiftyUSD_" + id).val(response.TwohundredFiftyUSD).attr('readonly', false);
+                                $("#FivehundredUSD_" + id).val(response.FivehundredUSD).attr('readonly', false);
+                                $("#OneThousandUSD_" + id).val(response.OneThousandUSD).attr('readonly', false);
+                                $("#DiscountUSD_" + id).val(response.DiscountUSD).attr('readonly', false);
+                                //$("#TenPrice_" + id).val(response.Ten).attr('readonly', false);
+                                //$("#TwentyFivePrice_" + id).val(response.Twentyfive).attr('readonly', false);
+                                //$("#FiftyPrice_" + id).val(response.Fifty).attr('readonly', false);
+                                //$("#HundredPrice_" + id).val(response.Onehundred).attr('readonly', false);
+                                //$("#TwoHundredPrice_" + id).val(response.TwohundredFifty).attr('readonly', false);
+                                //$("#FivehundredPrice_" + id).val(response.Fivehundred).attr('readonly', false);
+                                //$("#OneThousandPrice_" + id).val(response.OneThousand).attr('readonly', false);
+                                //$("#DiscountINR_" + id).val(response.DiscountINR).attr('readonly', false);
+                            },
+                            error: function (response) {
+                                alert("Error:" + response);
+                            }
+                        });
+                    } else {
+                        toastr.error("Your price is safe :)");
+
+                        setTimeout(function () {
+                            $("#categorymasterUSD_" + id + " option:selected").attr('selected', null);
+                            $("#categorymasterUSD_" + id).val(returnprevalue);
+                        }, 500);
+
+                    }
+                });
+        }
+        prevPricevalue = this.value;
+    });
+
+
+    $(document).on('focus', '.addinrcategorymaster', function () {
+        debugger;
+        prevPricevalueInr = this.value;
+    })
+    $(document).on('change', '.addinrcategorymaster', function () {
+        debugger;
+        var returnprevalue = prevPricevalueInr;
+        var $this = $(this);
+        if (prevPricevalueInr === '') {
+            var id = $(this).attr('id').replace('categorymasterINR_', '');
+            var value = $(this).val();
+            if (value === "") {
+                $("#TenPrice_" + id).val("").attr('readonly', true);
+                $("#TwentyFivePrice_" + id).val("").attr('readonly', true);
+                $("#FiftyPrice_" + id).val("").attr('readonly', true);
+                $("#HundredPrice_" + id).val("").attr('readonly', true);
+                $("#TwoHundredPrice_" + id).val("").attr('readonly', true);
+                $("#FivehundredPrice_" + id).val("").attr('readonly', true);
+                $("#OneThousandPrice_" + id).val("").attr('readonly', true);
+                $("#DiscountINR_" + id).val("").attr('readonly', true);
+                return false;
+            }
+            $.ajax({
+                type: "GET",
+                url: "/Form/GetCategoryMasterByCategoryMasterName/",
+                data: { 'id': value },
+                dataType: "json",
+                success: function (response) {
+                    $("#TenPrice_" + id).val(response.Ten).attr('readonly', false);
+                    $("#TwentyFivePrice_" + id).val(response.Twentyfive).attr('readonly', false);
+                    $("#FiftyPrice_" + id).val(response.Fifty).attr('readonly', false);
+                    $("#HundredPrice_" + id).val(response.Onehundred).attr('readonly', false);
+                    $("#TwoHundredPrice_" + id).val(response.TwohundredFifty).attr('readonly', false);
+                    $("#FivehundredPrice_" + id).val(response.Fivehundred).attr('readonly', false);
+                    $("#OneThousandPrice_" + id).val(response.OneThousand).attr('readonly', false);
+                    $("#DiscountINR_" + id).val(response.DiscountINR).attr('readonly', false);
+                },
+                error: function (response) {
+                    alert("Error:" + response);
+                }
+            });
+        }
+        else {
+            swal({
+                title: "Are you sure want to change price?",
+                text: "",
+                html: true,
+                type: "warning",
+                customClass: 'swalwide',
+                showCancelButton: true,
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes, Change it!",
+                cancelButtonText: "No, cancel!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        debugger;
+                        var id = $this.attr('id').replace('categorymasterINR_', '');
+                        var value = $this.val();
+                        if (value === "") {
+                            $("#TenPrice_" + id).val("").attr('readonly', true);
+                            $("#TwentyFivePrice_" + id).val("").attr('readonly', true);
+                            $("#FiftyPrice_" + id).val("").attr('readonly', true);
+                            $("#HundredPrice_" + id).val("").attr('readonly', true);
+                            $("#TwoHundredPrice_" + id).val("").attr('readonly', true);
+                            $("#FivehundredPrice_" + id).val("").attr('readonly', true);
+                            $("#OneThousandPrice_" + id).val("").attr('readonly', true);
+                            $("#DiscountINR_" + id).val("").attr('readonly', true);
+                            return false;
+                        }
+                        $.ajax({
+                            type: "GET",
+                            url: "/Form/GetCategoryMasterByCategoryMasterName/",
+                            data: { 'id': value },
+                            dataType: "json",
+                            success: function (response) {
+
+                                $("#TenPrice_" + id).val(response.Ten).attr('readonly', false);
+                                $("#TwentyFivePrice_" + id).val(response.Twentyfive).attr('readonly', false);
+                                $("#FiftyPrice_" + id).val(response.Fifty).attr('readonly', false);
+                                $("#HundredPrice_" + id).val(response.Onehundred).attr('readonly', false);
+                                $("#TwoHundredPrice_" + id).val(response.TwohundredFifty).attr('readonly', false);
+                                $("#FivehundredPrice_" + id).val(response.Fivehundred).attr('readonly', false);
+                                $("#OneThousandPrice_" + id).val(response.OneThousand).attr('readonly', false);
+                                $("#DiscountINR_" + id).val(response.DiscountINR).attr('readonly', false);
+                            },
+                            error: function (response) {
+                                alert("Error:" + response);
+                            }
+                        });
+                    } else {
+                        toastr.error("Your price is safe :)");
+
+                        setTimeout(function () {
+                            $("#categorymasterINR_" + id + " option:selected").attr('selected', null);
+                            $("#categorymasterINR_" + id).val(returnprevalue);
+                        }, 500);
+
+                    }
+                });
+        }
+        prevPricevalue = this.value;
+    });
+    //$(document).on('change', '.addinrcategorymaster', function () {
+    //    swal({
+    //        title: "Are you sure want to change price?",
+    //        text: "",
+    //        html: true,
+    //        type: "warning",
+    //        customClass: 'swalwide',
+    //        showCancelButton: true,
+    //        confirmButtonClass: "btn-danger",
+    //        confirmButtonText: "Yes, Change it!",
+    //        cancelButtonText: "No, cancel!",
+    //        closeOnConfirm: true,
+    //        closeOnCancel: true
+    //    },
+    //        function (isConfirm) {
+    //            if (isConfirm) {
+    //                var id = $(this).attr('id').replace('categorymasterINR_', '');
+    //                var value = $(this).val();
+    //                if (value === "") {
+    //                    $("#TenPrice_" + id).val("").attr('readonly', true);
+    //                    $("#TwentyFivePrice_" + id).val("").attr('readonly', true);
+    //                    $("#FiftyPrice_" + id).val("").attr('readonly', true);
+    //                    $("#HundredPrice_" + id).val("").attr('readonly', true);
+    //                    $("#TwoHundredPrice_" + id).val("").attr('readonly', true);
+    //                    $("#FivehundredPrice_" + id).val("").attr('readonly', true);
+    //                    $("#OneThousandPrice_" + id).val("").attr('readonly', true);
+    //                    $("#DiscountINR_" + id).val("").attr('readonly', true);
+    //                    return false;
+    //                }
+    //                $.ajax({
+    //                    type: "GET",
+    //                    url: "/Form/GetCategoryMasterByCategoryMasterName/",
+    //                    data: { 'id': value },
+    //                    dataType: "json",
+    //                    success: function (response) {
+
+    //                        $("#TenPrice_" + id).val(response.Ten).attr('readonly', false);
+    //                        $("#TwentyFivePrice_" + id).val(response.Twentyfive).attr('readonly', false);
+    //                        $("#FiftyPrice_" + id).val(response.Fifty).attr('readonly', false);
+    //                        $("#HundredPrice_" + id).val(response.Onehundred).attr('readonly', false);
+    //                        $("#TwoHundredPrice_" + id).val(response.TwohundredFifty).attr('readonly', false);
+    //                        $("#FivehundredPrice_" + id).val(response.Fivehundred).attr('readonly', false);
+    //                        $("#OneThousandPrice_" + id).val(response.OneThousand).attr('readonly', false);
+    //                        $("#DiscountINR_" + id).val(response.DiscountINR).attr('readonly', false);
+    //                    },
+    //                    error: function (response) {
+    //                        alert("Error:" + response);
+    //                    }
+    //                });
+    //            } else {
+    //                toastr.error("Your price is safe :)");
+    //            }
+    //        });
+    //    //$(".addcategorymaster").change(function () {
+
+
+    //});
+
+    $(".clsppop").click(function () {
+        $('#mypriceModal').modal('hide');
+
+        if (popupNumber === "10") {
+            $("#TenPrice_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "25") {
+            $("#TwentyFivePrice_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "50") {
+            $("#FiftyPrice_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "100") {
+            $("#HundredPrice_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "200") {
+            $("#TwoHundredPrice_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "500") {
+            $("#FivehundredPrice_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "1000") {
+            $("#OneThousandPrice_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "010") {
+            $("#TenUSD_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "025") {
+            $("#TwentyfiveUSD_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "050") {
+            $("#FiftyUSD_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "0100") {
+            $("#OnehundredUSD_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "0200") {
+            $("#TwohundredFiftyUSD_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "0500") {
+            $("#FivehundredUSD_" + selectedId).val($(this).attr('data-value'));
+        }
+        if (popupNumber === "01000") {
+            $("#OneThousandUSD_" + selectedId).val($(this).attr('data-value'));
+        }
+    });
+
+    function searchinventory() {
+        var value = $('#loadapiselect').val();
+        var search = $('#txtsearch').val();
+        if (value === "0" && search === "") {
+            swal("Please select API.")
+            return false;
+        }
+        RefstockGrid(value, search);
+    }
+
+    var firsttimeload = false;
+    function RefstockGrid(val, search) {
+        if (firsttimeload) {
+            $('#example1').DataTable().clear();
+            $('#example1').DataTable().destroy();
+            $('#example2').DataTable().clear();
+            $('#example2').DataTable().destroy();
+        }
+        firsttimeload = true;
+        var alltbl = $('#example1').DataTable({
+            "ordering": false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "orderMulti": false, // for disable multiple column at once
+            "pageLength": 25,
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "ajax": {
+                "url": "../Form/LoadProductPriceData?apiname=" + val + '&search=' + search + "&isusd=true",
+                "type": "POST",
+                "datatype": "json",
+                "data": function (d) {
+                    d.instockother = $("#filterinstock").is(":checked") + "," + $("#filterother").is(":checked")
+                }
+            },
+            "fnDrawCallback": function (oSettings) {
+                $('.clstooltip').tooltip();
+                $('#example1 td').click(function () { $('#example1 td').removeClass('highlightblue'); $(this).addClass('highlightblue'); });
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.IsBatchAvailable) {
+                    $('td', nRow).css('background-color', 'rgb(232 254 239)');
+                }
+                if (aData.CategoryMasterUSDId === null && aData.CategoryMasterINRId === null) {
+                    $('td', nRow).find('.clspri').attr('readonly', true);
+                }
+                $('td:eq(2)', nRow).addClass("imgclshover");
+            },
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                $(row).attr('id', 'tr_' + data.Id);
+                $(row).attr('class', 'clstr');
+            },
+            "columns": [
+                { "data": null },
+                { "data": "ChkRow", "autoWidth": true, "orderable": false },
+                
+                { "data": "ProductName", "autoWidth": true, "orderable": false },
+                { "data": "casno", "autoWidth": true, "orderable": false },
+                { "data": "catNoLink", "autoWidth": true, "orderable": false },
+                { "data": "AdditionalBatchNoText", "autoWidth": true, "orderable": false },
+                { "data": "ApprovedText", "autoWidth": true, "orderable": false },
+                { "data": "CategoryMasterUSDText", "autoWidth": true, "orderable": false },
+                { "data": "CopyPaste", "autoWidth": true, "orderable": false },
+                { "data": "TenUSD", "autoWidth": true, "orderable": false },
+                { "data": "TwentyfiveUSD", "autoWidth": true, "orderable": false },
+                { "data": "FiftyUSD", "autoWidth": true, "orderable": false },
+                { "data": "OnehundredUSD", "autoWidth": true, "orderable": false },
+                { "data": "TwohundredFiftyUSD", "autoWidth": true, "orderable": false },
+                { "data": "FivehundredUSD", "autoWidth": true, "orderable": false },
+                { "data": "OneThousandUSD", "autoWidth": true, "orderable": false },
+                { "data": "DiscountUSD", "autoWidth": true, "orderable": false },
+                { "data": "LeadTime", "autoWidth": true, "orderable": false },
+                { "data": "ProductRemark", "autoWidth": true, "orderable": false },
+                { "data": "LastRow", "autoWidth": true, "orderable": false },
+                //{ "data": "LastRow", "autoWidth": true, "orderable": false }
+            ]
+        });
+
+        alltbl.on('draw.dt', function () {
+            var PageInfo = $('#example1').DataTable().page.info();
+            alltbl.column(0, { page: 'current' }).nodes().each(function (cell, i) {
+                cell.innerHTML = i + 1 + PageInfo.start;
+            });
+        });
+    }
+
+
+    var popupNumber = "";
+    var selectedId = 0;
+    function popup(number, productid) {
+        popupNumber = number;
+        selectedId = productid;
+        $('#mypriceModal').modal('show');
+    }
+    var setProcessedChar = '';
+    function SelectInventoryChar(char) {
+        $('.letter').removeClass('letter-active');
+        $('.letter').each(function () {
+            var attr = $(this).attr('data-letter');
+            if (attr == char) {
+                $(this).addClass('letter-active');
+            }
+        })
+        setProcessedChar = char;
+
+        $.ajax({
+            type: "GET",
+            url: "/Form/MainCategory?isonlycategory=true",
+            data: { 'id': char },
+            dataType: "json",
+            success: function (response) {
+                if (response.records.length > 0) {
+                    $('#loadapiselect').empty();
+                    var str = "";
+                    str += "<option value='0'>Select</option>";
+                    $(response.records).each(function (i, v) {
+                        //str += "<div class='span2' onclick='InventoryGrid(&#39;" + v.Name + "&#39;)'>" + v.Name + "</div>";
+                        str += "<option value='" + v.Name + "'>" + v.Name + "</option>";
+                    });
+                    $('#loadapiselect').append(str);
+                }
+
+
+                //if (response.pricerecord.length > 0) {
+                //    $('#dashboardvalue').empty();
+                //    var str = "<table class='table table-bordered table-striped dataTable no-footer' width='100%'><thead><tr><th width='15%'>API Name</th><th width='3%'>Total</th><th width='3%'>Filled (USD)</th><th width='3%'>Pending (USD)</th><th width='3%'>Filled (INR)</th><th width='3%'>Pending (INR)</th><th style='text-align: center'>USD</th><th  style='text-align: center'>INR</th></tr></thead>";
+                //    str += "<tbody>";
+                //    $(response.pricerecord).each(function (i, v) {
+                //        var point = parseFloat(v.ProductCount) / 100;
+                //        var fillUSDGraph = parseFloat(v.PriceFilledUSDCount) / point;
+                //        var pendingUSDGraph = parseFloat(v.PricePendingUSDCount) / point;
+
+                //        var fillINRGraph = parseFloat(v.PriceFilledINRCount) / point;
+                //        var pendingINRGraph = parseFloat(v.PricePendingINRCount) / point;
+
+                //        var graphUSDstr = "<div class='clstooltip' style='background: #30475e;float:left;height:20px;width:" + fillUSDGraph + "%' title='Product Filled : " + v.PriceFilledUSDCount + "'></div><div class='clstooltip' title='Product Pending : " + v.PricePendingUSDCount + "' style='background: #feb377;float:left;height:20px;width:" + pendingUSDGraph + "%'></div>";
+                //        var graphINRstr = "<div class='clstooltip' style='background: #30475e;float:left;height:20px;width:" + fillINRGraph + "%' title='Product Filled : " + v.PriceFilledINRCount + "'></div><div class='clstooltip' title='Product Pending : " + v.PricePendingINRCount + "' style='background: #feb377;float:left;height:20px;width:" + pendingINRGraph + "%'></div>";
+
+                //        str += "<tr><td>" + v.CategoryName + "</td><td>" + v.ProductCount + "</td><td>" + v.PriceFilledUSDCount + "</td><td>" + v.PricePendingUSDCount + "</td><td>" + v.PriceFilledINRCount + "</td><td>" + v.PricePendingINRCount + "</td><td style='padding:5px 10%'>" + graphUSDstr + "</td><td style='padding:5px 10%'>" + graphINRstr + "</td></tr>";
+                //    });
+
+                //    str += "</tbody></table>";
+                //    $('#dashboardvalue').append(str);
+                //    $('.clstooltip').tooltip();
+                //}
+                //else {
+                //    $('#dashboardvalue').empty();
+                //    $('#dashboardvalue').append("<p>Please click on alphabet for more information</p>");
+                //}
+            },
+            error: function (response) {
+                alert("Error:" + response);
+            }
+        });
+    }
+
+    function SaveScientistProductDetails(id) {
+        var scStatus = $("#scientistStatus_" + id).val();
+        var batchcode1 = $("#batchcode1_" + id).val();
+        var qty1 = $("#qty1_" + id).val();
+        var batchcode2 = "";
+        var qty2 = "";
+        var esticompleteDate = $("#esticompleteDate_" + id).val();
+        $.ajax({
+            url: '/Form/UpdateScientistProjectInfo',
+            data: {
+                scStatus: scStatus,
+                batchcode1: batchcode1,
+                qty1: qty1, 
+                batchcode2: batchcode2,
+                qty2: qty2,
+                id: id,
+                esticompleteDate: esticompleteDate
+            },
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have updated product information.");
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (scStatus === readytodeliverId) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+    function savemasterprice() {
+        if (productId === 0) {
+            toastr.error("Please select product for save the process.");
+            return false;
+        }
+        var TenPrice = $("#clsmainpriceone").val();
+        var TwentyFivePrice = $("#clsmainpricetwo").val();
+        var FiftyPrice = $("#clsmainpricethree").val();
+        var HundredPrice = $("#clsmainpricefour").val();
+        var categorymaster = $("#ddlcategory").val();
+        var categorymasterUSD = $("#ddlcategory").val();
+        var TenPriceUSD = $("#clsmainpriceusdone").val();
+        var TwentyFivePriceUSD = $("#clsmainpriceusdtwo" ).val();
+        var FiftyPriceUSD = $("#clsmainpriceusdthree").val();
+        var HundredPriceUSD = $("#clsmainpriceusdfour").val();
+        var isApproved = $("#clsmainapproved").is(":checked");
+        $.ajax({
+            url: '/Form/UpdateMasterPriceList?id=' + productId + '&TenPrice=' + TenPrice
+                + '&TwentyFivePrice=' + TwentyFivePrice
+                + '&FiftyPrice=' + FiftyPrice
+                + '&HundredPrice=' + HundredPrice
+                + '&LeadTime=' + $("#clsmainleadtime").val()
+                + '&ProductRemark=' + $("#clsmainproductremark").val()
+                + '&categorymaster=' + categorymaster
+                + '&TenPriceUSD=' + TenPriceUSD
+                + '&TwentyFivePriceUSD=' + TwentyFivePriceUSD
+                + '&FiftyPriceUSD=' + FiftyPriceUSD
+                + '&HundredPriceUSD=' + HundredPriceUSD
+                + '&categorymasterUSD=' + categorymasterUSD
+                + '&isApproved=' + isApproved
+                + '&isUSD=' + true,
+            data: {},
+            type: 'POST',
+            success: function (data) { },
+            complete: function (data) {
+                toastr.success("You have updated price list..");
+                $('.clsSaverow').each(function () {
+                    $(this).prop('checked', false);
+                });
+
+                $('#selectallchk').prop('checked', false);
+                $('#example1').DataTable().draw();
+            }
+        });
+    }
+    function saveAll() {
+
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var isUSD = false;
+        var tableId = 'example2';
+        if (menulink === "usd") {
+            isUSD = true;
+            tableId = 'example1';
+        }
+        var ids = [];
+        $('.clsSaverow').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+
+        var count = 1;
+        $("#" + tableId).find('.clsSaverow').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                //need to change pass logic
+                var TenPrice = $("#TenPrice_" + id).val();
+                var TwentyFivePrice = $("#TwentyFivePrice_" + id).val();
+                var FiftyPrice = $("#FiftyPrice_" + id).val();
+                var HundredPrice = $("#HundredPrice_" + id).val();
+                var TwoHundredPrice = $("#TwoHundredPrice_" + id).val();
+                var FivehundredPrice = $("#FivehundredPrice_" + id).val();
+                var OneThousandPrice = $("#OneThousandPrice_" + id).val();
+                var categorymaster = $("#categorymasterINR_" + id).val();
+                var Discount = $("#DiscountINR_" + id).val();
+                var TenPriceUSD = $("#TenUSD_" + id).val();
+                var TwentyFivePriceUSD = $("#TwentyfiveUSD_" + id).val();
+                var FiftyPriceUSD = $("#FiftyUSD_" + id).val();
+                var HundredPriceUSD = $("#OnehundredUSD_" + id).val();
+                var TwoHundredPriceUSD = $("#TwohundredFiftyUSD_" + id).val();
+                var FivehundredPriceUSD = $("#FivehundredUSD_" + id).val();
+                var OneThousandPriceUSD = $("#OneThousandUSD_" + id).val();
+                var categorymasterUSD = $("#categorymasterUSD_" + id).val();
+                var DiscountUSD = $("#DiscountUSD_" + id).val();
+                var isApproved = $("#isApproved_" + id).is(":checked");
+                $.ajax({
+                    url: '/Form/UpdatePriceList?id=' + id + '&TenPrice=' + TenPrice
+                        + '&TwentyFivePrice=' + TwentyFivePrice
+                        + '&FiftyPrice=' + FiftyPrice
+                        + '&HundredPrice=' + HundredPrice
+                        + '&TwoHundredPrice=' + TwoHundredPrice
+                        + '&Discount=' + Discount
+                        + '&LeadTime=' + $("#" + tableId).find("#LeadTime_" + id).val()
+                        + '&ProductRemark=' + $("#" + tableId).find("#ProductRemark_" + id).val()
+                        + '&categorymaster=' + categorymaster
+                        + '&FivehundredPrice=' + FivehundredPrice
+                        + '&OneThousandPrice=' + OneThousandPrice
+
+                        + '&TenPriceUSD=' + TenPriceUSD
+                        + '&TwentyFivePriceUSD=' + TwentyFivePriceUSD
+                        + '&FiftyPriceUSD=' + FiftyPriceUSD
+                        + '&HundredPriceUSD=' + HundredPriceUSD
+                        + '&TwoHundredPriceUSD=' + TwoHundredPriceUSD
+                        + '&DiscountUSD=' + DiscountUSD
+                        + '&categorymasterUSD=' + categorymasterUSD
+                        + '&FivehundredPriceUSD=' + FivehundredPriceUSD
+                        + '&OneThousandPriceUSD=' + OneThousandPriceUSD
+                        + '&isApproved=' + isApproved
+                        + '&isUSD=' + isUSD,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) { },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function successAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated price list..");
+            $('.clsSaverow').each(function () {
+                $(this).prop('checked', false);
+            });
+
+            $('#selectallchk').prop('checked', false);
+            SelectInventoryChar(setProcessedChar);
+        }
+    }
+
+
+    function LoadAllCategoryPrice() {
+        $.ajax({
+            url: '/Form/GetAllCategoryPricePopup',
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+                $('#invoiceQueryModal').find(".modal-dialog").css("width", "1200px");
+                $('#invoiceQueryModal').find(".modal-content").css("width", "1200px");
+            }
+        });
+    }
+
+
+    function copyrecord(id) {
+        var str = '';
+        str += "10/" + $("#TenUSD_" + id).val() + ",";
+        str += "25/" + $("#TwentyfiveUSD_" + id).val() + ",";
+        str += "50/" + $("#FiftyUSD_" + id).val() + ",";
+        str += "100/" + $("#OnehundredUSD_" + id).val() + ",";
+        str += "200/" + $("#TwohundredFiftyUSD_" + id).val() + ",";
+        str += "500/" + $("#FivehundredUSD_" + id).val() + ",";
+        str += "1000/" + $("#OneThousandUSD_" + id).val() + ",";
+
+        str += "10/" + $("#TenPrice_" + id).val() + ",";
+        str += "25/" + $("#TwentyFivePrice_" + id).val() + ",";
+        str += "50/" + $("#FiftyPrice_" + id).val() + ",";
+        str += "100/" + $("#HundredPrice_" + id).val() + ",";
+        str += "200/" + $("#TwoHundredPrice_" + id).val() + ",";
+        str += "500/" + $("#FivehundredPrice_" + id).val() + ",";
+        str += "1000/" + $("#OneThousandPrice_" + id).val() + ",";
+        copyToClipboard(str);
+    }
+
+    function pasterecord(id) {
+        if (copyTextPrice === "") {
+            toastr.error("Please copy price.");
+            return false;
+        }
+        var categoryselected = $("#categorymasterUSD_" + id).val();
+        if (categoryselected === undefined || categoryselected === "") {
+            toastr.error("Please select category first.");
+            return false;
+        }
+        swal({
+            title: "Are you sure want to change price?",
+            text: "",
+            html: true,
+            type: "warning",
+            customClass: 'swalwide',
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, Change it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    var data = copyTextPrice.split(',');
+                    for (var i = 1; i <= data.length; i++) {
+                        var val = data[i - 1].split('/');
+                        if (i == 1) { $("#TenUSD_" + id).val(val[1]) }
+                        if (i == 2) { $("#TwentyfiveUSD_" + id).val(val[1]) }
+                        if (i == 3) { $("#FiftyUSD_" + id).val(val[1]) }
+                        if (i == 4) { $("#OnehundredUSD_" + id).val(val[1]) }
+                        if (i == 5) { $("#TwohundredFiftyUSD_" + id).val(val[1]) }
+                        if (i == 6) { $("#FivehundredUSD_" + id).val(val[1]) }
+                        if (i == 7) { $("#OneThousandUSD_" + id).val(val[1]) }
+                        if (i == 8) { $("#TenPrice_" + id).val(val[1]) }
+                        if (i == 9) { $("#TwentyFivePrice_" + id).val(val[1]) }
+                        if (i == 10) { $("#FiftyPrice_" + id).val(val[1]) }
+                        if (i == 11) { $("#HundredPrice_" + id).val(val[1]) }
+                        if (i == 12) { $("#TwoHundredPrice_" + id).val(val[1]) }
+                        if (i == 13) { $("#FivehundredPrice_" + id).val(val[1]) }
+                        if (i == 14) { $("#OneThousandPrice_" + id).val(val[1]) }
+                    }
+                } else {
+                    toastr.error("Your added quotation is safe :)");
+                }
+            });
+    }
+
+    var productId = 0;
+    function GetProductInformationForCategoryMaster(id) {
+        productId = id;
+        $.ajax({
+            url: '/Form/getProductDetailsByProductId?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $("#lblproductname").html(data.record.Name);
+                $("#lblcatno").html(data.record.Sku);
+                $("#lblcasno").html(data.record.ManufacturerPartNumber);
+                $("#lblmolweight").html(data.record.MolecularWeight);
+                $("#lblmolformula").html(data.record.Gtin);
+                if (data.record.DefaultPictureModel != null) {
+                    $("#lblimgurl").attr('src', data.record.DefaultPictureModel.FullSizeImageUrl);
+                }
+                $("#lblChemicalname").html(data.record.ChemicalName); 
+                $("#lblSynonym").html(data.record.Synonym);
+
+                if (data.pricedata != null) {
+                    $("#ddlcategory").val(data.pricedata.CategoryMasterUSdId);
+                    $("#clsmainleadtime").val(data.pricedata.LeadTime);
+                    $("#clsmainproductremark").val(data.pricedata.ProductRemark);
+                    $("#clsmainpriceusdone").val(data.pricedata.TenUSD);
+                    $("#clsmainpriceusdtwo").val(data.pricedata.TwentyfiveUSD);
+                    $("#clsmainpriceusdthree").val(data.pricedata.FiftyUSD);
+                    $("#clsmainpriceusdfour").val(data.pricedata.OnehundredUSD);
+                    $("#clsmainpriceone").val(data.pricedata.TenPrice);
+                    $("#clsmainpricetwo").val(data.pricedata.TwentyFivePrice);
+                    $("#clsmainpricethree").val(data.pricedata.FiftyPrice);
+                    $("#clsmainpricefour").val(data.pricedata.HundredPrice);
+                    if (data.pricedata.IsPriceApproved === true) {
+                        $("#clsmainapproved").prop("checked", true);
+                    }
+                    else {
+                        $("#clsmainapproved").prop("checked", false);
+                    }
+                }
+            }
+        });
+    }
+
+
+
+    function OpepCategorymasterpopup() {
+        if (setProcessedChar === "") {
+            toastr.error("Please select any alphabets for details");
+            return false;
+        }
+
+        $("#btncatmaster").text("Loading...");
+        $("#btncatmaster").attr("disabled", true);
+        $.ajax({
+            type: "GET",
+            url: "/Form/MainCategory?isonlycategory=false",
+            data: { 'id': setProcessedChar },
+            dataType: "json",
+            success: function (response) {
+                $("#btncatmaster").text("Master Price of API");
+                $("#btncatmaster").attr("disabled", false   );
+                var str = "";
+                if (response.pricerecord.length > 0) {
+                    $('#dashboardvalue').empty();
+                    str = "<table class='table table-bordered table-striped dataTable no-footer' width='100%'><thead><tr><th width='15%'>API Name</th><th width='3%'>Total</th><th width='3%'>Filled (USD)</th><th width='3%'>Pending (USD)</th><th width='3%'>Filled (INR)</th><th width='3%'>Pending (INR)</th><th style='text-align: center'>USD</th><th  style='text-align: center'>INR</th></tr></thead>";
+                    str += "<tbody>";
+                    $(response.pricerecord).each(function (i, v) {
+                        var point = parseFloat(v.ProductCount) / 100;
+                        var fillUSDGraph = parseFloat(v.PriceFilledUSDCount) / point;
+                        var pendingUSDGraph = parseFloat(v.PricePendingUSDCount) / point;
+
+                        var fillINRGraph = parseFloat(v.PriceFilledINRCount) / point;
+                        var pendingINRGraph = parseFloat(v.PricePendingINRCount) / point;
+
+                        var graphUSDstr = "<div class='clstooltip' style='background: #30475e;float:left;height:20px;width:" + fillUSDGraph + "%' title='Product Filled : " + v.PriceFilledUSDCount + "'></div><div class='clstooltip' title='Product Pending : " + v.PricePendingUSDCount + "' style='background: #feb377;float:left;height:20px;width:" + pendingUSDGraph + "%'></div>";
+                        var graphINRstr = "<div class='clstooltip' style='background: #30475e;float:left;height:20px;width:" + fillINRGraph + "%' title='Product Filled : " + v.PriceFilledINRCount + "'></div><div class='clstooltip' title='Product Pending : " + v.PricePendingINRCount + "' style='background: #feb377;float:left;height:20px;width:" + pendingINRGraph + "%'></div>";
+
+                        str += "<tr><td>" + v.CategoryName + "</td><td>" + v.ProductCount + "</td><td>" + v.PriceFilledUSDCount + "</td><td>" + v.PricePendingUSDCount + "</td><td>" + v.PriceFilledINRCount + "</td><td>" + v.PricePendingINRCount + "</td><td style='padding:5px 10%'>" + graphUSDstr + "</td><td style='padding:5px 10%'>" + graphINRstr + "</td></tr>";
+                    });
+
+                    str += "</tbody></table>";
+                    $('#dashboardvalue').append(str);
+                    $('.clstooltip').tooltip();
+                }
+                else {
+                    str = "<p>Please click on alphabet for more information</p>";
+                }
+                $('#invoiceQueryModal .modal-body').html(str);
+                $('#invoiceQueryModal').modal({ show: true });
+                $('#invoiceQueryModal').find(".modal-dialog").css("width", "1200px");
+                $('#invoiceQueryModal').find(".modal-content").css("width", "1200px");
+
+
+                
+            },
+            error: function (response) {
+                alert("Error:" + response);
+            }
+        });
+    }
+</script>
+
+<style type="text/css">
+    .letter {
+        float: left;
+        padding: 10px 14px;
+        background: #3c8dbc;
+        margin: 5px 10px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .letter:hover, .letter-active {
+            background: #2d729a;
+        }
+
+    .clsimageproduct {
+        display: block;
+        position: absolute;
+        background: #fff;
+        padding: 10px;
+        border: 1px solid #ececec;
+        left: 7.5%;
+    }
+
+    .highlightblue {
+        background: #b9d2e0 !important;
+    }
+
+    #tblpricemasterdata {
+        border: 1px solid #ececec;
+    }
+        #tblpricemasterdata th{
+            text-align:center;
+        }
+        #tblpricemasterdata td, #tblpricemasterdata th {
+            border: 1px solid #ececec;
+            padding: 8px;
+        }
+</style>

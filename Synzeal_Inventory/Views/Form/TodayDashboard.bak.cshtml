@@ -1,0 +1,1921 @@
+﻿@using Synzeal_Inventory.Models;
+@model List<MonthWiseUserDashboardDto>
+@{
+    ViewBag.Title = "Todays Quotations";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var synthesiscatno = ViewBag.SynthesisCatNo as List<string>;
+    var reviewedList = ViewBag.Reviewed as List<Synzeal_Inventory.Entity.SZ_Quotation>;
+    var instockList = ViewBag.Instock as List<Synzeal_Inventory.Entity.SZ_Quotation>;
+    var customSynthesisList = ViewBag.CustomSynthesis as List<Synzeal_Inventory.Entity.SZ_Quotation>;
+    var studyData = ViewBag.StudyData as List<Synzeal_Inventory.Entity.SZ_Quotation>;
+    var approvedList = ViewBag.Approved as List<Synzeal_Inventory.Entity.SZ_Quotation>;
+    var quotationList = ViewBag.QuotationList as List<Synzeal_Inventory.Entity.SZ_Quotation>;
+    var listofquotedetails = ViewBag.listofquotedetails as List<UserDashboardSummaryDto>;
+    var listofquotedetailscurrent = ViewBag.listofquotedetailsCurrent as List<UserDashboardSummaryDto>;
+    var totalEmail = 0;
+    if (ViewBag.TotalOfEmail != null)
+    {
+        totalEmail = Convert.ToInt32(ViewBag.TotalOfEmail);
+    }
+    var totalEmailCurrent = 0;
+    if (ViewBag.TotalOfEmailCurrent != null)
+    {
+        totalEmailCurrent = Convert.ToInt32(ViewBag.TotalOfEmailCurrent);
+    }
+
+    var totalRegrettedCurrent = 0;
+    if (ViewBag.TotalOfRegrettedCurrent != null)
+    {
+        totalRegrettedCurrent = Convert.ToInt32(ViewBag.TotalOfRegrettedCurrent);
+    }
+    var totalRegretted = 0;
+    if (ViewBag.TotalOfRegretted != null)
+    {
+        totalRegretted = Convert.ToInt32(ViewBag.TotalOfRegretted);
+    }
+
+}
+<link href="~/css/PrintTodaydashboard.css" rel="stylesheet" />
+<section class="content-header">
+    <h1>
+        Today's Quotations
+        <a href="javascript:void(0)" class="btn btn-primary" onclick="window.print()" style="float:right;margin-left:10px">Print</a>
+        <a href="javascript:void(0)" class="btn btn-primary" onclick="saveallremind()" style="float:right;margin-left:10px">Save All</a><a href="/Form/Dashboard" class="btn btn-primary" style="float:right">Go to Dashboard</a>
+        <a href="javascript:void(0)" class="btn btn-primary" onclick="addInStudy()" style="float:right;margin-right:10px">Study</a>
+
+
+        @Html.DropDownList("compList", (IEnumerable<SelectListItem>)ViewBag.compList, new { @class = "form-control", @style = "width:15%; margin-right:15px; float:right", @onchange = "filtercomap()" })
+        <input style="float:right;width:250px;margin-right:10px;" type="text" class="form-control" id="filtertext" />
+
+        <a href="javascript:void(0)" id="start-btn" style="float: right; width: 18px; padding-right: 15px; font-size: 16px; margin-top: 7px;">
+            <i class="fa fa-microphone"></i>
+        </a>
+        <a href="javascript:void(0)" id="create" style="display: none; float: right; width: 18px; padding-right: 15px; font-size: 16px; margin-top: 7px;">
+            <i class="fa fa-ban"></i>
+        </a>
+        <br />
+        <p style="font-size:13px; float:right; display: none" id="instration">Press Start Voice Recognition</p>
+    </h1>
+</section>
+<section class="content" style="margin-top: 10px">
+    <div class="row">
+        <div class="col-md-6">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">In-Stock (@instockList.Count)</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form role="form">
+                        <div class="box-body">
+                            @if (instockList != null && instockList.Count > 0)
+                            {
+                                <div class="col-md-6">
+                                    <b>Domestic</b>
+                                    @foreach (var item in instockList.Where(x => x.CountryType == "Domestic").ToList())
+                                    {
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+                                        //if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                        //{
+                                        //    cls = "clslightred";
+                                        //}
+
+                                        var catnolist = item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.CATNo)).Select(x => x.CATNo).ToList(); var anyavailable = catnolist.Where(x => synthesiscatno.Contains(x)).Any();
+                                        var underline = "";
+                                        if (anyavailable)
+                                        {
+                                            underline = "text-decoration:underline";
+                                        }
+
+                                        <div class="col-md-12">
+                                            @*@if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" checked />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                                }*@
+
+
+                                            <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                            <a href="/Form/Quote/@item.Id" class="@cls" style="@underline">
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count())  - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <img src="~/img/star.png" width="14px" height="14px" />
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    <b>Export</b>
+                                    @foreach (var item in instockList.Where(x => x.CountryType == "Export").ToList())
+                                    {
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+
+                                        var catnolist = item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.CATNo)).Select(x => x.CATNo).ToList(); var anyavailable = catnolist.Where(x => synthesiscatno.Contains(x)).Any();
+                                        var underline = "";
+                                        if (anyavailable)
+                                        {
+                                            underline = "text-decoration:underline";
+                                        }
+
+                                        <div class="col-md-12">
+
+                                            @*@if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" checked />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                                }*@
+                                            <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                            <a href="/Form/Quote/@item.Id" class="@cls" style="@underline">
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count())  - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <img src="~/img/star.png" width="14px" height="14px" />
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+
+                            }
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Reviewed (@reviewedList.Count)</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form role="form">
+                        <div class="box-body">
+                            @if (reviewedList != null && reviewedList.Count > 0)
+                            {
+                                <div class="col-md-6">
+                                    @foreach (var item in reviewedList.Where(x => x.CountryType == "Domestic").ToList())
+                                    {
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+                                        //if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                        //{
+                                        //    cls = "clslightred";
+                                        //}
+                                        //var catnolist = item.SZ_QuotationDetail.Select(x => x.CATNo).ToList();
+                                        //var anyavailable = catnolist.Where(x => !synthesiscatno.Contains(x)).Any();
+                                        //var underline = "";
+                                        //if (anyavailable)
+                                        //{
+                                        //    underline = "text-decoration:underline";
+                                        //}
+
+                                        <div class="col-md-12">
+                                            @*@if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" checked />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                                }*@
+
+
+                                            <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                            <a href="/Form/Quote/@item.Id" class="@cls" @*style="@underline"*@>
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count())  - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <img src="~/img/star.png" width="14px" height="14px" />
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    @foreach (var item in reviewedList.Where(x => x.CountryType == "Export").ToList())
+                                    {
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+                                        //if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                        //{
+                                        //    cls = "clslightred";
+                                        //}
+                                        //var catnolist = item.SZ_QuotationDetail.Select(x => x.CATNo).ToList();
+                                        //var anyavailable = catnolist.Where(x => !synthesiscatno.Contains(x)).Any();
+                                        //var underline = "";
+                                        //if (anyavailable)
+                                        //{
+                                        //    underline = "text-decoration:underline";
+                                        //}
+
+                                        <div class="col-md-12">
+                                            @*@if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" checked />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                                }*@
+
+                                            <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                            <a href="/Form/Quote/@item.Id" class="@cls" @*style="@underline"*@>
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count())  - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <img src="~/img/star.png" width="14px" height="14px" />
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+
+                            }
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Approved (@approvedList.Count)</h3>
+                    </div>
+                    <form role="form">
+                        <div class="box-body">
+                            @if (approvedList != null && approvedList.Count > 0)
+                            {
+                                <div class="col-md-6">
+                                    <b>Domestic</b>
+                                    @foreach (var item in approvedList.Where(x => x.CountryType == "Domestic").ToList())
+                                    {
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+                                        //var catnolist = item.SZ_QuotationDetail.Select(x => x.CATNo).ToList();
+                                        //var anyavailable = catnolist.Where(x => !synthesiscatno.Contains(x)).Any();
+                                        //var underline = "";
+                                        //if (anyavailable)
+                                        //{
+                                        //    underline = "text-decoration:underline";
+                                        //}
+
+                                        <div class="col-md-12">
+                                            <a href="/Form/Quote/@item.Id" class="@cls" @*style="@underline"*@>
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    <b>Export</b>
+                                    @foreach (var item in approvedList.Where(x => x.CountryType == "Export").ToList())
+                                    {
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+                                        //var catnolist = item.SZ_QuotationDetail.Select(x => x.CATNo).ToList();
+                                        //var anyavailable = catnolist.Where(x => !synthesiscatno.Contains(x)).Any();
+                                        //var underline = "";
+                                        //if (anyavailable)
+                                        //{
+                                        //    underline = "text-decoration:underline";
+                                        //}
+
+                                        <div class="col-md-12">
+                                            <a href="/Form/Quote/@item.Id" class="@cls" @*style="@underline"*@>
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-12 clsmonthreport">
+                <!-- general form elements -->
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Sent Quotation (@quotationList.Count)</h3>
+                    </div>
+                    <form role="form">
+                        <div class="box-body">
+                            @if (quotationList != null && quotationList.Count > 0)
+                            {
+                                <div class="col-md-6">
+                                    <b>Domestic</b>
+                                    @foreach (var item in quotationList.Where(x => x.CountryType == "Domestic").ToList())
+                                    {
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+                                        //var catnolist = item.SZ_QuotationDetail.Select(x => x.CATNo).ToList();
+                                        //var anyavailable = catnolist.Where(x => !synthesiscatno.Contains(x)).Any();
+                                        //var underline = "";
+                                        //if (anyavailable)
+                                        //{
+                                        //    underline = "text-decoration:underline";
+                                        //}
+
+                                        <div class="col-md-12">
+                                            <a href="/Form/Quote/@item.Id" class="@cls" @*style="@underline"*@>
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    <b>Export</b>
+                                    @foreach (var item in quotationList.Where(x => x.CountryType == "Export").ToList())
+                                    {
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+                                        //var catnolist = item.SZ_QuotationDetail.Select(x => x.CATNo).ToList();
+                                        //var anyavailable = catnolist.Where(x => !synthesiscatno.Contains(x)).Any();
+                                        //var underline = "";
+                                        //if (anyavailable)
+                                        //{
+                                        //    underline = "text-decoration:underline";
+                                        //}
+
+                                        <div class="col-md-12">
+                                            <a href="/Form/Quote/@item.Id" class="@cls" @*style="@underline"*@>
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="col-md-12">
+                <div class="box box-info clsCustomSynthesis">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Custom Synthesis (@DateTime.Now.AddDays(-2).ToShortDateString() - @DateTime.Now.ToShortDateString()) </h3>
+                    </div>
+                    <form role="form">
+                        <div class="box-body">
+                            @if (customSynthesisList != null && customSynthesisList.Count > 0)
+                            {
+                                DateTime startdate = DateTime.Now.AddDays(-2);
+                                DateTime enddate = DateTime.Now;
+                                <div class="col-md-6">
+                                    <b>Domestic</b>
+                                    @foreach (var item in customSynthesisList.Where(x => x.CreatedDate >= startdate && x.CreatedDate <= enddate && x.CountryType == "Domestic"))
+                                    {
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+                                        var catnolist = item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.CATNo)).Select(x => x.CATNo).ToList();
+                                        var anyavailable = catnolist.Where(x => synthesiscatno.Contains(x)).Any();
+                                        var underline = "";
+                                        if (anyavailable)
+                                        {
+                                            underline = "text-decoration:underline";
+                                        }
+
+                                        <div class="col-md-12">
+                                            @*@if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" checked />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                                }*@
+
+                                            <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                            <a href="/Form/Quote/@item.Id" class="@cls" style="@underline">
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <img src="~/img/star.png" width="14px" height="14px" />
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    <b>Export</b>
+                                    @foreach (var item in customSynthesisList.Where(x => x.CreatedDate >= startdate && x.CreatedDate <= enddate && x.CountryType == "Export"))
+                                    {
+                                        if (item.CompanyName == null || item.SZ_QuotationDetail == null || item.SZ_QuotationDetail.Count == 0)
+                                        {
+                                            continue;
+                                        }
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+                                        var catnolist = item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.CATNo)).Select(x => x.CATNo).ToList();
+                                        var anyavailable = catnolist.Where(x => synthesiscatno.Contains(x)).Any();
+                                        var underline = "";
+                                        if (anyavailable)
+                                        {
+                                            underline = "text-decoration:underline";
+                                        }
+
+                                        <div class="col-md-12">
+                                            @*@if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" checked />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                                }*@
+
+
+                                            <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                            <a href="/Form/Quote/@item.Id" class="@cls" style="@underline">
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <img src="~/img/star.png" width="14px" height="14px" />
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+
+                            }
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="box box-info clsCustomSynthesis">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Study</h3>
+                    </div>
+                    <form role="form">
+                        <div class="box-body">
+                            @if (studyData != null && studyData.Count > 0)
+                            {
+                                DateTime startdate = DateTime.Now.AddDays(-2);
+                                DateTime enddate = DateTime.Now;
+                                <div class="col-md-6">
+                                    <b>Domestic</b>
+                                    @foreach (var item in studyData.Where(x => x.CountryType == "Domestic"))
+                                    {
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+                                        var catnolist = item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.CATNo)).Select(x => x.CATNo).ToList();
+                                        var anyavailable = catnolist.Where(x => synthesiscatno.Contains(x)).Any();
+                                        var underline = "";
+                                        if (anyavailable)
+                                        {
+                                            underline = "text-decoration:underline";
+                                        }
+
+                                        <div class="col-md-12">
+                                            @*@if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" checked />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                                }*@
+
+
+                                            <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                            <a href="/Form/Quote/@item.Id" class="@cls" style="@underline">
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <img src="~/img/star.png" width="14px" height="14px" />
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    <b>Export</b>
+                                    @foreach (var item in studyData.Where(x => x.CountryType == "Export"))
+                                    {
+                                        if (item.CompanyName == null || item.SZ_QuotationDetail == null || item.SZ_QuotationDetail.Count == 0)
+                                        {
+                                            continue;
+                                        }
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+                                        var catnolist = item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.CATNo)).Select(x => x.CATNo).ToList();
+                                        var anyavailable = catnolist.Where(x => synthesiscatno.Contains(x)).Any();
+                                        var underline = "";
+                                        if (anyavailable)
+                                        {
+                                            underline = "text-decoration:underline";
+                                        }
+
+                                        <div class="col-md-12">
+                                            @*@if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" checked />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                                }*@
+
+
+                                            <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                            <a href="/Form/Quote/@item.Id" class="@cls" style="@underline">
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <img src="~/img/star.png" width="14px" height="14px" />
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+
+                            }
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-12 clsmonthreport clsCustomSynthesis">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Custom Synthesis (@DateTime.Now.AddDays(-10).ToShortDateString() - @DateTime.Now.AddDays(-3).ToShortDateString())</h3>
+                    </div>
+                    <form role="form">
+                        <div class="box-body">
+                            @if (customSynthesisList != null && customSynthesisList.Count > 0)
+                            {
+                                DateTime startdate = DateTime.Now.AddDays(-10);
+                                DateTime enddate = DateTime.Now.AddDays(-3);
+                                <div class="col-md-6">
+                                    <b>Domestic</b>
+                                    @foreach (var item in customSynthesisList.Where(x => x.CreatedDate >= startdate && x.CreatedDate <= enddate && x.CountryType == "Domestic"))
+                                    {
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+
+                                        <div class="col-md-12">
+                                            @*@if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" checked />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                                }*@
+
+
+                                            <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                            <a href="/Form/Quote/@item.Id" class="@cls" @*style="@underline"*@>
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <img src="~/img/star.png" width="14px" height="14px" />
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    <b>Export</b>
+                                    @foreach (var item in customSynthesisList.Where(x => x.CreatedDate >= startdate && x.CreatedDate <= enddate && x.CountryType == "Export"))
+                                    {
+                                        var cls = "";
+                                        if (item.IsPreviewed.HasValue && item.IsPreviewed.Value)
+                                        {
+                                            cls = "clsorange";
+                                        }
+                                        if (item.IsReviewed.HasValue && item.IsReviewed.Value)
+                                        {
+                                            cls = "clsblue";
+                                        }
+                                        if (item.IsRegret.HasValue && item.IsRegret.Value)
+                                        {
+                                            cls = "clslightgreen";
+                                        }
+                                        <div class="col-md-12">
+                                            @*@if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" checked />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                                }*@
+
+
+                                            <input type="checkbox" value="@item.Id" class="clscheckboxremind" />
+                                            <a href="/Form/Quote/@item.Id" class="@cls" @*style="@underline"*@>
+                                                @item.CompanyName - @item.Ref (@item.SZ_QuotationDetail.Count()) - @item.SZ_QuotationDetail.Where(x => !string.IsNullOrEmpty(x.ProductName)).OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()
+                                                @if (!string.IsNullOrEmpty(item.CreatedBy))
+                                                {
+                                                    <span>(</span> @item.CreatedBy.Split(' ')[0].Substring(0, 1) @item.CreatedBy.Split(' ')[1].Substring(0, 1)<span>)</span>
+                                                }
+                                                @if (item.IsReminder.HasValue && item.IsReminder.Value)
+                                                {
+                                                    <img src="~/img/star.png" width="14px" height="14px" />
+                                                }
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="col-md-12 clsmonthreport">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form role="form">
+
+
+
+                        <div class="box collapsed-box">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">
+                                    Quotation Summary Dated @DateTime.Now.AddDays(-1).ToShortDateString()
+                                </h3>
+
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="box-body" style="display:none">
+                                <table class="table table-reponsive">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Sr. No
+                                            </th>
+                                            <th>
+                                                Teammate
+                                            </th>
+                                            <th style="text-align:center">
+                                                In Stock
+                                            </th>
+                                            <th style="text-align:center">
+                                                Synthesis
+                                            </th>
+                                            <th style="text-align:center"> Reviewed</th>
+                                            <th style="text-align:center">Approved</th>
+                                            <th style="text-align:center">Deleted</th>
+                                            <th style="text-align:center">Park</th>
+                                            <th style="text-align:center">Regretted</th>
+                                            <th style="text-align:center">Clarification</th>
+                                            <th style="text-align:center">Upload</th>
+                                            <th style="text-align:center">Complex</th>
+                                            <th style="text-align:center">Total</th>
+                                            <th style="text-align:center"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int loop = 1;
+                                            var totaloftotal = 0;
+                                            var one = 0;
+                                            var two = 0;
+                                            var three = 0;
+                                            var four = 0;
+                                            var five = 0;
+                                            var six = 0;
+                                            var seven = 0;
+                                            var eight = 0;
+                                            var nine = 0;
+                                            var ten = 0;
+                                            var eleven = 0;
+
+                                            foreach (var item in listofquotedetails)
+                                            {
+                                                if (item.Username.ToLower().Contains("neela")
+                                                    || item.Username.ToLower().Contains("ketan")
+                                                    || item.Username.ToLower().Contains("mayur")
+                                                    || item.Username.ToLower().Contains("sagar"))
+                                                {
+                                                    continue;
+                                                }
+                                                if (item.Total.HasValue)
+                                                {
+                                                    totaloftotal += item.Total.Value;
+                                                }
+                                                if (item.InStock.HasValue)
+                                                {
+                                                    one += item.InStock.Value;
+                                                }
+                                                if (item.Synthesis.HasValue)
+                                                {
+                                                    two += item.Synthesis.Value;
+                                                }
+                                                if (item.Reviewed.HasValue)
+                                                {
+                                                    three += item.Reviewed.Value;
+                                                }
+                                                if (item.Approved.HasValue)
+                                                {
+                                                    four += item.Approved.Value;
+                                                }
+                                                if (item.Deleted.HasValue)
+                                                {
+                                                    five += item.Deleted.Value;
+                                                }
+                                                if (item.Park.HasValue)
+                                                {
+                                                    six += item.Park.Value;
+                                                }
+                                                if (item.Regretted.HasValue)
+                                                {
+                                                    seven += item.Regretted.Value;
+                                                }
+                                                if (item.Clarification.HasValue)
+                                                {
+                                                    eight += item.Clarification.Value;
+                                                }
+                                                if (item.Upload.HasValue)
+                                                {
+                                                    nine += item.Upload.Value;
+                                                }
+                                                if (item.Complex.HasValue)
+                                                {
+                                                    ten += item.Complex.Value;
+                                                }
+                                                if (item.Total.HasValue)
+                                                {
+                                                    eleven += item.Total.Value;
+                                                }
+                                                <tr>
+                                                    <td>@loop</td>
+                                                    <td>@item.Username</td>
+                                                    <td style="text-align:center">@item.InStock</td>
+                                                    <td style="text-align:center">@item.Synthesis</td>
+                                                    <td style="text-align:center">@item.Reviewed</td>
+                                                    <td style="text-align:center">@item.Approved</td>
+                                                    <td style="text-align:center">@item.Deleted</td>
+                                                    <td style="text-align:center">@item.Park</td>
+                                                    <td style="text-align:center">@item.Regretted</td>
+                                                    <td style="text-align:center">
+                                                        <input style="width: 50px;text-align:center" type="text" id="clarification_1_@item.UserId" value="@item.Clarification" />
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        <input style="width: 50px;text-align:center" type="text" id="upload_1_@item.UserId" value="@item.Upload" />
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        <input style="width: 50px;text-align:center" type="text" id="complex_1_@item.UserId" value="@item.Complex" />
+                                                    </td>
+                                                    @*<td style="text-align:center">
+                                                            <input style="width: 50px;" type="text" id="regretted_1_@item.UserId" value="@item.Regretted" />
+                                                        </td>*@
+                                                    <td style="text-align:center">
+                                                        @item.Total
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        @if (SessionCookieManagement.IsAdmin)
+                                                        {
+                                                            <a href="javascript:void(0)" onclick="editsummary(@item.UserId , 1)">Save</a>
+                                                        }
+                                                        @if (!SessionCookieManagement.IsAdmin &&
+                                                            (item.Username == SessionCookieManagement.UserName ||
+                                                            SessionCookieManagement.UserEmail == "neela@synzeal.com" ||
+                                                            SessionCookieManagement.UserEmail == "nilima@synzeal.com" ||
+                                                            SessionCookieManagement.UserEmail == "priya@synzeal.com"))
+                                                        {
+                                                            <a href="javascript:void(0)" onclick="editsummary(@item.UserId , 1)">Save</a>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                loop += 1;
+                                            }
+
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td style="text-align:center">@one</td>
+                                                <td style="text-align:center">@two</td>
+                                                <td style="text-align:center">@three</td>
+                                                <td style="text-align:center">@four</td>
+                                                <td style="text-align:center">@five</td>
+                                                <td style="text-align:center">@six</td>
+                                                <td style="text-align:center">@seven</td>
+                                                <td style="text-align:center">@eight</td>
+                                                <td style="text-align:center">@nine</td>
+                                                <td style="text-align:center">@ten</td>
+                                                <td style="text-align:center"><b>@eleven</b></td>
+                                                <td style="text-align: center; ">
+                                                    <b>Total Quote Made</b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="12" style="text-align:right">
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="totalemail_1" style="text-align:center;width:50px" value="@totalEmail" />
+                                                    @if (SessionCookieManagement.IsAdmin ||
+                                                        (SessionCookieManagement.UserEmail == "neela@synzeal.com" ||
+                                                        SessionCookieManagement.UserEmail == "nilima@synzeal.com" ||
+                                                        SessionCookieManagement.UserEmail == "priya@synzeal.com"))
+                                                    {
+                                                        <a href="javascript:void(0)" onclick="saveEmailTotal(1)">
+                                                            <i class="fa fa-save"></i>
+                                                        </a>
+                                                    }
+                                                </td>
+                                                <td colspan="13" style="text-align: center; ">
+                                                    <b>Total Quote Requests</b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="12" style="text-align:right">
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="regretted_1" style="text-align:center;width:50px" value="@totalRegretted" />
+                                                    @if (SessionCookieManagement.IsAdmin ||
+                                                        (SessionCookieManagement.UserEmail == "neela@synzeal.com" ||
+                                                        SessionCookieManagement.UserEmail == "nilima@synzeal.com" ||
+                                                        SessionCookieManagement.UserEmail == "priya@synzeal.com"))
+                                                    {
+                                                        <a href="javascript:void(0)" onclick="saveRegrettedTotal(1)">
+                                                            <i class="fa fa-save"></i>
+                                                        </a>
+                                                    }
+                                                </td>
+                                                <td colspan="13" style="text-align: center; ">
+                                                    <b>Regretted</b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="12" style="text-align:right">
+                                                </td>
+                                                <td style="text-align:center">
+                                                    <b>
+                                                        @{
+                                                            var pending = totalEmail - totaloftotal - totalRegretted;
+                                                            if (pending < 0)
+                                                            {
+                                                                pending = 0;
+                                                            }
+                                                        }
+
+                                                        @pending
+                                                    </b>
+                                                </td>
+                                                <td style="text-align: center; ">
+                                                    <b>
+                                                        Total Pending
+                                                    </b>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 clsmonthreport">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form role="form">
+                        <div class="box  collapsed-box">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">
+                                    Quotation Summary Dated @DateTime.Now.ToShortDateString()
+                                </h3>
+
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="box-body" style="display:none">
+                                <table class="table table-reponsive">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Sr. No
+                                            </th>
+                                            <th>
+                                                Teammate
+                                            </th>
+                                            <th style="text-align:center">
+                                                In Stock
+                                            </th>
+                                            <th style="text-align:center">
+                                                Synthesis
+                                            </th>
+                                            <th style="text-align:center"> Reviewed</th>
+                                            <th style="text-align:center">Approved</th>
+                                            <th style="text-align:center">Deleted</th>
+                                            <th style="text-align:center">Park</th>
+                                            <th style="text-align:center">Regretted</th>
+                                            <th style="text-align:center">Clarification</th>
+                                            <th style="text-align:center">Upload</th>
+                                            <th style="text-align:center">Complex</th>
+
+                                            <th style="text-align:center">Total</th>
+                                            <th style="text-align:center"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int loopss = 1;
+                                            var totaloftotalcurrent = 0;
+                                            var onecurrent = 0;
+                                            var twocurrent = 0;
+                                            var threecurrent = 0;
+                                            var fourcurrent = 0;
+                                            var fivecurrent = 0;
+                                            var sixcurrent = 0;
+                                            var sevencurrent = 0;
+                                            var eightcurrent = 0;
+                                            var ninecurrent = 0;
+                                            var tencurrent = 0;
+                                            var elevencurrent = 0;
+                                            foreach (var item in listofquotedetailscurrent)
+                                            {
+                                                if (item.Username.ToLower().Contains("neela")
+                                                   || item.Username.ToLower().Contains("ketan")
+                                                   || item.Username.ToLower().Contains("mayur")
+                                                    || item.Username.ToLower().Contains("sagar"))
+                                                {
+                                                    continue;
+                                                }
+                                                if (item.Total.HasValue)
+                                                {
+                                                    totaloftotalcurrent += item.Total.Value;
+                                                }
+                                                if (item.InStock.HasValue)
+                                                {
+                                                    onecurrent += item.InStock.Value;
+                                                }
+                                                if (item.Synthesis.HasValue)
+                                                {
+                                                    twocurrent += item.Synthesis.Value;
+                                                }
+                                                if (item.Reviewed.HasValue)
+                                                {
+                                                    threecurrent += item.Reviewed.Value;
+                                                }
+                                                if (item.Approved.HasValue)
+                                                {
+                                                    fourcurrent += item.Approved.Value;
+                                                }
+                                                if (item.Deleted.HasValue)
+                                                {
+                                                    fivecurrent += item.Deleted.Value;
+                                                }
+                                                if (item.Park.HasValue)
+                                                {
+                                                    sixcurrent += item.Park.Value;
+                                                }
+                                                if (item.Regretted.HasValue)
+                                                {
+                                                    sevencurrent += item.Regretted.Value;
+                                                }
+                                                if (item.Clarification.HasValue)
+                                                {
+                                                    eightcurrent += item.Clarification.Value;
+                                                }
+                                                if (item.Upload.HasValue)
+                                                {
+                                                    ninecurrent += item.Upload.Value;
+                                                }
+                                                if (item.Complex.HasValue)
+                                                {
+                                                    tencurrent += item.Complex.Value;
+                                                }
+                                                if (item.Total.HasValue)
+                                                {
+                                                    elevencurrent += item.Total.Value;
+                                                }
+                                                <tr>
+                                                    <td>@loopss</td>
+                                                    <td>@item.Username</td>
+                                                    <td style="text-align:center">@item.InStock</td>
+                                                    <td style="text-align:center">@item.Synthesis</td>
+                                                    <td style="text-align:center">@item.Reviewed</td>
+                                                    <td style="text-align:center">@item.Approved</td>
+                                                    <td style="text-align:center">@item.Deleted</td>
+                                                    <td style="text-align:center">@item.Park</td>
+                                                    <td style="text-align:center">@item.Regretted</td>
+                                                    <td style="text-align:center">
+                                                        <input style="width: 50px;text-align:center" type="text" id="clarification_0_@item.UserId" value="@item.Clarification" />
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        <input style="width: 50px;text-align:center" type="text" id="upload_0_@item.UserId" value="@item.Upload" />
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        <input style="width: 50px;text-align:center" type="text" id="complex_0_@item.UserId" value="@item.Complex" />
+                                                    </td>
+                                                    @*<td style="text-align:center">
+                                                            <input style="width: 50px;" type="text" id="regretted_0_@item.UserId" value="@item.Regretted" />
+                                                        </td>*@
+                                                    <td style="text-align:center">
+                                                        @item.Total
+                                                    </td>
+                                                    <td style="text-align:center">
+                                                        @if (SessionCookieManagement.IsAdmin)
+                                                        {
+                                                            <a href="javascript:void(0)" onclick="editsummary(@item.UserId , 0)">Save</a>
+                                                        }
+                                                        @if (!SessionCookieManagement.IsAdmin &&
+(item.Username == SessionCookieManagement.UserName ||
+SessionCookieManagement.UserEmail == "neela@synzeal.com" ||
+SessionCookieManagement.UserEmail == "nilima@synzeal.com" ||
+SessionCookieManagement.UserEmail == "priya@synzeal.com"))
+                                                        {
+                                                            <a href="javascript:void(0)" onclick="editsummary(@item.UserId , 0)">Save</a>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                loopss += 1;
+                                            }
+
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td style="text-align:center">@onecurrent</td>
+                                                <td style="text-align:center">@twocurrent</td>
+                                                <td style="text-align:center">@threecurrent</td>
+                                                <td style="text-align:center">@fourcurrent</td>
+                                                <td style="text-align:center">@fivecurrent</td>
+                                                <td style="text-align:center">@sixcurrent</td>
+                                                <td style="text-align:center">@sevencurrent</td>
+                                                <td style="text-align:center">@eightcurrent</td>
+                                                <td style="text-align:center">@ninecurrent</td>
+                                                <td style="text-align:center">@tencurrent</td>
+                                                <td style="text-align:center"><b>@elevencurrent</b></td>
+                                                <td style="text-align: center; ">
+                                                    <b>Total Quote Made</b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="12" style="text-align:right">
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="totalemail_0" style="text-align:center;width:50px" value="@totalEmailCurrent" />
+                                                    @if (SessionCookieManagement.IsAdmin ||
+                                                        (SessionCookieManagement.UserEmail == "neela@synzeal.com" ||
+                                                        SessionCookieManagement.UserEmail == "nilima@synzeal.com" ||
+                                                        SessionCookieManagement.UserEmail == "priya@synzeal.com"))
+                                                    {
+                                                        <a href="javascript:void(0)" onclick="saveEmailTotal(0)">
+                                                            <i class="fa fa-save"></i>
+                                                        </a>
+                                                    }
+                                                </td>
+                                                <td colspan="13" style="text-align: center; ">
+                                                    <b>Total Quote Requests</b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="12" style="text-align:right">
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="regretted_0" style="text-align:center;width:50px" value="@totalRegrettedCurrent" />
+                                                    @if (SessionCookieManagement.IsAdmin ||
+                                                        (SessionCookieManagement.UserEmail == "neela@synzeal.com" ||
+                                                        SessionCookieManagement.UserEmail == "nilima@synzeal.com" ||
+                                                        SessionCookieManagement.UserEmail == "priya@synzeal.com"))
+                                                    {
+                                                        <a href="javascript:void(0)" onclick="saveRegrettedTotal(0)">
+                                                            <i class="fa fa-save"></i>
+                                                        </a>
+                                                    }
+                                                </td>
+                                                <td colspan="13" style="text-align: center; ">
+                                                    <b>Regretted</b>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="12" style="text-align:right">
+                                                </td>
+                                                <td style="text-align:center">
+                                                    <b>
+                                                        @{
+                                                            var pendingcurrent = totalEmailCurrent - totaloftotalcurrent - totalRegrettedCurrent;
+                                                            if (pendingcurrent < 0)
+                                                            {
+                                                                pendingcurrent = 0;
+                                                            }
+                                                        }
+
+                                                        @pendingcurrent
+                                                    </b>
+                                                </td>
+                                                <td style="text-align: center; ">
+                                                    <b>
+                                                        Total Pending
+                                                    </b>
+                                                </td>
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 clsmonthreport">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form role="form">
+
+
+                        @foreach (var mainModel in Model)
+                        {
+                            <div class="box  collapsed-box">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">@mainModel.MonthName <span> - </span> @mainModel.Year</h3>
+
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <table class="table table-reponsive">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Sr. No
+                                                </th>
+                                                <th>
+                                                    Teammate
+                                                </th>
+                                                <th colspan="6" style="text-align:center">
+                                                    Products Added
+                                                </th>
+                                                <th colspan="4" style="text-align:center">
+                                                    Products Error
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th></th>
+                                                <th></th>
+                                                <th>
+                                                    All details
+                                                </th>
+                                                <th>
+                                                    Without Cat No
+                                                </th>
+                                                <th>
+                                                    Without CAS No
+                                                </th>
+                                                <th>
+                                                    Without Price
+                                                </th>
+                                                <th>
+                                                    Total Added
+                                                </th>
+                                                <th>
+                                                    Missing Correction(%)
+                                                </th>
+                                                <th>
+                                                    Cat No Revision
+                                                </th>
+                                                <th>
+                                                    CAS No revision
+                                                </th>
+                                                <th>
+                                                    Price Revision
+                                                </th>
+                                                <th></th>
+                                                <th>
+                                                    Revision Correction(%)
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                int loops = 1;
+                                                foreach (var item in mainModel.UserDashboardModel)
+                                                {
+                                                    if (item.Username.ToLower().Contains("neela")
+                                                    || item.Username.ToLower().Contains("ketan")
+                                                    || item.Username.ToLower().Contains("mayur")
+                                                    || item.Username.ToLower().Contains("sagar"))
+                                                    {
+                                                        continue;
+                                                    }
+                                                    <tr>
+                                                        <td>@loops</td>
+                                                        <td>@item.Username</td>
+                                                        <td>@item.AllDetails</td>
+                                                        <td>@item.WithoutCatNo</td>
+                                                        <td>@item.WithoutCasNo</td>
+                                                        <td>@item.WithoutPrice</td>
+                                                        <td>@item.TotalAdded</td>
+                                                        <td>
+                                                            @if (item.TotalAdded.HasValue && item.TotalAdded.Value != 0)
+                                                            {
+                                                                var missingperc = ((Convert.ToDecimal(item.TotalAdded) - Convert.ToDecimal(item.AllDetails)) / item.TotalAdded) * 100;
+                                                                @missingperc.Value.ToString("0.00") <span>%</span>
+                                                            }
+                                                        </td>
+                                                        <td>@item.RevisionCatNo</td>
+                                                        <td>@item.RevisionCasNo</td>
+                                                        <td>@item.RevisionPrice</td>
+                                                        <td>@item.TotalRevisionProduct</td>
+                                                        <td>
+                                                            @if (item.TotalAdded.HasValue && item.TotalAdded.Value != 0)
+                                                            {
+                                                                var revisionperc = ((Convert.ToDecimal(item.TotalAdded) - Convert.ToDecimal(item.TotalRevisionProduct)) / item.TotalAdded) * 100;
+                                                                @revisionperc.Value.ToString("0.00") <span>%</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    loops += 1;
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        }
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-12">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="box collapsed-box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Conversion Report</h3>
+
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="box-body" style="display:none">
+                        <form role="form">
+                            <div class="box-body">
+                                <div class="form-group col-md-2">
+                                    <label for="exampleInputEmail1">Start Date</label>
+                                    <input type="text" class="form-control" autocomplete="off" id="convStartdate" name="convStartdate" placeholder="Start date">
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="exampleInputEmail1">End Date</label>
+                                    <input type="text" class="form-control" autocomplete="off" id="convEnddate" name="convEnddate" placeholder="End date">
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="exampleInputEmail1">Quarter</label>
+                                    <select class="form-control" id="Quarter" name="Quarter">
+                                        <option value="">--Select--</option>
+                                        @for (DateTime date = DateTime.Now; date > new DateTime(2018, 1, 1); date = date.AddYears(-1))
+                                        {
+                                            <option value="Q1 - @date.Year">Q1 - @date.Year</option>
+                                            <option value="Q2 - @date.Year">Q2 - @date.Year</option>
+                                            <option value="Q3 - @date.Year">Q3 - @date.Year</option>
+                                            <option value="Q4 - @date.Year">Q4 - @date.Year</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="exampleInputEmail1">All Company</label>
+                                    <input type="checkbox" autocomplete="off" id="chkallcompany" name="chkallcompany" />
+                                </div>
+                                <div style="float: left;margin-top: 19px;">
+                                    <div>
+                                        <label for="inputPassword3" class="col-sm-10 control-label"></label>
+                                        <div>
+                                            <button type="button" class="btn btn-primary" onclick="SearchConversationReport()">Search</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="divresult"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.row -->
+</section>
+<script>
+
+    $("#Quarter").change(function () {
+        var value = $(this).val();
+        var currentDate = new Date();
+        var currentYear = currentDate.getFullYear();
+        if (value !== '') {
+            var lst = value.split('-');
+            currentYear = parseInt(lst[1]);
+            value = lst[0].trim();
+        }
+
+        if (value === "Q1") {
+            $("#convStartdate").datepicker().datepicker("setDate", new Date(currentYear, 0, 1));
+            $("#convEnddate").datepicker().datepicker("setDate", new Date(currentYear, 2, 31));
+        }
+        if (value === "Q2") {
+            $("#convStartdate").datepicker().datepicker("setDate", new Date(currentYear, 3, 1));
+            $("#convEnddate").datepicker().datepicker("setDate", new Date(currentYear, 5, 30));
+        }
+        if (value === "Q3") {
+            $("#convStartdate").datepicker().datepicker("setDate", new Date(currentYear, 6, 1));
+            $("#convEnddate").datepicker().datepicker("setDate", new Date(currentYear, 8, 30));
+        }
+        if (value === "Q4") {
+            $("#convStartdate").datepicker().datepicker("setDate", new Date(currentYear, 9, 1));
+            $("#convEnddate").datepicker().datepicker("setDate", new Date(currentYear, 11, 31));
+        }
+    });
+    $('#convStartdate').datepicker({
+        format: 'dd/mm/yyyy',
+        onSelect: function (dateText, inst) {
+        }
+    });
+    $('#convEnddate').datepicker({
+        format: 'dd/mm/yyyy',
+        onSelect: function (dateText, inst) {
+        }
+    });
+
+
+    var date1 = new Date();
+    date1.setMonth(date1.getMonth() - 1);
+    $("#convStartdate").datepicker().datepicker("setDate", date1);
+    $("#convEnddate").datepicker().datepicker("setDate", new Date());
+
+
+    SearchConversationReport();
+    function SearchConversationReport() {
+        var searchText = $("#tbldata_filter").find('.input-sm').val();
+
+
+        $("#divresult").html('Loading...');
+        $.ajax({
+            url: '/Form/SearchConversationReport?Startdate=' + $("#convStartdate").val() + '&Enddate=' + $("#convEnddate").val() + '&isallcompany=' + $("#chkallcompany").is(":checked"),
+            data: {},
+            async: true,
+            type: 'GET',
+            success: function (data) {
+                /*$('#tbldata').DataTable().clear().destroy();*/
+                var loop = 1;
+                var str = '<table id="tbldata" class="table table-responsive"><thead><tr><th>#</th> <th>Company</th><th>Quoted Products</th><th>PO Received </th><th>% Conversion</th><th>Action</th></tr></thead>';
+                $(data).each(function (i, v) {
+                    str += '<tr><td>' + loop + '</td><td>' + v.CompanyName + '</td><td>' + v.QuotedProduct + '</td><td>' + v.POProduct + '</td><td>' + v.Conversion.toFixed(1) + '%</td><td><a href="javascript:void(0)" onclick="DetailsOfConversion(' + v.CompanyId + ')">Details</a></td></tr>';
+                    loop += 1;
+                });
+
+                str += "</table>";
+                $("#divresult").html(str);
+
+                //$("#tbldata").DataTable({
+                //    "ordering": false
+                //});
+                var oTable = $("#tbldata").DataTable();
+
+                if (searchText !== undefined && searchText !== '') {
+                    oTable.search(searchText).draw();
+                    //        $("#tbldata_filter").find('.input-sm').val(searchText);
+                }
+            }
+        });
+    }
+
+    function DetailsOfConversion(companyId) {
+        var loop = 1;
+        var str = '<table class="table table-responsive dataTable no-footer"><thead><tr><th>#</th><th>Quote #</th><th>PO No</th><th>Product Name</th><th>CAS No</th><th>CAT No</th><th>Price</th><th>Lead Time</th></thead>';
+        $.ajax({
+            url: '/Form/GetQuoteDataForConversionReport?Startdate=' + $("#convStartdate").val() + '&Enddate=' + $("#convEnddate").val() + '&companyId=' + companyId,
+            data: {},
+            type: 'GET',
+            success: function (data) {
+
+                $(data).each(function (i, v) {
+                    var clsname = '';
+                    if (v.PO !== '') {
+                        clsname = 'clsbluebg';
+                    }
+                    str += '<tr class="' + clsname + '"><td>' + loop + '</td><td>' + v.quoteRef + '</td><td>' + v.PO + '</td><td>' + v.productname + '</td><td>' + v.casno + '</td><td>' + v.catno + '</td><td>' + v.price + '</td><td>' + v.leadtime + '</td></tr>';
+                    loop += 1;
+                });
+
+                str += "</table>";
+                $('#myModal').find('.modal-body').html(str);
+                $('#myModal').modal({ show: true });
+                $('#myModal').find(".modal-dialog").css("width", "95%   ");
+            }
+        });
+
+    }
+
+    function saveRegrettedTotal(days) {
+        var totalemail = $("#regretted_" + days).val();
+        $.ajax({
+            url: '/Form/saveRegrettedTotal?totalRegretted=' + totalemail + '&days=' + days,
+            data: {},
+            type: 'GET',
+            success: function (data) {
+                toastr.success("You changes was updated.");
+                window.location.reload(true);
+            }
+        });
+    }
+
+
+    function saveEmailTotal(days) {
+        var totalemail = $("#totalemail_" + days).val();
+        $.ajax({
+            url: '/Form/saveEmailTotal?totalemail=' + totalemail + '&days=' + days,
+            data: {},
+            type: 'GET',
+            success: function (data) {
+                toastr.success("You changes was updated.");
+                window.location.reload(true);
+            }
+        });
+    }
+    function editsummary(userId, days) {
+        var clarification = $("#clarification_" + days + "_" + userId).val();
+        var upload = $("#upload_" + days + "_" + userId).val();
+        var complex = $("#complex_" + days + "_" + userId).val();
+        //var regretted = $("#regretted_" + days + "_" + userId).val();
+        $.ajax({
+            url: '/Form/Editsummary?userid=' + userId + '&days=' + days + '&clarification=' + clarification
+                + '&upload=' + upload
+                + '&complex=' + complex,
+            data: {},
+            type: 'GET',
+            success: function (data) {
+                toastr.success("You changes was updated.");
+                window.location.reload(true);
+            }
+        });
+    }
+
+    function filtercomap() {
+        $('.col-md-12').each(function () { $(this).hide(); });
+        var txt = $("#compList option:selected").text();
+        if (txt !== '' && txt !== '--Select--') {
+            $('.col-md-12').each(function () {
+                if ($(this).text().toUpperCase().indexOf(txt.toUpperCase()) != -1) {
+                    $(this).show();
+                }
+            });
+        } else {
+            $('.col-md-12').each(function () { $(this).show(); });
+        }
+    }
+
+    $(document).on("keyup", '#filtertext', function () {
+        textboxFilter($(this).val());
+        //$('.col-md-12').each(function () { $(this).hide(); });
+        //var txt = $(this).val();
+        //if (txt !== '') {
+        //    $('.col-md-12').each(function () {
+        //        if ($(this).text().toUpperCase().indexOf(txt.toUpperCase()) != -1) {
+        //            $(this).show();
+        //        }
+        //    });
+        //} else {
+        //    $('.col-md-12').each(function () { $(this).show(); });
+        //}
+    });
+
+
+    function textboxFilter(txt) {
+        $('.col-md-12').each(function () { $(this).hide(); });
+        if (txt !== '') {
+            $('.col-md-12').each(function () {
+                if ($(this).text().toUpperCase().indexOf(txt.toUpperCase()) != -1) {
+                    $(this).show();
+                }
+            });
+        } else {
+            $('.col-md-12').each(function () { $(this).show(); });
+        }
+    }
+
+    function addInStudy() {
+        debugger;
+        var ids = [];
+        $('.clsCustomSynthesis ').find('.clscheckboxremind').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product from custom synthesis");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/AddStudyFromDashboard',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+
+    function saveallremind() {
+
+        var ids = [];
+        $('.clscheckboxremind').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/SetQuoteReminder',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+
+
+    var SpeechRecogntion = window.webkitSpeechRecognition;
+    var recognition = new window.SpeechRecogntion();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    var textbox = $('#filtertext');
+    var instration = $('#instration');
+    var content = '';
+    recognition.continuous = true
+    recognition.onstart = function () {
+        instration.text('Voice Recognition is on');
+
+        setTimeout(function () {
+            $('#start-btn').css('display', 'block');
+            $('#create').css('display', 'none');
+            recognition.stop()
+            content = '';
+        }, 4000);
+    }
+    recognition.onspeechend = function () {
+        instration.text('No Activity');
+    }
+    recognition.onerror = function (event) {
+        instration.text('Try Again');
+        console.log(event);
+    }
+    recognition.onresult = function (event) {
+        var current = event.resultIndex;
+        var transcript = event.results[current][0].transcript;
+        var confidence = event.results[current][0].confidence;
+        console.log(transcript);
+        content += transcript;
+
+        $('#filtertext').val('');
+        $('#filtertext').val(content);
+        textboxFilter($('#filtertext').val());
+    };
+
+    $('#start-btn').click(function (event) {
+        if (content.length) {
+            content += ''
+        }
+        //$('#filtertext').val('Speak...');
+        $('#downloadlink').css('display', 'none');
+        $('#create').css('display', 'block');
+        $(this).css('display', 'none');
+        recognition.start()
+    });
+
+    var textFile = null,
+        makeTextFile = function (text) {
+            var data = new Blob([text], { type: 'text/plain' });
+            // If we are replacing a previously generated file we need to
+            // manually revoke the object URL to avoid memory leaks.
+            if (textFile !== null) {
+                window.URL.revokeObjectURL(textFile);
+            }
+            textFile = window.URL.createObjectURL(data);
+            return textFile;
+        };
+    var create = document.getElementById('create'),
+        textbox = document.getElementById('filtertext');
+
+    create.addEventListener('click', function () {
+
+        //var link = document.getElementById('downloadlink');
+        //link.href = makeTextFile(textbox.value);
+        //link.style.display = 'block';
+        $('#start-btn').css('display', 'block');
+        $('#create').css('display', 'none');
+        recognition.stop()
+        content = '';
+        $('#instration').text('Press Start Voice Recognition');
+    }, false);
+
+</script>
+<style>
+    .clsblue {
+        color: blue
+    }
+
+    .clsorange {
+        color: #ef9d05;
+    }
+
+    .clslightgreen {
+        color: #b9c83e;
+        text-decoration: underline;
+        font-weight: bold;
+    }
+    /*.clslightred{
+        color:red;
+    }*/
+
+    a {
+        color: black;
+        font-weight: 700;
+    }
+
+    .clsbluebg {
+        background: #795cc0;
+        color: #fff;
+    }
+</style>

@@ -1,0 +1,103 @@
+﻿@model List<Synzeal_Inventory.Entity.SZ_QuotationDetail>
+@using Synzeal_Inventory.Entity;
+@{
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    int loop = 1;
+}
+
+<div class="box-body form-horizontal" id="profrm" style="overflow:scroll">
+    @if (Model != null)
+    {
+        <div style="text-align: center; vertical-align: middle">
+            <h3><b>Quote Approval Summary</b></h3>
+        </div>
+        <table border="1" class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+            <thead>
+                <tr style="vertical-align: middle">
+                    <th width="5%" style="text-align: center; vertical-align: middle">
+                        #
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        Date
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        PO No
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        Product Name
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        CAS No
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        CAT No
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        QTY
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        Lead Time
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        Summary
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        Purchase Remark
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        Manage Remark
+                    </th>
+                    <th style="text-align: center;vertical-align: middle">
+                        Client PO Date
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model)
+                {
+                    <tr>
+                        <td class="" style="text-align:center; ">
+                            @loop
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.PurchaseDate
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.SZ_Quotation.PONo
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.ProductName
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.CASNo
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.CATNo
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.RequiredQty
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.LeadTime
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.PurchaseStatus
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.PurchaseRemark
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.PurMangRemark
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.PurClientPODate
+                        </td>
+                    </tr>
+
+                    loop += 1;
+                }
+            </tbody>
+        </table>
+       
+    }
+</div>

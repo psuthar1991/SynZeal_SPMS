@@ -1,0 +1,59 @@
+﻿@model List<Synzeal_Inventory.Models.SalesSummaryDataModel>
+@using Synzeal_Inventory.Entity;
+@{
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    int loop = 1;
+}
+
+<div class="box-body form-horizontal" id="profrm" style="overflow:scroll">
+   
+       
+        <table border="1" class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+            <thead>
+                <tr style="vertical-align: middle">
+                    <th width="6%" style="text-align: center; vertical-align: middle">
+                        #
+                    </th>
+                    <th width="22%" style="text-align: center;vertical-align: middle">
+                        User Name
+                    </th>
+                    <th width="20%" style="text-align: center;vertical-align: middle">
+                        Quote Products
+                    </th>
+                    <th width="20%" style="text-align: center;vertical-align: middle">
+                        RFQ Products
+                    </th>
+                    <th width="14%" style="text-align: center;vertical-align: middle">
+                        Total
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model)
+                {
+
+                    <tr>
+                        <td class="" style="text-align:center; ">
+                            @loop
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Username
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.QuoteProducts
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.RFQProducts
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Total
+                        </td>
+                    </tr>
+
+                    loop += 1;
+                }
+            </tbody>
+        </table>
+
+      
+</div>

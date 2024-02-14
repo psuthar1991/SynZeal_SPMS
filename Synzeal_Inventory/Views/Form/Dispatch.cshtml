@@ -1,0 +1,2868 @@
+﻿@{
+    ViewBag.Title = "Dispatch";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    var queryLiveData = db.SZ_QueryModule.AsQueryable();
+    string correctionstatus = Convert.ToString((int)EnumList.ApprovedStatus.QCCorrection);
+    string approvalstatus = Convert.ToString((int)EnumList.ApprovedStatus.QCApproved);
+    var packedStatus = (int)EnumList.DispatchStatus.Packed;
+    var unpackedStatus = (int)EnumList.DispatchStatus.Unpacked;
+}
+@using Synzeal_Inventory.Entity;
+@model List<SZ_QuotationModel>
+@using Synzeal_Inventory.Models
+<section class="content-header">
+    <h1>
+        <div style="float:left">Dispatch List</div>
+        <div style="background: rgb(202, 251, 217);font-size: 16px; height: 16px; width: 25px;float: left;    margin: 6px 10px 0 50px;"></div><div style="float: left;    font-size: 16px;margin-top: 5px;"> In-Stock</div>
+        <div style="background: #ffe6b3;font-size: 16px; height: 16px; width: 25px;float: left;    margin: 6px 10px 0 10px;"></div><div style="float: left;    font-size: 16px;margin-top: 5px;"> Unpacked</div>
+        <div style="background:rgb(250, 209, 255); font-size: 16px; height: 16px; width: 25px;float: left;    margin: 6px 10px 0 10px;"></div><div style="float: left;    font-size: 16px;margin-top: 5px;"> Packed</div>
+        <div style="background: #ff9999;font-size: 16px; height: 16px; width: 25px;float: left;    margin: 6px 10px 0 10px;"></div><div style="float: left;    font-size: 16px;margin-top: 5px;"> Invoice</div>
+        @if (!SessionCookieManagement.IsQC 
+            || SessionCookieManagement.UserEmail == "bhumita@synzeal.com" 
+            || SessionCookieManagement.UserEmail == "malvika@synzeal.com" 
+            || SessionCookieManagement.UserEmail == "pooja.trapasiya@synzeal.com"
+            || SessionCookieManagement.UserEmail == "komal.gopani@synzeal.com")
+        {
+            <a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="MoveToInvoiceList()">Dispatch</a>
+        }
+        @if ((!SessionCookieManagement.IsDomesticDispatch && !SessionCookieManagement.IsQC) 
+                || SessionCookieManagement.UserEmail == "bhumita@synzeal.com"
+                || SessionCookieManagement.UserEmail == "malvika@synzeal.com"
+                || SessionCookieManagement.UserEmail == "arvind.senta@synzeal.com"
+                || Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "pooja.trapasiya@synzeal.com"
+                || Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "komal.gopani@synzeal.com")
+        {
+            <a href="javascript:void(0)" style="float:right;margin-right:15px;" class="btn btn-primary" onclick="GenerateForm()">Generate Form</a>
+        }
+    </h1>
+    <div class="clearfix"></div>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <ul class="nav nav-tabs">
+                    @if (!SessionCookieManagement.IsQC 
+                        || SessionCookieManagement.UserEmail == "bhumita@synzeal.com" 
+                        || Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "malvika@synzeal.com" 
+                        || Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "pooja.trapasiya@synzeal.com"
+                        || Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "komal.gopani@synzeal.com")
+                    {
+
+                        <li class="active"><a data-toggle="tab" href="#home">LOCAL DISPATCH</a></li>
+
+                        <li><a data-toggle="tab" href="#exportdispatch" onclick="tblexportdispatchtab()">EXPORT DISPATCH</a></li>
+                        <li><a data-toggle="tab" href="#menu1" onclick="shortqtytab()">SHORT QTY</a></li>
+                    }
+
+                    <li @((SessionCookieManagement.IsQC 
+        && SessionCookieManagement.UserEmail != "bhumita@synzeal.com" 
+        && SessionCookieManagement.UserEmail != "malvika@synzeal.com" 
+        && SessionCookieManagement.UserEmail != "pooja.trapasiya@synzeal.com"
+        && SessionCookieManagement.UserEmail != "komal.gopani@synzeal.com") ? "class=active" : "")>
+                        <a data-toggle="tab" href="#all" onclick="alltbltab()">ALL</a>
+                    </li>
+                    <li><a data-toggle="tab" href="#alldomestic" onclick="alldomestictbltab()">DOMESTIC</a></li>
+                    <li><a data-toggle="tab" href="#allexport" onclick="allexporttbltab()">EXPORT</a></li>
+                    @*<li><a data-toggle="tab" href="#divdataApproved" onclick="dataApprovedtab()">DATA APPROVAL</a></li>*@
+                    <li><a data-toggle="tab" href="#divdataDelivered" onclick="dataDeliveredtab()">DELIVERED</a></li>
+                    @if ((!SessionCookieManagement.IsDomesticDispatch && !SessionCookieManagement.IsQC) || SessionCookieManagement.UserEmail == "bhumita@synzeal.com" 
+                        || Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "malvika@synzeal.com" 
+                        || Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "pooja.trapasiya@synzeal.com"
+                        || Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "komal.gopani@synzeal.com")
+                    {
+                        <li><a data-toggle="tab" href="#divQuotelog" onclick="dataQuotelogtab()">QUOTE LOG</a></li>
+                        <li><a data-toggle="tab" href="#tabinventory" onclick="inventorytab()">FORM</a></li>
+                    }
+                </ul>
+                <div class="tab-content">
+                    @if (!SessionCookieManagement.IsQC || SessionCookieManagement.UserEmail == "bhumita@synzeal.com" 
+                        || Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "malvika@synzeal.com" 
+                        || Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "pooja.trapasiya@synzeal.com"
+                        || Synzeal_Inventory.Models.SessionCookieManagement.UserEmail == "komal.gopani@synzeal.com")
+                    {
+
+                        <div id="home" class="tab-pane fade in active">
+                            <div class="box-body resizediv" style="overflow:scroll;" id="divProj">
+                                <div>
+                                    <a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="returnall('example1')">Return All</a>
+                                    <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="exportdispatchlist('example1')">Export</a>
+                                    <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllDispatchList('example1')">Save All</a> <br />
+                                </div>
+                                <table id="example1" class="table table-bordered table-striped" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <input type="checkbox" id="chkdispatchlistAll" />
+                                            </th>
+                                            <th style="width:2%"></th>
+                                            <th></th>
+                                            <th>Date</th>
+                                            <th>Ref No</th>
+                                            <th>Product Name</th>
+                                            <th></th>
+                                            <th>Qty. (mg)</th>
+                                            <th>CAS No</th>
+                                            <th>CAT No</th>
+                                            <th>Additional Batch No</th>
+                                            <th></th>
+                                            <th>COA</th>
+                                            <th>Activity</th>
+                                            <th>Data Remark</th>
+                                            <th>Pack Size</th>
+                                            <th>Status</th>
+                                            <th>Last Upload Date</th>
+                                            <th>Reason</th>
+                                            <th> Client Remark For Changes</th>
+                                        </tr>
+                                    </thead>
+                                    @*<tbody>
+                                            @if (Model.Count > 0)
+                                            {
+                                                foreach (var i in Model.Where(x => (x.CountryType == "Domestic" || string.IsNullOrEmpty(x.CountryType)) && x.SZ_QuotationProductModel.FirstOrDefault().DispatchedStatus != (int)EnumList.DispatchStatus.SortQty))
+                                                {
+                                                    foreach (var k in i.SZ_QuotationProductModel)
+                                                    {
+                                                        var queryData = new List<SZ_QueryModule>();
+                                                        string queryString = "";
+
+                                                        queryData = queryLiveData.Where(x => x.CATNo.Trim() == k.CATNo.Trim()).OrderByDescending(x => x.Id).ToList();
+                                                        if (queryData != null && queryData.Count > 0)
+                                                        {
+                                                            var qlist = queryData.Select(x => x.QueryNo).ToArray();
+                                                            if (queryData.Select(x => x.Status.ToLower()).FirstOrDefault() == "solved" ||
+                                                                queryData.Select(x => x.Status.ToLower()).FirstOrDefault() == "close" ||
+                                                                queryData.Select(x => x.Status.ToLower()).FirstOrDefault() == "completed")
+                                                            {
+                                                                queryString = "<i class='clstooltip fa fa-info-circle' title='" + string.Join(", ", qlist) + "' style ='float:right; color: green' ></i>";
+                                                            }
+                                                            else
+                                                            {
+                                                                queryString = "<i class='clstooltip fa fa-info-circle' title='" + string.Join(", ", qlist) + "' style ='float:right' ></i>";
+                                                            }
+                                                        }
+
+                                                        string classname = "";
+                                                        if (k.DispatchedStatus == (int)EnumList.DispatchStatus.Packed)
+                                                        {
+                                                            classname = "background-color: rgb(250, 209, 255)";
+                                                        }
+                                            <tr id="tr_@k.QuoteDetailsId" style=" @classname">
+                                                <td width="1%">
+                                                    <input type="checkbox" value="@k.QuoteDetailsId" class="clssaveall" />
+                                                </td>
+                                                <td width="1%">
+                                                    @if (k.DispatchedStatus.HasValue && k.DispatchedStatus.Value == (int)EnumList.DispatchStatus.Packed && k.MoveToInvoice != null && k.MoveToInvoice.Value)
+                                                    {
+                                                        <i class="fa fa-check-square" style="color:lightseagreen"></i>
+                                                    }
+                                                    else if (k.DispatchedStatus.HasValue && k.DispatchedStatus.Value == (int)EnumList.DispatchStatus.Packed)
+                                                    {
+                                                        <input type="checkbox" value="@k.QuoteDetailsId" class="clsMoveDispatch" />
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <label>
+                                                        @if (i.MoveDispatchDate.HasValue)
+                                                        {
+                                                            @i.MoveDispatchDate.Value.ToShortDateString()
+                                                        }
+                                                    </label>
+                                                </td>
+                                                <td><label>@i.PONumber</label> </td>
+                                                <td><label>@k.ProductName</label> </td>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(i.Attachment))
+                                                    {
+                                                        <a href="javascript:void(0)" onclick="attachment('@i.QuoteId')"> <i class="fa fa-paperclip"></i></a>
+                                                    }
+                                                </td>
+                                                <td>@k.RequiredQty <span>mg</span></td>
+                                                <td><label>@k.CASNo</label> </td>
+                                                <td><label>@k.CATNo @Html.Raw(queryString)</label></td>
+                                                <td>
+                                                    @Html.DropDownList("additionalBatch_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)k.ListBatchNo, new { @class = "scientist addbatch ddladditionalbatch", @scientistId = k.ScientistCustomerId, @data_quotationdetailsid = k.QuoteDetailsId })
+                                                </td>
+                                                <td><i class="fa fa-clone" title="Change Batch No" onclick="GetAllBatchNo(@k.ProductId,@k.QuoteDetailsId)"></i></td>
+                                                <td>
+                                                    @Html.DropDownList("coa_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)k.ListChildCOANo, new { @class = "scientist", @scientistId = k.ScientistCustomerId })
+                                                </td>
+
+                                                <td>@k.ActivityStatus</td>
+                                                <td>
+                                                    @k.Remark
+                                                </td>
+                                                <td>
+                                                    @k.OrderRemark
+                                                </td>
+                                                <td>
+                                                    <select id="dispatchstatus_@k.QuoteDetailsId" data-quotedetailsid="@k.QuoteDetailsId" class="clsDispatch">
+                                                        @foreach (EnumList.DispatchStatus r in Enum.GetValues(typeof(EnumList.DispatchStatus)))
+                                                        {
+                                                            var item = Enum.GetName(typeof(EnumList.DispatchStatus), r);
+                                                            var test = r.ToString();
+                                                            string text = SZ_Helper.GetEnumDescription((EnumList.DispatchStatus)(int)r);
+                                                            int val = (int)r;
+                                                            string selected = "";
+                                                            if (val == k.DispatchedStatus)
+                                                            {
+                                                                selected = "selected ";
+                                                            }
+                                                            <option value="@val" @selected>@text</option>
+                                                        }
+                                                    </select>
+
+                                                    <input type="number" style="display:none;width:50px;" id="sortqty_@k.QuoteDetailsId" name="sortqty_@k.QuoteDetailsId" data-requiredqty="@k.RequiredQty" />
+                                                </td>
+
+                                                <td>
+                                                    @if (k.LastUploadDate != null && k.LastUploadDate.HasValue)
+                                                    {
+                                                        @k.LastUploadDate.Value.ToShortDateString()
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <input type="text" value="@k.Reason" id="reason_@k.QuoteDetailsId" name="reason_@k.QuoteDetailsId" />
+                                                </td>
+                                                <td>
+                                                    <a data-toggle='modal' data-target='#clientremarkModal' href="/Form/AddClientRemark/@k.QuoteDetailsId?isClientSection=false"><i class='fa fa-pencil'></i></a>
+                                                </td>
+                                            </tr>
+                                                    }
+                                                }
+                                            }
+                                        </tbody>*@
+                                </table>
+                            </div>
+                        </div>
+
+                    }
+                    <div id="exportdispatch" class="tab-pane fade">
+                        <div class="box-body resizediv" style="overflow:scroll;" id="divProj">
+                            <div>
+                                <a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="returnall('tblexportdispatch')">Return All</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="exportdispatchlist('tblexportdispatch')">Export</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllDispatchList('tblexportdispatch')">Save All</a>
+                                @*<a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="InvoiceGenerate('tblexportdispatch', 'clssaveall')">Invoice</a><br />*@
+                            </div>
+                            <table id="tblexportdispatch" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <input type="checkbox" id="chkexportdispatchlistAll" />
+                                        </th>
+                                        <th></th>
+                                        <th></th>
+                                        <th>Date</th>
+                                        <th>Ref No</th>
+                                        <th>Product Name</th>
+                                        <th></th>
+                                        <th>Qty. (mg)</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Additional Batch No</th>
+                                        <th></th>
+                                        <th>COA</th>
+                                        <th>Activity</th>
+                                        <th>Data Remark</th>
+                                        <th>Pack Size</th>
+                                        <th>Status</th>
+                                        <th>Last Upload Date</th>
+                                        <th>Reason</th>
+                                        <th> Client Remark For Changes</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="menu1" class="tab-pane fade">
+                        <div class="box-body resizediv" style="overflow:scroll;" id="divProj">
+                            <table id="example2" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Ref No</th>
+                                        <th>Product Name</th>
+                                        <th></th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Additional Batch No</th>
+                                        <th></th>
+                                        @*<th>Batch No</th>*@
+                                        <th>Data Remark</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                @*<tbody>
+                                        @if (Model.Count > 0)
+                                        {
+                                            foreach (var i in Model.Where(x => x.SZ_QuotationProductModel.FirstOrDefault().DispatchedStatus == (int)EnumList.DispatchStatus.SortQty))
+                                            {
+                                                foreach (var k in i.SZ_QuotationProductModel)
+                                                {
+                                                    var queryData = new List<SZ_QueryModule>();
+                                                    string queryString = "";
+
+                                                    queryData = queryLiveData.Where(x => x.CATNo.Trim() == k.CATNo.Trim()).OrderByDescending(x => x.Id).ToList();
+                                                    if (queryData != null && queryData.Count > 0)
+                                                    {
+                                                        var qlist = queryData.Select(x => x.QueryNo).ToArray();
+                                                        if (queryData.Select(x => x.Status.ToLower()).FirstOrDefault() == "solved" ||
+                                                            queryData.Select(x => x.Status.ToLower()).FirstOrDefault() == "close" ||
+                                                            queryData.Select(x => x.Status.ToLower()).FirstOrDefault() == "completed")
+                                                        {
+                                                            queryString = "<i class='clstooltip fa fa-info-circle' title='" + string.Join(", ", qlist) + "' style ='float:right; color: green' ></i>";
+                                                        }
+                                                        else
+                                                        {
+                                                            queryString = "<i class='clstooltip fa fa-info-circle' title='" + string.Join(", ", qlist) + "' style ='float:right' ></i>";
+                                                        }
+                                                    }
+                                        <tr id="tr_@k.QuoteDetailsId">
+                                            <td>
+                                                <label>
+                                                    @if (i.MoveDispatchDate.HasValue)
+                                                    {
+                                                        @i.MoveDispatchDate.Value.ToShortDateString()
+                                                    }
+                                                </label>
+                                            </td>
+                                            <td><label>@i.PONumber</label> </td>
+                                            <td><label>@k.ProductName</label> </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(i.Attachment))
+                                                {
+                                                    <a href="javascript:void(0)" onclick="attachment('@i.QuoteId')"> <i class="fa fa-paperclip"></i></a>
+                                                }
+                                            </td>
+                                            <td>@k.RequiredQty</td>
+                                            <td><label>@k.CASNo</label> </td>
+                                            <td><label>@k.CATNo @Html.Raw(queryString)</label> </td>
+                                            <td>
+                                                @Html.DropDownList("sortadditionalBatch_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)k.ListBatchNo, new { @class = "scientist ddladditionalbatch", @scientistId = k.ScientistCustomerId, @data_quotationdetailsid = k.QuoteDetailsId })
+                                            </td>
+                                            <td><i class="fa fa-clone" title="Change Batch No" onclick="GetAllBatchNo(@k.ProductId,@k.QuoteDetailsId)"></i></td>
+                                            <td><input id="sortremark_@k.QuoteDetailsId" type="text" value="@k.Remark" style="width:170px" title="@k.Remark" /></td>
+
+                                            <td>
+                                                <select id="sortdispatchstatus_@k.QuoteDetailsId" data-quotedetailsid="@k.QuoteDetailsId" class="clsDispatch">
+                                                    @foreach (EnumList.DispatchStatus r in Enum.GetValues(typeof(EnumList.DispatchStatus)))
+                                                    {
+                                                        var item = Enum.GetName(typeof(EnumList.DispatchStatus), r);
+                                                        var test = r.ToString();
+                                                        string text = SZ_Helper.GetEnumDescription((EnumList.DispatchStatus)(int)r);
+                                                        int val = (int)r;
+                                                        string selected = "";
+                                                        if (val == k.DispatchedStatus)
+                                                        {
+                                                            selected = "selected ";
+                                                        }
+                                                        <option value="@val" @selected>@text</option>
+                                                    }
+                                                </select>
+                                                <input type="number" style="display:none;width:50px;" id="sortsortqty_@k.QuoteDetailsId" name="sortqty_@k.QuoteDetailsId" data-requiredqty="@k.RequiredQty" />
+
+                                            </td>
+                                            <td>
+                                                <a href="javascript:void(0)" id="save_@k.QuoteDetailsId" onclick="SaveDispatchDetailsSort('@k.QuoteDetailsId')"> Save</a>
+                                            </td>
+                                        </tr>
+                                                }
+                                            }
+                                        }
+                                    </tbody>*@
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="all" class="tab-pane fade @((SessionCookieManagement.IsQC 
+        && SessionCookieManagement.UserEmail != "bhumita@synzeal.com" 
+        && SessionCookieManagement.UserEmail != "malvika@synzeal.com"
+        && SessionCookieManagement.UserEmail != "pooja.trapasiya@synzeal.com"
+        && SessionCookieManagement.UserEmail != "komal.gopani@synzeal.com") ? " in active" : "")">
+                        <div class="box-body resizediv" style="overflow:scroll;" id="divProj">
+                            <div class="col-md-1" style="margin-top:6px">
+                                <label>Status : </label>
+                                @Html.DropDownList("fltprostatusItem", (IEnumerable<SelectListItem>)ViewBag.fltprostatusItem, new { @class = "form-control", @onchange = "$('#alltbl').DataTable().draw()" })
+                            </div>
+                            <div class="col-md-1" style="margin-top:6px">
+                                <label>Type : </label>
+                                @Html.DropDownList("fltprotypeItem", (IEnumerable<SelectListItem>)ViewBag.fltprotypeItem, new { @class = "form-control", @onchange = "$('#alltbl').DataTable().draw()" })
+                            </div>
+                            <div class="col-md-2" style="margin-top:6px">
+                                <label>Activity : </label>
+                                @Html.DropDownList("fltactivitystatusItem", (IEnumerable<SelectListItem>)ViewBag.fltproactivitystatusItem, new { @class = "form-control", @onchange = "$('#alltbl').DataTable().draw()" })
+                            </div>
+                            <div class="col-md-4" style="margin-top:6px">
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="filterAll" id="optionsRadios2" value="ponumber">
+                                        PO #
+                                    </label>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <label>
+                                        <input type="radio" name="filterAll" id="optionsRadios2" value="productname">
+                                        Product
+                                    </label>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <label>
+                                        <input type="radio" name="filterAll" id="optionsRadios2" value="cas">
+                                        CAS #
+                                    </label>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <label>
+                                        <input type="radio" name="filterAll" id="optionsRadios2" value="cat">
+                                        CAT #
+                                    </label>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <label>
+                                        <input type="radio" name="filterAll" id="optionsRadios2" value="batchno">
+                                        Batch #
+                                    </label>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    @*<label>
+                                            <input type="radio" name="filterAll" id="optionsRadios2" value="teamleader">
+                                            TL
+                                        </label>*@
+                                </div>
+                            </div>
+                            <div class="col-md-4" style="margin-top:9px">
+                                <div>
+                                    <input class="form-control" id="allsearchbox" type="text" placeholder="Enter search string" style="width:300px; float:left">
+                                    <a href="javascript:void(0)" style="float:left;margin-left:8px;" class="btn btn-primary" onclick="$('#alltbl').DataTable().draw()">Search</a>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="ApproveAllTabList()">Approve All</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="RejectApproveAllTabList()">Reject All</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllTabList('alltbl')">Save All</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:15px" class="btn btn-primary" onclick="GetAuditLogForDispatch()">Log</a>
+                                <br />
+                            </div> <div class="clearfix"></div>
+                            <table id="alltbl" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="chkallforalltab" /></th>
+                                        <th></th>
+                                        <th>Action</th>
+                                        <th>#</th>
+                                        <th></th>
+                                        <th>PO Date</th>
+                                        <th>PO No</th>
+                                        <th>Project Type</th>
+                                        <th>Team leader</th>
+                                        <th>Product Name</th>
+                                        <th></th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Qty (mg)</th>
+                                        <th>Esti. Data Date</th>
+                                        <th>Batch No</th>
+                                        <th></th>
+                                        <th>COA</th>
+                                        <th>Activity</th>
+                                        <th>Dispatch Status</th>
+                                        <th>Data Remark</th>
+                                        <th>Reason</th>
+                                        <th>Pack Size</th>
+                                        <th>Last Upload Date</th>
+                                        <th></th>
+                                        <th></th>
+                                        @*<th>Sugg. Chem. Name</th>*@
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="alldomestic" class="tab-pane fade">
+                        <div class="box-body resizediv" style="overflow:scroll;" id="divProj">
+                            <div class="col-md-2" style="margin-top:6px">
+                                <label>Status : </label>
+                                @Html.DropDownList("fltprostatusItem", (IEnumerable<SelectListItem>)ViewBag.fltprostatusItem, new { @class = "form-control", @onchange = "$('#alldomestictbl').DataTable().draw()" })
+                            </div>
+                            <div class="col-md-2" style="margin-top:6px">
+                                <label>Activity : </label>
+                                @Html.DropDownList("fltactivitystatusItem", (IEnumerable<SelectListItem>)ViewBag.fltproactivitystatusItem, new { @class = "form-control", @onchange = "$('#alldomestictbl').DataTable().draw()" })
+                            </div><div class="clearfix"></div>
+                            <div>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="ApproveAllTabList()">Approve All</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="RejectApproveAllTabList()">Reject All</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllTabList('alldomestictbl')">Save All</a> <br />
+                            </div>
+                            <table id="alldomestictbl" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="chkallforalldomestictab" /></th>
+                                        <th></th>
+                                        <th>Action</th>
+                                        <th>#</th>
+                                        <th></th>
+                                        <th>PO Date</th>
+                                        <th>PO No</th>
+                                        <th>Project Type</th>
+                                        <th>Team leader</th>
+                                        <th>Product Name</th>
+                                        <th></th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Qty (mg)</th>
+                                        <th>Esti. Data Date</th>
+                                        <th>Batch No</th>
+                                        <th></th>
+                                        <th>COA</th>
+                                        <th>Activity</th>
+                                        <th>Dispatch Status</th>
+                                        <th>Data Remark</th>
+                                        <th>Reason</th>
+                                        <th>Pack Size</th>
+                                        <th>Last Upload Date</th>
+
+                                        <th></th>
+                                        @*<th>Sugg. Chem. Name</th>*@
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="allexport" class="tab-pane fade">
+                        <div class="box-body resizediv" style="overflow:scroll;" id="divProj">
+                            <div class="col-md-2" style="margin-top:6px">
+                                <label>Status : </label>
+                                @Html.DropDownList("fltprostatusItem", (IEnumerable<SelectListItem>)ViewBag.fltprostatusItem, new { @class = "form-control", @onchange = "$('#allexporttbl').DataTable().draw()" })
+                            </div>
+                            <div class="col-md-2" style="margin-top:6px">
+                                <label>Activity : </label>
+                                @Html.DropDownList("fltactivitystatusItem", (IEnumerable<SelectListItem>)ViewBag.fltproactivitystatusItem, new { @class = "form-control", @onchange = "$('#allexporttbl').DataTable().draw()" })
+                            </div>
+                            <div class="clearfix"></div>
+                            <div>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="ApproveAllTabList()">Approve All</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="RejectApproveAllTabList()">Reject All</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllTabList('allexporttbl')">Save All</a>
+                                @*<a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="InvoiceGenerate('allexporttbl', 'clssavealltab')">Invoice</a><br />*@
+                            </div>
+                            <table id="allexporttbl" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="chkallforallexporttab" /></th>
+                                        <th></th>
+                                        <th>Action</th>
+                                        <th>#</th>
+                                        <th></th>
+                                        <th>PO Date</th>
+                                        <th>PO No</th>
+                                        <th>Project Type</th>
+                                        <th>Team leader</th>
+                                        <th>Product Name</th>
+                                        <th></th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Qty (mg)</th>
+                                        <th>Esti. Data Date</th>
+                                        <th>Batch No</th>
+                                        <th></th>
+                                        <th>COA</th>
+                                        <th>Activity</th>
+                                        <th>Dispatch Status</th>
+                                        <th>Data Remark</th>
+                                        <th>Reason</th>
+                                        <th>Pack Size</th>
+                                        <th>Last Upload Date</th>
+
+                                        <th></th>
+                                        @*<th>Sugg. Chem. Name</th>*@
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="divdataDelivered" class="tab-pane fade">
+                        <div class="box-body resizediv" style="overflow:scroll;" id="divProj">
+                            <div>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllDeliveredTabList('deliveredtbl')">Save All</a> <br />
+                            </div>
+                            <table id="deliveredtbl" class="table table-bordered table-striped" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Action</th>
+                                        <th>#</th>
+                                        <th>Invoice Date</th>
+                                        <th>PO No</th>
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Qty (mg)</th>
+                                        @*<th>Est. Date</th>*@
+                                        <th>Batch No</th>
+                                        <th></th>
+                                        <th>COA</th>
+                                        @*<th>Team leader</th>
+                                            <th>
+                                                Client Remark For Changes
+                                            </th>*@
+                                        <th>Data Remark</th>
+                                        <th>Pack Size</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="divQuotelog" class="tab-pane fade in">
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote resizediv" style="overflow:scroll;" id="divProj">
+                            <div class="col-md-5" style="margin-top:6px">
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="filterAll" id="optionsRadios1" value="quoteid" checked="">
+                                        Quote #
+                                    </label>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <label>
+                                        <input type="radio" name="filterAll" id="optionsRadios2" value="productname">
+                                        Product
+                                    </label>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <label>
+                                        <input type="radio" name="filterAll" id="optionsRadios2" value="cas">
+                                        CAS #
+                                    </label>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <label>
+                                        <input type="radio" name="filterAll" id="optionsRadios2" value="cat">
+                                        CAT #
+                                    </label>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <label>
+                                        <input type="radio" name="filterAll" id="optionsRadios2" value="batchno">
+                                        Batch #
+                                    </label>&nbsp;&nbsp;&nbsp;&nbsp;
+                                </div>
+                            </div>
+                            <div class="col-md-7" style="margin-top:9px">
+                                <div>
+                                    <input class="form-control" id="allsearchbox" type="text" placeholder="Enter search string" style="width:300px; float:left">
+                                    <a href="javascript:void(0)" style="float:left;margin-left:8px;" class="btn btn-primary" onclick="$('#tblquotelog').DataTable().draw()">Search</a>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllQuotelogList()">Save All</a> <br />
+                            </div>
+                            <table id="tblquotelog" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="chkallquotelogtab" /></th>
+                                        <th></th>
+                                        <th>Ref#</th>
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Batch No</th>
+                                        <th></th>
+                                        <th>COA</th>
+                                        <th>Activity</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabinventory" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote" style="overflow:scroll;">
+                            @*<a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom:15px;" class="btn btn-primary" onclick="SaveAll('tblinventory')">Save</a>
+                                <div class="clearfix"></div>*@
+                            <table id="tblinventory" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        @*<th><input type="checkbox" id="chkallforalltab" /></th>
+                                            <th></th>*@
+                                        <th>Action</th>
+                                        <th>#</th>
+                                        <th></th>
+                                        <th>PO Date</th>
+                                        <th>PO No</th>
+                                        @*<th>Project Type</th>
+                                            <th>Team leader</th>*@
+                                        <th>Product Name</th>
+                                        <th></th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Qty (mg)</th>
+                                        <th>Esti. Data Date</th>
+                                        @*<th>Batch No</th>*@
+                                        <th></th>
+                                        @*<th>COA</th>*@
+                                        @*<th>Activity</th>*@
+                                        <th>Data Remark</th>
+                                        <th>Reason</th>
+                                        <th>Pack Size</th>
+                                        @*<th>Last Upload Date</th>*@
+
+                                        @*<th>Sugg. Chem. Name</th>*@
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<style>
+    .group label {
+        font-weight: 700 !important;
+    }
+</style>
+<script type="text/javascript">
+    var inventorytabload = false;
+    var tblexportdispatchload = false;
+    var shortqtyload = false;
+    function inventorytab() {
+        if (inventorytabload === false) {
+            var inventorytbl = $('#tblinventory').DataTable({
+                "ordering": false,
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "orderMulti": false,
+                "pageLength": 25,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "ajax": {
+                    "url": "../Form/LoadFormDataInDispatchedData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.ApprovedFormStatus === "@approvalstatus") {
+                        $('td', nRow).css('background-color', 'lightgreen');
+                    }
+                    if (aData.ApprovedFormStatus === "@correctionstatus") {
+                        $('td', nRow).css('background-color', 'lightyellow');
+                    }
+                    if (aData.StrProjectStatus === "Attention") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                    if (aData.IsControlledSubstance) {
+                        $('td', nRow).css('color', 'red');
+                    }
+                },
+                "fnDrawCallback": function (oSettings) {
+                    inventorytabload = true;
+                    setTimeout(function () {
+                        inventorytbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    $(row).attr('id', 'tr_' + data.FormId);
+                },
+                "columns": [
+                    //{ "data": "ChkFirstRow", "autoWidth": true },
+                    //{ "data": "LastRowText", "name": "LastRowText", "width": "5%" },
+                    { "data": "ChkSaveRow", "autoWidth": true },
+                    { "data": "SrPo", "autoWidth": true },
+                    { "data": "ApprovalCommentsText", "autoWidth": true },
+                    { "data": "MoveProjectDateText", "name": "MoveProjectDateText", "autoWidth": true },
+                    { "data": "PONumber", "name": "PONumber", "autoWidth": true },
+                    //{ "data": "SelectedProjectType", "width": "18%" },
+                    //{ "data": "SelectedScientistName", "name": "SelectedScientistName", "width": "8%" },
+                    { "data": "ProductName", "width": "18%" },
+                    { "data": "Attachment", "name": "Attachment", "width": "11%" },
+
+                    { "data": "CASNo", "name": "CompanyName", "width": "11%" },
+                    { "data": "CATNo", "name": "PONumber", "width": "11%" },
+                    { "data": "RequiredQtyTxt", "name": "Ref", "autoWidth": true },
+                    { "data": "EstimateCompleteDateText", "orderable": false, "autoWidth": true },
+                    //{ "data": "BatchNo", "name": "AdditionalBatchNoText", "width": "5%" },
+                    { "data": "ChangeBatch", "name": "ChangeBatch", "width": "5%" },
+                    //{ "data": "COAText", "name": "COAText" },
+                    //{ "data": "ActivityStatus", "name": "ActivityStatus" },
+                    { "data": "Remark", "name": "Remark", "width": "8%" },
+                    { "data": "ReasonText", "name": "ReasonText", "autoWidth": true },
+                    { "data": "OrderRemark", "name": "OrderRemark", "width": "8%" },
+                    //{ "data": "LastUploadDateStr", "name": "LastUploadDateStr", "autoWidth": true },
+                    //{ "data": "SuggChemName", "name": "SuggChemName", "autoWidth": true },
+                ]
+            });
+        }
+    }
+
+    function tblexportdispatchtab() {
+        if (tblexportdispatchload === false) {
+            var alltbl = $('#tblexportdispatch').DataTable({
+                "ordering": false,
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "orderMulti": false,
+                "pageLength": 25,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "fnDrawCallback": function (oSettings) {
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+                    var groupingCounts = [];
+                    var counter = 1;
+                    api.column(4, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+                            if (last !== undefined) {
+                            }
+                            $(rows).eq(i).before(
+                                '<td class="group" id="groupid_' + group + '" colspan="19" style="' + (rows[i].attributes["data-IsConversionReport"] != null && rows[i].attributes["data-IsConversionReport"].value == "true" ? "BACKGROUND-COLOR:#95647d" : "BACKGROUND-COLOR:#3c8dbc") +';font-weight:700 !important;color:#fff;padding:10px;" >' + group + ' | ' + rows[i].attributes["data-ProjectAssignName"].value +' </td>'
+                            );
+
+                            last = group;
+                            counter = 1;
+                        } else {
+                            counter++;
+                        }
+
+                        groupingCounts[group] = counter;
+                    });
+                    alltbl.columns.adjust();
+                    tblexportdispatchload = true;
+                },
+                "columnDefs":
+                    [
+                        { targets:4, visible: false },
+                    ],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadDispatchedExportData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.DispatchedStatus === @packedStatus) {
+                        $('td', nRow).css('background-color', 'rgb(250, 209, 255)');
+                    }
+                    if (aData.DispatchedStatus === @unpackedStatus) {
+                        $('td', nRow).css('background-color', '#ffe6b3');
+                    }
+                    if (aData.StrProjectStatus === "Attention") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                    if (aData.IsControlledSubstance) {
+                        $('td', nRow).css('color', 'red');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    if (data.ProjectAssignName === null) {
+                        $(row).attr('data-ProjectAssignName', "");
+                    }
+                    else {
+                        $(row).attr('data-ProjectAssignName', data.ProjectAssignName);
+                    }
+                    $(row).attr('data-IsConversionReport', data.IsConversionReport);
+                },
+                "columns": [
+                    { "data": "ChkFirstRow", "autoWidth": true },
+                    { "data": "ActionRow", "autoWidth": true },
+                    { "data": "ChkSaveRow", "autoWidth": true },
+                    { "data": "MoveDispatchDateText", "autoWidth": true },
+                    { "data": "PONumber", "name": "Ref", "autoWidth": true },
+                    { "data": "ProductName", "autoWidth": true },
+                    { "data": "Attachment", "autoWidth": true },
+                    { "data": "RequiredQty", "autoWidth": true },
+                    { "data": "CASNo", "autoWidth": true },
+                    { "data": "CATNo", "autoWidth": true },
+                    { "data": "AdditionalBatchNoText", "autoWidth": true },
+                    { "data": "ChangeBatch", "autoWidth": true },
+                    { "data": "COAText", "autoWidth": true },
+                    { "data": "ActivityStatus", "autoWidth": true },
+                    { "data": "Remark", "autoWidth": true },
+                    { "data": "OrderRemark", "autoWidth": true },
+                    { "data": "DispatchStatusText", "autoWidth": true },
+                    { "data": "LastUploadDateText", "autoWidth": true },
+                    { "data": "ReasonText", "autoWidth": true },
+                    { "data": "ClientRemark", "autoWidth": true }
+                ]
+            });
+        }
+    }
+
+    function shortqtytab() {
+        if (shortqtyload === false) {
+            var shortqtytbl = $('#example2').DataTable({
+                "ordering": false,
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "orderMulti": false,
+                "pageLength": 25,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "fnDrawCallback": function (oSettings) {
+                    //var api = this.api();
+                    //var rows = api.rows({ page: 'current' }).nodes();
+                    //var last = null;
+                    //var groupingCounts = [];
+                    //var counter = 1;
+                    //api.column(3, { page: 'current' }).data().each(function (group, i) {
+                    //    if (last !== group) {
+                    //        if (last !== undefined) {
+                    //        }
+                    //        $(rows).eq(i).before(
+                    //            '<td class="group" id="groupid_' + group + '" colspan="19" style="BACKGROUND-COLOR:#3c8dbc;font-weight:700 !important;color:#fff;padding:10px;" >' + group + ' </td>'
+                    //        );
+
+                    //        last = group;
+                    //        counter = 1;
+                    //    } else {
+                    //        counter++;
+                    //    }
+
+                    //    groupingCounts[group] = counter;
+                    //});
+                    shortqtytbl.columns.adjust();
+                    shortqtyload = true;
+                },
+                "columnDefs":
+                    [
+                        //{ targets: 3, visible: false },
+                    ],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadDispatchedShortQTYData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.DispatchedStatus === @packedStatus) {
+                        $('td', nRow).css('background-color', 'rgb(250, 209, 255)');
+                    }
+                    if (aData.DispatchedStatus === @unpackedStatus) {
+                        $('td', nRow).css('background-color', '#ffe6b3');
+                    }
+                    if (aData.StrProjectStatus === "Attention") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                    if (aData.IsControlledSubstance) {
+                        $('td', nRow).css('color', 'red');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                },
+                "columns": [
+                    //{ "data": "ChkFirstRow", "autoWidth": true },
+                    //{ "data": "ActionRow", "autoWidth": true },
+                    { "data": "MoveDispatchDateText", "autoWidth": true },
+                    { "data": "PONumber", "name": "Ref", "autoWidth": true },
+                    { "data": "ProductName", "autoWidth": true },
+                    { "data": "Attachment", "autoWidth": true },
+                    { "data": "RequiredQty", "autoWidth": true },
+                    { "data": "CASNo", "autoWidth": true },
+                    { "data": "CATNo", "autoWidth": true },
+                    { "data": "AdditionalBatchNoText", "autoWidth": true },
+                    { "data": "ChangeBatch", "autoWidth": true },
+                    //{ "data": "COAText", "autoWidth": true },
+                    //{ "data": "ActivityStatus", "autoWidth": true },
+                    { "data": "Remark", "autoWidth": true },
+                    //{ "data": "OrderRemark", "autoWidth": true },
+                    { "data": "DispatchStatusText", "autoWidth": true },
+                    //{ "data": "LastUploadDateText", "autoWidth": true },
+                    //{ "data": "ReasonText", "autoWidth": true },
+                    { "data": "LastRow", "autoWidth": true }
+                ]
+            });
+        }
+    }
+
+
+    $(function () {
+        var alltbl = $('#example1').DataTable({
+        "ordering": false,
+        "processing": true,
+        "serverSide": true,
+        "filter": true,
+        "orderMulti": false,
+        "pageLength": 25,
+        "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+        "fnDrawCallback": function (oSettings) {
+            var api = this.api();
+            var rows = api.rows({ page: 'current' }).nodes();
+            var last = null;
+            var groupingCounts = [];
+            var counter = 1;
+            api.column(4, { page: 'current' }).data().each(function (group, i) {
+                if (last !== group) {
+                    if (last !== undefined) {
+                    }
+                    $(rows).eq(i).before(
+                        '<td class="group" id="groupid_' + group + '" colspan="19" style="' + (rows[i].attributes["data-IsConversionReport"] != null && rows[i].attributes["data-IsConversionReport"].value == "true" ? "BACKGROUND-COLOR:#95647d" : "BACKGROUND-COLOR:#3c8dbc")+';font-weight:700 !important;color:#fff;padding:10px;" >' + group + ' | ' + rows[i].attributes["data-ProjectAssignName"].value +' </td>'
+                );
+
+                                last = group;
+                                counter = 1;
+                } else {
+                    counter++;
+                }
+
+                groupingCounts[group] = counter;
+            });
+            alltbl.columns.adjust();
+        },
+        "columnDefs":
+            [
+                { targets: 4, visible: false },
+            ],
+        "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+        "initComplete": function (settings, json) {
+
+        },
+        "ajax": {
+            "url": "../Form/LoadDispatchedLocalData",
+            "type": "POST",
+            "datatype": "json",
+            "data": function (d) {
+                //d.sciname = $("#home").find("#ScientistListItem").val();
+                //d.subsciname = $("#home").find("#SubScientistListItem").val();
+                //d.fltprostatusItem = $("#home").find("#fltprostatusItem").val();
+                //d.fltactivity = $("#home").find("#fltactivity").val();
+                //d.radiobuton = $("#home").find('input[name="filterAll"]:checked').val();
+                //d.searchbox = $("#home").find("#allsearchbox").val();
+            }
+        },
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            if (aData.DispatchedStatus === @packedStatus) {
+                $('td', nRow).css('background-color', 'rgb(250, 209, 255)');
+                }
+             if (aData.DispatchedStatus === @unpackedStatus) {
+                 $('td', nRow).css('background-color', '#ffe6b3');
+            }
+            if (aData.StrProjectStatus === "47") {
+                $('td', nRow).css('color', 'blue');
+            }
+            if (aData.IsControlledSubstance) {
+                $('td', nRow).css('color', 'red');
+            }
+        },
+            "createdRow": function (row, data, dataIndex) {
+                if (data.ProjectAssignName === null) {
+                    $(row).attr('data-ProjectAssignName', "");
+                }
+                else {
+                    $(row).attr('data-ProjectAssignName', data.ProjectAssignName);
+                }
+    $(row).attr('data-IsConversionReport', data.IsConversionReport);
+            // Set the data-status attribute, and add a class
+            //$(row).attr('id', 'tr_' + data.QuoteDetailsId);
+            //$(row).attr('data-email', data.EmailAddress);
+            //$(row).attr('data-company', data.CompanyName);
+            //$(row).attr('data-companyId', data.CompanyId);
+            //$(row).attr('data-podate', data.MoveProjectDateText);
+            //$(row).attr('data-pono', data.PONumber);
+            //$(row).attr('data-ProductCount', data.ProductCount);
+            //$(row).attr('data-PaymentTerms', data.PaymentTerms);
+            //$(row).attr('data-QuoteId', data.QuoteId);
+            //$(row).attr('data-IsPaymentPending', (data.IsPaymentPending == null ? false : data.IsPaymentPending));
+        },
+        "columns": [
+            { "data": "ChkFirstRow", "autoWidth": true },
+            { "data": "ActionRow", "autoWidth": true },
+            { "data": "ChkSaveRow", "autoWidth": true },
+            { "data": "MoveDispatchDateText", "autoWidth": true  },
+            { "data": "PONumber", "name": "Ref", "autoWidth": true  },
+            { "data": "ProductName", "autoWidth": true  },
+            { "data": "Attachment", "autoWidth": true  },
+            { "data": "RequiredQty", "autoWidth": true  },
+            { "data": "CASNo", "autoWidth": true  },
+            { "data": "CATNo", "autoWidth": true },
+            { "data": "AdditionalBatchNoText", "autoWidth": true  },
+            { "data": "ChangeBatch", "autoWidth": true  },
+            { "data": "COAText", "autoWidth": true  },
+            { "data": "ActivityStatus", "autoWidth": true },
+            { "data": "Remark", "autoWidth": true },
+            { "data": "OrderRemark", "autoWidth": true },
+            { "data": "DispatchStatusText", "autoWidth": true  },
+            { "data": "LastUploadDateText", "autoWidth": true },
+            { "data": "ReasonText", "autoWidth": true  },
+            { "data": "ClientRemark", "autoWidth": true }
+        ]
+    });
+    });
+
+    //$("#tblexportdispatch").DataTable({
+    //    "pageLength": 25,
+    //    "ordering": false,
+    //    "columnDefs":
+    //        [
+    //            { targets: 3, visible: false },
+    //        ],
+    //    "fnDrawCallback": function (oSettings) {
+
+
+    //        var api = this.api();
+    //        var rows = api.rows({ page: 'current' }).nodes();
+    //        var last = null;
+    //        var groupingCounts = [];
+    //        var counter = 1;
+    //        api.column(3, { page: 'current' }).data().each(function (group, i) {
+
+    //            if (last !== group) {
+    //                if (last !== undefined) {
+
+    //                }
+    //                $(rows).eq(i).before(
+    //                    '<td class="group" id="groupid_' + group + '" colspan="19" style="BACKGROUND-COLOR:#3c8dbc;font-weight:700 !important;color:#fff;padding:10px;" >' + group + ' </td>'
+    //                );
+
+    //                last = group;
+    //                counter = 1;
+    //            } else {
+    //                counter++;
+    //            }
+
+    //            groupingCounts[group] = counter;
+    //        });
+    //    },
+    //});
+
+     $('.datepicker').datepicker({
+            format: 'dd/mm/yyyy'
+    });
+
+    $('#alltbl').on('search.dt', function () {
+        calledExtra();
+    });
+    $('#alltbl').on('page.dt', function () {
+        calledExtra();
+    });
+    $('#alldomestictbl').on('search.dt', function () {
+        calledExtra();
+    });
+    $('#alldomestictbl').on('page.dt', function () {
+        calledExtra();
+    });
+    $('#allexporttbl').on('search.dt', function () {
+        calledExtra();
+    });
+    $('#allexporttbl').on('page.dt', function () {
+        calledExtra();
+    });
+    function calledExtra()
+    {
+        setTimeout(function () {
+                    $('.datepicker').datepicker({
+                        format: 'dd/mm/yyyy'
+            });
+
+            $(".clsRow").each(function () {
+
+                var dateValue = $(this).find('.datepicker').attr('data-value');
+                if (dateValue !== '') {
+                    dateValue = dateValue.toString().replace(' 00:00:00', '');
+                    $(this).find('.datepicker').datepicker("setDate", dateValue);
+                }
+            });
+
+        }, 500);
+    }
+
+
+    $(".resizediv").css('height', window.innerHeight - 200);
+
+    $(document).on("click", "#chkallquotelogtab", function () {
+        if ($(this).is(":checked")) {
+            $('#tblquotelog').find('.clsclubQuote').each(function () {
+                $(this).prop("checked", true);
+            });
+        }
+        else {
+            $('#tblquotelog').find(".clsclubQuote").each(function () {
+                $(this).prop("checked", false);
+            });
+        }
+    });
+    $(document).on("click", "#chkdispatchlistAll", function () {
+                    if ($(this).is(":checked")) {
+                        $('#example1').find('.clssaveall').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $('#example1').find(".clssaveall").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+    });
+
+    $(document).on("click", "#chkexportdispatchlistAll", function () {
+        if ($(this).is(":checked")) {
+            $('#tblexportdispatch').find('.clssaveall').each(function () {
+                $(this).prop("checked", true);
+            });
+        }
+        else {
+            $('#tblexportdispatch').find(".clssaveall").each(function () {
+                $(this).prop("checked", false);
+            });
+        }
+    });
+
+    $(document).on("click", "#chkallforalldomestictab", function () {
+        if ($(this).is(":checked")) {
+            $('#alldomestictbl').find('.clssavealltab').each(function () {
+                $(this).prop("checked", true);
+            });
+        }
+        else {
+            $('#alldomestictbl').find(".clssavealltab").each(function () {
+                $(this).prop("checked", false);
+            });
+        }
+    });
+    $(document).on("click", "#chkallforallexporttab", function () {
+        if ($(this).is(":checked")) {
+            $('#allexporttbl').find('.clssavealltab').each(function () {
+                $(this).prop("checked", true);
+            });
+        }
+        else {
+            $('#allexporttbl').find(".clssavealltab").each(function () {
+                $(this).prop("checked", false);
+            });
+        }
+    });
+
+    //$(document).on("click", "#selectallchk", function () {
+
+    //    if ($(this).is(':checked')) {
+    //        $('.clsSaverow').each(function() {
+    //            $(this).prop('checked', true);
+    //        });
+    //    } else {
+    //        $('.clsSaverow').each(function() {
+    //            $(this).prop('checked', false);
+    //        });
+    //    }
+    //});
+
+    var dataApprovedload = false;
+    var dataDeliveredLoad = false;
+    var dataQuotelogLoad = false;
+
+    function dataApprovedtab() {
+        if (dataApprovedload === false) {
+            $('#tbldataApproved').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "fnDrawCallback": function(oSettings) {
+                    dataApprovedload = true;
+                    $(".darowcls").each(function() {
+                        var id = $(this).attr("id").replace('tr_', '');
+                        var status = $(this).attr("data-approved");
+                        if (status !== "" && status !== null && status !== undefined)
+                            $('#dataapproved_' + id).val(status);
+                    });
+
+                },
+                "language": {
+                    processing:
+                        '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+                },
+                "initComplete": function(settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/DataApprovedDispatchData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                },
+                "columnDefs": [],
+                "createdRow": function(row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.Id);
+                    $(row).attr('class', 'darowcls');
+                    $(row).attr('data-approved', data.DataApprovedStatus);
+                    if (data.DataApprovedStatus === "Send") {
+                        $(row).attr('class', 'darowcls bluecls');
+                    }
+                    $(row).attr('data-IsConversionReport', data.IsConversionReport);
+                },
+                "columns": [
+                    { "data": "ChkSaveRow", "autoWidth": true },
+                    { "data": "Ref", "autoWidth": true },
+                    { "data": "DataApprovedDateText", "name": "PODateText", "autoWidth": true },
+                    { "data": "ProductName", "name": "ProductName", "autoWidth": true },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "autoWidth": true, "orderable": false },
+                    { "data": "QTY", "autoWidth": true, "orderable": false },
+                    { "data": "AdditionalBatchNoText", "name": "ProductName", "autoWidth": true },
+                    { "data": "ChangeBatch", "name": "ChangeBatch", "autoWidth": true },
+                    { "data": "Remark", "width": "18%" },
+                    { "data": "DataApprovedStatusText", "width": "18%" },
+                ]
+
+            });
+        }
+    }
+
+
+    function dataDeliveredtab() {
+        if (dataDeliveredLoad === false) {
+            $('#deliveredtbl').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                 dataDeliveredLoad = true;
+                $('#deliveredtbl').find("#selectAllclsMoveDispatch").click(function () {
+                    if ($(this).is(":checked")) {
+                        $('#deliveredtbl').find('.clsMoveDispatch').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $('#deliveredtbl').find(".clsMoveDispatch").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+
+                $('#deliveredtbl').find("#selectAllclsSaverow").click(function () {
+                    if ($(this).is(":checked")) {
+                        $('#deliveredtbl').find('.clsSaverow').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $('#deliveredtbl').find(".clsSaverow").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+
+                        var api = this.api();
+                        var rows = api.rows({ page: 'current' }).nodes();
+                        var last = null;
+                        var groupingCounts = [];
+                        var counter = 1;
+                        api.column(4, { page: 'current' }).data().each(function (group, i) {
+                            if (last !== group) {
+                                if (last !== undefined) {
+                                }
+                                $(rows).eq(i).before(
+                                    '<td class="group" id="groupid_' + group + '" colspan="13" style="' + (rows[i].attributes["data-IsConversionReport"] != null && rows[i].attributes["data-IsConversionReport"].value == "true" ? "BACKGROUND-COLOR:#95647d" : "BACKGROUND-COLOR:#3c8dbc") +';font-weight:700 !important;color:#fff;padding:10px;" >' + group + ' | ' + rows[i].attributes["data-ProjectAssignName"].value +' </td>'
+                                );
+
+                                last = group;
+                                counter = 1;
+                            } else {
+                                counter++;
+                            }
+
+                            groupingCounts[group] = counter;
+                        });
+             },
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "initComplete": function (settings, json) {
+
+            },
+            "ajax": {
+                "url": "../Form/LoadAllDelivereddata",
+                "type": "POST",
+                "datatype": "json"
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.SelectedProjectType === "In-Stock" && aData.MoveToDispatch != true) {
+                    $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                }
+                if (aData.ReadyToDeliverScientistStatusId === aData.ScientistStatus) {
+                    $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                }
+                if (aData.StrProjectStatus === "Attention") {
+                    $('td', nRow).css('color', 'blue');
+                }
+                if (aData.IsControlledSubstance) {
+                    $('td', nRow).css('color', 'red');
+                }
+                //debugger;
+                //var date = new Date(aData.MoveProjectDateText);
+                //var month = date.getMonth() + 1;
+                //aData.MoveProjectDateText = (month.length > 1 ? month : "0" + month) + "/" + date.getDate() + "/" + date.getFullYear();
+            },
+                "columnDefs":
+                    [
+                        { targets: 4, visible: false },
+                    ],
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                if (data.ProjectAssignName === null) {
+                    $(row).attr('data-ProjectAssignName', "");
+                }
+                else {
+                    $(row).attr('data-ProjectAssignName', data.ProjectAssignName);
+                }
+                $(row).attr('data-IsConversionReport', data.IsConversionReport);
+            },
+                "columns": [
+
+                    { "data": "ChkFirstRow", "autoWidth": true },
+                    { "data": "ChkSaveRow", "autoWidth": true },
+                { "data": "SrPo", "autoWidth": true },
+                    { "data": "InvoicedDateText", "name": "InvoicedDateText", "autoWidth": true },
+                { "data": "PONumber", "name": "PONumber", "autoWidth": true },
+                { "data": "ProductName", "width": "18%" },
+                { "data": "CASNo", "name": "CompanyName", "width": "7%" },
+                { "data": "CATNo", "name": "PONumber", "width": "7%" },
+                { "data": "RequiredQtyTxt", "name": "Ref", "autoWidth": true },
+                // { "data": "EstimateCompleteDateText", "orderable": false, "autoWidth": true },
+                { "data": "AdditionalBatchNoText", "name": "AdditionalBatchNoText", "width": "5%" },
+                { "data": "ChangeBatch", "name": "ChangeBatch", "autoWidth": true },
+                { "data": "COAText", "name": "COAText", "autoWidth": true },
+                //{ "data": "SelectedScientistName", "name": "SelectedScientistName", "width": "5%" },
+                //{ "data": "ClientRemarkText", "name": "ClientRemarkText", "autoWidth": true },
+                { "data": "Remark", "name": "Remark", "width": "5%" },
+                { "data": "OrderRemark", "name": "OrderRemark", "width": "5%" }
+            ]
+
+        });
+        }
+    }
+
+    function dataQuotelogtab() {
+        if (dataQuotelogLoad === false) {
+            var quotelogtbl = $('#tblquotelog').DataTable({
+                "searching": false,
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadQuotationData?tabname=all&isDispatch=true",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.tablename = "tblquotelog";
+                        d.radiobuton = $("#divQuotelog").find('input[name="filterAll"]:checked').val();
+                        d.searchbox = $("#divQuotelog").find("#allsearchbox").val();
+                    }
+                },
+                "fnDrawCallback": function (oSettings) {
+                    dataQuotelogLoad = true;
+
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+                    var groupingCounts = [];
+                    var counter = 1;
+                    api.column(2, { page: 'current' }).data().each(function (group, i) {
+
+                         if (last !== group) {
+                             if (last !== undefined) {
+
+                            }
+                            $(rows).eq(i).before(
+                                '<td class="group" id="groupid_' + group + '" colspan="9" style="' + (rows[i].attributes["data-IsConversionReport"] != null && rows[i].attributes["data-IsConversionReport"].value == "true" ? "BACKGROUND-COLOR:#95647d" : "BACKGROUND-COLOR:#3c8dbc") +';font-weight:700;color:#fff;padding:10px;" >' + group +' </td>'
+                            );
+
+                            last = group;
+                            counter = 1;
+                        } else {
+                            counter++;
+                        }
+
+                        groupingCounts[group] = counter;
+                    });
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    $("td:eq(0)", nRow).children('a').attr("href", $("td:eq(0)", nRow).children('a').attr("href") + "?isdispatchquotelog=true");
+                    if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                    }
+                    if (aData.IsOnHold === true) {
+                        $('td', nRow).css('background-color', 'rgb(255 255 146)');
+                    }
+                    if (aData.StrProjectStatus === "Attention") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                    if (aData.IsControlledSubstance) {
+                        $('td', nRow).css('color', 'red');
+                    }
+                },
+                "columnDefs":
+                [
+                     { targets: 2, visible: false },
+                ],
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-IsConversionReport', data.IsConversionReport);
+                },
+                "columns": [
+                    { "data": "ChkFirstRow", "autoWidth": true, "orderable": false },
+                    //{ "data": "MoveToProjectText", "autoWidth": true, "orderable": false },
+                    { "data": "DownloadSampleRow", "width": "10px" , "orderable": false },
+                    //{ "data": "DownloadRow", "autoWidth": true, "orderable": false },
+                    { "data": "Ref", "name": "Ref", "width": "100px" },
+                    //{ "data": "CompanyName", "name": "CompanyName", "width": "200px" },
+                    //{ "data": "PONumberText", "name": "PONumber", "width": "100px" },
+                    { "data": "ProductNameText", "name": "ProductName", "width": "50%" },
+                    { "data": "CASNoText", "name": "CASNo", "width": "10%" },
+                    { "data": "CATNoText", "name": "CATNo", "width": "10%" },
+                    { "data": "AdditionalBatchNoText", "name": "AdditionalBatchNoText" },
+                    { "data": "ChangeBatch", "name": "ChangeBatch", "autoWidth": true },
+                    { "data": "COAText", "name": "COAText" },
+                    { "data": "ActivityStatus", "name": "ActivityStatus" },
+                    //{ "data": "ProductRemark", "orderable": false, "width": "100px" },
+                    //{ "data": "ActionRow", "orderable": false, "width": "130px" }
+                ]
+
+            });
+        }
+    }
+
+    function GetAuditLogForDispatch() {
+        var arr = [];
+        var id = 0;
+        $(".clssavealltab").each(function () {
+            if ($(this).is(":checked")) {
+                arr.push($(this).val());
+            }
+        });
+
+        if (arr.length > 1) {
+            toastr.error("Please select only one Product");
+            return false;
+        }
+        id = arr[0];
+        $.ajax({
+            url: '/Form/GetAuditLogForDispatch?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+            }
+        });
+    }
+
+    function GenerateForm() {
+        var ids = [];
+        var errorcoa = 0;
+        $('.clssavealltab').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+        if (ids.length > 1) {
+            toastr.error('Please select only one Product.');
+            return false;
+        }
+        window.location.href = "/Form/SubmitForm/" + ids[0] +"?isdispatch=true";
+    }
+
+
+    function MoveToInvoiceList() {
+        var ids = [];
+        var errorcoa = 0;
+        $('.clsMoveDispatch').each(function() {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+                if ($(this).attr('data-ponumber').indexOf("S-") === -1 || $(this).attr('data-ponumber').indexOf("FOC-") === -1) {
+                    if ($("#coa_" + $(this).val()).val() === null || $("#coa_" + $(this).val()).val() === undefined || $("#coa_" + $(this).val()).val() === "") {
+                        errorcoa += 1;
+                    }
+                }
+            }
+        });
+        if (errorcoa !== 0) {
+            toastr.error('Please select COA of the product.');
+            return false;
+        }
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+
+        var str = "<table><tr><th>Ref No</th><th>Product Name</th><th>CAS No</th><th>CAT No</th><th>QTY. (mg)</th></tr>";
+        $(ids).each(function(i, v) {
+            var poNo =$("#tr_" + v).find("td:nth-child(4)").text();
+            var qty =$("#tr_" + v).find("td:nth-child(6)").text();
+            var productName = $("#tr_" + v).find("td:nth-child(5)").text();
+            var casNo = $("#tr_" + v).find("td:nth-child(7)").text();
+            var catNo = $("#tr_" + v).find("td:nth-child(8)").text();
+
+            str += "<tr><td>" +
+                poNo +
+                "</td><td>" +
+                productName +
+                "</td><td>" +
+                casNo +
+                "</td><td>" +
+                catNo +
+                "</td><td>" +
+                qty +
+                "</td></tr>";
+        });
+        str += "</table>";
+
+        swal({
+                title: "Are you sure want to dispatch this product?",
+                text: str,
+                type: "warning",
+                showCancelButton: true,
+                html: true,
+                customClass: 'swalwide',
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes, move it!",
+                cancelButtonText: "No, cancel!",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: '/Form/MoveToInvoiceList',
+                        data: { id: ids },
+                        type: 'POST',
+                        traditional: true, // add this
+                        dataType: 'json',
+                        success: function(data) {
+                            if (data.success) {
+                                window.location.href = "/Form/Dispatch";
+                            } else {
+                                toastr.warning(data.message);
+                            }
+                        }
+                    });
+                }
+            });
+    }
+
+    function RejectApproveProductDetail(id) {
+        $.ajax({
+            url: '/Form/RejectApproveProductDetail?id=' + id,
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                if (data.success) {
+                    toastr.success("Product is approved for dispatch.");
+                    window.location.reload(true);
+                }
+                else {
+                    swal("Good job!", "Something went wrong.", "success");
+                }
+            }
+        });
+    }
+
+    function ApproveProductDetail(id) {
+        $.ajax({
+            url: '/Form/ApproveProductDetail?id=' + id,
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                if (data.success) {
+                    toastr.success("Product is approved for dispatch.");
+                    window.location.reload(true);
+                }
+                else {
+                    swal("Good job!", "Something went wrong.", "success");
+                }
+            }
+        });
+    }
+
+    function ReverseProduct(id)
+    {
+        var str = "<select id='ddlactivitystatus'><option value=''>--Select--</option>";
+        //str += "<option value='PDC Awaited'>PDC Awaited</option>";
+        //str += "<option value='Advance Payment'>Advance Payment</option>";
+        //str += "<option value='Payment Due'>Payment Due</option>";
+        str += "<option value='Insufficient QTY'>Insufficient QTY</option>";
+        str += "<option value='Payment Issue'>Payment Issue</option>";
+        str += "<option value='Client Cancelled'>Client Cancelled</option>";
+        str += "</select>";
+        swal({
+            title: "Are you sure want to move this product back?",
+            text: str,
+            type: "warning",
+            showCancelButton: true,
+            html: true,
+            customClass: 'swalwide',
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, move it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: '/Form/ReverseStatus?id=' + id + '&status=project',
+                        data: {},
+                        type: 'POST',
+                        success: function (data) {
+                            if (data.success) {
+                                toastr.success("Product is moved to project.");
+                                window.location.reload(true);
+                            }
+                            else {
+                                swal("Good job!", "Something went wrong.", "success");
+                            }
+                        }
+                    });
+
+                }
+            });
+
+    }
+
+    function SaveDispatchDetailsSort(id) {
+        var value = $("#example2").find('#sortdispatchstatus_' + id).val();
+        var quotedetailsid = $("#example2").find('#sortdispatchstatus_' + id).attr("data-quotedetailsid");
+        var additionalBatch = $("#example2").find('#sortadditionalBatch_' + id).val();
+        var sortQty = $("#example2").find("#sortsortqty_" + quotedetailsid).val();
+        var batchNo = $("#example2").find("#sortBatchNo_" + quotedetailsid).val();
+        var reqQty = $("#example2").find("#sortsortqty_" + quotedetailsid).attr('data-requiredqty');
+        var remark = $("#example2").find("#sortremark_" + quotedetailsid).val();
+        $.ajax({
+            url: '/Form/ChangeDispatchStatus?id=' +
+                quotedetailsid +
+                '&status=' +
+                value +
+                '&additionalBatch=' +
+                additionalBatch +
+                '&sortQty=' +
+                parseInt(sortQty) +
+                '&batchNo=' +
+                batchNo +
+                '&remark=' +
+                remark,
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have changed dispatch status.");
+                window.location.reload(true);
+            }
+        });
+    }
+
+    function exportdispatchlist(tblName)
+    {
+        var ids = [];
+        $("#" + tblName).find('.clssaveall').each(function() {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+
+        $.ajax({
+                url: '/Form/ExportDispatchList',
+                data: { id : ids },
+                type: 'POST',
+                traditional: true, // add this
+                dataType: 'json',
+                success: function(data) {
+                    window.location.href = data;
+                }
+            });
+    }
+
+    function SaveAllQuotelogList() {
+        var count = 1;
+        var ids = [];
+        $('.clsclubQuote').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+        var mainModel = [];
+        $("#tblquotelog").find('.clsclubQuote').each(function () {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var additionalBatch = $("#tblquotelog").find('#additionalBatch_' + id).val();
+                var coa = $("#tblquotelog").find("#coa_" + id).val();
+                var activityStatus = $("#tblquotelog").find("#activityStatus_" + id).val();
+
+                var obj = {
+                    id: id,
+                    additionalBatch: additionalBatch,
+                    coa: coa,
+                    activitystatus: activityStatus
+                };
+                mainModel.push(obj);
+                //$.ajax({
+                //    url: '/Form/SaveQuoteLogInfoFromDispatch?id=' + id + '&additionalBatch=' + additionalBatch + '&coa=' + coa + '&activitystatus=' + activityStatus,
+                //    data: {},
+                //    type: 'POST',
+                //    success: function (data) {
+                //        successSaveallTabAlert(count, ids.length, 'tblquotelog');
+                //        count += 1;
+                //    }
+                //});
+            }
+        });
+
+        if (mainModel.length > 0) {
+            $.ajax({
+                url: '/Form/SaveQuoteLogInfoFromDispatch',
+                data: JSON.stringify({ model: mainModel }),
+                type: 'POST',
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                },
+                complete: function (data) {
+                    toastr.success("You have updated details.");
+                    $('#tblquotelog').DataTable().ajax.reload(null, false);
+                }
+            });
+            //$.ajax({
+            //    url: '/Form/SaveQuoteLogInfoFromDispatch',
+            //    data: JSON.stringify({  model: mainModel }),
+            //    type: 'POST',
+            //    success: function (data) {
+            //        toastr.success("You have updated details.");
+            //        //window.location.reload(true);
+            //        $('#tblquotelog').DataTable().ajax.reload(null, false);
+            //        //successSaveallTabAlert(count, ids.length, 'tblquotelog');
+            //        //count += 1;
+            //    }
+            //});
+        }
+    }
+
+    function SaveAllDeliveredTabList(tblname) {
+
+        var count = 1;
+        var ids = [];
+        $("#" + tblname).find('.clsSaverow').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        $("#" + tblname).find('.clsSaverow').each(function () {
+            if ($(this).is(':checked')) {
+
+                var id = $(this).val();
+                var additionalBatch = $("#" + tblname).find('#additionalBatch_' + id).val();
+                var coa = $("#" + tblname).find('#coa_' + id).val();
+                $.ajax({
+                    url: '/Form/SaveDeliveredDispatch?id=' + id + '&additionalBatch=' + additionalBatch + '&coa=' + coa ,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                        successSaveallTabAlert(count, ids.length, tblname);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function SaveAllTabList(tblname) {
+
+        var count = 1;
+        var ids = [];
+        $('.clssavealltab').each(function() {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        $('.clssavealltab').each(function() {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var additionalBatch = $("#" + tblname).find('#additionalBatch_' + id).val();
+                var reason = $("#" + tblname).find("#reason_" + id).val();
+                var esticompleteDate = $("#" + tblname).find("#esticompleteDate_" + id).val();
+                var coa = $("#" + tblname).find('#coa_' + id).val();
+                var dispatchstatus = $("#" + tblname).find('#dispatchstatus_' + id).val();
+                $.ajax({
+                    url: '/Form/SaveDispatchAll?id=' + id + '&additionalBatch=' + additionalBatch + '&coa=' + coa + '&reason=' + reason + '&esticompleteDate=' + esticompleteDate + '&dispatchstatus=' + dispatchstatus,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                        successSaveallTabAlert(count, ids.length, tblname);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function ApproveAllTabList() {
+
+        var count = 1;
+        var ids = [];
+        $('.clssavealltab').each(function () {
+            var divid = $(this).val();
+            var value = $(this).attr("data-showapprovebutton");
+            if ($(this).is(':checked') && value === "True") {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Nonapproved Product.');
+            return false;
+        }
+
+        $('.clssavealltab').each(function () {
+            var value = $(this).attr("data-showapprovebutton");
+            if ($(this).is(':checked') && value === "True") {
+                var id = $(this).val();
+                var additionalBatch = $('#additionalBatch_' + id).val();
+                var reason = $("#reason_" + id).val();
+                var esticompleteDate = $("#esticompleteDate_" + id).val();
+
+                $.ajax({
+                    url: '/Form/ApproveProductDetail?id=' + id ,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                        successapprovedrejectAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function RejectApproveAllTabList() {
+        var count = 1;
+        var ids = [];
+        $('.clssavealltab').each(function () {
+            var divid = $(this).val();
+            var value = $(this).attr("data-showapprovebutton");
+            if ($(this).is(':checked') && value === "False") {
+                ids.push($(this).val());
+            }
+        });
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Approved Product.');
+            return false;
+        }
+        $('.clssavealltab').each(function () {
+            var value = $(this).attr("data-showapprovebutton");
+            if ($(this).is(':checked') && value === "False") {
+                var id = $(this).val();
+                var additionalBatch = $('#additionalBatch_' + id).val();
+                var reason = $("#reason_" + id).val();
+                var esticompleteDate = $("#esticompleteDate_" + id).val();
+
+                $.ajax({
+                    url: '/Form/RejectApproveProductDetail?id=' + id,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                        successapprovedrejectAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function successapprovedrejectAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated data approved status.");
+            $('.clsSaverow').each(function () {
+                $(this).prop('checked', false);
+            });
+
+            $('#selectallchk').prop('checked', false);
+            $('#alltbl').DataTable().ajax.reload();
+        }
+    }
+
+    function returnall(tblName) {
+        var ids = [];
+        $("#" + tblName).find('.clssaveall').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one product for process this operation.");
+            return false;
+        }
+        var str = "<select id='ddlactivitystatus'><option value=''>--Select--</option>";
+        //str += "<option value='PDC Awaited'>PDC Awaited</option>";
+        //str += "<option value='Advance Payment'>Advance Payment</option>";
+        //str += "<option value='Payment Due'>Payment Due</option>";
+        str += "<option value='Insufficient QTY'>Insufficient QTY</option>";
+        str += "<option value='Payment Issue'>Payment Issue</option>";
+        str += "<option value='Client Cancelled'>Client Cancelled</option>";
+        str += "</select>";
+        swal({
+            title: "Are you sure want to move this product back?",
+            text: str,
+            type: "warning",
+            showCancelButton: true,
+            html: true,
+            customClass: 'swalwide',
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, move it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    var count = 1;
+                    $('.clssaveall').each(function () {
+                        var id = $(this).val();
+                        if ($(this).is(':checked')) {
+                            if ($('#ddlactivitystatus').val() === '') {
+                                toastr.error('Please select reason');
+                                return false;
+                            }
+                            $.ajax({
+                                url: '/Form/ReverseStatus?id=' + id + '&status=project&activitystatus=' + $('#ddlactivitystatus').val() ,
+                                data: {},
+                                type: 'POST',
+                                success: function (data) {
+
+                                },
+                                complete: function (data) {
+                                    successreturnAlert(count, ids.length);
+                                    count += 1;
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+    }
+    var tableId = '';
+    function SaveAllDispatchList(tblName) {
+        tableId = tblName;
+        var count = 1;
+        var ids = [];
+        $("#" + tblName).find('.clssaveall').each(function() {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+        $("#" + tblName).find('.clssaveall').each(function() {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var value = $("#" + tblName).find('#dispatchstatus_' + id).val();
+                var quotedetailsid = $("#" + tblName).find('#dispatchstatus_' + id).attr("data-quotedetailsid");
+                var additionalBatch = $("#" + tblName).find('#additionalBatch_' + id).val();
+                var sortQty = $("#" + tblName).find("#sortqty_" + quotedetailsid).val();
+                var reqQty = $("#" + tblName).find("#sortqty_" + quotedetailsid).attr('data-requiredqty');
+                var batchNo = $("#" + tblName).find("#BatchNo_" + quotedetailsid).val();
+                var remark = $("#" + tblName).find("#remark_" + quotedetailsid).val();
+                var orderremark = $("#" + tblName).find("#orderremark_" + quotedetailsid).val();
+                var reason = $("#" + tblName).find("#reason_" + quotedetailsid).val();
+                var coa = $("#" + tblName).find("#coa_" + quotedetailsid).val();
+                //var activitystatus = $("#" + tblName).find("#activitystatus_" + quotedetailsid).val();
+                if (value === '@Convert.ToInt32(EnumList.DispatchStatus.SortQty)') {
+                    if(sortQty === '' || sortQty === '0')
+                    {
+                        toastr.error("Please enter valid Sort Qtuantity.");
+                        return false;
+                    }
+                    if(parseInt(sortQty) >= parseInt(reqQty) )
+                    {
+                        toastr.error("Sort Quantity should not greater than Required quantity.");
+                        return false;
+                    }
+                }
+
+                var model = {
+                    'id': quotedetailsid,
+                    'status': value,
+                    'additionalBatch': additionalBatch,
+                    'sortQty': parseInt(sortQty),
+                    'batchNo': batchNo,
+                    'remark': remark,
+                    'reason': reason,
+                    'coa': coa,
+                    'orderremark': orderremark,
+                    'tabname':'list'
+                };
+
+                debugger;
+                $.ajax({
+                    url: '/Form/ChangeDispatchStatus',
+                    data: JSON.stringify(model),
+                    type: 'POST',
+                    traditional: true, // add this
+                    dataType: 'json',
+                    contentType: "application/json",
+                    success: function (data) {
+                        successSaveallDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function successSaveallDispatchAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have changed dispatch status.");
+            if (tableId === "example2" || tableId === "tblexportdispatch" || tableId === "example1") {
+                window.location.reload(true);
+            }
+            else {
+                $('#' + tableId).DataTable().ajax.reload(null, false);
+            }
+        }
+    }
+
+    function successSaveallTabAlert(count, forloopcount, tblname) {
+        if (count === forloopcount) {
+            toastr.success("You have updated details.");
+            //window.location.reload(true);
+            $('#' + tblname).DataTable().ajax.reload(null, false);
+        }
+    }
+
+    function SaveDispatchDetails(id) {
+        var value = $('#dispatchstatus_'+id).val();
+        var quotedetailsid = $('#dispatchstatus_' + id).attr("data-quotedetailsid");
+        var additionalBatch = $('#additionalBatch_' + id).val();
+        var sortQty = $("#sortqty_"+quotedetailsid).val();
+        var reqQty =$("#sortqty_"+quotedetailsid).attr('data-requiredqty');
+        var batchNo = $("#BatchNo_"+quotedetailsid).val();
+        var remark = $("#remark_"+quotedetailsid).val();
+            var reason = $("#reason_" + quotedetailsid).val();
+            if (value === '@Convert.ToInt32(EnumList.DispatchStatus.SortQty)') {
+            if(sortQty === '' || sortQty === '0')
+            {
+                toastr.error("Please enter valid Sort Qtuantity.");
+                return false;
+            }
+            if(parseInt(sortQty) >= parseInt(reqQty) )
+            {
+                toastr.error("Sort Quantity should not greater than Required quantity.");
+                return false;
+            }
+        }
+        $.ajax({
+            url: '/Form/ChangeDispatchStatus?id=' + quotedetailsid + '&status=' + value + '&additionalBatch=' + additionalBatch +'&sortQty='+parseInt(sortQty)+'&batchNo='+batchNo+'&remark='+remark +'&reason='+ reason +'&tabname=all',
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have changed dispatch status.");
+                window.location.reload(true);
+            }
+        });
+    }
+
+
+
+    $(document).on("change", ".clsDispatch", function () {
+        var value = $(this).val();
+        var $this = $(this);
+        var quotedetailsid = $(this).attr("data-quotedetailsid");
+        $("#sortqty_"+quotedetailsid).hide();
+        if (value === '@Convert.ToInt32(EnumList.DispatchStatus.SortQty)') {
+            $("#sortqty_"+quotedetailsid).show();
+        }
+    });
+
+
+    function SaveAll() {
+        var ids = [];
+        $('.clsSaverow').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+        var count = 1;
+        $('.clsSaverow').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                var da = $("#dataapproved_" + id).val();
+                var additionalBatch = $("#additionalBatch_" + id).val();
+
+                $.ajax({
+                    url: '/Form/UpdateDataapprovedInfo?status='+da+'&id='+id+'&additionalBatch='+additionalBatch,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                    },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function successAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated data approved status.");
+            $('.clsSaverow').each(function(){
+                $(this).prop('checked',false);
+            });
+
+            $('#selectallchk').prop('checked', false);
+            $('#tbldataApproved').DataTable().ajax.reload();
+        }
+    }
+
+    function successreturnAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have moved back to return data.");
+            window.location.reload(true);
+        }
+    }
+
+    var alltableloaded = false;
+    function alltbltab() {
+        if (alltableloaded === false) {
+            var alltbl = $('#alltbl').DataTable({
+                "searching": false,
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    alltableloaded = true;
+                    $("#chkallforalltab").click(function () {
+                        if ($(this).is(":checked")) {
+                            $('.clssavealltab').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $(".clssavealltab").each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+                    $("#selectAllclsMoveDispatch").click(function () {
+                        if ($(this).is(":checked")) {
+                            $('.clsMoveDispatch').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $(".clsMoveDispatch").each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+
+                    $("#selectAllclsSaverow").click(function () {
+                        if ($(this).is(":checked")) {
+                            $('.clsSaverow').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $(".clsSaverow").each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+
+                    api.column(6, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+                            $(rows).eq(i).before(
+                                '<td class="group" colspan="23" style="' + (rows[i].attributes["data-IsConversionReport"] != null && rows[i].attributes["data-IsConversionReport"].value == "true" ? "BACKGROUND-COLOR:#95647d" : "BACKGROUND-COLOR:#3c8dbc") +';font-weight:700;color:#fff;padding:10px;">' + group + " | " + rows[i].attributes["data-podate"].value + ' | ' + rows[i].attributes["data-ProjectAssignName"].value + ' </td>'
+                            );
+                            last = group;
+                        }
+                    });
+                    alltbl.columns.adjust();
+                    calledExtra();
+                },
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadAllDispatchdata",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.type = "all";
+                        d.tableName = "alltbl";
+                        d.fltprostatusItem = $("#all").find("#fltprostatusItem").val();
+                        d.fltactivitystatusItem = $("#all").find("#fltactivitystatusItem").val();
+                        d.radiobuton = $("#all").find('input[name="filterAll"]:checked').val();
+                        d.searchbox = $("#all").find("#allsearchbox").val();
+                        d.fltprotypeItem = $("#all").find("#fltprotypeItem").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.SelectedProjectType === "In-Stock") {
+                        $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                    }
+                    if (aData.SelectedProjectType === "In-Stock" && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                    }
+                    if (aData.MoveToDispatch && (aData.DispatchedStatus == "0" || aData.DispatchedStatus == null)) {
+                        $('td', nRow).css('background-color', '#ffe6b3');
+                    }
+                    if (aData.MoveToDispatch && aData.DispatchedStatus == "1") {
+                        $('td', nRow).css('background-color', 'rgb(250, 209, 255)');
+                    }
+                    if (aData.MoveToInvoice) {
+                        $('td', nRow).css('background-color', '#ff9999');
+                    }
+                    if (aData.IsControlledSubstance) {
+                        $('td', nRow).css('color', 'red');
+                    }
+                    if (aData.SelectedProStatus === "Attention") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                    //if (aData.SelectedProjectType === "In-Stock" && aData.MoveToDispatch != true) {
+                    //    $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                    //}
+                    //if (aData.ReadyToDeliverScientistStatusId === aData.ScientistStatus) {
+                    //    $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                    //}
+                    //if (aData.MoveToDispatch && (aData.DispatchedStatus == "0" || aData.DispatchedStatus == null)) {
+                    //    $('td', nRow).css('background-color', '#ffe6b3');
+                    //}
+                    //if (aData.MoveToDispatch && aData.DispatchedStatus == "1") {
+                    //    $('td', nRow).css('background-color', '#ffccb3');
+                    //}
+                    //if (aData.MoveToInvoice) {
+                    //    $('td', nRow).css('background-color', '#ff9999');
+                    //}
+                    //if (aData.StrProjectStatus === "Attention") {
+                    //    $('td', nRow).css('color', 'blue');
+                    //}
+                    //if (aData.IsControlledSubstance) {
+                    //    $('td', nRow).css('color', 'red');
+                    //}
+                    $(nRow).addClass("clsRow");
+
+                },
+                "columnDefs":
+                    [
+                        { targets: 6, visible: false },
+                        { targets: 5, visible: false }
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-company', data.CompanyName);
+                    $(row).attr('data-podate', data.MoveProjectDateText);
+                    $(row).attr('data-pono', data.PONumber);
+                    if (data.ProjectAssignName === null) {
+                        $(row).attr('data-ProjectAssignName', "");
+                    }
+                    else {
+                        $(row).attr('data-ProjectAssignName', data.ProjectAssignName);
+                    }
+                    $(row).attr('data-IsConversionReport', data.IsConversionReport);
+                },
+                "columns": [
+                    { "data": "ChkFirstRow", "autoWidth": true },
+                    { "data": "LastRowText", "name": "LastRowText", "width": "5%" },
+                    { "data": "ChkSaveRow", "autoWidth": true },
+                    { "data": "SrPo", "autoWidth": true },
+                    { "data": "ApprovalCommentsText", "autoWidth": true },
+
+                    { "data": "MoveProjectDateText", "name": "MoveProjectDateText", "autoWidth": true },
+                    { "data": "PONumber", "name": "PONumber", "autoWidth": true },
+                    { "data": "SelectedProjectType", "width": "18%" },
+                    { "data": "SelectedScientistName", "name": "SelectedScientistName", "width": "8%" },
+                    { "data": "ProductName", "width": "18%" },
+                    { "data": "Attachment", "name": "Attachment", "width": "11%" },
+
+                    { "data": "CASNo", "name": "CompanyName", "width": "11%" },
+                    { "data": "CATNo", "name": "PONumber", "width": "11%" },
+                    { "data": "RequiredQtyTxt", "name": "Ref", "autoWidth": true },
+                    { "data": "EstimateCompleteDateText", "orderable": false, "autoWidth": true },
+                    { "data": "AdditionalBatchNoText", "name": "AdditionalBatchNoText", "width": "5%" },
+                    { "data": "ChangeBatch", "name": "ChangeBatch", "width": "5%" },
+                    { "data": "COAText", "name": "COAText" },
+
+                    { "data": "ActivityStatus", "name": "ActivityStatus" },
+                    { "data": "DispatchStatusText", "name": "DispatchStatusText" },
+                    { "data": "Remark", "name": "Remark", "width": "8%" },
+                    { "data": "ReasonText", "name": "ReasonText", "autoWidth": true },
+                    { "data": "OrderRemark", "name": "OrderRemark", "width": "8%" },
+                    { "data": "LastUploadDateStr", "name": "LastUploadDateStr", "autoWidth": true },
+                    { "data": "SpectralData", "name": "Attachment", "width": "11%" },
+                    //{ "data": "SuggChemName", "name": "SuggChemName", "autoWidth": true },
+                    //{ "data": "LastRowText", "name": "LastRowText", "width": "5%" }
+                ]
+
+            });
+        }
+    }
+
+
+    var alldomestictblloaded = false;
+    function alldomestictbltab() {
+        if (alldomestictblloaded === false) {
+            var alldomestictbl = $('#alldomestictbl').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    alldomestictblloaded = true;
+                    $("#chkallforalltab").click(function () {
+                        if ($(this).is(":checked")) {
+                            $('.clssavealltab').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $(".clssavealltab").each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+                    $("#selectAllclsMoveDispatch").click(function () {
+                        if ($(this).is(":checked")) {
+                            $('.clsMoveDispatch').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $(".clsMoveDispatch").each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+
+                    $("#selectAllclsSaverow").click(function () {
+                        if ($(this).is(":checked")) {
+                            $('.clsSaverow').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $(".clsSaverow").each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+
+                    api.column(6, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+                            $(rows).eq(i).before(
+                                '<td class="group" colspan="21" style="' + (rows[i].attributes["data-IsConversionReport"] != null && rows[i].attributes["data-IsConversionReport"].value == "true" ? "BACKGROUND-COLOR:#95647d" : "BACKGROUND-COLOR:#3c8dbc")+';font-weight:700;color:#fff;padding:10px;">' + group + " | " + rows[i].attributes["data-podate"].value + ' | ' + rows[i].attributes["data-ProjectAssignName"].value +'  </td>'
+                            );
+                            last = group;
+                        }
+                    });
+                    alldomestictbl.columns.adjust();
+                    calledExtra();
+                },
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadAllDispatchdata",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.type = "domestic";
+                        d.tableName = "alldomestictbl";
+                        d.fltprostatusItem = $("#alldomestic").find("#fltprostatusItem").val();
+                        d.fltactivitystatusItem = $("#alldomestic").find("#fltactivitystatusItem").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                    if (aData.SelectedProjectType === "In-Stock" && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                    }
+                    if (aData.ReadyToDeliverScientistStatusId === aData.ScientistStatus) {
+                        $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                    }
+                    if (aData.MoveToDispatch && (aData.DispatchedStatus == "0" || aData.DispatchedStatus == null)) {
+                        $('td', nRow).css('background-color', '#ffe6b3');
+                    }
+                    if (aData.MoveToDispatch && aData.DispatchedStatus == "1") {
+                        $('td', nRow).css('background-color', '#ffccb3');
+                    }
+                    if (aData.MoveToInvoice) {
+                        $('td', nRow).css('background-color', '#ff9999');
+                    }
+                    if (aData.StrProjectStatus === "Attention") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                    if (aData.IsControlledSubstance) {
+                        $('td', nRow).css('color', 'red');
+                    }
+                    $(nRow).addClass("clsRow");
+                },
+                "columnDefs":
+                    [
+                        { targets: 6, visible: false },
+                        { targets: 5, visible: false }
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    debugger;
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-company', data.CompanyName);
+                    $(row).attr('data-podate', data.MoveProjectDateText);
+                    $(row).attr('data-pono', data.PONumber);
+                    if (data.ProjectAssignName === null) {
+                        $(row).attr('data-ProjectAssignName', "");
+                    }
+                    else {
+                        $(row).attr('data-ProjectAssignName', data.ProjectAssignName);
+                    }
+                    $(row).attr('data-IsConversionReport', data.IsConversionReport);
+                },
+                "columns": [
+                    { "data": "ChkFirstRow", "autoWidth": true },
+                    { "data": "LastRowText", "name": "LastRowText", "width": "5%" },
+                    { "data": "ChkSaveRow", "autoWidth": true },
+                    { "data": "SrPo", "autoWidth": true },
+                    { "data": "ApprovalCommentsText", "autoWidth": true },
+                    { "data": "MoveProjectDateText", "name": "MoveProjectDateText", "autoWidth": true },
+                    { "data": "PONumber", "name": "PONumber", "autoWidth": true },
+                    { "data": "SelectedProjectType", "width": "18%" },
+                    { "data": "SelectedScientistName", "name": "SelectedScientistName", "width": "8%" },
+                    { "data": "ProductName", "width": "18%" },
+                    { "data": "Attachment", "name": "Attachment", "width": "11%" },
+
+                    { "data": "CASNo", "name": "CompanyName", "width": "11%" },
+                    { "data": "CATNo", "name": "PONumber", "width": "11%" },
+                    { "data": "RequiredQtyTxt", "name": "Ref", "autoWidth": true },
+                    { "data": "EstimateCompleteDateText", "orderable": false, "autoWidth": true },
+                    { "data": "AdditionalBatchNoText", "name": "AdditionalBatchNoText", "width": "5%" },
+                    { "data": "ChangeBatch", "name": "ChangeBatch", "width": "5%" },
+                    { "data": "COAText", "name": "COAText" },
+
+                    { "data": "ActivityStatus", "name": "ActivityStatus" },
+                    { "data": "DispatchStatusText", "name": "DispatchStatusText" },
+                    { "data": "Remark", "name": "Remark", "width": "8%" },
+                    { "data": "ReasonText", "name": "ReasonText", "autoWidth": true },
+                    { "data": "OrderRemark", "name": "OrderRemark", "width": "8%" },
+                    { "data": "LastUploadDateStr", "name": "LastUploadDateStr", "autoWidth": true },
+                    { "data": "SpectralData", "name": "Attachment", "width": "11%" },
+                    //{ "data": "SuggChemName", "name": "SuggChemName", "autoWidth": true },
+                    //{ "data": "LastRowText", "name": "LastRowText", "width": "5%" }
+                ]
+
+            });
+        }
+    }
+
+    var allexporttblloaded = false;
+    function allexporttbltab() {
+        if (allexporttblloaded === false) {
+            var allexporttbl = $('#allexporttbl').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    allexporttblloaded = true;
+                    $("#chkallforalltab").click(function () {
+                        if ($(this).is(":checked")) {
+                            $('.clssavealltab').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $(".clssavealltab").each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+                    $("#selectAllclsMoveDispatch").click(function () {
+                        if ($(this).is(":checked")) {
+                            $('.clsMoveDispatch').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $(".clsMoveDispatch").each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+
+                    $("#selectAllclsSaverow").click(function () {
+                        if ($(this).is(":checked")) {
+                            $('.clsSaverow').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $(".clsSaverow").each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+
+                    api.column(6, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+                            $(rows).eq(i).before(
+                                '<td class="group" colspan="21" style="' + (rows[i].attributes["data-IsConversionReport"] != null && rows[i].attributes["data-IsConversionReport"].value == "true" ? "BACKGROUND-COLOR:#95647d" : "BACKGROUND-COLOR:#3c8dbc") +';font-weight:700;color:#fff;padding:10px;">' + group + " | " + rows[i].attributes["data-podate"].value + ' | ' + rows[i].attributes["data-ProjectAssignName"].value +'  </td>'
+                            );
+                            last = group;
+                        }
+                    });
+                    allexporttbl.columns.adjust();
+                    calledExtra();
+                },
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadAllDispatchdata",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.type = "export";
+                        d.tableName = "allexporttbl";
+                        d.fltprostatusItem = $("#allexport").find("#fltprostatusItem").val();
+                        d.fltactivitystatusItem = $("#allexport").find("#fltactivitystatusItem").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                    if (aData.SelectedProjectType === "In-Stock" && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                    }
+                    if (aData.ReadyToDeliverScientistStatusId === aData.ScientistStatus) {
+                        $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                    }
+                    if (aData.MoveToDispatch && (aData.DispatchedStatus == "0" || aData.DispatchedStatus == null)) {
+                        $('td', nRow).css('background-color', '#ffe6b3');
+                    }
+                    if (aData.MoveToDispatch && aData.DispatchedStatus == "1") {
+                        $('td', nRow).css('background-color', '#ffccb3');
+                    }
+                    if (aData.MoveToInvoice) {
+                        $('td', nRow).css('background-color', '#ff9999');
+                    }
+                    if (aData.StrProjectStatus === "Attention") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                    if (aData.IsControlledSubstance) {
+                        $('td', nRow).css('color', 'red');
+                    }
+                    $(nRow).addClass("clsRow");
+
+                },
+                "columnDefs":
+                    [
+                        { targets: 6, visible: false },
+                        { targets: 5, visible: false }
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    debugger;
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-company', data.CompanyName);
+                    $(row).attr('data-podate', data.MoveProjectDateText);
+                    $(row).attr('data-pono', data.PONumber);
+                    if (data.ProjectAssignName === null) {
+                        $(row).attr('data-ProjectAssignName', "");
+                    }
+                    else {
+                        $(row).attr('data-ProjectAssignName', data.ProjectAssignName);
+                    }
+                    $(row).attr('data-IsConversionReport', data.IsConversionReport);
+                },
+                "columns": [
+                    { "data": "ChkFirstRow", "autoWidth": true },
+                    { "data": "LastRowText", "name": "LastRowText", "width": "5%" },
+                    { "data": "ChkSaveRow", "autoWidth": true },
+                    { "data": "SrPo", "autoWidth": true },
+                    { "data": "ApprovalCommentsText", "autoWidth": true },
+                    { "data": "MoveProjectDateText", "name": "MoveProjectDateText", "autoWidth": true },
+                    { "data": "PONumber", "name": "PONumber", "autoWidth": true },
+                    { "data": "SelectedProjectType", "width": "18%" },
+                    { "data": "SelectedScientistName", "name": "SelectedScientistName", "width": "8%" },
+                    { "data": "ProductName", "width": "18%" }, { "data": "Attachment", "name": "Attachment", "width": "11%" },
+
+                    { "data": "CASNo", "name": "CompanyName", "width": "11%" },
+                    { "data": "CATNo", "name": "PONumber", "width": "11%" },
+                    { "data": "RequiredQtyTxt", "name": "Ref", "autoWidth": true },
+                    { "data": "EstimateCompleteDateText", "orderable": false, "autoWidth": true },
+                    { "data": "AdditionalBatchNoText", "name": "AdditionalBatchNoText", "width": "5%" },
+                    { "data": "ChangeBatch", "name": "ChangeBatch", "width": "5%" },
+                    { "data": "COAText", "name": "COAText" },
+
+                    { "data": "ActivityStatus", "name": "ActivityStatus" },
+                    { "data": "DispatchStatusText", "name": "DispatchStatusText" },
+                    { "data": "Remark", "name": "Remark", "width": "8%" },
+                    { "data": "ReasonText", "name": "ReasonText", "autoWidth": true },
+                    { "data": "OrderRemark", "name": "OrderRemark", "width": "8%" },
+                    { "data": "LastUploadDateStr", "name": "LastUploadDateStr", "autoWidth": true },
+                    { "data": "SpectralData", "name": "Attachment", "width": "11%" },
+                    //{ "data": "SuggChemName", "name": "SuggChemName", "autoWidth": true },
+                    //{ "data": "LastRowText", "name": "LastRowText", "width": "5%" }
+                ]
+
+            });
+        }
+    }
+
+    function UploadDocumentOfProduct(id) {
+        $("#myModal").modal('show');
+        $("#myModal").find(".modal-body").load("../Form/UploadDocumentAndData?id="+id);
+    }
+
+    $(document).on("change",".addbatch",function () {
+        var quotedetailsid = $(this).attr("id").replace("additionalBatch_", "");
+        var tablename = $(this).attr("data-tablename");
+        var inventoryId = $(this).val();
+        $.ajax({
+            url: '/Form/GetCOADetailsFromBatchId?batchId=' + inventoryId,
+            data: { },
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $("#" + tablename).find("#coa_" + quotedetailsid).html(data);
+            }
+        });
+    });
+    function approCommentGenerate(id) {
+        $.ajax({
+            url: '/Form/AddApprovComment?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+                // $("#invoiceQueryModal .modal-content").css("width", "1080px");
+            }
+        });
+    }
+
+    function InvoiceGenerate(tblname, classname) {
+        var ids = [];
+        $('#' + tblname).find('.' + classname).each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+        $.ajax({
+            url: '/Form/GenerateInvoice',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1200px");
+            }
+        });
+    }
+</script>
+<style type="text/css">
+    .bluecls {
+        background-color: #cfcdfc !important;
+    }
+</style>
+<div id="clientremarkModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal</h4>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 15px;text-align: center;color: #1d3f72;font-weight: 800;">Please wait few minutes...</p>
+                <div style="text-align:center">
+                    <img src="@Url.Content("~/images/loader.svg")" />
+                </div>
+            </div>
+            @*<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>*@
+        </div>
+
+    </div>
+</div>

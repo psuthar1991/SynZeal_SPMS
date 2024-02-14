@@ -1,0 +1,101 @@
+﻿@{
+    ViewBag.Title = "BackupDatabase";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<Synzeal_Inventory.Entity.Sz_DatabaseBackup>
+    <section class="content-header">
+        <h1>
+            Database Backup Manager
+        </h1>
+    </section>
+    <section class="content">
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Add New Backup</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form role="form">
+                        <div class="box-body">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="Name" name="Name" placeholder="Backup Name" required>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            <button type="button" class="btn btn-primary" onclick="DBBackup()">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        @*<div class="row" style="display:none">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-body form-horizontal" id="profrm" style="overflow:scroll">
+                        @if (Model.Count > 0)
+                        {
+                            <table class="table table-bordered table-striped dataTable no-footer" id="example1">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Name
+                                        </th>
+                                        <th>
+                                            Date
+                                        </th>
+                                        <th>
+                                            Download
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var i in Model)
+                                    {
+                                    <tr>
+                                        <td>@i.Name</td>
+                                        <td>@i.CreatedDate.Value.ToShortDateString()</td>
+                                        <td><a href="@Url.Content(i.Path)" download>Download</a> </td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>*@
+
+    </section>
+    <script type="text/javascript">
+        function DBBackup() {
+            $("#Name").css('border', '');
+            if ($("#Name").val() === "") {
+                $("#Name").css('border','1px solid red');
+                return false;
+            }
+            $.ajax({
+                url: '/Form/TakeBackupDatabase?name=' + $("#Name").val() ,
+                data: {},
+                type: 'POST',
+                success: function (data) {
+                    if (data.success) {
+                        toastr.success("Backup Taken.");
+
+                            setTimeout(function(){
+                                window.location.reload(true);
+                            },1500);
+                        
+                    }
+                    else {
+                        toastr.error(data.message);
+                        return false;
+                    }
+                }
+            });
+        }
+    </script>

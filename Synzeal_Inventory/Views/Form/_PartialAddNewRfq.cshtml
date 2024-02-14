@@ -1,0 +1,45 @@
+﻿@model Synzeal_Inventory.Entity.SZ_PurchaseRFQ
+
+<!-- DataTables -->
+<script src="@Url.Content("~/Content/bower_components/datatables.net/js/jquery.dataTables.min.js")"></script>
+<script src="@Url.Content("~/Content/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js")"></script>
+<!-- DataTables -->
+<link rel="stylesheet" href="@Url.Content("~/Content/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css")">
+<style type="text/css">
+</style>
+<div class="box-body form-horizontal" style="overflow:scroll">
+        <fieldset id="fdsaddcompany">
+            <legend>Add New Enquiry</legend>
+            <form role="form" >
+                <div class="box-body" style="padding-left:20px;">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Ref By</label>
+                        <select id="RefBy" name="RefBy" class="form-control">
+                            <option value="">Select</option>
+                            <option value="Dr. Shailesh Patel">Dr. Shailesh Patel</option>
+                            <option value="Dr. Ramesh Patel">Dr. Ramesh Patel</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Ref CAT #</label>
+                        <input type="text" class="form-control" id="catno" name="catno" placeholder="Ref CAT #">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">CAS #</label>
+                        <input type="text" class="form-control" id="casno" name="casno" placeholder="CAS #">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Chemical Name</label>
+                        <input type="text" class="form-control" id="chemicalname" name="chemicalname" placeholder="Chemical Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Comment</label>
+                        <textarea class="form-control" id="comment" name="comment" style="width:100%" rows="4"></textarea>
+                    </div>
+                    <div class="form-group" style="text-align:right">
+                        <button type="button" onclick="Quote.addNewPurchaseRFQData()" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </form>
+        </fieldset>
+</div>

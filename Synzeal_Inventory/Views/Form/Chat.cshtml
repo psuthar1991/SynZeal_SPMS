@@ -1,0 +1,217 @@
+﻿@{
+    ViewBag.Title = "Chat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-12">
+    <div id="banner" class="page-header">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Recent Chats</h3>
+                    </div>
+                    <div class="panel-body left-chat-panel" style="background: #f7f7ff">
+                        <div class="list-group recent-chats">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Collegues </h3>
+                    </div>
+                    <div class="panel-body left-chat-panel-bottom">
+                        <div>
+                            <input type="text" id="searchcollegues" style="width: 100%;font-size: 15px;" />
+                        </div>
+                        <div class="list-group online-friends" id="divCollegues">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9">
+                <div id="divBody">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="clearfix"></div>
+<style>
+    .panel-info > .panel-heading {
+        color: #31708f;
+        background-color: #3c8dbc;
+        border-color: #3c8dbc;
+        color: #fff;
+    }
+    .flex-grow-1 {
+        -webkit-box-flex: 1 !important;
+        -ms-flex-positive: 1 !important;
+        flex-grow: 1 !important;
+    }
+    .font-size-11 {
+        font-size: 11px !important;
+    }
+    .chat-list li .unread-message {
+        position: absolute;
+        display: inline-block;
+        right: 24px;
+        left: auto;
+        top: 12px;
+    }
+    .chat-leftsidebar {
+        height: 100vh;
+        background-color: var(--bs-sidebar-sub-bg);
+    }
+    .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+        z-index: 2;
+        color: #6a6868;
+        background-color: #e0e0e0;
+        border-color: #e0e0e0;
+    }
+
+    .list-group-item {
+        background-color:transparent;
+        border:none;
+    }
+    .chat-list li a {
+        position: relative;
+        display: block;
+        padding: 5px 20px;
+        color: var(--bs-secondary-color);
+        -webkit-transition: all .4s;
+        transition: all .4s;
+        border-top: 1px solid var(--bs-sidebar-sub-bg);
+        border-radius: 4px;
+    }
+    .custom-badge {
+        background-color: #2B3E50;
+        border-radius: 10px;
+        color: #ebebeb;
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 300;
+        line-height: 1;
+        min-width: 10px;
+        padding: 3px 7px;
+        text-align: center;
+        vertical-align: middle;
+        white-space: nowrap;
+        float: right;
+        margin-top: 10px;
+    }
+
+    .recent-chats a, .online-friends a {
+        font-size: 17px;
+    }
+    .chat-message-status {
+        color: #c6cbd3;
+        font-size: 11px;
+        font-style: italic;
+        float: left;
+    }
+    
+    ul.chat .time {
+        color: #c6cbd3;
+        font-size: 11px;
+        font-style: italic;
+    }
+    ul.chat li {
+        font-size: 13px;
+        list-style: outside none none;
+        margin: 10px auto;
+        padding: 5px 0;
+        display: flex;
+    }
+        ul.chat li.right {
+            -webkit-box-pack: end;
+            -ms-flex-pack: end;
+            justify-content: flex-end;
+        }
+        ul.chat li.left .message {
+            padding: 12px 20px;
+            background-color: #7269ef;
+            border-radius: 8px 8px 8px 0;
+            color: #fff;
+            position: relative;
+        }
+        ul.chat li.right .message {
+            padding: 12px 20px;
+            background-color: #f5f7fb;
+            border-radius: 8px 8px 8px 0;
+            color: #343a40;
+            position: relative;
+        }
+    ul.chat li .message {
+        /* border: 1px solid #ddd; */
+        border-radius: 4px;
+        /* box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05), 0 -1px 1px rgba(0, 0, 0, 0.05) inset; */
+        display: block;
+        padding: 5px;
+        position: relative;
+        /*background: #485563;*/
+    }
+    ul.chat .from {
+        color: #c6cbd3;
+        font-size: 11px;
+        font-style: italic;
+    }
+    ul.chat li.right .message {
+        text-align: right;
+    }
+    ul.chat li.right .message {
+/*        margin-right: 65px;
+*/        margin-left: 65px;
+        min-height: 45px;
+        text-align: right;
+        padding-right: 15px;
+    }
+    ul.chat li.left .message {
+        text-align: left;
+    }
+    ul.chat li.left .message {
+        /*margin-left: 65px;*/
+        margin-right: 65px;
+        min-height: 45px;
+        text-align: left;
+        padding-left: 15px;
+    }
+    .left .message .text 
+    {
+        color:#fff;
+        font-size:16px
+    }
+    .right .message .text {
+        color: #343a40;
+        font-size: 16px
+    }
+    .chat-user-img.online .user-status {
+        background-color: #06d6a0;
+        height: 12px;
+        width: 12px;
+        border-radius: 50%;
+        margin-top: -35px;
+        margin-left: 1px;
+        display: block;
+        position: relative;
+    }
+    .font-size-15 {
+        font-size: 15px !important;
+    }
+</style>
+<script type="text/javascript">
+    $(document).on("keyup", '#searchcollegues', function () {
+        var value = $(this).val().toLowerCase();
+        $("#divCollegues").find('h5').each(function () {
+            debugger;
+            if ($(this).text().toLowerCase().search(value) > -1) {
+                $(this).closest('li').show();
+                // $(this).prev('.subjectName').last().show();
+            } else {
+                $(this).closest('li').hide();
+            }
+        });
+    }); 
+</script>

@@ -1,0 +1,430 @@
+﻿@{
+    ViewBag.Title = "CompanyList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model IEnumerable<Synzeal_Inventory.Entity.SZ_CompanyList>
+@using Synzeal_Inventory.Models
+<section class="content-header">
+    <h1>
+        Company List  <a style="float:right;margin-left:10px;" class="btn btn-primary" href="@Url.Action("ExportAllCompanydata","Form")">Export Company</a> <a data-toggle="modal" data-target="#myModal" style="float:right" class="btn btn-primary" href="@Url.Action("AddCompany","Form")">Add Company</a>
+        <a data-toggle="modal" style="float:right;margin-right:10px;" class="btn btn-warning" onclick="projectAssign()">Project Assign</a>
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#home" data-tabname="all">ALL</a></li>
+                    <li><a data-toggle="tab" href="#tabsapcode" onclick="sapcodetab()" data-tabname="sapcode">SAP CODE</a></li>
+                    <li><a data-toggle="tab" href="#tabwithoutsapcode" onclick="withoutsapcodetab()" data-tabname="withoutsapcode">WITHOUT SAP CODE</a></li>
+                    <li><a data-toggle="tab" href="#tabblockcompany" onclick="blockcompanytab()" data-tabname="blockcompany">BLOCKED</a></li>
+                </ul>
+
+
+
+                <div class="tab-content">
+                    <div id="home" class="tab-pane fade in active">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <table id="example1" style="width:100%" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>SAP Code</th>
+                                        <th>Country Type</th>
+                                        <th>User / Distributor</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabsapcode" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <table id="tblsapcode" style="width:100%" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>SAP Code</th>
+                                        <th>Country Type</th>
+                                        <th>User / Distributor</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabwithoutsapcode" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <table id="tblwithoutsapcode" style="width:100%" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>SAP Code</th>
+                                        <th>Country Type</th>
+                                        <th>User / Distributor</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabblockcompany" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <table id="tblblockcompany" style="width:100%" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>SAP Code</th>
+                                        <th>Country Type</th>
+                                        <th>User / Distributor</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+</section>
+<style>
+    .clsblock {
+        background: #5c5c5c !important;
+        color: #fff;
+    }
+    .clsblock a {
+        background: #5c5c5c !important;
+        color: #fff;
+    }
+
+    #myModal .modal-content {
+        width: 1200px;
+    }
+
+    #myModal .modal-dialog {
+        width: 1200px;
+    }
+</style>
+<script>
+    $(function () {
+        var alltbl = $('#example1').DataTable({
+            "searching": true,
+            "ordering": true,
+            "scrollX": true,
+            "scrollY": "550px",
+            //"sPaginationType": "listbox",
+            //"autoWidth" : false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "pageLength": 25,
+            "fnDrawCallback": function (oSettings) {
+                setTimeout(function () { alltbl.columns.adjust(); }, 1000);
+
+            },
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "initComplete": function (settings, json) {
+
+            },
+            "ajax": {
+                "url": "../Form/LoadCompanyData",
+                "type": "POST",
+                "datatype": "json"
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.IsBlockCompany === true) {
+                    $('td', nRow).addClass('clsblock');
+                }
+            },
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                //    $(row).attr('id', 'tr_' + data.Name);
+            },
+            "columns": [
+                { "data": "Firstrow", "name": "Firstrow" },
+                { "data": "Name", "name": "Name" },
+                { "data": "SAPCode", "name": "SAPCode" },
+                { "data": "CountryType", "name": "CountryType" },
+                { "data": "UserDist", "name": "UserDist" },
+                { "data": "Action" },
+            ]
+        });
+    });
+
+    var tblsapcodeload = false;
+    function sapcodetab() {
+        if (tblsapcodeload === false) {
+            var sapcodetbl = $('#tblsapcode').DataTable({
+                "searching": true,
+                "ordering": true,
+                "scrollX": true,
+                "scrollY": "550px",
+                //"sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    setTimeout(function () {
+                        sapcodetbl.columns.adjust();
+                        tblsapcodeload = true;
+                    }, 1000);
+
+                },
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadCompanyData?tabname=sapcode" ,
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsBlockCompany === true) {
+                        $('td', nRow).addClass('clsblock');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    //    $(row).attr('id', 'tr_' + data.Name);
+                },
+                "columns": [
+                    { "data": "Firstrow", "name": "Firstrow" },
+                    { "data": "Name", "name": "Name" },
+                    { "data": "SAPCode", "name": "SAPCode" },
+                    { "data": "CountryType", "name": "CountryType" },
+                    { "data": "UserDist", "name": "UserDist" },
+                    { "data": "Action" },
+                ]
+            });
+        }
+    }
+    var tblwithoutsapcode = false;
+    function withoutsapcodetab() {
+        if (tblwithoutsapcode === false) {
+            var withoutsapcodetbl = $('#tblwithoutsapcode').DataTable({
+                "searching": true,
+                "ordering": true,
+                "scrollX": true,
+                "scrollY": "550px",
+                //"sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    setTimeout(function () {
+                        withoutsapcodetbl.columns.adjust();
+                        tblwithoutsapcode = true;
+                    }, 1000);
+
+                },
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadCompanyData?tabname=withoutsapcode",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsBlockCompany === true) {
+                        $('td', nRow).addClass('clsblock');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    //    $(row).attr('id', 'tr_' + data.Name);
+                },
+                "columns": [
+                    { "data": "Firstrow", "name": "Firstrow" },
+                    { "data": "Name", "name": "Name" },
+                    { "data": "SAPCode", "name": "SAPCode" },
+                    { "data": "CountryType", "name": "CountryType" },
+                    { "data": "UserDist", "name": "UserDist" },
+                    { "data": "Action" },
+                ]
+            });
+        }
+    } 
+
+
+    
+    var tblblockcompany = false;
+    function blockcompanytab() {
+        if (tblblockcompany === false) {
+            var blockcompanytbl = $('#tblblockcompany').DataTable({
+                "searching": true,
+                "ordering": true,
+                "scrollX": true,
+                "scrollY": "550px",
+                //"sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    setTimeout(function () {
+                        blockcompanytbl.columns.adjust();
+                        blockcompanytbl = true;
+                    }, 1000);
+
+                },
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadCompanyData?tabname=block",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsBlockCompany === true) {
+                        $('td', nRow).addClass('clsblock');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    //    $(row).attr('id', 'tr_' + data.Name);
+                },
+                "columns": [
+                    { "data": "Firstrow", "name": "Firstrow" },
+                    { "data": "Name", "name": "Name" },
+                    { "data": "SAPCode", "name": "SAPCode" },
+                    { "data": "CountryType", "name": "CountryType" },
+                    { "data": "UserDist", "name": "UserDist" },
+                    { "data": "Action" },
+                ]
+            });
+        }
+    } 
+    var arr = [];
+    var projectteamData;
+
+    $.ajax({
+        type: "GET",
+        url: "/Form/GetProjectTeamData",
+        data: {},
+        success: function (results) {
+            projectteamData = results;
+        }
+    });
+
+    function projectAssign() {
+        arr = [];
+        $(".clsSaverow").each(function () {
+            if ($(this).is(':checked')) {
+                arr.push($(this).val());
+            }
+        });
+        debugger;
+        if (arr.length == 0) {
+            toastr.error("Please select atleast one Company");
+            return false;
+        }
+        var results = projectteamData;
+        //$.ajax({
+        //    type: "GET",
+        //    url: "/Form/GetProjectTeamData",
+        //    data: {},
+        //    success: function (results) {
+        var html = '<div class="col-md-12"><label>Select Project Member</label></div>';
+        html += '<div class="col-md-12"><select id="ddlprojectteamid" class="form-control">';
+        $(results).each(function (i, v) {
+            html += '<option value="' + v.Value + '">' + v.Text + '</option>';
+        });
+        html += '</select>';
+        html += '</br> <a href="javascript:void(0)" class="btn btn-primary pull-right" onclick="saveprojectassign()">Save</a> </div><div class="clearfix"></div>';
+        $('#invoiceQueryModal').find('.modal-body').html("");
+        $('#invoiceQueryModal').find('.modal-body').html(html);
+        $('#invoiceQueryModal').modal({ show: true });
+        //    }
+        //});
+    }
+
+    function saveprojectassign() {
+        debugger;
+        var projectassignid = $("#ddlprojectteamid").val();
+        if (projectassignid == '' || projectassignid == undefined) {
+            toastr.error("Please select atleast one Team member");
+            return false;
+        }
+
+        $.ajax({
+            url: "/Form/ProjectAssignToCompany?projectassignid=" + projectassignid,
+            data: { id: arr },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (results) {
+                toastr.success("Company has been assigned.");
+            }
+        });
+    }
+
+    function deleteCompany(id) {
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this company!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Form/DeleteCompany?id=" + id,
+                        data: {},
+                        success: function (results) {
+                            if (results.success) {
+                                toastr.success("Company has been deleted.");
+                                setTimeout(function () { window.location.reload(true); }, 2000);
+                            }
+                            else {
+                                if (results.multiple) {
+                                    toastr.error('Company already assigned to quotation.');
+                                }
+
+                            }
+                        }
+                    });
+
+                }
+                else {
+                    toastr.error('Your added quote is safe :).');
+                }
+            });
+    }
+</script>

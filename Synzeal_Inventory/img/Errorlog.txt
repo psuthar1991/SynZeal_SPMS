@@ -1,0 +1,20 @@
+07/02/2024 18:33:45 /Error : Line: 2990 / stacktrace:   at System.Runtime.CompilerServices.RuntimeHelpers._CompileMethod(IRuntimeMethodInfo method)
+   at System.Reflection.Emit.DynamicMethod.CreateDelegate(Type delegateType, Object target)
+   at System.Linq.Expressions.Compiler.LambdaCompiler.Compile(LambdaExpression lambda, DebugInfoGenerator debugInfoGenerator)
+   at System.Data.Entity.Core.Objects.DelegateFactory.CreatePropertyGetter(Type entityDeclaringType, PropertyInfo propertyInfo)
+   at System.Data.Entity.Core.Objects.DelegateFactory.GetGetterDelegateForProperty(EdmProperty property)
+   at System.Data.Entity.Core.Objects.DelegateFactory.GetValue(EdmProperty property, Object target)
+   at System.Data.Entity.Core.Objects.StateManagerMemberMetadata.GetValue(Object userObject)
+   at System.Data.Entity.Core.Objects.EntityEntry.TakeSnapshot(Boolean onlySnapshotComplexProperties)
+   at System.Data.Entity.Core.Objects.Internal.SnapshotChangeTrackingStrategy.TakeSnapshot(EntityEntry entry)
+   at System.Data.Entity.Core.Objects.ObjectStateManager.AddEntry(IEntityWrapper wrappedObject, EntityKey passedKey, EntitySet entitySet, String argumentName, Boolean isAdded)
+   at System.Data.Entity.Core.Common.Internal.Materialization.Shaper.HandleEntityAppendOnly[TEntity](Func`2 constructEntityDelegate, EntityKey entityKey, EntitySet entitySet)
+   at lambda_method(Closure , Shaper )
+   at System.Data.Entity.Core.Common.Internal.Materialization.Coordinator`1.ReadNextElement(Shaper shaper)
+   at System.Data.Entity.Core.Common.Internal.Materialization.Shaper`1.SimpleEnumerator.MoveNext()
+   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at Synzeal_Inventory.Controllers.FormController.<>c__DisplayClass157_0.<PrepareQuotationListModel>b__2() in F:\Working\Synzeal_Quotation\Synzeal_Inventory\Controllers\FormController.cs:line 23159
+   at Synzeal_Inventory.Models.MemoryCacheManager.Get[T](String key, Func`1 acquire) in F:\Working\Synzeal_Quotation\Synzeal_Inventory\Models\MemoryCacheManager.cs:line 102
+   at Synzeal_Inventory.Controllers.FormController.PrepareQuotationListModel(List`1 data, Boolean isDispatch, String tablename) in F:\Working\Synzeal_Quotation\Synzeal_Inventory\Controllers\FormController.cs:line 23157
+   at Synzeal_Inventory.Controllers.FormController.LoadQuotationData(String tabname, Boolean isDispatch) in F:\Working\Synzeal_Quotation\Synzeal_Inventory\Controllers\FormController.cs:line 2990

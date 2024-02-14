@@ -1,0 +1,789 @@
+﻿@model Synzeal_Inventory.Entity.SZ_Quotation
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    string terms = db.SZ_Terms.Where(x => x.Id == Model.TermsId).Select(x => x.Value).FirstOrDefault();
+    List<PriceQtyModel> priceQtyModel = new List<PriceQtyModel>();
+    List<PriceQtyModel> discpriceQtyModel = new List<PriceQtyModel>();
+    Synzeal_Inventory.Models.MemoryCacheManager objCache = new Synzeal_Inventory.Models.MemoryCacheManager();
+    int additionalcountqty = 0;
+    var masterCOAData = objCache.Get("cache.mastercoadata", () =>
+    {
+        return db.SZ_MasterCOA.ToList();
+    });
+}
+@using Synzeal_Inventory.Models
+@using Newtonsoft.Json
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+
+<div style="margin:5% 33%;float:left;box-shadow:0 0 3px #aaa; height:auto;color:gray;">
+    <div style="width:100%; padding:0px; padding-top:10px;text-align: center">
+        <span style="color:black">"Please use this "@Model.Ref" for further communication and mentione in PO copy."</span>
+        @if (!string.IsNullOrEmpty(Model.ClientRef))
+        {
+            <br /><span style="color:blue">Customer RFQ Reference # @Model.ClientRef</span>
+        }
+    </div>
+    <br />
+    <table width="100%">
+        <tr>
+            <td valign="top">
+                <img src="http://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" width="200px" />
+            </td>
+            <td style="float:right">
+                <span style="font-size:9px;float:right;padding:10px; text-align:right;color:gray">
+                    <b style="color:#000">Syn</b><b style="color: #00659e;">Zeal</b><b style="color:#000"> Research Pvt Ltd</b><br />
+                    Plot No. F, Shree Ganesh Industrial Estate,<br />
+                    423/24/8, Mahagujarat Industrial Estate,<br />
+                    Sarkhej-Bavla Road , Moraiya , India-382213<br />
+                    <b>Email:-</b> standards@synzeal.com<br />
+                    <b>GSTIN/UIN # </b> 24AAVCS1383C1Z9<br />
+                    <b>PAN # </b> AAVCS1383C<br />
+                    @*<b>Phone:-</b> +91-757-500-2050<br />*@
+                </span>
+            </td>
+        </tr>
+    </table>
+
+    <div style="width:100%; border-bottom:1px solid rgba(0,0,0,0.2);float:left;border-top:1px solid #000;padding-bottom:5px;color:#000;">
+        <table width="100%">
+            <tr>
+                <td style="font-size:9px;">
+                    <b style="color:#000;">SynZeal Quote ID :</b> @Model.Ref
+                </td>
+                <td>
+                    <span style="font-size:9px;float:right;padding:10px; text-align:right;">
+                        <b style="color:#000;">Date :</b> @Model.CreatedDate.Value.Day<sup>@GetDaySuffix(Model.CreatedDate.Value.Day)</sup> @Model.CreatedDate.Value.ToString("MMMM yy")
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size:9px;">
+                    <b style="color:#000;">Customer Name :</b> @Model.CompanyName
+                </td>
+                <td>
+                    <span style="font-size:9px;float:right;padding:10px; text-align:right;">
+                        @*<b style="color:#000;">Valid Till :</b> @DateTime.Now.Day<sup>@GetDaySuffix(DateTime.Now.Day)</sup> @DateTime.Now.ToString("MMMM yy")*@
+                        <b style="color:#000;">Valid Till :</b> @Model.CreatedDate.Value.AddDays(Model.QuoteValidDay.Value).Day <sup>@GetDaySuffix(Model.CreatedDate.Value.AddDays(Model.QuoteValidDay.Value).Day)</sup> @Model.CreatedDate.Value.AddDays(Model.QuoteValidDay.Value).ToString("MMMM yy")
+                    </span>
+                </td>
+            </tr>
+            @if (!string.IsNullOrEmpty(Model.SZ_CompanyList.SAPCode))
+            {
+                <tr>
+                    <td style="font-size:9px;">
+                        <b style="color:#000;">Customer ID :</b> @Model.SZ_CompanyList.SAPCode
+                    </td>
+                    <td>
+                        <span style="font-size:9px;float:right;padding:10px; text-align:right;">
+                            <b style="color:#000;">Payment Term :</b> @Model.PaymentTerm
+                        </span>
+                    </td>
+                </tr>
+            }
+            @*<tr>
+                    <td style="font-size:9px;">
+                        <b style="color:#000;">GSTIN/UIN # </b>24AAVCS1383C1Z9
+                    </td>
+                    <td style="font-size:9px;">
+                        <span style="font-size:9px;float:right;padding:10px; text-align:right;">
+                            <b style="color:#000;">PAN # </b>AAVCS1383C
+                        </span>
+                    </td>
+                </tr>*@
+        </table>
+    </div>
+
+    <hrline />
+
+    @if (!string.IsNullOrEmpty(Model.ExternalComment))
+    {
+        <div style="width:100%; padding:0px; float:left;padding-top:10px;color: grey; font-size:9px;">
+            @Model.ExternalComment
+        </div>
+        <hrline />
+    }
+
+    @if (Model.IsImageAttach)
+    {
+        <div style="width:100%; padding:0px; float:left;padding-top:10px;">
+
+            <table>
+                <thead>
+                    <tr style="font-size:10px">
+                        <th width="7%">
+                            <b>Sr. No.</b>
+                        </th>
+                        <th>
+                            <b style="text-align:center;">Structure</b>
+                        </th>
+                        <th width="57%"><b>Quotation Details</b></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr> <td colspan="3"> <hrline /></td></tr>
+                    @{
+
+                        int srno = 1;
+                        foreach (var item in Model.SZ_QuotationDetail.OrderBy(x => x.DisplayOrder).ToList())
+                        {
+                            int totalprice = 0;
+                            string strprice = "";
+                            string imagePath = string.Empty;
+                            string invstatus = string.Empty;
+                            string shippingcondition = string.Empty;
+                            bool exists = false;
+                            if (!string.IsNullOrEmpty(item.CATNo))
+                            {
+                                string uri = "https://synzeal.com/api/RestAPI/ProductDetailsBySku?sku=" + item.CATNo.Trim();
+                                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                                request.Method = "GET";
+                                request.ContentType = "application/json";
+                                try
+                                {
+                                    WebResponse response = request.GetResponse();
+                                    using (var reader = new StreamReader(response.GetResponseStream()))
+                                    {
+                                        var ApiStatus = reader.ReadToEnd();
+                                        string productModel = JsonConvert.DeserializeObject<string>(ApiStatus);
+                                        var product = JsonConvert.DeserializeObject<Synzeal_Inventory.Models.ProductDetailsModel>(productModel);
+                                        if (product != null && product.DefaultPictureModel != null)
+                                        {
+                                            imagePath = product.DefaultPictureModel.FullSizeImageUrl;
+                                            invstatus = product.ProductInstockStatus;
+                                            shippingcondition = product.ShippingCondition;
+                                        }
+                                        else
+                                        {
+                                            imagePath = string.Empty;
+                                        }
+                                    }
+                                    exists = true;
+                                }
+                                catch
+                                {
+                                    exists = false;
+                                }
+                            }
+                            else
+                            {
+                                if (!string.IsNullOrEmpty(item.ImagePath) && item.ImagePath.Contains("../"))
+                                {
+                                    string host = Request.Url.AbsoluteUri.ToString().Substring(0, Request.Url.AbsoluteUri.ToLower().IndexOf("/form"));
+                                    imagePath = item.ImagePath.Replace("..", host);
+                                }
+                                else
+                                {
+                                    imagePath = item.ImagePath;
+                                    if (string.IsNullOrEmpty(item.CATNo) && imagePath != null && imagePath.Contains("synzeal.com"))
+                                    {
+                                        imagePath = "";
+                                    }
+                                }
+                                if (!string.IsNullOrEmpty(imagePath))
+                                {
+                                    HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(imagePath);
+                                    request.Method = "HEAD";
+                                    try
+                                    {
+                                        request.GetResponse();
+                                        exists = true;
+                                    }
+                                    catch
+                                    {
+                                        exists = false;
+                                    }
+                                }
+                            }
+
+                            <tr style="color:#000;">
+                                <td style="font-size:9px;text-align:center;" width="7%">
+                                    @srno
+                                </td>
+                                <td style="font-size:9px;text-align:center;">
+                                    @if (!string.IsNullOrEmpty(imagePath) && exists)
+                                    {
+                                        <img src="@imagePath" width="200px" />
+                                    }
+                                    else
+                                    {
+                                        <img src="https://www.synzeal.com/content/images/thumbs/default-image_500.png" width="200px" />
+                                    }
+                                    <br />
+
+                                </td>
+                                <td style="font-size:9px;" width="57%">
+                                    <table width="100%">
+                                        <tr>
+                                            @if (Model.IsCustomPDFLayout.HasValue && Model.IsCustomPDFLayout.Value)
+                                            {
+                                                <td>
+                                                    <b>Name:</b> @item.ProductName<br />
+                                                    @if (!string.IsNullOrEmpty(item.CATNo))
+                                                    {
+                                                        <b>CAT No:</b> @item.CATNo<br />
+                                                    }
+                                                    <b>CAS No:</b> @item.CASNo<br />
+                                                    @if (!string.IsNullOrEmpty(item.Price))
+                                                    {
+                                                        var allpricedata = item.Price.Split(',');
+                                                        var alldata = new List<string>();
+                                                        var allpricearray = new List<string>();
+                                                        foreach (var priitem in allpricedata)
+                                                        {
+                                                            var prilist = priitem.Split('@');
+                                                            var isNumeric = System.Text.RegularExpressions.Regex.IsMatch(prilist[1], @"\d");
+                                                            if (isNumeric)
+                                                            {
+                                                                if (prilist[1].Contains("X"))
+                                                                {
+                                                                    int mgdata = Convert.ToInt32(prilist[0].Trim().Split(' ')[0]);
+                                                                    int price = Convert.ToInt32(prilist[1].Trim().Split(' ')[0]);
+                                                                    var pack = 0;
+
+                                                                    if (priitem.Split('X')[1].Trim().Contains("="))
+                                                                    {
+                                                                        pack = Convert.ToInt32(priitem.Split('X')[1].Trim().Split(' ')[0]);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        pack = Convert.ToInt32(priitem.Split('X')[1].Trim());
+                                                                    }
+
+                                                                    //alldata.Add(mgdata * pack + " mg@" + (price * pack) + " " + prilist[1].Trim().Split(' ')[1] + "(" + mgdata + " mg*" + pack + "vials)");
+                                                                    alldata.Add(mgdata * pack + " mg" + " (" + mgdata + " mg*" + pack + "vials)");
+                                                                    allpricearray.Add((price * pack) + " " + prilist[1].Trim().Split(' ')[1]);
+                                                                }
+                                                                else
+                                                                {
+                                                                    alldata.Add(priitem.Split('@')[0]);
+                                                                    allpricearray.Add(priitem.Split('@')[1]);
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if (alldata.Count > 1)
+                                                        {
+                                                            for (int i = 0; i < alldata.Count; i++)
+                                                            {
+                                                                var count = i + 1;
+                                                                <b>Quantity @count:</b> @alldata[i]<br />
+                                                                <b>Price @count:</b> @allpricearray[i] <br />
+
+                                                                PriceQtyModel objModel = new PriceQtyModel();
+                                                                objModel.Price = allpricearray[i];
+                                                                objModel.MG = alldata[i];
+                                                                priceQtyModel.Add(objModel);
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            var str = string.Join(", ", alldata);
+                                                            var strpricedata = string.Join(", ", allpricearray);
+                                                            if (!string.IsNullOrEmpty(str))
+                                                            {
+                                                                strprice = str;
+                                                                <b>Quantity:</b> @str<br />
+                                                                <b>Price:</b> @strpricedata<br />
+
+                                                                PriceQtyModel objModel = new PriceQtyModel();
+                                                                objModel.Price = str;
+                                                                objModel.MG = strpricedata;
+                                                                priceQtyModel.Add(objModel);
+                                                            }
+                                                        }
+                                                    }
+                                                    <b>Lead Time:</b> @item.LeadTime<br />
+                                                    <b>Product Remark:</b> @item.ProductRemark<br />
+
+                                                    @*@if (!string.IsNullOrEmpty(item.AddTestCostRemark))
+                                                        {
+                                                            <b>Included Analytical Data:</b> <span> COA, HPLC, IR, MASS, 1H-NMR, TGA, @item.AddTestCostRemark.Replace("(p)", "").Replace("(f)", "")</span><br />
+                                                        }
+                                                        else
+                                                        {
+                                                            <b>Included Analytical Data:</b> <span> COA, HPLC, IR, MASS, 1H-NMR, TGA</span><br />
+                                                        }*@
+                                                    @if (shippingcondition == "Cold Shipment" || shippingcondition == "Ice Pack")
+                                                    {
+                                                        <b>Shipping Condition : </b> @shippingcondition <br />
+                                                    }
+                                                    @if (item.IsControlledSubstanceCharge.HasValue && item.IsControlledSubstanceCharge.Value)
+                                                    {
+                                                        PriceQtyModel objModel = new PriceQtyModel();
+                                                        objModel.Price = "1200";
+                                                        objModel.MG = "0";
+                                                        priceQtyModel.Add(objModel);
+                                                        additionalcountqty += 1;
+                                                        <b>Controlled Substance Charges : </b> <span>1200 </span>@item.SZ_Quotation.Currency <br />
+                                                        totalprice += 1200;
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(item.AddTestCost) && item.AddTestCost != "0")
+                                                    {
+                                                        PriceQtyModel objModel = new PriceQtyModel();
+                                                        objModel.Price = item.AddTestCost;
+                                                        objModel.MG = "0";
+                                                        priceQtyModel.Add(objModel);
+                                                        additionalcountqty += 1;
+                                                        totalprice += Convert.ToInt32(item.AddTestCost);
+                                                        <b>Additional Analysis Cost:</b> @item.AddTestCost<span> </span> @item.SZ_Quotation.Currency
+
+                                                        <br />
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(item.TracebilityCostRemark))
+                                                    {
+                                                        <b>Traceability Information:</b> <span>@item.TracebilityCostRemark.Replace("(p)", "").Replace("(f)", "")</span>
+                                                        <br />
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(item.TracebilityCost) && item.TracebilityCost != "0")
+                                                    {
+                                                        PriceQtyModel objModel = new PriceQtyModel();
+                                                        objModel.Price = item.TracebilityCost;
+                                                        objModel.MG = "0";
+                                                        priceQtyModel.Add(objModel);
+                                                        additionalcountqty += 1;
+                                                        totalprice += Convert.ToInt32(item.TracebilityCost);
+                                                        <b>Traceability Cost:</b> @item.TracebilityCost<span> </span> @item.SZ_Quotation.Currency
+
+                                                        <br />
+                                                    }
+
+                                                    @if (!string.IsNullOrEmpty(item.ColdShipCost))
+                                                    {
+                                                        PriceQtyModel objModel = new PriceQtyModel();
+                                                        objModel.Price = item.ColdShipCost;
+                                                        objModel.MG = "0";
+                                                        priceQtyModel.Add(objModel);
+                                                        additionalcountqty += 1;
+                                                        totalprice += Convert.ToInt32(item.ColdShipCost);
+                                                        <b>Shipment Charges:</b> @item.ColdShipCost<span> </span> @item.SZ_Quotation.Currency
+                                                        if (!string.IsNullOrEmpty(item.ColdShipCostRemark))
+                                                        {
+                                                            <span>(@item.ColdShipCostRemark)</span>
+                                                        }
+                                                        <br />
+                                                    }
+
+                                                    @if ((!string.IsNullOrEmpty(item.TracebilityCost) && item.TracebilityCost != "0")
+         || (!string.IsNullOrEmpty(item.ColdShipCost) && item.ColdShipCost != "0")
+         || (!string.IsNullOrEmpty(item.AddTestCost) && item.AddTestCost != "0"))
+                                                    {
+                                                        var finalprice = "";
+                                                        var spltcomma = strprice.Split(',');
+                                                        foreach (var itemcomma in spltcomma)
+                                                        {
+                                                            if (!string.IsNullOrEmpty(itemcomma))
+                                                            {
+                                                                var splitat = itemcomma.Split('@');
+                                                                var splitspace = itemcomma.Split('@')[1].Split(' ');
+                                                                var splitprice = Convert.ToInt32(splitspace[0]) + totalprice;
+                                                                if (item.ItemDiscount.HasValue && item.ItemDiscount > 0)
+                                                                {
+                                                                    splitprice = Convert.ToInt32(item.Price.GetDiscountedPrice(item.ItemDiscount, true)) + totalprice;
+                                                                }
+                                                                finalprice += splitat[0] + "@" + splitprice + " " + splitspace[1] + ",";
+                                                            }
+                                                        }
+                                                        <span style="color:#367fa9">
+                                                            <b>Total(Including Additional Cost):</b><span> @finalprice</span>
+                                                        </span>
+                                                    }
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                        <td>
+                                            <b>Name:</b> @item.ProductName<br />
+                                            @if (!string.IsNullOrEmpty(item.CATNo))
+                                            {
+                                                <b>CAT No:</b> @item.CATNo<br />
+                                            }
+                                            <b>CAS No:</b> @item.CASNo<br />
+                                            @if (!string.IsNullOrEmpty(item.Price))
+                                            {
+                                                var allpricedata = item.Price.Split(',');
+                                                var alldata = new List<string>();
+                                                foreach (var priitem in allpricedata)
+                                                {
+                                                    var prilist = priitem.Split('@');
+                                                    var isNumeric = System.Text.RegularExpressions.Regex.IsMatch(prilist[1], @"\d");
+                                                    if (isNumeric)
+                                                    {
+                                                        if (prilist[1].Contains("X"))
+                                                        {
+                                                            int mgdata = Convert.ToInt32(prilist[0].Trim().Split(' ')[0]);
+                                                            int price = Convert.ToInt32(prilist[1].Trim().Split(' ')[0]);
+                                                            var pack = 0;
+
+                                                            if (priitem.Split('X')[1].Trim().Contains("="))
+                                                            {
+                                                                pack = Convert.ToInt32(priitem.Split('X')[1].Trim().Split(' ')[0]);
+                                                            }
+                                                            else
+                                                            {
+                                                                pack = Convert.ToInt32(priitem.Split('X')[1].Trim());
+                                                            }
+
+                                                            alldata.Add(mgdata * pack + " mg@" + (price * pack) + " " + prilist[1].Trim().Split(' ')[1] + "(" + mgdata + " mg*" + pack + "vials)");
+
+                                                            PriceQtyModel objModel = new PriceQtyModel();
+                                                            objModel.Price = Convert.ToString(price * pack);
+                                                            objModel.MG = Convert.ToString(mgdata * pack);
+                                                            priceQtyModel.Add(objModel);
+                                                        }
+                                                        else
+                                                        {
+                                                            PriceQtyModel objModel = new PriceQtyModel();
+                                                            objModel.Price = System.Text.RegularExpressions.Regex.Match(prilist[1], @"\d+").Value;
+                                                            objModel.MG = System.Text.RegularExpressions.Regex.Match(prilist[0], @"\d+").Value;
+                                                            priceQtyModel.Add(objModel);
+
+                                                            alldata.Add(priitem);
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        PriceQtyModel objModel = new PriceQtyModel();
+                                                        objModel.Price = "0";
+                                                        objModel.MG = "0";
+                                                        priceQtyModel.Add(objModel);
+                                                    }
+                                                }
+
+                                                var str = string.Join(", ", alldata);
+                                                if (!string.IsNullOrEmpty(str))
+                                                {
+                                                    strprice = str;
+                                                    <b>Quoted Price:</b> @str<br />
+                                                }
+                                            }
+                                            @if (item.ItemDiscount.HasValue && item.ItemDiscount > 0)
+                                            {
+                                                PriceQtyModel objdisModel = new PriceQtyModel();
+                                                objdisModel.Price = item.Price.GetDiscountedPrice(item.ItemDiscount, true);
+                                                objdisModel.MG = "0";
+                                                discpriceQtyModel.Add(objdisModel);
+
+                                                <span style="color: #00659e"><b>Discounted Price:</b> @item.Price.GetDiscountedPrice(item.ItemDiscount)</span><span>(@item.ItemDiscount % Discount)</span><br />
+                                            }
+                                            @if (item.IsControlledSubstanceCharge.HasValue && item.IsControlledSubstanceCharge.Value)
+                                            {
+                                                PriceQtyModel objModel = new PriceQtyModel();
+                                                objModel.Price = "1200";
+                                                objModel.MG = "0";
+                                                priceQtyModel.Add(objModel);
+                                                if (item.ItemDiscount.HasValue && item.ItemDiscount > 0)
+                                                {
+                                                    discpriceQtyModel.Add(objModel);
+                                                }
+                                                additionalcountqty += 1;
+                                                <b>Controlled Substance Charges : </b> <span>1200 </span>@item.SZ_Quotation.Currency <br />
+                                                totalprice += 1200;
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.AddTestCost) && item.AddTestCost != "0")
+                                            {
+                                                PriceQtyModel objModel = new PriceQtyModel();
+                                                objModel.Price = item.AddTestCost;
+                                                objModel.MG = "0";
+                                                priceQtyModel.Add(objModel);
+                                                if (item.ItemDiscount.HasValue && item.ItemDiscount > 0)
+                                                {
+                                                    discpriceQtyModel.Add(objModel);
+                                                }
+                                                additionalcountqty += 1;
+                                                totalprice += Convert.ToInt32(item.AddTestCost);
+                                                <b>Additional Analysis Cost:</b> @item.AddTestCost<span> </span> @item.SZ_Quotation.Currency
+
+                                                <br />
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.TracebilityCost) && item.TracebilityCost != "0")
+                                            {
+                                                PriceQtyModel objModel = new PriceQtyModel();
+                                                objModel.Price = item.TracebilityCost;
+                                                objModel.MG = "0";
+                                                priceQtyModel.Add(objModel);
+                                                if (item.ItemDiscount.HasValue && item.ItemDiscount > 0)
+                                                {
+                                                    discpriceQtyModel.Add(objModel);
+                                                }
+                                                additionalcountqty += 1;
+                                                totalprice += Convert.ToInt32(item.TracebilityCost);
+                                                <b>Traceability Cost:</b> @item.TracebilityCost<span> </span> @item.SZ_Quotation.Currency
+                                                <br />
+                                            }
+                                            @if (!string.IsNullOrEmpty(item.ColdShipCost))
+                                            {
+                                                PriceQtyModel objModel = new PriceQtyModel();
+                                                objModel.Price = item.ColdShipCost;
+                                                objModel.MG = "0";
+                                                priceQtyModel.Add(objModel);
+                                                if (item.ItemDiscount.HasValue && item.ItemDiscount > 0)
+                                                {
+                                                    discpriceQtyModel.Add(objModel);
+                                                }
+                                                additionalcountqty += 1;
+                                                totalprice += Convert.ToInt32(item.ColdShipCost);
+                                                <b>Shipment Charges:</b> @item.ColdShipCost<span> </span> @item.SZ_Quotation.Currency
+                                                if (!string.IsNullOrEmpty(item.ColdShipCostRemark))
+                                                {
+                                                    <span>(@item.ColdShipCostRemark)</span>
+                                                }
+                                                <br />
+                                            }
+                                            <b>Lead Time:</b> @item.LeadTime<br />
+                                            <b>Product Remark:</b> @item.ProductRemark<br />
+
+
+                                            @if (shippingcondition == "Cold Shipment" || shippingcondition == "Ice Pack")
+                                            {
+                                                <b>Shipping Condition : </b> @shippingcondition <br />
+                                            }
+
+                                            @if (!string.IsNullOrEmpty(item.TracebilityCostRemark))
+                                            {
+                                                <b>Traceability Information:</b> <span>@item.TracebilityCostRemark.Replace("(p)", "").Replace("(f)", "")</span>
+                                                <br />
+                                            }
+
+
+
+                                            @{ 
+                                                var finalprice = "";
+                                                var spltcomma = strprice.Split(',');
+                                                foreach (var itemcomma in spltcomma)
+                                                {
+                                                    if (!string.IsNullOrEmpty(itemcomma))
+                                                    {
+                                                        var splitat = itemcomma.Split('@');
+                                                        var splitspace = itemcomma.Split('@')[1].Split(' ');
+                                                        var splitprice = Convert.ToInt32(splitspace[0]) + totalprice;
+                                                        if (item.ItemDiscount.HasValue && item.ItemDiscount > 0 && splitprice > 0)
+                                                        {
+                                                            var txtprice = itemcomma.GetDiscountedPrice(item.ItemDiscount, true);
+                                                            splitprice = Convert.ToInt32(txtprice) + totalprice;
+                                                        }
+                                                        if (splitspace.Count() > 2)
+                                                        {
+                                                            finalprice += splitat[0] + "@" + splitprice + " " + splitspace[1] + " " + splitspace[2] + ",";
+
+                                                        }
+                                                        else
+                                                        {
+                                                            finalprice += splitat[0] + "@" + splitprice + " " + splitspace[1] + ",";
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                                <span style="color: blue">
+                                                    <b>Total Price:</b><span> @finalprice</span>
+                                                </span>
+                                        </td>
+                                            }
+
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+
+                            var appreance = masterCOAData.Where(x => x.BatchNo == item.QuoteBatchNo).Select(x => x.AppearanceProduct).FirstOrDefault();
+
+                            <tr style="color:#000;font-size:9px;">
+                                <td colspan="2">
+                                    <b>Inv. Status: </b> @invstatus
+
+                                    @if (!string.IsNullOrEmpty(appreance))
+                                    {
+                                        <span>
+                                            &nbsp;&nbsp;&nbsp;
+                                        </span>
+                                        <b>Appearance: </b> @appreance
+                                    }
+                                    <br />
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.AddTestCostRemark))
+                                    {
+                                        <b>Included Analytical Data:</b> <span> COA, HPLC, IR, MASS, 1H-NMR, TGA, @item.AddTestCostRemark.Replace("(p)", "").Replace("(f)", "")</span><br />
+                                    }
+                                    else
+                                    {
+                                        <b>Included Analytical Data:</b> <span> COA, HPLC, IR, MASS, 1H-NMR, TGA</span><br />
+                                    }
+                                </td>
+                            </tr>
+
+                            srno += 1;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div style="width:100%; padding:0px; float:left;padding-top:10px;">
+            <table width="100%">
+                <thead>
+                    <tr style="font-size:10px">
+                        <th width="5%" style="text-align:center;">
+                            <b>Sr. No.</b>
+                        </th>
+                        <th>
+                            <b>Quotation Details</b>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int srno = 1;
+                        foreach (var item in Model.SZ_QuotationDetail.OrderBy(x => x.DisplayOrder).ToList())
+                        {
+                            bool isdiscount = item.ItemDiscount.HasValue;
+                            <tr style="color:#000;">
+                                <td style="font-size:10px;text-align:center;border-bottom:1px solid #5c5c5c" width="5%">
+                                    @srno
+                                </td>
+                                <td style="font-size:10px;text-align:left;border-bottom:1px solid #5c5c5c;padding-left:10px;" width="95%">
+                                    <b>Name:</b> @item.ProductName<br />
+                                    @if (!string.IsNullOrEmpty(item.CATNo))
+                                    {
+                                        <b>CAT No:</b> @item.CATNo<br />
+                                    }
+                                    <b>CAS No:</b> @item.CASNo<br />
+                                    @if (!string.IsNullOrEmpty(item.Price))
+                                    {
+                                        var allpricedata = item.Price.Split(',');
+                                        var alldata = new List<string>();
+                                        foreach (var priitem in allpricedata)
+                                        {
+                                            if (isdiscount)
+                                            {
+
+                                            }
+                                            var prilist = priitem.Split('@');
+                                            int n;
+                                            var isNumeric = System.Text.RegularExpressions.Regex.IsMatch(prilist[1], @"\d");
+                                            if (isNumeric)
+                                            {
+                                                alldata.Add(priitem);
+                                            }
+                                        }
+                                        var str = string.Join(", ", alldata);
+                                        if (!string.IsNullOrEmpty(str))
+                                        {
+                                            <b>Quoted Price:</b> @str<br />
+                                        }
+                                        if (item.ItemDiscount.HasValue && item.ItemDiscount > 0)
+                                        {
+                                            <span style="color: #00659e"><b>Discounted Price:</b> @item.Price.GetDiscountedPrice(item.ItemDiscount)<span>(@item.ItemDiscount % Discount)</span><br /></span>
+                                        }
+                                    }
+                                    <b>Lead Time:</b> @item.LeadTime<br />
+                                </td>
+                            </tr>
+
+                            srno += 1;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <hrline />
+    <div style="width:100%; padding:0px; padding-top:10px;">
+        <span style="text-align:left;font-size:9px;color:#000;"> @Model.Remark</span>
+    </div>
+
+    @if ((priceQtyModel.Count - additionalcountqty) == Model.SZ_QuotationDetail.Count)
+    {
+        decimal priceQUOTETOTAL = 0;
+        decimal priceDiscTOTAL = 0;
+        foreach (var priquo in priceQtyModel)
+        {
+            priceQUOTETOTAL += Convert.ToDecimal(priquo.Price);
+        }
+        foreach (var priquo in discpriceQtyModel)
+        {
+            try
+            {
+                if (priquo != null && !string.IsNullOrEmpty(priquo.Price))
+                {
+                    priceDiscTOTAL += Convert.ToDecimal(priquo.Price);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        if (Model.ShippingCharges.HasValue)
+        {
+            priceQUOTETOTAL += Model.ShippingCharges.Value;
+            if (priceDiscTOTAL > 0)
+            {
+                priceDiscTOTAL += Model.ShippingCharges.Value;
+            }
+
+            <div style="width:100%; padding:0px; padding-top:10px;">
+                <span style="text-align:left;font-size:9px;color:#000;"> <b>Shipping Charges: </b>@Model.ShippingCharges @Model.Currency</span>
+            </div>
+        }
+
+
+        if (priceQUOTETOTAL > 0)
+        {
+            <div style="width:100%; padding:0px; padding-top:10px;">
+                <span style="text-align:left;font-size:9px;color:#000;"> <b>Quotation Total: </b>@priceQUOTETOTAL @Model.Currency</span>
+            </div>
+        }
+        if (priceDiscTOTAL > 0)
+        {
+            <div style="width:100%; padding:0px; padding-top:10px;">
+                <span style="text-align:left;font-size:9px;color:#000;"> <b>Discount Total: </b>@priceDiscTOTAL  @Model.Currency</span>
+            </div>
+        }
+    }
+
+    @if (!string.IsNullOrEmpty(Model.PaymentTerm) && Model.PaymentTerm != "--Select--")
+    {
+        <div style="width:100%; padding:0px; padding-top:10px;">
+            <span style="text-align:left;font-size:9px;color:#000;"> <b>Payment Term: </b>@Model.PaymentTerm</span>
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Model.IncoTerm) && Model.PaymentTerm != "--Select--" && Model.CountryType == "Export")
+    {
+        <div style="width:100%; padding:0px; padding-top:10px;">
+            <span style="text-align:left;font-size:9px;color:#000;"> <b>Inco Term: </b>@Model.IncoTerm</span>
+        </div>
+    }
+    <div style="width:100%; padding:0px; padding-top:10px;">
+        <span style="text-align:left;font-size:9px;color:#000;"> <b>Shipping Conditions: </b>All products are stable to be shipped at room temperature, unless otherwise specified.</span>
+    </div>
+    <hrline />
+    @if (!string.IsNullOrEmpty(terms))
+    {
+        <div style="width:100%; padding:0px; padding-top:10px;">
+            <div style="text-align:left;font-size:9px;color:#000;"> @Html.Raw(terms)</div>
+        </div>
+    }
+    <hrline />
+</div>

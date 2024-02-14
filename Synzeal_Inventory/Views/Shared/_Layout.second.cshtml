@@ -1,0 +1,357 @@
+﻿@using Synzeal_Inventory.Models
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SPMS :: @ViewBag.Title</title>
+
+    <!-- jQuery UI 1.11.4 -->
+    <script src="@Url.Content("~/Content/bower_components/jquery-ui/jquery-ui.min.js")"></script>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="@Url.Content("~/Content/adminlte/plugins/fontawesome-free/css/all.min.css")">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="@Url.Content("~/Content/adminlte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css")">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="@Url.Content("~/Content/adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css")">
+    <!-- JQVMap -->
+    <link rel="stylesheet" href="@Url.Content("~/Content/adminlte/plugins/jqvmap/jqvmap.min.css")">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="@Url.Content("~/Content/adminlte/dist/css/adminlte.min.css")">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="@Url.Content("~/Content/adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css")">
+    <!-- Daterange picker -->
+    <link rel="stylesheet" href="@Url.Content("~/Content/adminlte/plugins/daterangepicker/daterangepicker.css")">
+    <!-- summernote -->
+    <link rel="stylesheet" href="@Url.Content("~/Content/adminlte/plugins/summernote/summernote-bs4.min.css")">
+
+
+
+    <!-- jQuery -->
+    <script src="@Url.Content("~/Content/adminlte/plugins/jquery/jquery.min.js")"></script>
+    <!-- jQuery UI 1.11.4 -->
+    <script src="@Url.Content("~/Content/adminlte/plugins/jquery-ui/jquery-ui.min.js")"></script>
+    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    <script>
+        $.widget.bridge('uibutton', $.ui.button)
+    </script>
+    <!-- Bootstrap 4 -->
+    <script src="@Url.Content("~/Content/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js")"></script>
+    <!-- ChartJS -->
+    <script src="@Url.Content("~/Content/adminlte/plugins/chart.js/Chart.min.js")"></script>
+    <!-- Sparkline -->
+    <script src="@Url.Content("~/Content/adminlte/plugins/sparklines/sparkline.js")"></script>
+    <!-- JQVMap -->
+    <script src="@Url.Content("~/Content/adminlte/plugins/jqvmap/jquery.vmap.min.js")"></script>
+    <script src="@Url.Content("~/Content/adminlte/plugins/jqvmap/maps/jquery.vmap.usa.js")"></script>
+    <!-- jQuery Knob Chart -->
+    <script src="@Url.Content("~/Content/adminlte/plugins/jquery-knob/jquery.knob.min.js")"></script>
+    <!-- daterangepicker -->
+    <script src="@Url.Content("~/Content/adminlte/plugins/moment/moment.min.js")"></script>
+    <script src="@Url.Content("~/Content/adminlte/plugins/daterangepicker/daterangepicker.js")"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="@Url.Content("~/Content/adminlte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js")"></script>
+    <!-- Summernote -->
+    <script src="@Url.Content("~/Content/adminlte/plugins/summernote/summernote-bs4.min.js")"></script>
+    <!-- overlayScrollbars -->
+    <script src="@Url.Content("~/Content/adminlte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js")"></script>
+    <!-- AdminLTE App -->
+    <script src="@Url.Content("~/Content/adminlte/dist/js/adminlte.js")"></script>
+    <!-- AdminLTE for demo purposes -->
+    @*<script src="dist/js/demo.js"></script>*@
+    <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+    <script src="@Url.Content("~/Content/adminlte/dist/js/pages/dashboard.js")"></script>
+
+    <script src="@Url.Content("~/js/toastr.min.js")"></script>
+    <link href="@Url.Content("~/js/toastr.css")" rel="stylesheet" />
+
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+
+
+        <!-- Preloader -->
+        <div class="preloader flex-column justify-content-center align-items-center">
+            <img class="animation__shake" src="https://synzeal.com/images/footer-logo.png" alt="Synzeal" height="60" width="100">
+        </div>
+
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                @*<li class="nav-item d-none d-sm-inline-block">
+                    <a href="index3.html" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="#" class="nav-link">Contact</a>
+                </li>*@
+            </ul>
+
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <select class="form-control" id="ddlcurrency">
+                        <option value="">--Select--</option>
+                    </select>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="far fa-user"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <span class="dropdown-item dropdown-header">@CommonOperation.GetLocalizestring("home.welcome") @SessionCookieManagement.UserName</span>
+                        <div class="dropdown-divider"></div>
+                        <a href="/Home/Logout" class="dropdown-item">
+                            <i class="fas fa-envelope mr-2"></i> Logout
+                            <span class="float-right text-muted text-sm"></span>
+                        </a>
+                    </div>
+                </li>
+
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="#" class="brand-link" style=" height: 100px;">
+                <img src="https://synzeal.com/images/footer-logo.png" alt="AdminLTE Logo" class="brand-image elevation-3" style="width: 90%; min-height: 68px;">
+                <div class="clearfix"></div>
+            </a>
+
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar user panel (optional) -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="info">
+                        <a href="#" class="d-block">Welcome,</a>
+                        <a href="#" class="d-block">@SessionCookieManagement.UserName</a>
+                    </div>
+                </div>
+
+                <!-- SidebarSearch Form -->
+                <div class="form-inline">
+                    <div class="input-group">
+                        @*<input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+                        <div class="input-group-append">
+                            <button class="btn btn-sidebar">
+                                <i class="fas fa-search fa-fw"></i>
+                            </button>
+                        </div>*@
+
+                        <select id="leftcompanylist" name="leftcompanylist" class="form-control form-control-sidebar">
+                        </select>
+                    </div>
+                </div>
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+    with font-awesome or any other icon font library -->
+                        <li class="nav-item">
+                            <a href="/Form/Summary" class="nav-link">
+                                <i class="nav-icon fas fa-info-circle"></i>
+                                <p>
+                                    @CommonOperation.GetLocalizestring("products.summary")
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a href="/Form/MainDashboard" class="nav-link">
+                                <i class="nav-icon fas fa-history"></i>
+                                <p>
+                                    @CommonOperation.GetLocalizestring("products.quotelog")
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a href="https://synzeal.com/Order/Dashboard" target="_blank" class="nav-link">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>
+                                    @CommonOperation.GetLocalizestring("products.dashboard")
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+
+                        </li>
+                        @*<li class="nav-item">
+                            <a href="/Form/Graph" class="nav-link">
+                                <i class="nav-icon fas fa-chart-line"></i>
+                                <p>
+                                    Graph
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+
+                        </li>*@
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+
+
+        <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title"></h4>
+                    </div>
+                    <div class="modal-body">
+                        <p style="font-size: 15px;text-align: center;color: #1d3f72;font-weight: 800;">Please wait few minutes...</p>
+                        <div style="text-align:center">
+                            <img src="@Url.Content("~/images/loader.svg")" />
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="display:none">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div id="modal" class="modal right fade" aria-hidden="false" role="dialog">
+            <div id="modal-dialog" class="modal-dialog">
+                <div class="modal-content" style="width:100%">
+                    <div class="modal-header">
+                        <button type="button" class="close" onclick="closeModal()"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel2"> </h4>
+                    </div>
+                    <div class="modal-body" style="position:fixed">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="width: 100%;
+    background: #f37272;
+    height: 35px;
+    color: rgb(255, 255, 255);
+    text-align: center;
+    padding: 7px;
+    font-weight: bold;
+    position: fixed;
+    z-index: 9999;
+    border: 0;display:none" id="alertnotification">
+
+        </div>
+        <script>
+
+            function GetAccessedCompanyList() {
+                $.ajax({
+                    type: "GET",
+                    url: "/Form/GetAccessedCompanyList",
+                    data: {},
+                    cache: false,
+                    success: function (data) {
+                        var str = "";
+                        $(data).each(function (i, v) {
+                            str += '<option value="' + v.Value + '">' + v.Text + '</option>';
+                        });
+
+                        $("#leftcompanylist").html(str);
+                        var getvalcompany = readCookie("nop.companydata");
+                        if (getvalcompany !== '' && getvalcompany !== null) {
+                            $("#leftcompanylist").val(getvalcompany);
+                        }
+                        else {
+                            $("#leftcompanylist").val($("#leftcompanylist option:first").val());
+                        }
+                    }
+                });
+
+                $.ajax({
+                    type: "GET",
+                    url: "/Form/GetlanguageList",
+                    data: {},
+                    cache: false,
+                    success: function (data) {
+                        var str = "";
+                        $(data).each(function (i, v) {
+                            str += '<option value="' + v.Value + '">' + v.Text + '</option>';
+                        });
+
+                        $("#ddlcurrency").html(str);
+
+                        $("#ddlcurrency").val('@SessionCookieManagement.DefaultCurrencyId');
+                    }
+                });
+
+            }
+
+            $("#ddlcurrency").change(function () {
+                $.ajax({
+                    type: "GET",
+                    url: "/Form/Updatelanguage?langid=" + $(this).val(),
+                    data: {},
+                    cache: false,
+                    success: function (data) {
+                        window.location.reload(true);
+                    }
+                });
+            });
+
+
+            // Cookies
+            function createCookie(name, value, days) {
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    var expires = "; expires=" + date.toGMTString();
+                }
+                else var expires = "";
+
+                document.cookie = name + "=" + value + expires + "; path=/";
+            }
+
+            function readCookie(name) {
+                var nameEQ = name + "=";
+                var ca = document.cookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            }
+
+            function eraseCookie(name) {
+                createCookie(name, "", -1);
+            }
+
+
+        </script>
+        <div class="content-wrapper">
+            @RenderBody()
+        </div>
+
+        <footer class="main-footer">
+            <strong>Copyright &copy; @System.DateTime.Now.Year <a href="http://synzeal.com">Synzeal</a>.</strong>.</strong>
+            All rights reserved.
+        </footer>
+
+    </div>
+
+<style>
+    .brand-link .brand-image{
+        float: none;
+    }
+</style>
+</body>
+</html>

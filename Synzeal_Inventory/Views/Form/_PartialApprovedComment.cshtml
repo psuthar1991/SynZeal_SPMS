@@ -1,0 +1,51 @@
+﻿@using Synzeal_Inventory.Entity
+@model  Synzeal_Inventory.Entity.SZ_QuotationDetail
+@{
+    ViewBag.Title = "Company";
+    Layout = null;
+    string sectionName = ViewBag.sectionName;
+    bool isSCientist = Convert.ToBoolean(ViewBag.isScientist);
+    var comments = ViewBag.QuoteDetailsComment as List<SZ_QuoteDetailsComment>;
+}
+<div class="col-md-12">
+    <div class="box">
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body">
+                <p><b>Remarks: </b>@ViewBag.FormRemark</p>
+                @if (comments != null && comments.Count > 0)
+                {
+                    foreach (var item in comments)
+                    {
+                        <div class="col-md-12" style=" border: 1px solid #08c; margin: 5px 8px;">
+                            <b>@item.GeneratedUserName <p style="text-align: right; margin-top: -16px;">@item.CreatedDate.ToString("F")</p></b>
+                            <div>
+                                @Html.Raw(item.ApprovedComment)
+                            </div>
+                        </div>
+                    }
+                }
+
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Comments</label>
+                    <textarea class="form-control" id="CommentText" name="CommentText" rows="10 " value="@Model.ApprovalComment"></textarea>
+                    <input type="hidden" id="Commentid" name="Commentid" value="@Model.Id" />
+                    <input type="hidden" id="CommentisSCientist" name="CommentisSCientist" value="@isSCientist" />
+                </div>
+                <div class="form-group" style="text-align: right">
+                    <button type="button" onclick="Quote.addApprovedComment()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ApprovalComment))
+{
+    <text>
+        <script type="text/javascript">
+            var test = $("#CommentText").attr('value');
+            document.getElementById("CommentText").value = test;
+        </script>
+    </text>
+}

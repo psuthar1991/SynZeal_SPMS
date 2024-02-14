@@ -1,0 +1,151 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32825.248
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synzeal_Inventory", "Synzeal_Inventory\Synzeal_Inventory.csproj", "{A0CC4BCC-F787-4ED9-915D-D66E0FFE0CC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synzeal_FTP_Sync", "Synzeal_FTP_Sync\Synzeal_FTP_Sync.csproj", "{F689DE59-259B-488A-B9AC-8B48E4A68E88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synzeal_Client_UpdateDaily", "Synzeal_Client_UpdateDaily\Synzeal_Client_UpdateDaily.csproj", "{078DC131-2556-4AAA-9DBF-95FB2760168B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synzeal_AutoBackup", "Synzeal_AutoBackup\Synzeal_AutoBackup.csproj", "{4386D3A3-8310-4678-87DD-3102F3636C2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synzeal_Qty_Update", "Synzeal_Qty_Update\Synzeal_Qty_Update.csproj", "{A956336D-A584-4C0E-AEE6-CAC33A127C2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synzeal_ParkQuote", "Synzeal_ParkQuote\Synzeal_ParkQuote.csproj", "{DB883260-4BCB-414E-80FB-76EB08CC4165}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synzeal_BatchFormData_Sync", "Synzeal_BatchFormData_Sync\Synzeal_BatchFormData_Sync.csproj", "{CEECADEB-A3F2-4B7B-B5F5-818ECA4DABB2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Synzeal_API", "Synzeal_API\Synzeal_API.csproj", "{718DAF5E-3571-4C10-86DE-DE8F688D7310}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Synzeal_PurchaseEmail", "Synzeal_PurchaseEmail\Synzeal_PurchaseEmail.csproj", "{97AF6A37-8B4F-4F80-91A4-A73AD4F216C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SZ_Compress_PDF", "SZ_Compress_PDF\SZ_Compress_PDF.csproj", "{CF6F9AF7-25F4-43EB-B2BF-F8F5A08E1189}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synzeal_Export_Catalogue", "Synzeal_Export_Catalogue\Synzeal_Export_Catalogue.csproj", "{C69F2466-DDEF-4A8E-9232-7282EEE26EA9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synzeal_SAP_Stock_API", "Synzeal_SAP_Stock_API\Synzeal_SAP_Stock_API.csproj", "{EF43CA76-428C-4EC2-AADF-5E979770593E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Synzeal_UpdateDaily", "Synzeal_UpdateDaily\Synzeal_UpdateDaily.csproj", "{116F77E3-3B10-4570-94AB-8EB0F90A6628}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynZeal_RemoveFile", "SynZeal_RemoveFile\SynZeal_RemoveFile.csproj", "{50DA91CB-1EAC-4FFA-93B8-E86ABC50C7AB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A0CC4BCC-F787-4ED9-915D-D66E0FFE0CC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0CC4BCC-F787-4ED9-915D-D66E0FFE0CC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0CC4BCC-F787-4ED9-915D-D66E0FFE0CC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0CC4BCC-F787-4ED9-915D-D66E0FFE0CC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F689DE59-259B-488A-B9AC-8B48E4A68E88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F689DE59-259B-488A-B9AC-8B48E4A68E88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F689DE59-259B-488A-B9AC-8B48E4A68E88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F689DE59-259B-488A-B9AC-8B48E4A68E88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{078DC131-2556-4AAA-9DBF-95FB2760168B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{078DC131-2556-4AAA-9DBF-95FB2760168B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{078DC131-2556-4AAA-9DBF-95FB2760168B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{078DC131-2556-4AAA-9DBF-95FB2760168B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4386D3A3-8310-4678-87DD-3102F3636C2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4386D3A3-8310-4678-87DD-3102F3636C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4386D3A3-8310-4678-87DD-3102F3636C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4386D3A3-8310-4678-87DD-3102F3636C2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A956336D-A584-4C0E-AEE6-CAC33A127C2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A956336D-A584-4C0E-AEE6-CAC33A127C2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A956336D-A584-4C0E-AEE6-CAC33A127C2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A956336D-A584-4C0E-AEE6-CAC33A127C2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB883260-4BCB-414E-80FB-76EB08CC4165}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB883260-4BCB-414E-80FB-76EB08CC4165}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB883260-4BCB-414E-80FB-76EB08CC4165}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB883260-4BCB-414E-80FB-76EB08CC4165}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEECADEB-A3F2-4B7B-B5F5-818ECA4DABB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEECADEB-A3F2-4B7B-B5F5-818ECA4DABB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEECADEB-A3F2-4B7B-B5F5-818ECA4DABB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEECADEB-A3F2-4B7B-B5F5-818ECA4DABB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{718DAF5E-3571-4C10-86DE-DE8F688D7310}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{718DAF5E-3571-4C10-86DE-DE8F688D7310}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{718DAF5E-3571-4C10-86DE-DE8F688D7310}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{718DAF5E-3571-4C10-86DE-DE8F688D7310}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97AF6A37-8B4F-4F80-91A4-A73AD4F216C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97AF6A37-8B4F-4F80-91A4-A73AD4F216C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97AF6A37-8B4F-4F80-91A4-A73AD4F216C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97AF6A37-8B4F-4F80-91A4-A73AD4F216C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF6F9AF7-25F4-43EB-B2BF-F8F5A08E1189}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF6F9AF7-25F4-43EB-B2BF-F8F5A08E1189}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF6F9AF7-25F4-43EB-B2BF-F8F5A08E1189}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF6F9AF7-25F4-43EB-B2BF-F8F5A08E1189}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C69F2466-DDEF-4A8E-9232-7282EEE26EA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C69F2466-DDEF-4A8E-9232-7282EEE26EA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C69F2466-DDEF-4A8E-9232-7282EEE26EA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C69F2466-DDEF-4A8E-9232-7282EEE26EA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF43CA76-428C-4EC2-AADF-5E979770593E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF43CA76-428C-4EC2-AADF-5E979770593E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF43CA76-428C-4EC2-AADF-5E979770593E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF43CA76-428C-4EC2-AADF-5E979770593E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{116F77E3-3B10-4570-94AB-8EB0F90A6628}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{116F77E3-3B10-4570-94AB-8EB0F90A6628}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{116F77E3-3B10-4570-94AB-8EB0F90A6628}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{116F77E3-3B10-4570-94AB-8EB0F90A6628}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50DA91CB-1EAC-4FFA-93B8-E86ABC50C7AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50DA91CB-1EAC-4FFA-93B8-E86ABC50C7AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50DA91CB-1EAC-4FFA-93B8-E86ABC50C7AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50DA91CB-1EAC-4FFA-93B8-E86ABC50C7AB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8612D0B1-6CB3-4302-A828-2AC311D2288E}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 15
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://dev.azure.com/zenithsofttech
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = SZ_Compress_PDF\\SZ_Compress_PDF.csproj
+		SccProjectName1 = SZ_Compress_PDF
+		SccLocalPath1 = SZ_Compress_PDF
+		SccProjectUniqueName2 = Synzeal_API\\Synzeal_API.csproj
+		SccProjectName2 = Synzeal_API
+		SccLocalPath2 = Synzeal_API
+		SccProjectUniqueName3 = Synzeal_AutoBackup\\Synzeal_AutoBackup.csproj
+		SccProjectName3 = Synzeal_AutoBackup
+		SccLocalPath3 = Synzeal_AutoBackup
+		SccProjectUniqueName4 = Synzeal_BatchFormData_Sync\\Synzeal_BatchFormData_Sync.csproj
+		SccProjectName4 = Synzeal_BatchFormData_Sync
+		SccLocalPath4 = Synzeal_BatchFormData_Sync
+		SccProjectUniqueName5 = Synzeal_Client_UpdateDaily\\Synzeal_Client_UpdateDaily.csproj
+		SccProjectName5 = Synzeal_Client_UpdateDaily
+		SccLocalPath5 = Synzeal_Client_UpdateDaily
+		SccProjectUniqueName6 = Synzeal_Export_Catalogue\\Synzeal_Export_Catalogue.csproj
+		SccProjectName6 = Synzeal_Export_Catalogue
+		SccLocalPath6 = Synzeal_Export_Catalogue
+		SccProjectUniqueName7 = Synzeal_FTP_Sync\\Synzeal_FTP_Sync.csproj
+		SccProjectName7 = Synzeal_FTP_Sync
+		SccLocalPath7 = Synzeal_FTP_Sync
+		SccProjectUniqueName8 = Synzeal_Inventory\\Synzeal_Inventory.csproj
+		SccProjectName8 = Synzeal_Inventory
+		SccLocalPath8 = Synzeal_Inventory
+		SccProjectUniqueName9 = Synzeal_ParkQuote\\Synzeal_ParkQuote.csproj
+		SccProjectName9 = Synzeal_ParkQuote
+		SccLocalPath9 = Synzeal_ParkQuote
+		SccProjectUniqueName10 = Synzeal_PurchaseEmail\\Synzeal_PurchaseEmail.csproj
+		SccProjectName10 = Synzeal_PurchaseEmail
+		SccLocalPath10 = Synzeal_PurchaseEmail
+		SccProjectUniqueName11 = Synzeal_Qty_Update\\Synzeal_Qty_Update.csproj
+		SccProjectName11 = Synzeal_Qty_Update
+		SccLocalPath11 = Synzeal_Qty_Update
+		SccProjectUniqueName12 = Synzeal_SAP_Stock_API\\Synzeal_SAP_Stock_API.csproj
+		SccProjectName12 = Synzeal_SAP_Stock_API
+		SccLocalPath12 = Synzeal_SAP_Stock_API
+		SccProjectUniqueName13 = Synzeal_UpdateDaily\\Synzeal_UpdateDaily.csproj
+		SccProjectName13 = Synzeal_UpdateDaily
+		SccLocalPath13 = Synzeal_UpdateDaily
+		SccProjectUniqueName14 = SynZeal_RemoveFile\\SynZeal_RemoveFile.csproj
+		SccProjectName14 = SynZeal_RemoveFile
+		SccLocalPath14 = SynZeal_RemoveFile
+	EndGlobalSection
+EndGlobal

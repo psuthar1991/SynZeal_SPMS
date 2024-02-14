@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "Quote Daily Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Quote Daily Report
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <form role="form">
+                    <div class="box-body">
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">Company Name</label>
+                            @Html.DropDownList("CreatedBy", (IEnumerable<SelectListItem>)ViewBag.listCompItems, new { @class = "form-control" })
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">Start Date</label>
+                            <input type="text" class="form-control" id="Startdate" name="Startdate" placeholder="Start date">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">End Date</label>
+                            <input type="text" class="form-control" id="Enddate" name="Enddate" placeholder="End date">
+                        </div>
+                        <div style="        float: left;margin-top: 19px;">
+                            <div>
+                                <label for="inputPassword3" class="col-sm-10 control-label"></label>
+                                <div>
+                                    <button type="button" class="btn btn-primary" onclick="GenerateQuotedailyReport()">Generate PDF</button>
+                                    <button type="button" class="btn btn-primary" onclick="GenerateQuotedailyExcelReport()">Generate Excel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    $('#Startdate').datepicker({
+        format: 'dd/mm/yyyy',
+        onSelect: function (dateText, inst) {
+        }
+    });
+    $('#Enddate').datepicker({
+        format: 'dd/mm/yyyy',
+        onSelect: function (dateText, inst) {
+        }
+    });
+
+    function GenerateQuotedailyReport() {
+        window.location.href = '/Form/PrintQuotedailyReportPDF?CreatedBy=' + $("#CreatedBy").val() + '&Startdate=' + $("#Startdate").val() + '&Enddate=' + $("#Enddate").val();
+    }
+
+    function GenerateQuotedailyExcelReport() {
+        window.location.href = '/Form/PrintQuotedailyReportExcel?CreatedBy=' + $("#CreatedBy").val() + '&Startdate=' + $("#Startdate").val() + '&Enddate=' + $("#Enddate").val();
+    }
+    </script>

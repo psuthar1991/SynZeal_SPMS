@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "Company";
+    Layout = null;
+}
+@model  Synzeal_Inventory.Entity.SZ_ReservedQty
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        @*<div class="box-header with-border">
+            <h3 class="box-title">Add New Reserved Qty</h3>
+        </div>*@
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">CAT No</label>
+                    <input type="text" class="form-control" id="catno" name="catno" value="@ViewBag.CATNo" placeholder="CAT No" required>
+                </div>
+                <div class="form-group" style="text-align:right; display: none">
+                    <button type="button" onclick="searchbatchnumber()" class="btn btn-primary">Search</button>
+                </div>
+                <input type="hidden" id="txtrefdata" value="@ViewBag.RefData" />
+                <div id="divresult">
+
+                </div>
+                <div class="form-group" id="btnsave" style="text-align:right; display:none"> <br />
+                    <button type="button" onclick="Quote.addreservedqtydata()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    searchbatchnumber();
+    function searchbatchnumber() {
+        if ($("#catno").val() === "") {
+            toastr.error("Please enter cat number.");
+            return false;
+        }
+        $.ajax({
+            url: '/Form/GetAllBatchNoByProductId?catnumber=' + $("#catno").val(),
+            data: {},
+            type: 'GET',
+            success: function (data) {
+                
+                var str = "<table width='100%' class='table table-responsive'>";
+                str += "<thead><tr><th></th><th>Batch Code</th><th>Available QTY</th><th></th></tr></thead>";
+
+                $(data).each(function (i,v) {
+                    str += "<tr><td><input type='radio' name='namebatch' class='rdbatchnumber' value='"+v.Id+"'/></td><td>" + v.BatchCode + "</td><td>" + v.Qty +"</td><td></td></tr>";
+                });
+                
+                str += "</table>";
+                str += "<div><b>Reserved Qty:</b> <input type='number' id='txtresqty' /></div>";
+                str += "<div><b>Reason:</b> <input type='text' class='form-control' id='txtReason' /></div>";
+                $("#divresult").html(str);
+
+                $("#btnsave").show();
+            }
+        }); 
+    }
+</script>

@@ -1,0 +1,123 @@
+﻿<div style="margin:5% 33%;float:left;box-shadow:0 0 3px #aaa; height:auto;color: #000;font-family:Arial, Helvetica, sans-serif">
+    <h2 style="text-align:center; color:#3c8dbc">
+        SynZeal Research PVT LTD. <br /><br /><br />
+    </h2>
+    <table width="100%" style="text-align:center; ">
+        <tr>
+            <td style="float:left; text-align:center">
+                <div style="font-size: 10px;float: left;padding: 10px;text-align: left;color: #000">
+                    Total PO Entry Done @ViewBag.Date  :- @ViewBag.POCount
+                    <span>(<b>D: </b> @ViewBag.DomesticPOCount / <b>E: </b> @ViewBag.ExportPOCount)</span>
+                </div>
+                
+                <div style="font-size: 10px;float: left;padding: 10px;text-align: left;color: #000">
+                    Total Product(s) in @ViewBag.Date PO's :- @ViewBag.POProductCount
+                    <span>(<b>D: </b> @ViewBag.DomesticPOProductCount / <b>E: </b> @ViewBag.ExportPOProductCount)</span>
+
+                </div>
+            </td>
+            <td style="float:right; text-align:right ">
+                <div style="float:right">
+                    Today's Dispatch:- @ViewBag.TodaysDispatch <span>(<b>D: </b> @ViewBag.DomesticTodaysDispatch / <b>E: </b> @ViewBag.ExportTodaysDispatch)</span>
+                    <br />
+                    All Product Count:- @ViewBag.AllProductCount
+                </div>
+            </td>
+        </tr>
+    </table>
+    <table width="100%" border="1" style=" border-collapse: collapse; ">
+        <tr>
+            <td style="padding:5px;font-size: 10px; text-align:center;">
+            </td>
+            <td  style="padding:5px;font-size: 10px; text-align:center;">
+                <b>In-Stock</b>
+            </td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">
+                <b>No Action / Data Pending</b>
+            </td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">
+                <b>In-Stock QC Approval</b>
+            </td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">
+                <b>Ready For Dispatch</b>
+            </td>
+            <td  style="padding:5px;font-size: 10px; text-align:center;">
+                <b>Synthesis</b>
+            </td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">
+                <b>Purchase</b>
+            </td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">
+                <b>Pur-Synthesis</b>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding:5px;font-size: 10px; text-align:center;">
+                Domestic @ViewBag.Date
+            </td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.DomesticInStock</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.DomesticNoAction</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.DomesticQC</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.DomesticReady</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.DomesticSynthesis</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.DomesticPurchase</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.DomesticPurSynthesis</td>
+        </tr>
+        <tr>
+            <td style="padding:5px;font-size: 10px; text-align:center;">
+                Export @ViewBag.Date
+            </td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.ExportInStock</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.ExportNoAction</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.ExportQC </td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.ExportReady</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.ExportSynthesis</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.ExportPurchase</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.ExportPurSynthesis</td>
+        </tr>
+        <tr>
+            <td style="padding:5px;font-size: 10px; text-align:center;">
+                Total as on date (Domestic)
+            </td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.TotalDomesticInStock</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.TotalDomesticNoAction</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.TotalDomesticQC</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">
+                @ViewBag.TotalDomesticReady <br />
+                <span><b>Data Pending to Send :</b> @ViewBag.TotalDomesticDataPending</span> <br />
+                <span><b>Data Send :</b> @ViewBag.TotalDomesticDataSend    </span> <br />
+                <span><b>Data Approved :</b> @ViewBag.TotalDomesticDataApproval</span> <br />
+                <span><b>UnPacked :</b> @ViewBag.TotalDomesticDataApprovalunPacked</span> <br />
+                <span><b>Packed :</b> @ViewBag.TotalDomesticDataApprovalPacked</span> <br />
+            </td>
+            <td style="padding:5px;font-size: 10px; text-align:center;" rowspan="2">
+                @ViewBag.TotalDomesticSynthesis</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;" rowspan="2">
+                @ViewBag.TotalDomesticPurchase <br />
+                <b>Submitted : </b>@ViewBag.TotalPurchaseSubmitted
+            </td>
+            <td style="padding:5px;font-size: 10px; text-align:center;" rowspan="2">
+                @ViewBag.TotalDomesticPurSynthesis</td>
+        </tr>
+        <tr>
+            <td style="padding:5px;font-size: 10px; text-align:center;">
+                Total as on date (Export)
+            </td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.TotalExportInStock</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.TotalExportNoAction</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.TotalExportQC</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">
+                @ViewBag.TotalExportReady <br />
+                <span><b>Data Pending to Send :</b> @ViewBag.TotalExportDataPending</span> <br />
+                <span><b>Data Send :</b> @ViewBag.TotalExportDataSend    </span> <br />
+                <span><b>Data Approved :</b> @ViewBag.TotalExportDataApproval</span> <br />
+                <span><b>UnPacked :</b> @ViewBag.TotalExportDataApprovalunPacked</span> <br />
+                <span><b>Packed :</b> @ViewBag.TotalExportDataApprovalPacked</span> <br />
+            </td>
+            @*<td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.TotalExportSynthesis</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.TotalExportPurchase</td>
+            <td style="padding:5px;font-size: 10px; text-align:center;">@ViewBag.TotalExportPurSynthesis</td>*@
+        </tr>
+    </table>
+</div>
+

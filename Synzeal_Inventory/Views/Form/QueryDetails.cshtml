@@ -1,0 +1,21 @@
+﻿@model Synzeal_Inventory.Entity.SZ_QueryModule
+@using Synzeal_Inventory.Entity;
+@{
+    ViewBag.Title = "QueryDetails";
+    Layout = null;
+}
+<section class="content-header">
+    <h1>
+        <div style="float:left">Query Details :: @Model.QueryNo</div>
+    </h1>
+    <div class="clearfix"></div>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                @Html.Partial("_PartialQueryGeneralTab", Model)
+            </div>
+        </div>
+    </div>
+</section>

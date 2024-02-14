@@ -1,0 +1,187 @@
+﻿@{
+    ViewBag.Title = "Price";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<Synzeal_Inventory.Models.ProductModel>
+
+<link href="~/Content/css/select2.css" rel="stylesheet" />
+<link href="~/Content/select2-bootstrap.css" rel="stylesheet" />
+<script src="~/js/select2.js"></script>
+
+
+<style type="text/css">
+  .letter {
+          padding: 8px;
+    background: #2e363f;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    width: 15px;
+    float: left;
+        margin: 2px 0.6%;
+    text-align: center;
+    }
+
+    .showimage {
+        position: absolute;
+        left: 46.5%;
+        padding: 10px;
+        border: 5px solid #5c5c5c;
+        background: #fff;
+        margin-top: -1.5%;
+    }
+
+    .showSynonym {
+        position: absolute;
+        left: 29.5%;
+        padding: 10px;
+        border: 5px solid #5c5c5c;
+        background: #fff;
+        margin-top: -1.5%;
+    }
+
+    #loadapi .span2 {
+        background: #ef6718;
+        font-size: 14px;
+        color: #fff;
+        padding: 8px 5px;
+        margin: 2px;
+        border-radius: 5px;
+        cursor: pointer;
+    } th.ui-th-column div {
+    white-space: normal !important;
+    height: auto !important;
+    padding: 2px;
+}
+</style>
+
+<div style="padding:5px 30px;color:Red;font-size:15px;text-align:right">
+    @if (TempData["Message"] != null)
+    {
+        @TempData["Message"]
+    }
+</div>
+<!--End-breadcrumbs-->
+
+@*@if (Session["ShowPrice"] == "true")
+{*@
+    <div class="container-fluid">
+       
+        @using (Html.BeginForm("UploadPrice", "Form", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <div class="span5" style="position: relative;float: right;padding: 10px;border: 1px solid #5c5c5c; width: 300px; height: 75px;">
+                <b>Import Excel File : <br /></b>
+                <input type="file" name="UploadedFile" style="    width: 70%;" />
+                <input type="submit" name="Submit" value="Submit" class="btn btn-primary" /><br />
+                <a href="~/Document/samplepricefile.xlsx" style="color:red" download>Download Sample File</a>
+            </div>
+        }
+        <div style="margin:15px;">
+            @for (char c = 'A'; c <= 'Z'; c++)
+            {
+                <div class="letter " data-letter="@c" onclick="SelectPriceChar('@c')">@c</div>
+            }
+        </div>
+        <div class="clearfix"></div>
+        <div id="loadapi">
+            Select API : <select id="loadapiselect">
+                <option value="0">--Select--</option>
+            </select>
+            <input type="button" value="Search" class="btn btn-primary" onclick="searchpriceinventory()" />
+            <button class="btn btn-primary" id="collapsediv" onclick="PriceCollapseExpandGrid('expand')">Expand</button>
+            <a href="@Url.Action("ExportPriceList","Form")" class="btn btn-primary">Export Data</a>
+        </div>
+
+        <div id="prigrid">
+
+        </div>
+        <div class="tags_clear"></div>
+        <div>
+            <table id="grid"></table>
+            <div id="pager"></div>
+        </div>
+    </div>
+    
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+            $("#loadapiselect").select2();
+        });
+
+        //  PriceGrid();
+
+        function searchpriceinventory() {
+            var value = $('#loadapiselect').val();
+            if (value === "0") {
+                swal("Please select API.")
+                // return false;
+            }
+
+            PriceGrid(value);
+        }
+        
+        function SelectPriceChar(char) {
+            $('.letter').removeClass('letter-active');
+            $('.letter').each(function () {
+                var attr = $(this).attr('data-letter');
+                if (attr == char) {
+                    $(this).addClass('letter-active');
+                }
+            })
+            $.ajax({
+                type: "GET",
+                url: "/Form/MainCategory/",
+                data: { 'id': char },
+                dataType: "json",
+                success: function (response) {
+
+                    if (response.records.length > 0) {
+                        $('#grid').jqGrid("clearGridData");
+                        $('#loadapiselect').empty();
+                        var str = "";
+                        str += "<option value='0'>--Select--</option>";
+                        $(response.records).each(function (i, v) {
+                           // str += "<div class='span2' onclick='PriceGrid(&#39;" + v.Name + "&#39;)'>" + v.Name + "</div>";
+                            str += "<option value='" + v.Name + "'>" + v.Name + "</option>";
+                        })
+                        $('#loadapiselect').html(str);
+                    }
+                },
+                error: function (response) {
+                    alert("Error:" + response);
+                }
+            });
+        }
+    </script>
+@*}
+else
+{
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="widget-box">
+                    <div class="widget-title">
+                        <span class="icon"> <i class="icon-align-justify"></i> </span>
+                        <h5>Protection Price Info</h5>
+                    </div>
+                    <div class="widget-content nopadding">
+                        @using (Html.BeginForm("EnterPassword", "Form", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+                        {
+                            <div class="control-group">
+                                <label class="control-label">Enter Password :</label>
+                                <div class="controls">
+                                    <input type="hidden" id="page" name="page" value="Price" />
+                                    <input type="password" id="password" name="password" />
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-success" >LogIn</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}*@

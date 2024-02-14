@@ -1,0 +1,345 @@
+﻿@model Synzeal_Inventory.Entity.SZ_QuoteDetailForm
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+
+    string dateNow = DateTime.Now.ToShortDateString();
+}
+@using System.Text
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+<HTML>
+<HEAD>
+</HEAD>
+<BODY style="margin:0;font-size:10px; color:#000">
+    <section class="content">
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="box box-primary">
+                    <!-- /.box-header -->
+                    <table width="100%">
+                        <tr>
+                            <td>
+                                <img width="120px" src="http://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" style="float:left;" />
+                            </td>
+                            <td>
+                                <h2>PRODUCT SUBMISSION FORM</h2>
+                            </td>
+                        </tr>
+                    </table>
+                    <hrline style="width:100%" />
+                    <!-- form start -->
+
+                    <table width="100%">
+                        <tr>
+                            <td>
+                                <b> Submission Date  : </b>
+                            </td>
+                            <td>
+                                @if (Model.SubmissionDate != null)
+                                {
+                                    @Model.SubmissionDate.ToShortDateString()
+                                }
+                            </td>
+                            <td>
+                                <b>Scientist Name : </b>
+                            </td>
+                            <td>
+                                @Model.ScientistName
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b> Journal Date : </b>
+                            </td>
+                            <td>
+                                @if (Model.JournalDate != null)
+                                {
+                                    @Model.JournalDate.ToShortDateString()
+                                }
+                            </td>
+                            <td>
+                                <b>Team Leader Name : </b>
+                            </td>
+                            <td>
+                                @Model.TLName
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Chemist : </b>
+                            </td>
+                            <td>
+                                @Model.Chemist
+                            </td>
+                            <td colspan="2" rowspan="8" style="text-align:left">
+                                <img id="drwstructure" src="@Model.StructurePath" width="270%" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Catelogue No. : </b>
+                            </td>
+                            <td>
+                                @Model.CATNo
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Project Name : </b></td>
+                            <td>@Model.ProjectName </td>
+                        </tr>
+                        <tr>
+                            <td><b>Product Name : </b></td>
+                            <td>@Model.ProductName </td>
+                        </tr>
+                        <tr>
+                            <td><b>CAS No. : </b></td>
+                            <td>@Model.CASNo </td>
+                        </tr>
+                        <tr>
+                            <td><b>Mole. Weight : </b></td>
+                            <td>@Model.MolWeight</td>
+                        </tr>
+                        <tr>
+                            <td><b>Mole. Formula : </b></td>
+                            <td>@Model.MolFormula</td>
+                        </tr>
+                    </table>
+                    <hrline style="width:100%" />
+
+                    <table width="100%">
+                        <tr>
+                            <td>
+                                <b>  Batch Code : </b>
+                            </td>
+                            <td>
+                                @Model.BatchCode
+                            </td>
+                            <td>
+                                <b> Quantity Submitted : </b>
+                            </td>
+                            <td>
+                                @Model.Qty
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b> Ref. 1H/HPLC/MS Code : </b>
+                            </td>
+                            <td>
+                                @Model.HPCLCode
+                            </td>
+                            <td>
+                                <b> 1H Status : </b>
+                            </td>
+                            <td>
+                                @Model.NMRCode
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b> HPLC/GC/ELSD Date : </b>
+                            </td>
+                            <td>
+                                @Model.HPLCDate
+                            </td>
+                            <td>
+                                <b>  Chromatography : </b>
+                            </td>
+                            <td>
+                                @Model.HPLCPurity %
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <b> MS Analysis : </b>
+                            </td>
+                            <td>
+                                @Model.MSCode
+                            </td>
+                            <td>
+                                <b>Type Of Compound : </b>
+                            </td>
+                            <td>
+                                @Model.TypeCompound
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b> State Of Compound : </b>
+                            </td>
+                            <td>
+                                @Model.StateCompound
+                                @if (Model.ChkHygroscopic.HasValue && Model.ChkHygroscopic.Value)
+                                {
+                                    <b>(Hygroscopic)</b>
+                                }
+                            </td>
+                            <td>
+                                <b>If Salt Mention the Name : </b>
+                            </td>
+                            <td>
+                                @Model.RbSaltMentionName @if (!string.IsNullOrEmpty(Model.SaltName))
+                                {
+                                    <b>(@Model.SaltName)</b>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b> No Of Steps of Final Route : </b>
+                            </td>
+                            <td>
+                                @Model.NoOfFinalStep
+                            </td>
+                            <td>
+                                <b>Earlier Synthesized : </b>
+                            </td>
+                            <td>
+                                @Model.EarlierSynthesized
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                @if (Model.ChkHygroscopic.HasValue && Model.ChkHygroscopic.Value)
+                                {
+                                    <span>Hygroscopic &nbsp;&nbsp;</span>
+                                }
+                                @if (Model.TempSensitive.HasValue && Model.TempSensitive.Value)
+                                {
+                                    <span>Temp Sensitive &nbsp;&nbsp;</span>
+                                }
+                                @if (Model.Lacrymatory.HasValue && Model.Lacrymatory.Value)
+                                {
+                                    <span>Lacrymatory &nbsp;&nbsp;</span>
+                                }
+                                @if (Model.LightSensitivity.HasValue && Model.LightSensitivity.Value)
+                                {
+                                    <span>Light Sensitivity &nbsp;&nbsp;</span>
+                                }
+                                @if (Model.Photostability.HasValue && Model.Photostability.Value)
+                                {
+                                    <span>Photostability &nbsp;&nbsp;</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Additional Analysis : </b>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(Model.RbAdditionalAnalysis))
+                                {
+                                    @Model.RbAdditionalAnalysis
+                                }
+                                else
+                                {
+                                    <span>None</span>
+                                }
+                            </td>
+                            <td>
+                                <b>Remark : </b>
+                            </td>
+                            <td>
+                                @Html.Raw(Model.OtherAnalysis)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Stability Related Comment : </b>
+                            </td>
+                            <td>
+                                @Model.StabilityRelatedComment
+                            </td>
+                            <td>
+                                <b>Stability  : </b>
+                            </td>
+                            <td>
+                                @Model.Stability
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Stability data in solution form after 7 days : </b>
+                            </td>
+                            <td>
+                                @Model.SolutionForm
+                            </td>
+                            <td>
+                                <b>Stability data in solid form after 7 days : </b>
+                            </td>
+                            <td>
+                                @Model.SolidForm
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <b>Physical State :</b> @Model.State
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <b>Stability data in solution form after 7 days :</b> @Model.SolutionForm
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <b>Stability data in solid form after 7 days :</b> @Model.SolidForm
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <b>Any of last 3 step NMR done ? :</b> @if (Model.chkNMRDone.HasValue && Model.chkNMRDone.Value)
+                                {
+                                    <span>Yes</span>
+                                }
+                                else
+                                {
+                                    <span>No</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <b>Any of last 2 step crystallization done? :</b> @if (Model.chkCrystallizationDone.HasValue && Model.chkCrystallizationDone.Value)
+                                {
+                                    <span>Yes</span>
+                                }
+                                else
+                                {
+                                    <span>No</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <b>Purification By :</b> @Model.PurificationBy
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</BODY>
+</HTML>

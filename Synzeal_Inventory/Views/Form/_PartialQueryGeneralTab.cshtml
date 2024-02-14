@@ -1,0 +1,290 @@
+﻿@model Synzeal_Inventory.Entity.SZ_QueryModule
+@using Synzeal_Inventory.Entity;
+@{
+    int loopCnt = 1;
+    SynzealLiveEntities db = new SynzealLiveEntities();
+}
+<div class="box-body form-horizontal" id="profrm">
+    <div class="col-md-12">
+        <div class="single-form-block">
+            <div class="general-tab">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <div class="main-title">
+                            <h4><b>Subject: </b>@Model.QuerySubject (@Model.CreatedDate.Value.ToShortDateString())</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="row">
+                            <input type="hidden" id="QuoteDetailsId" name="QuoteDetailsId" value="@Model.QuoteDetailsId" />
+                            <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+                            <div class="form-group col-md-12 col-sm-12">
+                                <label>Query Status</label>
+                                <select class="form-control" id="Status" name="Status">
+                                    <option value="Open">Open</option>
+                                    <option value="In Process">In Process</option>
+                                    <option value="Solved">Solved</option>
+                                    <option class="Completed">Completed</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-12 col-sm-12">
+                                <label>Primary Email</label>
+                                <input type="text" class="form-control" name="PrimaryEmail" id="PrimaryEmail">
+                            </div>
+                            <div class="form-group col-md-12 col-sm-12">
+                                <label>Sub Status</label>
+                                <select class="form-control" id="SubStatus" name="SubStatus">
+                                    @*<option value="Verification">
+                                        Verification
+                                    </option>*@
+                                    <option value="Invistiatgion">
+                                        Invistiatgion
+                                    </option>
+                                    <option class="Re-synthesis">Re-synthesis</option>
+                                    @*<option value="Document check">
+                                        Document check
+                                    </option>*@
+                                    <option value="Re-Purification">Re-Purification</option>
+                                    <option value="Data Recording">
+                                        Data Recording
+                                    </option>
+                                    @*<option value="Prep Purification">
+                                        Prep Purification
+                                    </option>*@
+                                    <option value="Replacement">
+                                        Replacement
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-12 col-sm-12">
+                                <label>Estimated On</label>
+                                <input type="number" class="form-control" name="ClosingOn" id="ClosingOn">
+                            </div>
+                            <div class="form-group col-md-12 col-sm-12">
+                                <label>Estimated Date</label>
+                                <input type="text" class="form-control" name="ClosingDate" id="ClosingDate" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="form-group col-md-12 col-sm-12">
+                                <label>Team Leader</label>
+                                @Html.DropDownList("TeamLeaderId", (IEnumerable<SelectListItem>)ViewBag.TeamLeaderList, "--Select--", new { @class = "form-control clsteamleader" })
+
+                            </div>
+                            <div class="form-group col-md-12 col-sm-12">
+                                <label>Scientist</label>
+                                @Html.DropDownList("ScientistId", (IEnumerable<SelectListItem>)ViewBag.ScientistList, "--Select--", new { @class = "form-control clsteamleader" })
+                            </div>
+
+                            <div class="form-group col-md-12 col-sm-12">
+                                <label>Dispatch</label>
+                                <input type="checkbox" id="IsDispatched" name="IsDispatched" />
+                            </div>
+                            <div class="form-group col-md-12 col-sm-12">
+                                <label>Analytical</label>
+                                <input type="checkbox" id="IsAnalytical" name="IsAnalytical" />
+                            </div>
+
+
+                            <div class="form-group col-md-12 col-sm-12">
+                                <label>Quote Attach</label>
+                                <input type="file" name="Attachment" id="Attachment" multiple>
+                            </div>
+                            <div id="divattachment">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12">
+                        <label>Query Details</label>
+                        <textarea class="form-control" id="ClientRemark" name="ClientRemark" rows="3"></textarea>
+                    </div>
+
+                    <div class="col-md-12 col-sm-12">
+                        <div class="submit-button">
+                            <br />
+                            <input type="hidden" id="clientremarkhidden" value="@Model.ClientRemark" />
+                            <input type="button" name="" onclick="save();" value="Submit" class="btn btn-primary">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $("#ClosingOn").keyup(function () {
+        var createdDate = '@Model.CreatedDate.Value.ToShortDateString()'.split("/");
+        var date = new Date(createdDate[2], createdDate[1] - 1, createdDate[0]);
+        date.setDate(date.getDate() + parseInt($(this).val()));
+        $("#ClosingDate").val(convert(date));
+
+    });
+
+    function convert(str) {
+        var date = new Date(str),
+            mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+            day = ("0" + date.getDate()).slice(-2);
+        return [day, mnth, date.getFullYear() ].join("/");
+    }
+
+    function save() {
+        var paramdata = {
+                Id: $("#Id").val(),
+                QuoteDetailsId: $("#QuoteDetailsId").val(),
+                Status: $("#Status").val(),
+                Priority: $("#Priority").val(),
+                ClosingOn: $("#ClosingOn").val(),
+                ClosingDate: $("#ClosingDate").val(),
+                CCEmail: $("#CCEmail").val(),
+                ClientRemark: $("#ClientRemark").val(),
+                TeamLeaderId: $("#TeamLeaderId").val(),
+                ScientistId: $("#ScientistId").val(),
+                PrimaryEmail: $("#PrimaryEmail").val(),
+                SubStatus: $("#SubStatus").val(),
+                DispatchId: $("#DispatchId").val(),
+                AnalyticalId: $("#AnalyticalId").val(),
+                Scientist: $("#ScientistId option:selected").text(),
+                TeamLeader: $("#TeamLeaderId option:selected").text(),
+                DispatchText: $("#DispatchId option:selected").text(),
+                AnalyticalText: $("#AnalyticalId option:selected").text(),
+                IsAnalytical: $("#IsAnalytical").is(":checked"),
+                IsDispatched: $("#IsDispatched").is(":checked"),
+            };
+        $.ajax({
+            type: "POST",
+            url: "/Form/saveQueryModuleData",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            traditional: true,
+            data: JSON.stringify(paramdata) ,
+            success: function (result) {
+                toastr.success("You have updated query.");
+                window.location.href = "/Form/QueryModule";
+            }
+        });
+    }
+
+    $("#Attachment").change(function () {
+        if (window.FormData !== undefined) {
+            var fileUpload = $("#Attachment").get(0);
+            var files = fileUpload.files;
+
+            // Create FormData object
+            var fileData = new FormData();
+
+            // Looping over all files and add it to FormData object
+            for (var i = 0; i < files.length; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+
+            // Adding one more key to FormData object
+            fileData.append('Id', '@Model.Id');
+
+            $.ajax({
+                url: '/Form/QueryModuleAttachment',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                data: fileData,
+                success: function (result) {
+                    if (!result.success) {
+                        toastr.error(result.message);
+                        return false;
+                    }
+                    else {
+                        ReloadAttachments(result.attachment);
+                    }
+                },
+                error: function (err) {
+                    alert(err.statusText);
+                }
+            });
+        } else {
+            alert("FormData is not supported.");
+        }
+    });
+
+
+    function ReloadAttachments(attachment) {
+        var listattchment = attachment.split(',');
+        var str = "<table style='width:100%' border='1' cellpadding='5'>";
+
+        $(listattchment).each(function (i, v) {
+            if (v !== "") {
+                str += "<tr><td><a href='../" + v + "' download>" + v + "</a></td><td> <a href='javascript:void(0)' onclick='deleteattchment(&apos;" + v +"&apos;)'>Delete</a></td></tr>";
+            }
+        });
+
+        str += "</table>";
+        $("#divattachment").html(str);
+    }
+
+    function deleteattchment(filename) {
+        $.ajax({
+            type: "GET",
+            url: "/Form/DeleteAttchment?filename=" + filename +"&id=@Model.Id",
+            dataType: "json",
+            traditional: true,
+            data: {},
+            success: function (result) {
+                ReloadAttachments(result);
+            }
+        });
+    }
+</script>
+@if (Model.Id != 0)
+{
+    <text>
+        <script type="text/javascript">
+            var entityMap = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;',
+                '/': '&#x2F;',
+                '`': '&#x60;',
+                '=': '&#x3D;'
+            };
+
+            function escapeHtml(string) {
+                return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+                    return entityMap[s];
+                });
+            }
+
+            $("#ClientRemark").val($("#clientremarkhidden").val());
+            $("#Status").val('@Model.Status');
+            $("#ProblemType").val('@Model.QueryType');
+            $("#SubStatus").val('@Model.SubStatus');
+            $("#ProblemSubType").val('@Model.ProblemSubType');
+            $("#Priority").val('@Model.Priority');
+            $("#TeamLeaderId").val('@Model.TeamLeaderId');
+            $("#ClosingOn").val('@Model.ClosingOn');
+            $("#ScientistId").val('@Model.ScientistId');
+            
+            $("#PrimaryEmail").val('@Model.Email');
+            $("#CCEmail").val('@Model.CCEmail');
+            ReloadAttachments('@Model.Attachment');
+            if ('@Model.IsDispatched' === 'True') {
+                $("#IsDispatched").prop('checked', true);
+            }
+            if ('@Model.IsAnalytical' === 'True') {
+                $("#IsAnalytical").prop('checked', true);
+            }
+        </script>
+    </text>
+    if (Model.ClosingDate.HasValue)
+    {
+        <text>
+            <script type="text/javascript">
+                $("#ClosingDate").val('@Model.ClosingDate.Value.ToShortDateString()');
+            </script>
+        </text>
+    }
+}

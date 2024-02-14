@@ -1,0 +1,79 @@
+﻿@model  List<Synzeal_Inventory.Entity.SZ_QuotationDetailLog>
+@using Synzeal_Inventory.Entity;
+@{
+    ViewBag.Title = "Audit Log List";
+    Layout = null;
+
+    SynzealLiveEntities db = new SynzealLiveEntities();
+}
+@using Synzeal_Inventory.Models;
+<div class="col-md-12">
+    <div class="box">
+        <form role="form">
+            <div class="box-body">
+                <table id="tblQuotedetailslog" class="table table-bordered table-striped" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Field Name</th>
+                            <th>Before</th>
+                            <th>After</th>
+                            <th>Date</th>
+                            <th>Changed By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            if (item.PropertyName.ToLower() == "project type")
+                            {
+                                foreach (EnumList.ProjectType r in Enum.GetValues(typeof(EnumList.ProjectType)))
+                                {
+                                    var items = Enum.GetName(typeof(EnumList.ProjectType), r);
+                                    var test = r.ToString();
+                                    string text = SZ_Helper.GetEnumDescription((EnumList.ProjectType)(int)r);
+                                    int val = (int)r;
+                                    if (val.ToString() == item.Before)
+                                    {
+                                        item.Before = text;
+                                    }
+                                    if (val.ToString() == item.After)
+                                    {
+                                        item.After = text;
+                                    }
+                                }
+                            }
+
+                            if (item.PropertyName.ToLower() == "difficultylevel")
+                            {
+                                foreach (EnumList.DifficultyLevel r in Enum.GetValues(typeof(EnumList.DifficultyLevel)))
+                                {
+                                    var items = Enum.GetName(typeof(EnumList.DifficultyLevel), r);
+                                    var test = r.ToString();
+                                    string text = SZ_Helper.GetEnumDescription((EnumList.DifficultyLevel)(int)r);
+                                    int val = (int)r;
+                                    if (val.ToString() == item.Before)
+                                    {
+                                        item.Before = text;
+                                    }
+                                    if (val.ToString() == item.After)
+                                    {
+                                        item.After = text;
+                                    }
+                                }
+                            }
+
+
+                            <tr id="@item.Id">
+                                <td>@item.FieldName</td>
+                                <td>@item.Before</td>
+                                <td>@item.After</td>
+                                <td>@item.Datetime.ToString()</td>
+                                <td>@item.Username</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,119 @@
+﻿@{
+    ViewBag.Title = "CompanyList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model List<Synzeal_Inventory.Entity.SZ_NameMaster>
+@using Synzeal_Inventory.Models
+<section class="content-header">
+    <h1>
+        Name Master List  <a data-toggle="modal" data-target="#myModal" style="float:right" class="btn btn-primary" href="@Url.Action("AddNameMasterCompany","Form")">Add Name Master</a>
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Catalog No.
+                                </th>
+                                <th>EP</th>
+                                <th>USP</th>
+                                <th>Chem Draw/IUPAC</th>
+                                <th>EP Chemical Name</th>
+                                <th>USP Chemical Name</th>
+                                <th>Other Chemical Name 1</th>
+                                <th>Other Chemical Name 2</th>
+                                <th>Other Chemical Name 3</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Count > 0)
+                            {
+                                foreach (var i in Model)
+                                {
+                            <tr>
+                                <td>@i.Sku</td>
+                                <td>@i.EP</td>
+                                <td>@i.USP</td>
+                                <td>@i.ChemDraw</td>
+                                <td>@i.EPChemicalName</td>
+                                <td>@i.USPChemicalName</td>
+                                <td>@i.OtherNameOne</td>
+                                <td>@i.OtherNameSecond</td>
+                                <td>@i.OtherNameThird</td>
+                                <td>
+                                    <a data-toggle="modal" data-target="#myModal" href="@Url.Action("AddNameMasterCompany","Form",new { id = i.Id})"> Edit</a> |
+                                    <a href="javascript:void(0)" onclick="deleteNameMaster('@i.Id')"> Delete</a>
+                                </td>
+                            </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+	$(function () {
+	    $('#example1').DataTable({
+	        "pageLength": 25,
+	        "order": [[0, "asc"]]
+	    })
+	});
+
+    function deleteNameMaster(id)
+    {
+    swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this company!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Form/DeleteNameMaster?id=" + id,
+                        data: {},
+                        success: function (results) {
+                            if (results.success) {
+                                toastr.success( "Name master has been deleted.");
+                                setTimeout(function () { window.location.reload(true); }, 2000);
+                            }
+                            else{
+                                if (results.multiple) {
+                                    toastr.error("Name master already assigned to quotation.");
+                                }
+
+                            }
+                        }
+                    });
+
+                } else {
+                    toastr.error("Your added quote is safe.");
+                }
+            });
+    }
+</script>
+<style type="text/css">
+    .modal-dialog {
+        width: 70%
+    }
+</style>

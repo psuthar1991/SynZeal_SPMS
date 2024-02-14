@@ -1,0 +1,136 @@
+﻿@model List<Synzeal_Inventory.Entity.SZ_QuotationDetail>
+@using Synzeal_Inventory.Models;
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    int loopCont = 1;
+}
+<div class="box-body form-horizontal">
+    <div>
+        <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom:10px;" class="btn btn-primary" onclick="SaveAllPendingActions()">Save All</a>
+        <br />
+    </div>
+    <table width="100%" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Sr No.</th>
+                <th>PO No.</th>
+                <th>Project Type</th>
+                <th>Team Leader</th>
+                <th>Product Name</th>
+                <th>CAS No</th>
+                <th>CAT No</th>
+                <th>Batch No</th>
+                <th>QTY. (mg)</th>
+                <th>Scientist Status</th>
+                <th>Estimate Comp. Date	</th>
+            </tr>
+        </thead>
+        @foreach (var k in Model)
+        {
+            <tr>
+                <td><input type="checkbox" value="@k.Id" class="clsSaveAll" /></td>
+                <td>@loopCont</td>
+                <td>@k.SZ_Quotation.PONo</td>
+                <td>
+                    <select id="Projecttypeaction_@k.Id" name="Projecttypeaction_@k.Id" class="clsProjType" data-quoteDetailsId="@k.Id">
+                        <option value="">--Select--</option>
+                        @foreach (EnumList.ProjectType r in Enum.GetValues(typeof(EnumList.ProjectType)))
+                        {
+                            var item = Enum.GetName(typeof(EnumList.ProjectType), r);
+                            var test = r.ToString();
+                            string text = SZ_Helper.GetEnumDescription((EnumList.ProjectType)(int)r);
+                            int val = (int)r;
+                            string selected = "";
+                            if (Convert.ToString(val) == k.ProjectType)
+                            {
+                                selected = "selected ";
+                            }
+                            <option value="@val" @selected>@text</option>
+                        }
+                    </select>
+                </td>
+                <td>@Html.DropDownList("ScientistIdaction_" + k.Id, (IEnumerable<SelectListItem>)ViewBag.ScientistList, "--Select--", new { @class = "scientist", @scientistId = k.ScientistCustomerId, @quotedetailsid = k.Id })</td>
+                <td>@k.ProductName</td>
+                <td>@k.CASNo</td>
+                <td>@k.CATNo</td>
+                <td>@k.BatchNo</td>
+                <td>@k.RequiredQty</td>
+                <td>@k.AdminScientistStatus</td>
+                <td>
+                    @if (k.EstimateCompleteDate.HasValue)
+                    {
+                        @k.EstimateCompleteDate.Value.ToShortDateString()
+                    }
+                </td>
+            </tr>
+            loopCont += 1;
+        }
+    </table>
+</div>
+
+<script type="text/javascript">
+
+     $(document).ready(function () {
+        $(".scientist").each(function () {
+            var value = $(this).attr("scientistId");
+            var quotedetailsid = $(this).attr("quotedetailsid");
+            if (value != "") {
+                $(this).val(value);
+            }
+        });
+    });
+
+    //function SaveAllPendingActions() {
+    //    var ids = [];
+
+    //    $('.clsSaveAll').each(function () {
+    //        if ($(this).is(':checked')) {
+    //            ids.push($(this).val());
+    //        }
+    //    });
+
+    //    if (ids.length === 0) {
+    //        swal("Opps!", 'Please select atleast one Product.', "error");
+    //        return false;
+    //    }
+
+    //    var count = 1;
+    //    $('.clsSaveAll').each(function () {
+    //        var id = $(this).val();
+    //        //$("#qty_" + id).css('border', '');
+    //        if ($(this).is(':checked')) {
+
+    //            var scId = $("#ScientistId_" + id).val();
+    //            var projectType = $("#projecttype_" + id).val();
+    //            alert(id + " " + scId + " " + projectType);
+    //            //var qty = $("#qty_" + id).val();
+    //            //var batchno = $("#batchno_" + id).val();
+    //            //var additionalBatch = $("#additionalBatch_" + id).val();
+    //            //var remark = $("#remark_" + id).val();
+    //            //if (qty === "" && qty !== "0") {
+    //            //    $("#qty_" + id).css('border', '1px solid red');
+    //            //    return false;
+    //            //}
+    //            $.ajax({
+    //                url: '/Form/SavePendingAction?scId=' + scId + '&projectType=' + projectType + '&id=' + id, /* + '&batchno=' + batchno + '&remark=' + remark + '&additionalBatch=' + additionalBatch + '&scientistStatus=' + scientistStatus,*/
+    //                data: {},
+    //                type: 'POST',
+    //                async: false,
+    //                success: function (data) {
+    //                },
+    //                complete: function (data) {
+    //                    successAlert(count, ids.length);
+    //                    count += 1;
+    //                }
+    //            });
+    //        }
+    //    });
+    //}
+    //function successAlert(count, forloopcount) {
+    //    if (count === forloopcount) {
+    //        toastr.success("You have updated product information.");
+    //        setTimeout(function () { window.location.reload(true); }, 2000);
+    //    }
+    //}
+</script>

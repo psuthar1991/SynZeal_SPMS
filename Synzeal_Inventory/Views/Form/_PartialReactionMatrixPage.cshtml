@@ -1,0 +1,211 @@
+﻿@model List<Synzeal_Inventory.Models.ReactionMatrixModel>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+
+}
+@using Synzeal_Inventory.Models
+<div class="box-body form-horizontal">
+    <table width="100%" class="table table-bordered table-striped" id="tblreactionmatrix">
+        <thead>
+            <tr>
+                <th>Products Name</th>
+                <th>
+                    CAS No
+                </th>
+                <th>Cat No</th>
+                <th>Date</th>
+                <th>Scheme</th>
+                <th>Total Steps</th>
+                <th>Step No</th>
+                <th>No of Reaction</th>
+                <th>Successful reaction</th>
+                <th>No of Purification</th>
+                <th>Batch Size</th>
+                <th>Exp No</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var k in Model)
+            {
+                string id = "tr_" + k.Range + "_" + k.QuoteDetailId + "_" + k.SrNo;
+                string schemeid = id + "_scheme";
+                string stepsid = id + "_steps";
+                string stepnoid = id + "_stepno";
+                string noofreactionid = id + "_noofreaction";
+                string succreactionid = id + "_succreaction";
+                string noofpurificationid = id + "_noofpurification";
+                string batchid = id + "_batch";
+                string expnoid = id + "_expno";
+                <tr id="@id" data-srno="@k.SrNo" data-quotedetails="@k.QuoteDetailId" data-startdate="@k.SchemeFromDate.ToShortDateString()" data-enddate="@k.SchemeEndDate.ToShortDateString()">
+                    <td>@k.Productname</td>
+                    <td>@k.CASNo</td>
+                    <td>@k.CATNo</td>
+                    <td>@k.SchemeFromDate.ToShortDateString() <span>-</span> @k.SchemeEndDate.ToShortDateString()</td>
+                    <td>
+                        <select id="@schemeid" data-value="@k.Scheme" class="clsdata">
+                            @for (char c = 'A'; c <= 'Z'; ++c)
+                            {
+                                <option value="@c">@c</option>
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <select id="@stepsid" data-value="@k.TotalStep" class="clsdata">
+                            @for (int c = 0; c <= 50; ++c)
+                            {
+                                <option value="@c">@c</option>
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <select id="@stepnoid" data-value="@k.StepNo" class="clsdata">
+                            @for (int c = 0; c <= 50; ++c)
+                            {
+                                <option value="@c">@c</option>
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <select id="@noofreactionid" data-value="@k.NoofReaction" class="clsdata">
+                            @for (int c = 0; c <= 50; ++c)
+                            {
+                                <option value="@c">@c</option>
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <select id="@succreactionid" data-value="@k.SuccessReaction" class="clsdata">
+                            @for (int c = 0; c <= 50; ++c)
+                            {
+                                <option value="@c">@c</option>
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <select id="@noofpurificationid" data-value="@k.NoofPurification" class="clsdata">
+                            @for (int c = 0; c <= 50; ++c)
+                            {
+                                <option value="@c">@c</option>
+                            }
+                        </select>
+                    </td>
+                    <td><input type="text" id="@batchid" value="@k.BatchSize" style="width: 90px" /></td>
+                    <td><input type="text" id="@expnoid" value="@k.ExpNo"  style="width: 90px" /></td>
+                    <td>
+                        <a href="javascript:void(0)" class="btn btn-primary" onclick="addnewrow(@k.QuoteDetailId, '@k.Range', '@k.SchemeFromDate.ToShortDateString()', '@k.SchemeEndDate.ToShortDateString()', '@k.SrNo')">Add</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="pull-right">
+        <a href="javascript:void(0)" onclick="savedataforreaction()" class="btn btn-primary" >Save</a>
+    </div>
+</div>
+<script>
+
+    $(".clsdata").each(function () {
+        var value = $(this).attr('data-value');
+        $(this).val(value);
+    });
+
+    function addnewrow(qdid, range, startdate, enddate, srno) {
+        var trId = "tr_" + range + "_" + qdid + "_" + srno;
+        var newsrno = parseInt(srno) + 1;
+        
+        var length = $('#tr_' + range + '_' + qdid + '_' + newsrno).length;
+        if (length !== 0) {
+            for (var i = 1; i < 40; i++) {
+                var lengthss = $('#tr_' + range + '_' + qdid + '_' + i).length;
+                if (lengthss === 0) {
+                    newsrno = i;
+                    break;
+                }
+            }
+        }
+
+        var rowid = 'tr_' + range + '_' + qdid + '_' + newsrno;
+        var schemeid = rowid + "_scheme";
+        var stepsid = rowid + "_steps";
+        var stepnoid = rowid + "_stepno";
+        var noofreactionid = rowid + "_noofreaction";
+        var succreactionid = rowid + "_succreaction";
+        var noofpurificationid = rowid + "_noofpurification";
+        var batchid = rowid + "_batch";
+        var expnoid = rowid + "_expno";
+
+        var str = '<tr id="' + rowid + '" data-srno="' + newsrno + '" data-quotedetails="' + qdid + '" data-startdate="' + startdate + '"  data-enddate="' + enddate + '">';
+        str += '<td>' + $("#" + trId)[0].children[0].textContent + '</td>';
+        str += '<td>' + $("#" + trId)[0].children[1].textContent + '</td>';
+        str += '<td>' + $("#" + trId)[0].children[2].textContent + '</td>';
+        str += '<td>' + $("#" + trId)[0].children[3].textContent + '</td>';
+        str += '<td>' + $("#" + trId)[0].children[4].innerHTML + '</td>';
+        str += '<td>' + $("#" + trId)[0].children[5].innerHTML + '</td>';
+        str += '<td>' + $("#" + trId)[0].children[6].innerHTML + '</td>';
+        str += '<td>' + $("#" + trId)[0].children[7].innerHTML + '</td>';
+        str += '<td>' + $("#" + trId)[0].children[8].innerHTML + '</td>';
+        str += '<td>' + $("#" + trId)[0].children[9].innerHTML + '</td>';
+        str += '<td>' + $("#" + trId)[0].children[10].innerHTML + '</td>';
+        str += '<td>' + $("#" + trId)[0].children[11].innerHTML + '</td>';
+        str += '<td><a href="javascript:void(0)" class="btn btn-primary"  onclick="addnewrow(' + qdid + ',&#39;' + range + '&#39;, &#39;' + startdate + '&#39;, &#39;' + enddate + '&#39;, &#39;' + newsrno + '&#39;)">Add</a></td>';
+        str += '</tr>';
+        $('#myModal').find('#' + trId).after($(str));
+        $('#myModal').find('#' + rowid)[0].children[4].children[0].setAttribute('id', schemeid);
+        $('#myModal').find('#' + rowid)[0].children[5].children[0].setAttribute('id', stepsid);
+        $('#myModal').find('#' + rowid)[0].children[6].children[0].setAttribute('id', stepnoid);
+        $('#myModal').find('#' + rowid)[0].children[7].children[0].setAttribute('id', noofreactionid);
+        $('#myModal').find('#' + rowid)[0].children[8].children[0].setAttribute('id', succreactionid);
+        $('#myModal').find('#' + rowid)[0].children[9].children[0].setAttribute('id', noofpurificationid);
+        $('#myModal').find('#' + rowid)[0].children[10].children[0].setAttribute('id', batchid);
+        $('#myModal').find('#' + rowid)[0].children[11].children[0].setAttribute('id', expnoid);
+        $('#myModal').find('#' + rowid)[0].children[10].children[0].value = '';
+        $('#myModal').find('#' + rowid)[0].children[11].children[0].value = '';
+    }
+
+    function savedataforreaction() {
+        var table = $("#tblreactionmatrix > tbody");
+        var childdata = table[0].rows;
+        var obj = [];
+        for (var i = 0; i < childdata.length; i++) {
+            var id = childdata[i].attributes['id'].value;
+            var qdid = childdata[i].attributes['data-quotedetails'].value;
+            var startdate = childdata[i].attributes['data-startdate'].value;
+            var enddate = childdata[i].attributes['data-enddate'].value;
+            var reactionId = 0;
+            var subobj = {
+                "QuoteDetailId": qdid,
+                "Id": reactionId,
+                "SchemeFromDate": startdate,
+                "SchemeEndDate": enddate,
+                "Scheme": $("#" + id +"_scheme").val(),
+                "TotalStep": $("#" + id + "_steps").val(),
+                "StepNo": $("#" + id + "_stepno").val(),
+                "NoofReaction": $("#" + id + "_noofreaction").val(),
+                "SuccessReaction": $("#" + id + "_succreaction").val(),
+                "NoofPurification": $("#" + id + "_noofpurification").val(),
+                "BatchSize": $("#" + id + "_batch").val(),
+                "ExpNo": $("#" + id + "_expno").val(),
+                "SrNo": childdata[i].attributes['data-srno'].value
+            };
+            obj.push(subobj);
+        }
+
+        var things = JSON.stringify({ 'id': obj });
+        $.ajax({
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: 'POST',
+            url: '/Form/SaveReactionMatrixData',
+            data: things,
+            success: function () {
+                toastr.success("Record saved successfully.");
+                $('#myModal').modal('hide');
+            },
+            failure: function (response) {
+            }
+        }); 
+        
+    }
+
+</script>

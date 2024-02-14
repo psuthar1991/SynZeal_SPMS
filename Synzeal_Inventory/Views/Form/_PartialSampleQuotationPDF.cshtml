@@ -1,0 +1,208 @@
+﻿@model Synzeal_Inventory.Entity.SZ_Quotation
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+
+}
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+
+@using Newtonsoft.Json
+
+@*<style type="text/css">
+        table thead tr th {
+            font-size:12px;
+            text-align:center;
+            padding:10px 0;
+        }
+        table {
+            background: pink;
+            border: 0;
+            border-collapse: separate;
+            border-spacing: 0 5px;
+        }
+
+        thead tr th {
+            border-bottom: 1px solid #5c5c5c;
+            border-collapse: separate;
+            border-spacing: 5px 5px;
+        }
+
+        tbody tr#first td {
+            border-top: 3px solid #4d4d4d;
+            border-collapse: separate;
+            border-spacing: 5px 5px;
+        }
+
+    </style>*@
+
+<div style="margin:5% 33%;float:left;box-shadow:0 0 3px #aaa; height:auto;color:gray;">
+    <table width="100%">
+        <tr>
+            <td valign="top">
+                <img src="http://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" width="200px" />
+                @*<br />
+                    <div style="font-size:12px;padding-left:30%;">QUALITY ASSURED</div>*@
+            </td>
+            @*<td style="float:right">
+                    <span style="font-size:9px;float:right;padding:10px; text-align:right;color:gray">
+                        <b style="color:#000">Syn</b><b style="color: #00659e;">Zeal</b><b style="color:#000"> Research Pvt Ltd</b><br />
+                        Plot No. F, Shree Ganesh Industrial Estate,<br />
+                        423/24/8, Mahagujarat Industrial Estate,<br />
+                        Sarkhej-Bavla Road , Moraiya , India-382213<br />
+                        <b>Email:-</b> standards@synzeal.com<br />
+                        <b>Phone:-</b> +91-757-500-2050<br />
+                    </span>
+                </td>*@
+        </tr>
+    </table>
+    <div>
+        Date : @Model.CreatedDate.Value.Day<sup>@GetDaySuffix(Model.CreatedDate.Value.Day)</sup> @Model.CreatedDate.Value.ToString("MMMM yy")
+    </div>
+
+    <div style="width:100%; padding:0px; float:left;padding-top:10px;">
+        <table width="100%">
+            <thead>
+                <tr style="font-size:10px">
+                    <th width="15%">
+                        <b>Sr. No.</b>
+                    </th>
+                    <th>
+                        <b style="text-align:center;">Structure</b>
+                    </th>
+                    <th><b>Details</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int srno = 1;
+                    foreach (var item in Model.SZ_QuotationDetail.OrderBy(x => x.DisplayOrder).ToList())
+                    {
+                        string MolecularWeight = db.Products.Where(x => x.Sku == item.CATNo && x.Published == true && x.Deleted == false).Select(x => x.MolecularWeight).FirstOrDefault();
+                        string imagePath = string.Empty;
+                        bool exists = false;
+                        if (!string.IsNullOrEmpty(item.CATNo))
+                        {
+                            string uri = "https://synzeal.com/api/RestAPI/ProductDetailsBySku?sku=" + item.CATNo.Trim();
+                            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                            request.Method = "GET";
+                            request.ContentType = "application/json";
+
+                            try
+                            {
+                                WebResponse response = request.GetResponse();
+                                using (var reader = new StreamReader(response.GetResponseStream()))
+                                {
+                                    var ApiStatus = reader.ReadToEnd();
+                                    string productModel = JsonConvert.DeserializeObject<string>(ApiStatus);
+                                    var product = JsonConvert.DeserializeObject<Synzeal_Inventory.Models.ProductDetailsModel>(productModel);
+                                    if (product != null && product.DefaultPictureModel != null)
+                                    {
+                                        imagePath = product.DefaultPictureModel.ImageUrl;
+                                    }
+                                    else
+                                    {
+                                        imagePath = string.Empty;
+                                    }
+                                }
+                                exists = true;
+                            }
+                            catch
+                            {
+                                exists = false;
+                            }
+                            //using (System.Net.Http.HttpClient httpClient = new System.Net.Http.HttpClientFactory())
+                            //{
+                            //    System.Threading.Tasks.Task<String> response = httpClient.GetStringAsync(uri);
+                            //    string productModel = JsonConvert.DeserializeObjectAsync<string>(response.Result).Result;
+                            //    var product = JsonConvert.DeserializeObject<Synzeal_Inventory.Models.ProductDetailsModel>(productModel);
+                            //}
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(item.ImagePath) && item.ImagePath.Contains("../"))
+                            {
+                                string host = Request.Url.AbsoluteUri.ToString().Substring(0, Request.Url.AbsoluteUri.ToLower().IndexOf("/form"));
+                                imagePath = item.ImagePath.Replace("..", host);
+                            }
+                            else
+                            {
+                                imagePath = item.ImagePath;
+                                    if(string.IsNullOrEmpty(item.CATNo) && imagePath != null && imagePath.Contains("synzeal.com"))
+                                    {
+                                        imagePath = "";
+                                    }
+                            }
+
+                            if (!string.IsNullOrEmpty(imagePath))
+                            {
+                                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(imagePath);
+                                request.Method = "HEAD";
+                                try
+                                {
+                                    request.GetResponse();
+                                    exists = true;
+                                }
+                                catch
+                                {
+                                    exists = false;
+                                }
+                            }
+                        }
+                        <tr style="color:#000;">
+                            <td style="font-size:9px;text-align:center;" width="15%">
+                                @srno
+                            </td>
+                            <td style="font-size:9px;text-align:center;">
+                                @if (!string.IsNullOrEmpty(imagePath) && exists)
+                                {
+                                    <img src="@imagePath" width="220px" />
+                                }
+                                else
+                                {
+                                    <img src="https://www.synzeal.com/content/images/thumbs/default-image_500.png" width="220px" />
+                                }
+                            </td>
+                            <td style="font-size:9px;">
+                                <table width="100%">
+                                    <tr>
+                                        <td>
+                                            <b>Name:</b> @item.ProductName<br />
+                                            @if (!string.IsNullOrEmpty(item.CATNo))
+                                            {
+                                                <b>CAT No:</b> @item.CATNo<br />
+                                            }
+                                            <b>CAS No:</b> @item.CASNo<br />
+                                            <b>Mol Wt:</b> @MolecularWeight<br />
+                                           
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        srno += 1;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+

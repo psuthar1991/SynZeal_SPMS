@@ -1,0 +1,136 @@
+﻿@{
+    ViewBag.Title = "Scientist Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<Synzeal_Inventory.Models.ScientistDetailDashboardModel>
+<section class="content-header">
+    <h1>
+        Scientist's detail dashboard : @ViewBag.ScientistName
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <form role="form">
+                    <div class="box-body">
+                        @*@if (Model != null && Model.Count > 0)
+                        {
+                            int loop = 1;*@
+                            <table id="alltbl" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        @*<th>Sci. Name</th>*@
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Quantity Demanded</th>
+                                        <th>Quantity</th>
+                                        <th>Category</th>
+                                        <th>Sub Sci. Name</th>
+                                        <th>Chemist</th>
+                                        <th>Sub. Dt</th>
+                                        <th>Duration</th>
+                                        <th>Quoted Lead Time</th>
+                                        <th>PO No</th>
+                                        <th>No Of Steps of Final Route</th>
+                                        <th>Earlier Synthesized</th>
+                                        <th>Purification By</th>
+                                        <th>API Category</th>
+                                        <th>Spectral Data Attachment</th>
+                                    </tr>
+                                </thead>
+                                @*<tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                    <tr>
+                                        <td>@loop</td>
+                                        <td>@item.ScientistName</td>
+                                        <td>@item.ProductName</td>
+                                        <td>@item.QuantityDemand</td>
+                                        <td>@item.Quantity </td>
+                                        <td>@item.DiffLevel</td>
+                                        <td>
+                                            @if (item.SubmitedDate != null)
+                                            {
+                                                @item.SubmitedDate.ToShortDateString()
+                                            }
+                                        </td>
+                                        <td>@item.Duration</td>
+                                        <td>@item.QuotedLeadTime</td>
+                                        <td>@item.PONumber</td>
+                                        <td>@item.FinalRoute</td>
+                                        <td>@item.EarlierSynthesized</td>
+                                        <td>@item.PurificationBy</td>
+                                        <td>@item.APIcategory</td>
+                                        <td>@item.SpeDataAttachment</td>
+                                    </tr>
+                                        loop +=1;
+                                    }
+                                </tbody>*@
+                            </table>
+                        @*}*@
+
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    <!-- /.row -->
+</section>
+<script type="text/javascript">
+    $(function () {
+
+        var alltbl = $('#alltbl').DataTable({
+            "ordering": false,
+            "scrollX": true,
+            "scrollY": "550px",
+            //"autoWidth" : false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "pageLength": 25,
+            "fnDrawCallback": function (oSettings) {
+            },
+            "columnDefs": [],
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "initComplete": function (settings, json) {
+            },
+            "ajax": {
+                "url": "/Form/LoadScientistDashboardDetail?id=" + @ViewBag.ScientistId,
+                "type": "POST",
+                "datatype": "json"
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                $("td:nth-child(1)", nRow).html(iDisplayIndex + 1);
+                return nRow;
+            },
+            "createdRow": function (row, data, dataIndex) {
+            },
+            "columns": [
+                { "data": null },
+                //{ "data": "ScientistName" },
+                { "data": "ProductName" },
+                { "data": "CASNO" },
+                { "data": "CATNoText" },
+                { "data": "QuantityDemand" },
+                { "data": "Quantity" },
+                { "data": "DiffLevelText" },
+                { "data": "SubScientistName" },
+                { "data": "Chemist" },
+                { "data": "SubmitedDateText" },
+                { "data": "Duration" },
+                { "data": "QuotedLeadTime" },
+                { "data": "PONumber" },
+                { "data": "FinalRoute" },
+                { "data": "EarlierSynthesized" },
+                { "data": "PurificationBy" },
+                { "data": "APIcategory" },
+                { "data": "SpeDataAttachment" },
+            ]
+
+        });
+    });
+</script>

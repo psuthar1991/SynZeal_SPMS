@@ -1,0 +1,221 @@
+﻿@{
+    ViewBag.Title = "ClientAdmin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section class="content-wrapper" style="min-height: 960px;">
+    <section class="content-header">
+        <h1>
+            Project Status List <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="SaveAll()">Save All</a>
+        </h1>
+    </section>
+
+    <section class="content">
+        <div class="box box-info">
+            @*<div class="box-header with-border">
+                <h3 class="box-title">Latest Orders</h3>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                    </div>
+                </div>*@
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="table-responsive" style="overflow:scroll;" id="divQuote">
+                    <table id="alltbl" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAllclsSaverow" /></th>
+                                <th>#</th>
+                                <th>PO Date</th>
+                                <th>Status</th>
+                                <th>PO No</th>
+                                <th>Product Name</th>
+                                <th>CAT No</th>
+                                <th>CAS No</th>
+                                <th>Team leader</th>
+                                <th>Batch No</th>
+                                <th>Current Status</th>
+                                <th>Last Status</th>
+                                <th>
+                                    Estimated Date for Data
+                                </th>
+                                <th>COA</th>
+                                <th>
+                                    Analytical Data
+                                </th>
+                                <th>Attached data list</th>
+                                <th>
+                                    Client Remark For Changes
+                                </th>
+                                <th>
+                                    Pickup address
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+    $(function () {
+        $('#alltbl').DataTable({
+            "ordering": false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "orderMulti": false, // for disable multiple column at once
+            "pageLength": 25,
+            "fnDrawCallback": function (oSettings) {
+
+                $("#selectAllclsSaverow").click(function () {
+                    if ($(this).is(":checked")) {
+                        $('.svcheck').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $(".svcheck").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+            },
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "initComplete": function (settings, json) {
+
+            },
+            "ajax": {
+                "url": "../LoadAllClientAdmindata?id=" + @ViewBag.CompanyId +'&isClientSection='+false,
+                "type": "POST",
+                "datatype": "json"
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.ClientStatus === 'COA/Data Correction') {
+                    $('td', nRow).css('background-color', '#ffff5f');
+                }
+                if (aData.ClientStatus === 'COA/Data Sent') {
+                    $('td', nRow).css('background-color', '#effbff');
+                }
+                if (aData.ClientStatus === 'COA/Data Approved') {
+                    $('td', nRow).css('background-color', 'lightgreen');
+                }
+            },
+            "columnDefs": [],
+            "createdRow": function (row, data, dataIndex) {
+                $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+            },
+            "columns": [
+                { "data": "ChkSaveRow", "autoWidth": true },
+
+                { "data": "SrPo", "autoWidth": true },
+                { "data": "MoveProjectDateText", "name": "MoveProjectDateText", "autoWidth": true },
+                { "data": "ClientStatusText", "name": "ClientStatusText", "width": "6%" },
+                { "data": "PONumber", "name": "PONumber", "autoWidth": true },
+                { "data": "ProductName", "width": "18%" },
+                { "data": "CATNo", "name": "PONumber", "width": "6%" },
+                { "data": "CASNo", "name": "CompanyName", "width": "6%" },
+                { "data": "SelectedScientistName", "name": "SelectedScientistName", "autoWidth": true },
+                { "data": "SelectedAdditionalBatchNo", "name": "ProductName", "width": "5%" },
+                { "data": "ScientistStatustext", "name": "ScientistStatustext"},
+                { "data": "LastStatusText", "name": "LastStatusText" },
+                { "data": "EstimateCompleteDateText", "orderable": false, "autoWidth": true },
+                { "data": "COADownloadLink", "name": "COADownloadLink", "autoWidth": true },
+                { "data": "AnalyticalDataLink", "name": "AnalyticalDataLink", "autoWidth": true },
+                { "data": "AttachedDataList", "name": "AttachedDataList", "autoWidth": true },
+                { "data": "ClientRemarkText", "name": "ClientRemarkText", "autoWidth": true },
+                { "data": "ClientAddressText", "name": "ClientAddressText", "autoWidth": true }
+                
+            ]
+        });
+    });
+
+
+    function SaveInformation(id) {
+        var status = $('#clientstatus_' + id).val();
+        var currentStatus = $("#scientistStatus_" + id).val();
+        var lastStatus = $("#lastStatus_" + id).val();
+        var clientremark = $("#clientremark_" + id).val();
+        var clientaddress = $("#clientaddress_" + id).val();
+        $.ajax({
+            url: '/Form/SaveClientAdminInfo?id=' + id + '&clientstatus=' + status + '&currentStatus=' + currentStatus + '&lastStatus=' + lastStatus + '&clientremark=' + clientremark + '&clientaddress=' + clientaddress,
+            data: {},
+            type: 'POST',
+            success: function (data) {
+               toastr.success("Information Saved Successfully.");
+                window.location.reload(true);
+            }
+        });
+    }
+
+    function SaveAll() {
+        var ids = [];
+        $('#alltbl').find('.svcheck').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        }); 
+        
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+
+        var count = 1;
+        $('#alltbl').find('.svcheck').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                var status = $('#clientstatus_' + id).val();
+                var currentStatus = $("#scientistStatus_" + id).val();
+                var lastStatus = $("#lastStatus_" + id).val();
+                var clientremark = $("#clientremark_" + id).val();
+                var clientaddress = $("#clientaddress_" + id).val();
+                debugger;
+                $.ajax({
+                    url: '/Form/SaveClientAdminInfo?id=' + id + '&clientstatus=' + status + '&currentStatus=' + currentStatus + '&lastStatus=' + lastStatus + '&clientremark=' + clientremark + '&clientaddress=' + clientaddress,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                    },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function successAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("Information Saved Successfully.");
+            setTimeout(function () { window.location.reload(true); }, 2000);
+        }
+    }
+
+    $("#divQuote").css('height', window.innerHeight - 200);
+</script>
+<div id="clientremarkModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal</h4>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 15px;text-align: center;color: #1d3f72;font-weight: 800;">Please wait few minutes...</p>
+                <div style="text-align:center">
+                    <img src="@Url.Content("~/images/loader.svg")" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

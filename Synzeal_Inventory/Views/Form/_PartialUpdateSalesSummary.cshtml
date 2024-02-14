@@ -1,0 +1,288 @@
+﻿@model Synzeal_Inventory.Models.SalesSummaryModel
+@using Synzeal_Inventory.Entity;
+@{
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    int loop = 1;
+    int todayTotal = 0;
+    int weekTotal = 0;
+    int quoteweekTotal = 0;
+    int rfqweekTotal = 0;
+    int monthTotal = 0;
+    int quotemonthTotal = 0;
+    int rfqmonthTotal = 0;
+    int yearTotal = 0;
+    int quoteyearTotal = 0;
+    int rfqyearTotal = 0;
+}
+
+<div class="box-body form-horizontal" id="profrm" style="overflow:scroll">
+    @if (Model != null)
+    {
+        <div style="text-align: center; vertical-align: middle">
+            <h3><b>Quotation Summary</b></h3>
+        </div>
+        <table border="1" class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+            <thead>
+                <tr style="vertical-align: middle">
+                    <th width="6%" style="text-align: center; vertical-align: middle">
+                        #
+                    </th>
+                    <th width="13%" style="text-align: center;vertical-align: middle">
+                        Date
+                    </th>
+                    <th width="22%" style="text-align: center;vertical-align: middle">
+                        User Name
+                    </th>
+                    <th width="20%" style="text-align: center;vertical-align: middle">
+                        Quote Products
+                    </th>
+                    <th width="20%" style="text-align: center;vertical-align: middle">
+                        RFQ Products
+                    </th>
+                    <th width="14%" style="text-align: center;vertical-align: middle">
+                        Total
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model.TodayData)
+                {
+                    <tr>
+                        <td class="" style="text-align:center; ">
+                            @loop
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Date.ToShortDateString()
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Username
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.QuoteProducts
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.RFQProducts
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Total
+                        </td>
+                    </tr>
+
+                    todayTotal += k.Total;
+
+                    loop += 1;
+                }
+
+                <tr>
+                    <td colspan="5" style="text-align:right;"> <b>Total : </b> </td>
+                    <td class="" style="text-align:center;"><b> @todayTotal</b></td>
+                </tr>
+            </tbody>
+        </table>
+        <br /><br />
+
+        <div style="text-align: center; vertical-align: middle">
+            <h3><b>Week Quotation Summary :: @ViewBag.Weekstart <span>-<span> @ViewBag.Weekend </b></h3> <br /><br />
+        </div>
+        <table border="1" class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+            <thead>
+                <tr style="vertical-align: middle">
+                    <th width="6%" style="text-align: center; vertical-align: middle">
+                        #
+                    </th>
+                    <th width="25%" style="text-align: center;vertical-align: middle">
+                        User Name
+                    </th>
+                    <th width="25%" style="text-align: center;vertical-align: middle">
+                        Quote Products
+                    </th>
+                    <th width="25%" style="text-align: center;vertical-align: middle">
+                        RFQ Products
+                    </th>
+                    <th width="14%" style="text-align: center;vertical-align: middle">
+                        Total
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model.WeekData)
+                {
+
+                    <tr>
+                        <td class="" style="text-align:center; ">
+                            @loop
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Username
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.QuoteProducts
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.RFQProducts
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Total
+                        </td>
+                    </tr>
+                    weekTotal += k.Total;
+                    rfqweekTotal += k.RFQProducts;
+                    quoteweekTotal += k.QuoteProducts;
+
+                    loop += 1;
+                }
+
+            <tr>
+                <td colspan="2" style="text-align:right;">  </td>
+                <td class="" style="text-align:center;"><b> @quoteweekTotal</b></td>
+                <td class="" style="text-align:center;"><b> @rfqweekTotal</b></td>
+                <td class="" style="text-align:center;"><b> @weekTotal</b></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <br /><br />
+        <div style="text-align: center; vertical-align: middle">
+            <h3><b>Month Quotation Summary :: @DateTime.Now.ToString("MMMM")<span>-</span>@DateTime.Now.Year</b></h3>
+        </div>
+        <table border="1" class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+            <thead>
+                <tr style="vertical-align: middle">
+                    <th width="6%" style="text-align: center; vertical-align: middle">
+                        #
+                    </th>
+                    <th width="25%" style="text-align: center;vertical-align: middle">
+                        User Name
+                    </th>
+                    <th width="25%" style="text-align: center;vertical-align: middle">
+                        Quote Products
+                    </th>
+                    <th width="15%" style="text-align: center;vertical-align: middle">
+                        RFQ Products
+                    </th>
+
+                    <th width="14%" style="text-align: center;vertical-align: middle">
+                        Total
+                    </th>
+                    <th width="15%" style="text-align: center;vertical-align: middle">
+                        Conversion
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model.MonthData)
+                {
+
+                    <tr>
+                        <td class="" style="text-align:center; ">
+                            @loop
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Username
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.QuoteProducts
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.RFQProducts
+                        </td>
+
+                        <td class="" style="text-align:center; ">
+                            @k.Total
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Conversion
+                        </td>
+                    </tr>
+                    monthTotal += k.Total;
+                    quotemonthTotal += k.QuoteProducts;
+                    rfqmonthTotal += k.RFQProducts;
+
+                    loop += 1;
+                }
+
+            <tr>
+                <td colspan="2" style="text-align:right;"> <b>Total : </b> </td>
+                <td class="" style="text-align:center;"><b> @quotemonthTotal</b></td>
+                <td class="" style="text-align:center;"><b> @rfqmonthTotal</b></td>
+
+                <td class="" style="text-align:center;"><b> @monthTotal</b></td>
+                <td class="" style="text-align:center;"><b>@ViewBag.Monthconversion</b></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <br /><br />
+
+        <div style="text-align: center; vertical-align: middle">
+            <h3>
+                <b>
+                    Financial Year :: @ViewBag.FinYear
+                </b>
+            </h3> <br /><br />
+        </div>
+        <table border="1" class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+            <thead>
+                <tr style="vertical-align: middle">
+                    <th width="6%" style="text-align: center; vertical-align: middle">
+                        #
+                    </th>
+                    <th width="25%" style="text-align: center;vertical-align: middle">
+                        User Name
+                    </th>
+                    <th width="25%" style="text-align: center;vertical-align: middle">
+                        Quote Products
+                    </th>
+                    <th width="15%" style="text-align: center;vertical-align: middle">
+                        RFQ Products
+                    </th>
+                    
+                    <th width="14%" style="text-align: center;vertical-align: middle">
+                        Total
+                    </th><th width="15%" style="text-align: center;vertical-align: middle">
+    Conversion
+</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model.YearData)
+                {
+
+                    <tr>
+                        <td class="" style="text-align:center; ">
+                            @loop
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Username
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.QuoteProducts
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.RFQProducts
+                        </td>
+
+                        <td class="" style="text-align:center; ">
+                            @k.Total
+                        </td>
+                        <td class="" style="text-align:center; ">
+                            @k.Conversion
+                        </td>
+                    </tr>
+                    yearTotal += k.Total;
+
+                    loop += 1;
+                }
+
+            <tr>
+
+                <td colspan="2" style="text-align:right;"> <b>Total : </b> </td>
+                <td class="" style="text-align:center;"><b> @quoteyearTotal</b></td>
+                <td class="" style="text-align:center;"><b> @rfqyearTotal</b></td>
+                <td class="" style="text-align:center;"><b> @yearTotal</b></td>
+                <td class="" style="text-align:center;">@ViewBag.Yearconversion</td>
+            </tr>
+            </tbody>
+        </table>
+    }
+</div>

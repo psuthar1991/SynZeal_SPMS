@@ -1,0 +1,238 @@
+﻿@{
+    ViewBag.Title = "SynthesisLog";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model List<Synzeal_Inventory.Models.SZ_QuotationModel>
+
+
+<section class="content-header">
+    <h1>
+        Synthesis Log
+        <a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="SaveAll()">Save All</a>
+        <a href="javascript:void(0)" style="float:right;margin-right:10px" class="btn btn-primary" onclick="EditAll()">Edit All</a>
+        <a href="javascript:void(0)" style="float:right;margin-right:10px" class="btn btn-primary" onclick="Export()">Export</a>
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <div class="box-body divQuote" style="overflow:scroll;">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th> <input type="checkbox" id="chkquotationallAll" /></th>
+                                @*<th> <input type="checkbox" id="chksecondallAll" /> </th>*@
+                                <th></th>
+                                <th></th>
+                                <th>Ref#</th>
+                                <th>Company Name</th>
+                                <th>Scientist</th>
+                                <th>Project Type</th>
+                                <th>PO No</th>
+                                <th>Product Name</th>
+                                <th>CAS No</th>
+                                <th>CAT No</th>
+                                <th>Price/Qty</th>
+
+                                <th>Lead Time</th>
+                                <th>Batch No</th>
+                                <th>Product Remark</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(".divQuote").css('height', window.innerHeight - 200);
+    $(document).ready(function () {
+        //console.log('inside the function');
+        $('#example1').DataTable({
+            //"fixedHeader": {
+            //    header: true
+            //},
+            "ordering": false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "orderMulti": false, // for disable multiple column at once
+            "pageLength": 25,
+            //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+            "ajax": {
+                "url": "../Form/LoadSynthesisLogData?issynthesispage=true",
+                "type": "POST",
+                "datatype": "json"
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                    $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                }
+            },
+            "fnDrawCallback": function (oSettings) {
+                $("#chkquotationallAll").click(function () {
+                    if ($(this).is(":checked")) {
+                        $("#example1").find('.clsclubQuote').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $("#example1").find(".clsclubQuote").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+
+                $("#chksecondallAll").click(function () {
+                    if ($(this).is(":checked")) {
+                        $("#example1").find('.clsMoveProject').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $("#example1").find(".clsMoveProject").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+            },
+            "columnDefs":
+                [
+                ],
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+            },
+            "columns": [
+                { "data": "ChkFirstRow", "autoWidth": true, "orderable": false },
+                //{ "data": "MoveToProjectText", "autoWidth": true, "orderable": false },
+                { "data": "DownloadSampleRow", "autoWidth": true, "orderable": false },
+                { "data": "DownloadRow", "autoWidth": true, "orderable": false },
+                { "data": "Ref", "name": "Ref", "width": "100px" },
+                { "data": "CompanyName", "name": "CompanyName", "width": "200px" },
+                { "data": "ScientistName", "autoWidth": true, "orderable": false },
+                { "data": "ProjectTypeText", "autoWidth": true, "orderable": false },
+                { "data": "PONumberText", "name": "PONumber", "width": "100px" },
+                { "data": "ProductNameText", "name": "ProductName", "width": "18%" },
+                { "data": "CASNoText", "name": "CASNo", "width": "6%" },
+                { "data": "CATNoText", "name": "CATNo", "width": "6%" },
+                { "data": "PriceText", "name": "Price", "width": "250px" },
+                { "data": "LeadTimeText", "name": "LeadTime", "autoWidth": true },
+                { "data": "AdditionalBatchNoText", "name": "AdditionalBatchNoText" },
+                { "data": "ProductRemark", "orderable": false, "width": "100px" },
+                { "data": "ActionRow", "orderable": false, "width": "130px" }
+            ]
+
+        });
+    });
+
+    function EditProductDetails(id) {
+
+          var  tableId = 'example1';
+
+
+        $('#' + tableId).find("#edit_" + id).hide();
+        $('#' + tableId).find("#save_" + id).show();
+        $('#' + tableId).find("#tr_" + id).find("label").hide();
+        $('#' + tableId).find("#tr_" + id).find("input").show();
+    }
+    function EditAll() {
+        var tableId = 'example1';
+
+        $('#' + tableId).find('.clsclubQuote').each(function () {
+            var id = $(this).val();
+                $('#' + tableId).find("#edit_" + id).hide();
+                $('#' + tableId).find("#save_" + id).show();
+                $('#' + tableId).find("#tr_" + id).find("label").hide();
+                $('#' + tableId).find("#tr_" + id).find("input").show();
+            
+        });
+       
+    }
+
+    function SaveAll() {
+        var tableId = 'example1';
+        var ids = [];
+        $('#' + tableId).find('.clsclubQuote').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        var count = 1;
+        $('#' + tableId).find('.clsclubQuote').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                var ponumber = $('#' + tableId).find("#ponumber_" + id).val();
+                var productname = $('#' + tableId).find("#productname_" + id).val();
+                var price = $('#' + tableId).find("#price_" + id).val();
+                var casno = $('#' + tableId).find("#casno_" + id).val();
+                var catno = $('#' + tableId).find("#catno_" + id).val();
+                var leadtime = $('#' + tableId).find("#leadtime_" + id).val();
+                var ProductRemark = $('#' + tableId).find("#ProductRemark_" + id).val();
+                var projectType = $('#' + tableId).find("#projecttype_" + id).val();
+                var followUpRemark = $('#' + tableId).find("#followUpRemark_" + id).val();
+                var followUpRemarkSecond = $('#' + tableId).find("#followUpRemarkSecond_" + id).val();
+                var scientistCustomerid = $('#' + tableId).find("#ScientistId_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateSynthesisProductInfo?ProductName=' + productname + '&projectType=' + projectType + '&casno=' + casno + '&catNo=' + catno + '&price=' + price + '&leadtime=' + leadtime + '&id=' + id + '&ponumber=' + ponumber + '&productremark=' + ProductRemark + '&followUpRemark=' + followUpRemark + '&followUpRemarkSecond=' + followUpRemarkSecond + '&scientistCustomerid=' + scientistCustomerid,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                        
+                    },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+        
+    }
+    function successAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product information.");
+            setTimeout(function () { window.location.reload(true); }, 2000);
+        }
+    }
+
+    function SaveProductDetails(id) {
+        var tableId = 'example1';
+        var ponumber = $('#' + tableId).find("#ponumber_" + id).val();
+        var productname = $('#' + tableId).find("#productname_" + id).val();
+        var price = $('#' + tableId).find("#price_" + id).val();
+        var casno = $('#' + tableId).find("#casno_" + id).val();
+        var catno = $('#' + tableId).find("#catno_" + id).val();
+        var leadtime = $('#' + tableId).find("#leadtime_" + id).val();
+        var ProductRemark = $('#' + tableId).find("#ProductRemark_" + id).val();
+        var projectType = $('#' + tableId).find("#projecttype_" + id).val();
+        var followUpRemark = $('#' + tableId).find("#followUpRemark_" + id).val();
+        var followUpRemarkSecond = $('#' + tableId).find("#followUpRemarkSecond_" + id).val();
+        var scientistCustomerid= $('#' + tableId).find("#ScientistId_" + id).val();
+        $.ajax({
+            url: '/Form/UpdateSynthesisProductInfo?ProductName=' + productname + '&projectType=' + projectType + '&casno=' + casno + '&catNo=' + catno + '&price=' + price + '&leadtime=' + leadtime + '&id=' + id + '&ponumber=' + ponumber + '&productremark=' + ProductRemark + '&followUpRemark=' + followUpRemark + '&followUpRemarkSecond=' + followUpRemarkSecond + '&scientistCustomerid=' + scientistCustomerid,
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                if (data.success) {
+                    window.location.href = "/Form/SynthesisLog";
+                }
+            }
+        });
+    }
+
+    function Export() {
+        window.location.href = "/Form/ExportFromSynthesisLog";
+    }
+</script>

@@ -1,0 +1,500 @@
+﻿@{
+    ViewBag.Title = "Purchase Product Master List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<SZ_QuotationModel>
+@using Synzeal_Inventory.Models
+<section class="content-header">
+    <h1>
+        Purchase Product Master List
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12" style="text-align:center">
+            @for (char c = 'A'; c <= 'Z'; c++)
+            {
+                <div class="letter " data-letter="@c" onclick="SelectInventoryChar('@c')">@c</div>
+            }
+        </div>
+        <div class="col-md-12" style="margin: 10px;">
+            <div class="form-group">
+                <label class="col-md-1" style="padding-top: 6px;">Select API :</label>
+                <div class="col-md-2">
+                    <select id="loadapiselect" class="form-control">
+                        <option value="0">--Select--</option>
+                    </select>
+                </div>
+                <div class="col-md-1" style="text-align: center;padding-top: 6px;">
+                    OR
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="txtsearch" name="txtsearch" class="form-control" />
+                </div>
+                <div class="col-md-1">
+                    <input type="button" value="Search" class="btn btn-primary" onclick="searchinventory()" />
+                </div>
+                <div class="col-md-4">
+                    <b style="float:left">Import Excel File : </b><input type="file" name="importPurchaseProductFile" id="importPurchaseProductFile" onchange="Quote.importPurchaseProductFile()" style="float:left;width: 40%;padding-left:20px;" />
+                </div>
+                <div class="col-md-1">
+                    <input type="button" value="Save All" class="btn btn-primary" onclick="saveAll()" />
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <div class="box-body" style="overflow:scroll;" id="divQuote">
+                    <div class="row " style="padding-bottom:10px">
+                        <div class="form-group">
+                            <div class="col-md-1">
+                                <label style="padding-top: 6px;">In-Stock:</label>
+                                <input type="checkbox" id="filterinstock" name="instock" value="Instock" checked class="filterstatus" />
+                            </div>
+                            <div class="col-md-2">
+                                <label style="padding-top: 6px;">Custom Synthesis:</label>
+                                <input type="checkbox" id="filterother" name="other" value="Custom Synthesis" checked class="filterstatus" />
+                            </div>
+                            <div class="col-md-1">
+                                <a href="javascript:void(0)" onclick="$('#example1').DataTable().draw()" class="btn btn-primary">Search</a>
+                            </div>
+                            <div class="col-md-8" style="text-align:right" >
+                            </div>
+                        </div>
+                    </div>
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th width="1%"><input type="checkbox" id="selectallchk" /></th>
+                                <th></th>
+                                <th>Product Name</th>
+                                <th>CAS No</th>
+                                <th>CAT No</th>
+                                <th>M.W.</th>
+                                <th>M.F.</th>
+                                <th>Quotation Received</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<style type="text/css">
+    .clsppop:hover {
+        color: red;
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .clsppop {
+        width: 10%;
+        padding: 3px 0;
+    }
+
+    .modal-footer {
+        border: 0;
+    }
+</style>
+<script>
+    $('#selectallchk').change(function () {
+        if ($(this).is(':checked')) {
+            $('.clsSaverow').each(function () {
+                $(this).prop('checked', true);
+            });
+        }
+        else {
+            $('.clsSaverow').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    function searchinventory() {
+        var value = $('#loadapiselect').val();
+        var search = $('#txtsearch').val();
+        if (value === "0" && search === "") {
+            swal("Please select API.")
+            return false;
+        }
+        RefstockGrid(value, search);
+    }
+
+    var firsttimeload = false;
+    function RefstockGrid(val, search) {
+        if (firsttimeload) {
+            $('#example1').DataTable().clear();
+            $('#example1').DataTable().destroy();
+        }
+        firsttimeload = true;
+        $('#example1').DataTable({
+            "ordering": false,
+            "processing": true, 
+            "serverSide": true, 
+            "filter": true,
+            "orderMulti": false, 
+            "pageLength": 25,
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "ajax": {
+                "url": "../Form/LoadPurchaseProducMasterData?apiname=" + val + '&search=' + search,
+                "type": "POST",
+                "datatype": "json",
+                "data": function (d) {
+                    d.instockother = $("#filterinstock").is(":checked") + "," + $("#filterother").is(":checked")
+                }
+            },
+            "fnDrawCallback": function (oSettings) {
+                $(".clsquotationreceived").each(function () {
+                    var val = $(this).attr('data-value');
+                    if (val !== '') {
+                        $(this).val(val);
+                    }
+                });
+                $(".clspurchasecommnet").each(function () {
+                    var val = $(this).attr('data-value');
+                    if (val !== '') {
+                        $(this).val(val);
+                    }
+                });
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.IsBatchAvailable) {
+                    $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                }
+                $('td:eq(2)', nRow).addClass("imgclshover");
+            },
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                $(row).attr('id', 'tr_' + data.Id);
+                $(row).attr('class', 'clstr');
+            },
+            "columns": [
+                { "data": "ChkRow", "autoWidth": true, "orderable": false },
+                { "data": "ProductRemark", "autoWidth": true, "orderable": false },
+                { "data": "ProductName", "autoWidth": true, "orderable": false },
+                { "data": "casno", "autoWidth": true, "orderable": false },
+                { "data": "catNo", "autoWidth": true, "orderable": false },
+                { "data": "MW", "orderable": false, "className": "clsTempSensitive" },
+                { "data": "MF", "orderable": false },
+                { "data": "Quotationreceived", "orderable": false },
+                { "data": "PurchaseComment", "orderable": false },
+            ]
+
+        });
+    }
+
+
+    var popupNumber = "";
+    var selectedId = 0;
+    function popup(number, productid) {
+        popupNumber = number;
+        selectedId = productid;
+        $('#mypriceModal').modal('show');
+    }
+
+    function SelectInventoryChar(char) {
+        $('.letter').removeClass('letter-active');
+        $('.letter').each(function () {
+            var attr = $(this).attr('data-letter');
+            if (attr == char) {
+                $(this).addClass('letter-active');
+            }
+        })
+
+        $.ajax({
+            type: "GET",
+            url: "/Form/MainCategory/",
+            data: { 'id': char , 'isonlycategory' : true},
+            dataType: "json",
+            success: function (response) {
+                if (response.records.length > 0) {
+                    $('#loadapiselect').empty();
+                    var str = "";
+                    str += "<option value='0'>--Select--</option>";
+                    $(response.records).each(function (i, v) {
+                        //str += "<div class='span2' onclick='InventoryGrid(&#39;" + v.Name + "&#39;)'>" + v.Name + "</div>";
+                        str += "<option value='" + v.Name + "'>" + v.Name + "</option>";
+                    });
+                    $('#loadapiselect').append(str);
+                }
+            },
+            error: function (response) {
+                alert("Error:" + response);
+            }
+        });
+    }
+
+    function SaveScientistProductDetails(id) {
+        var scStatus = $("#scientistStatus_" + id).val();
+        var batchcode1 = $("#batchcode1_" + id).val();
+        var qty1 = $("#qty1_" + id).val();
+        var batchcode2 = "";
+        var qty2 = "";
+        var esticompleteDate = $("#esticompleteDate_" + id).val();
+        $.ajax({
+            url: '/Form/UpdateScientistProjectInfo',
+            data: {
+                scStatus: scStatus,
+                batchcode1: batchcode1,
+                qty1: qty1,
+                batchcode2: batchcode2,
+                qty2: qty2,
+                id: id,
+                esticompleteDate:esticompleteDate
+            },
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have updated product information.");
+
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (scStatus === readytodeliverId) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+
+    function saveAll() {
+        var ids = [];
+        $('.clsSaverow').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        var count = 1;
+        $('.clsSaverow').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                $.ajax({
+                    url: '/Form/UpdatePurchaseProductMasterList?id=' + id + '&quotecreceived=' + $("#Quotationreceived_" + id).val()
+                        + '&comment=' + $("#PurchaseComment_" + id).val()
+                    ,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) { },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function successAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product master list..");
+            $('.clsSaverow').each(function () {
+                $(this).prop('checked', false);
+            });
+
+            $('#selectallchk').prop('checked', false);
+        }
+    }
+
+    function batchpopup(productid) {
+            $.ajax({
+                url: '/Form/GetBatch?productId=' + productid,
+                data: {},
+                type: 'GET',
+                traditional: true, // add this
+                dataType: 'json',
+                success: function (data) {
+                    if (data.Data === "Yes") {
+                        var str = '<table width="100%" class="table table-bordered table-striped"><tr><th>Batch No</th><th>Is Form Available?</th><th></th></tr>';
+                        $(data.Record).each(function (i, v) {
+                            var isformavailable = "";
+                            var aLink = "";
+                            if (v.FormId === 0) {
+                                isformavailable = "No";
+                                aLink = "<a href='/Form/GetQuoteDetailsId/" + v.ProductId + "?formid=0&newprodumastr=true'>New Form</a>";
+                            } else {
+                                isformavailable = "Yes";
+                                aLink = "<a href='/Form/SubmitForm/" + v.QuoteDetailsId + "?formid=" + v.FormId + "&newprodumastr=true'>Edit Form</a>";
+                            }
+                            str += "<tr><th>" + v.BatchNo + " </th><th>" + isformavailable + " </th><th>" + aLink +"</th></tr>";
+                        });
+                        str += "</table>";
+                        $('.modal-body').html(str);
+                        $('#myModal').modal({ show: true });
+                        $(".modal-dialog").css("width", "1200px");
+                    }
+                    else {
+                        toastr.error("No Data Available.");
+                    }
+                }
+            });
+    }
+
+    $(document).on("change", '.addbatch', function () {
+        var id = $(this).attr('id').replace('additionalBatch_', '');
+        $.ajax({
+            url: '/Form/GetFormDatafromBatchId?batchId='+ $(this).val(),
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data !== null) {
+
+                    $("#Description_" + id).val(data.State); 
+                    $("#Appearance_" + id).val(data.Apearance); 
+
+                    if (data.IRAttachment !== null && data.IRAttachment !== "") {
+                        $("#IR_" + id).attr('href', data.IRAttachment);
+                        $("#IR_" + id).html('<i class="fa fa-download"></i>');
+                    }
+
+                    
+                    if (data.MassAttachment !== null && data.MassAttachment !== "") {
+                        $("#Mass_" + id).attr('href', data.MassAttachment);
+                        $("#Mass_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.PLCAttachment !== null && data.PLCAttachment !== "") {
+                        $("#HPLCGCELSD_" + id).attr('href', data.PLCAttachment);
+                        $("#HPLCGCELSD_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.NMRAttchment !== null && data.NMRAttchment !== "") {
+                        $("#NMR_" + id).attr('href', data.NMRAttchment);
+                        $("#NMR_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.QNMRAttchment !== null && data.QNMRAttchment !== "") {
+                        $("#qNMR_" + id).attr('href', data.QNMRAttchment);
+                        $("#qNMR_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.TGAAttachment !== null && data.TGAAttachment !== "") {
+                        $("#TGA_" + id).attr('href', data.TGAAttachment);
+                        $("#TGA_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.CMRAttchment !== null && data.CMRAttchment !== "") {
+                        $("#CMR_" + id).attr('href', data.CMRAttchment);
+                        $("#CMR_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.DEPTAttachment !== null && data.DEPTAttachment !== "") {
+                        $("#DEPT_" + id).attr('href', data.DEPTAttachment);
+                        $("#DEPT_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.HRMSAttachment !== null && data.HRMSAttachment !== "") {
+                        $("#HRMS_" + id).attr('href', data.HRMSAttachment);
+                        $("#HRMS_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.ROIAttachment !== null && data.ROIAttachment !== "") {
+                        $("#ROI_" + id).attr('href', data.ROIAttachment);
+                        $("#ROI_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.ElementralAttachment !== null && data.ElementralAttachment !== "") {
+                        $("#Elemental_" + id).attr('href', data.ElementralAttachment);
+                        $("#Elemental_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.SERAttachment !== null && data.SERAttachment !== "") {
+                        $("#SER_" + id).attr('href', data.SERAttachment);
+                        $("#SER_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.Hygroscopic !== null && data.Hygroscopic !== "") {
+                        if (data.Hygroscopic === true) {
+                            $("#Hygroscopic_" + id).html('<i class="fa fa-check"></i>');
+                        }
+                        else {
+                            $("#Hygroscopic_" + id).html('<i class="fa fa-close"></i>');
+                        }
+                    }
+                    
+                    if (data.TempSensitive !== null && data.TempSensitive !== "") {
+                        if (data.TempSensitive === true) {
+                            $("#TempSensitive_" + id).html('<i class="fa fa-check"></i>');
+                        }
+                        else {
+                            $("#TempSensitive_" + id).html('<i class="fa fa-close"></i>');
+                        }
+                    }
+                    
+                    if (data.Lacrymatory !== null && data.Lacrymatory !== "") {
+                        if (data.Lacrymatory === true) {
+                            $("#Lacrymatory_" + id).html('<i class="fa fa-check"></i>');
+                        }
+                        else {
+                            $("#Lacrymatory_" + id).html('<i class="fa fa-close"></i>');
+                        }
+                    }
+
+                    if (data.Photostability !== null && data.Photostability !== "") {
+                        if (data.Photostability === true) {
+                            $("#Photostability_" + id).html('<i class="fa fa-check"></i>');
+                        }
+                        else {
+                            $("#Photostability_" + id).html('<i class="fa fa-close"></i>');
+                        }
+                    }
+                    
+                    if (data.APCIMassAttachment !== null && data.APCIMassAttachment !== "") {
+                        $("#APCIMass_" + id).attr('href', data.APCIMassAttachment);
+                        $("#APCIMass_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.NMRInterpretaionAttachment !== null && data.NMRInterpretaionAttachment !== "") {
+                        $("#NMRInterpretaion_" + id).attr('href', data.NMRInterpretaionAttachment);
+                        $("#NMRInterpretaion_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                   
+
+                }
+            }
+        });
+    });
+    
+
+
+</script>
+
+<style type="text/css">
+    .letter {
+        float: left;
+        padding: 10px 14px;
+        background: #3c8dbc;
+        margin: 5px 10px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .letter:hover, .letter-active {
+            background: #2d729a;
+        }
+
+    .clsimageproduct {
+        display: block;
+        position: absolute;
+        background: #fff;
+        padding: 10px;
+        border: 1px solid #ececec;
+        left: 7.5%;
+    }
+</style>

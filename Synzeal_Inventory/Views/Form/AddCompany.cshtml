@@ -1,0 +1,266 @@
+﻿@{
+    ViewBag.Title = "Company";
+    Layout = null;
+}
+@model  Synzeal_Inventory.Entity.SZ_CompanyList
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Add New Company</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body col-md-4">
+                <b>Basic Details:</b>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Company Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Company Name" required value="@Model.Name">
+                    <input type="hidden" id="compid" name="compid" value="@Model.Id" />
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Master Email <span style="font-size:13px"><i>(Use comma(;) when you use multiple email)</i></span></label>
+                    <input type="text" class="form-control" id="masteremail" name="masteremail" placeholder="Email" required value="@Model.MasterEmail">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Address</label>
+                    <input type="text" class="form-control" id="address" name="address" placeholder="Address" required value="@Model.Address">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">State</label>
+                    <input type="text" class="form-control" id="Location" name="Location" placeholder="State" required value="@Model.Location">
+                </div>
+                <!--<div class="form-group">
+    <label for="exampleInputEmail1">Country</label>
+                 @Html.DropDownList("Country", (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control" })-->
+                @*<input type="text" class="form-control" id="Country" name="Country" placeholder="Country" required value="@Model.Country">*@
+                <!--</div>-->
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Contact</label>
+                    <input type="text" class="form-control" id="Contact" name="Contact" placeholder="Contact" required value="@Model.Contact">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Location</label>
+                    <input type="text" class="form-control" id="Branch" name="Branch" placeholder="Location" required value="@Model.Branch">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Followup Time</label>
+                    <input type="text" class="form-control" id="FollowupTime" name="FollowupTime" placeholder="Followup Time" required value="@Model.FollowupTime">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Terms</label>
+                    @Html.DropDownList("TermsId", (IEnumerable<SelectListItem>)ViewBag.termsList, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Payment Terms</label>
+                    @Html.DropDownList("PaymentTerms", (IEnumerable<SelectListItem>)ViewBag.listPaymentTermsItems, new { @class = "form-control", @style = "width:100%; float:left" })
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">SAP Code</label>
+                    <input type="text" class="form-control" id="SAPCode" name="SAPCode" placeholder="SAP Code" required value="@Model.SAPCode">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Client Suggested Comment</label>
+                    <textarea id="ClientSuggestedComment" name="ClientSuggestedComment" class="form-control"></textarea>
+                </div>
+
+            </div>
+
+            <div class="box-body col-md-4">
+                <b>Billing Address:</b>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Add1</label>
+                    <input type="text" class="form-control" id="Add1" name="Add1" placeholder="Address Line 1" value="@Model.Add1">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Add2</label>
+                    <input type="text" class="form-control" id="Add2" name="Add2" placeholder="Address Line 2" value="@Model.Add2">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">City</label>
+                    <input type="text" class="form-control" id="City" name="City" placeholder="City" value="@Model.City">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">State</label>
+                    <input type="text" class="form-control" id="State" name="State" placeholder="State" value="@Model.State">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Country</label>
+                    @Html.DropDownList("Country", (IEnumerable<SelectListItem>)ViewBag.CountryList, Model.Country, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">PostCode</label>
+                    <input type="text" class="form-control" id="PostCode" name="PostCode" placeholder="Postcode" value="@Model.PostCode">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Telno</label>
+                    <input type="text" class="form-control" id="Telno" name="Telno" placeholder="Telno" value="@Model.Telno">
+                </div>
+                <div class="form-group">
+                    <div class="radio">
+                        <label style="padding-right:25px;">
+                            <input type="radio" id="CountryType" name="CountryType" value="Domestic">
+                            Domestic
+                        </label>
+                        <label>
+                            <input type="radio" id="CountryType" name="CountryType" value="Export">
+                            Export
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="radio">
+                        <label style="padding-right:25px;">
+                            <input type="radio" id="UserDistType" name="UserDistType" value="User">
+                            User
+                        </label>
+                        <label>
+                            <input type="radio" id="UserDistType" name="UserDistType" value="Distributor">
+                            Distributor
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="radio">
+                        <label>
+                            <input type="checkbox" id="IsPaymentPending" name="IsPaymentPending">
+                            Payment Pending?
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="radio">
+                        <label>
+                            <input type="checkbox" id="IsBlockCompany" name="IsBlockCompany">
+                            Blocked Company?
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="radio">
+                        <label>
+                            <input type="checkbox" id="IsConversionReport" name="IsConversionReport">
+                            Show in Conversion?
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="radio">
+                        <label>
+                            <input type="checkbox" id="IsQuoteHide" name="IsQuoteHide">
+                            Quotation Hide?
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="radio">
+                        <label>
+                            <input type="checkbox" id="IsApprovedFirst" name="IsApprovedFirst">
+                            Approval First?
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Geographical</label>
+                    @Html.DropDownList("GeographicalLocation", (IEnumerable<SelectListItem>)ViewBag.GeographicalLocationList, null, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="box-body col-md-4">
+                <b>Shipping Address:</b>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Add1</label>
+                    <input type="text" class="form-control" id="ShipAdd1" name="ShipAdd1" placeholder="Address Line 1" value="@Model.ShipAdd1">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Add2</label>
+                    <input type="text" class="form-control" id="ShipAdd2" name="ShipAdd2" placeholder="Address Line 2" value="@Model.ShipAdd2">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">City</label>
+                    <input type="text" class="form-control" id="ShipCity" name="ShipCity" placeholder="City" value="@Model.ShipCity">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">State</label>
+                    <input type="text" class="form-control" id="ShipState" name="ShipState" placeholder="State" value="@Model.ShipState">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Country</label>
+                    @Html.DropDownList("ShipCountry", (IEnumerable<SelectListItem>)ViewBag.CountryList, Model.ShipCountry, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">PostCode</label>
+                    <input type="text" class="form-control" id="ShipPostCode" name="ShipPostCode" placeholder="Postcode" value="@Model.ShipPostCode">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Telno</label>
+                    <input type="text" class="form-control" id="ShipTelno" name="ShipTelno" placeholder="Telno" value="@Model.ShipTelno">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">BD Team</label>
+                    @Html.DropDownList("BDTeam", (IEnumerable<SelectListItem>)ViewBag.bdList, new { @class = "form-control", @style = "width:100%; float:left" })
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Project Team</label>
+                    @Html.DropDownList("ProjectTeam", (IEnumerable<SelectListItem>)ViewBag.projectList, new { @class = "form-control", @style = "width:100%; float:left" })
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Analytical Data</label>
+                    <textarea id="AnalyticalData" name="AnalyticalData" class="form-control"></textarea>
+                </div>
+
+                <div class="form-group" style="text-align:right">
+                    <button type="button" onclick="Quote.addCompanyData()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </form>
+    </div>
+    <div class="clearfix"></div>
+</div>
+@if(Model.Id != 0)
+{
+    <text>
+        <script type="text/javascript">
+
+            $('textarea#AnalyticalData').html('@Model.AnalyticalData');
+            $('textarea#ClientSuggestedComment').html('@Model.ClientSuggestedComment');
+
+    if ("@Model.IsPaymentPending" === "True") {
+        $("#IsPaymentPending").prop("checked", true);
+    }
+    if ("@Model.IsBlockCompany" === "True") {
+        $("#IsBlockCompany").prop("checked", true);
+    }
+    if ("@Model.IsConversionReport" === "True") {
+        $("#IsConversionReport").prop("checked", true);
+            }
+            if ("@Model.IsQuoteHide" === "True") {
+                $("#IsQuoteHide").prop("checked", true);
+            }
+             if ("@Model.IsApprovedFirst" === "True") {
+                 $("#IsApprovedFirst").prop("checked", true);
+ }
+            if ("@Model.GeographicalLocation" !== null) {
+                $("#GeographicalLocation").val(@Model.GeographicalLocation);
+     }
+    $("#address").val('@Model.Address');
+    $("#TermsId").val('@Model.TermsId');
+    if('@Model.CountryType' != null && '@Model.CountryType' != "")
+    {
+        $("input[name=CountryType][value=" + '@Model.CountryType' + "]").prop('checked', true);
+    }
+    if('@Model.UserDistType' != null && '@Model.UserDistType' != "")
+    {
+        $("input[name=UserDistType][value=" + '@Model.UserDistType' + "]").prop('checked', true);
+    }
+    if ('@Model.PaymentTerms' !== '') {
+        $("#PaymentTerms").val('@Model.PaymentTerms');
+    }
+
+     $("#BDTeam").val('@Model.BDTeam');
+    $("#ProjectTeam").val('@Model.ProjectTeam');
+        </script>
+</text>
+}

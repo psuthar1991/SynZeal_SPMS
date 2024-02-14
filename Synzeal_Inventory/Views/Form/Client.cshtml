@@ -1,0 +1,529 @@
+﻿@{
+    ViewBag.Title = "ClientAdmin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section class="content-wrapper" style="min-height: 960px;">
+    <section class="content-header">
+        <h1 style="float: left">
+            Project Status List
+        </h1>
+        <div style="background: #a9f7a9; height: 16px; width: 25px;float: left;    margin: 6px 10px 0 50px;"></div><div style="float: left;margin-top: 3px;"> COA/Data Approved</div>
+        <div style="background: #ffe6b3; height: 16px; width: 25px;float: left;    margin: 6px 10px 0 10px;"></div><div style="float: left;margin-top: 3px;"> COA/Data Correction</div>
+        <div style="background: rgb(193, 213, 255); height: 16px; width: 25px;float: left;    margin: 6px 10px 0 10px;"></div><div style="float: left;margin-top: 3px;"> COA/Data Sent</div>
+        <div style="float:left;margin-left: 25px;margin-top: 3px;">
+            <label>Filter By:</label>
+            <select id="filterby">
+                <option value="">All</option>
+                <option value="In Progress">In Progress</option>
+                <option value="COA/Data Sent">COA/Data Sent</option>
+                <option value="COA/Data Approved">COA/Data Approved</option>
+                <option value="COA/Data Correction">COA/Data Correction</option>
+            </select>
+        </div>
+        <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="SaveAll()">Save All</a> <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Printrecords()">Copy</a>
+        <div class="clearfix"></div>
+    </section>
+
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#home">ALL</a></li>
+                        <li><a data-toggle="tab" href="#divdispatched" onclick="dataDispatchedData()">DISPATCHED</a></li>
+                        <li><a data-toggle="tab" href="#divhold" onclick="dataOnHoldData()">ON-HOLD/CANCELLED</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="home" class="tab-pane fade in active">
+                            <div class="box-body divQuote table-responsive" style="overflow:scroll;">
+                                @*<div class="table-responsive divQuote" style="overflow:scroll;" id="divProj">*@
+                                <table id="alltbl" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="selectAllclsSaverow" /></th>
+                                            <th>#</th>
+                                            <th>PO Date</th>
+                                            <th>Status</th>
+                                            <th>PO No</th>
+                                            <th>Product Name</th>
+                                            <th>Qty</th>
+                                            <th>CAT No</th>
+                                            <th>CAS No</th>
+                                            <th>Batch No</th>
+                                            <th>Current Status</th>
+                                            <th>
+                                                Estimated Date for Data
+                                            </th>
+                                            <th>Last Uploaded Data</th>
+                                            <th>COA</th>
+                                            <th>
+                                                Analytical Data
+                                            </th>
+                                            <th>Attached data list</th>
+                                            <th>
+                                                Client Remark For Changes
+                                            </th>
+                                            <th>
+                                                Pickup address
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                                @*</div>*@
+                            </div>
+                        </div>
+                        <div id="divdispatched" class="tab-pane">
+                            <div class="box-body divQuote table-responsive" style="overflow:scroll;">
+                                @*<div class="table-responsive divQuote" style="overflow:scroll;" >*@
+                                <table id="dispatchtbl" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>PO Date</th>
+                                            @*<th>Status</th>*@
+                                            <th>PO No</th>
+                                            <th>Product Name</th>
+                                            <th>Qty</th>
+                                            <th>CAT No</th>
+                                            <th>CAS No</th>
+
+                                            <th>Batch No</th>
+                                            <th>Last Uploaded Data</th>
+                                            <th>COA</th>
+
+                                            <th>
+                                                Analytical Data
+                                            </th>
+                                            <th>Attached data list</th>
+                                            <th>
+                                                Client Remark For Changes
+                                            </th>
+                                            <th>
+                                                Tracking No
+                                            </th>
+                                            <th>
+                                                Courier
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                                @*</div>*@
+                            </div>
+                        </div>
+
+                        <div id="divhold" class="tab-pane fade">
+                            <div class="box-body divQuote table-responsive" style="overflow:scroll;">
+                                @*<div class="table-responsive divQuote" style="overflow:scroll;" id="divProj">*@
+                                <table id="holdtbl" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            @*<th><input type="checkbox" id="selectAllclsSaverow" /></th>*@
+                                            <th>#</th>
+                                            <th>PO Date</th>
+                                            <th>Status</th>
+                                            <th>PO No</th>
+                                            <th>Product Name</th>
+                                            <th>Qty</th>
+                                            <th>CAT No</th>
+                                            <th>CAS No</th>
+                                            <th>Batch No</th>
+                                            <th>Current Status</th>
+                                            <th>
+                                                Estimated Date for Data
+                                            </th>
+                                            <th>Last Uploaded Data</th>
+                                            <th>COA</th>
+                                            <th>
+                                                Analytical Data
+                                            </th>
+                                            <th>Attached data list</th>
+                                            <th>
+                                                Client Remark For Changes
+                                            </th>
+                                            <th>
+                                                Pickup address
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                                @*</div>*@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+
+<script type="text/javascript">
+    $("#filterby").change(function() {
+        var value = $(this).val();
+        $('#alltbl').DataTable().search(value).draw();
+    });
+
+
+    $(".divQuote").css('height', window.innerHeight - 200);
+    $(function () {
+        alltbl = $('#alltbl').DataTable({
+            "ordering": false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "orderMulti": false, // for disable multiple column at once
+            "pageLength": 25,
+            "fnDrawCallback": function (oSettings) {
+                $("#selectAllclsSaverow").click(function () {
+                    if ($(this).is(":checked")) {
+                        $('.svcheck').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $(".svcheck").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+
+                var api = this.api();
+                var rows = api.rows({ page: 'current' }).nodes();
+                var last = null;
+
+                api.column(4, { page: 'current' }).data().each(function (group, i) {
+                    if (last !== group) {
+                        $(rows).eq(i).before(
+                            '<td class="group" colspan="17" style="BACKGROUND-COLOR:#3c8dbc;font-weight:700;color:#fff;padding:10px;">' + group + '</td>'
+                        );
+                        last = group;
+                    }
+                });
+
+                alltbl.columns.adjust()
+            },
+            "columnDefs":
+                [
+                    { targets: 4, visible: false }
+                ],
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "initComplete": function (settings, json) {
+
+            },
+            "ajax": {
+                "url": "../Form/LoadAllClientAdmindata?id=" + @ViewBag.CompanyId +'&isClientSection=' + true,
+                "type": "POST",
+                "datatype": "json"
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                if (aData.ClientStatus === 'COA/Data Correction') {
+                    $('td', nRow).css('background-color', '#ffe6b3');
+                }
+                if (aData.ClientStatus === 'COA/Data Sent') {
+                    $('td', nRow).css('background-color', 'rgb(193, 213, 255)');
+                }
+                if (aData.ClientStatus === 'COA/Data Approved') {
+                    $('td', nRow).css('background-color', '#a9f7a9');
+                }
+            },
+
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+            },
+            //scrollX: true,
+            //autoWidth: false,
+            "columns": [
+                { "data": "ChkSaveRow"},
+
+                { "data": "SrPo"},
+                { "data": "MoveProjectDateText", "name": "MoveProjectDateText"},
+                { "data": "ClientStatusText", "name": "ClientStatusText" },
+                { "data": "PONumber", "name": "PONumber", "width": "100px"},
+                { "data": "ProductName" },
+                { "data": "RequiredQtyTxt" },
+                { "data": "CATNo", "name": "CATNo" , "width": "150px"},
+                { "data": "CASNo", "name": "CASNo" , "width": "150px"},
+                { "data": "BatchNo", "name": "BatchNo", "width": "150px"},
+                { "data": "ScientistStatustext", "name": "ScientistStatustext"},
+                { "data": "EstimateCompleteDateText", "orderable": false, "autoWidth": true },
+                { "data": "LastUploadDateStr", "orderable": false, "autoWidth": true },
+                { "data": "COADownloadLink", "name": "COADownloadLink", "autoWidth": true },
+                { "data": "AnalyticalDataLink", "name": "AnalyticalDataLink", "autoWidth": true },
+                { "data": "AttachedDataList", "name": "AttachedDataList", "width": "120px"},
+                { "data": "ClientRemarkText", "name": "ClientRemarkText", "autoWidth": true },
+                { "data": "ClientAddressText", "name": "ClientAddressText", "autoWidth": true }
+
+            ]
+        });
+    });
+
+
+    function SaveInformation(id) {
+        var status = $('#clientstatus_' + id).val();
+        var currentStatus = $("#scientistStatus_" + id).val();
+        var lastStatus = $("#lastStatus_" + id).val();
+        var clientremark = $("#clientremark_" + id).val();
+        var clientaddress = $("#clientaddress_" + id).val();
+        $.ajax({
+            url: '/Form/SaveClientModuleInfo?id=' + id + '&clientstatus=' + status + '&currentStatus=' + currentStatus + '&clientremark=' + clientremark + '&clientaddress=' + clientaddress,
+            data: {},
+            type: 'POST',
+            success: function (data) {
+    
+toastr.success("Information Saved Successfully.");
+                window.location.reload(true);
+            }
+        });
+    }
+
+    var thirdtabloaded = false;
+    var onholdtabLoaded = false;
+    function dataDispatchedData() {
+        if (thirdtabloaded === false) {
+            $('#dispatchtbl').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    thirdtabloaded = true;
+                },
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadAllClientDispatcheddata?id=" + @ViewBag.CompanyId,
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                },
+                "columnDefs": [],
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                },
+                "columns": [
+                    { "data": "SrPo", "autoWidth": true },
+                    { "data": "MoveProjectDateText", "name": "MoveProjectDateText", "width": "9%", "autoWidth": true },
+                    // { "data": "ClientStatusText", "name": "ClientStatusText", "width": "6%" },
+                    { "data": "PONumber", "name": "PONumber" , "width": "9%"},
+                    { "data": "ProductName", "width": "22%" },
+                    { "data": "RequiredQtyTxt", "width": "8%" },
+                    { "data": "CATNo", "name": "PONumber", "width": "8%" },
+                    { "data": "CASNo", "name": "CompanyName", "width": "8%" },
+                    { "data": "BatchNo", "name": "BatchNo", "width": "8%" },
+                    { "data": "LastUploadDateStr", "orderable": false, "autoWidth": true },
+                    { "data": "COADownloadLink", "name": "COADownloadLink", "width": "4%" },
+                    { "data": "AnalyticalDataLink", "name": "AnalyticalDataLink", "width": "3%" },
+                    { "data": "AttachedDataList", "name": "AttachedDataList", "autoWidth": true },
+                    { "data": "ClientRemarkText", "name": "ClientRemarkText", "autoWidth": true },
+                    { "data": "TrackingNo", "name": "TrackingNo", "autoWidth": true },
+                    { "data": "Courier", "name": "Courier", "autoWidth": true }
+
+                ]
+            });
+        }
+    }
+
+    function dataOnHoldData() {
+        if (onholdtabLoaded === false) {
+            $('#holdtbl').DataTable({
+            "ordering": false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "orderMulti": false, // for disable multiple column at once
+            "pageLength": 25,
+            "fnDrawCallback": function (oSettings) {
+                onholdtabLoaded = true;
+                $("#selectAllclsSaverow").click(function () {
+                    if ($(this).is(":checked")) {
+                        $('.svcheck').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $(".svcheck").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+            },
+           
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "initComplete": function (settings, json) {
+
+            },
+            "ajax": {
+                "url": "../Form/LoadClientOnHoldData?id=" + @ViewBag.CompanyId +'&isClientSection=' + true,
+                "type": "POST",
+                "datatype": "json"
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                if (aData.ClientStatus === 'COA/Data Correction') {
+                    $('td', nRow).css('background-color', '#ffe6b3');
+                }
+                if (aData.ClientStatus === 'COA/Data Sent') {
+                    $('td', nRow).css('background-color', 'rgb(193, 213, 255)');
+                }
+                if (aData.ClientStatus === 'COA/Data Approved') {
+                    $('td', nRow).css('background-color', '#a9f7a9');
+                }
+            },
+
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+            },
+            //scrollX: true,
+            //autoWidth: false,
+            "columns": [
+                //{ "data": "ChkSaveRow"},
+
+                { "data": "SrPo"},
+                { "data": "MoveProjectDateText", "name": "MoveProjectDateText"},
+                { "data": "ClientStatusText", "name": "ClientStatusText" },
+                { "data": "PONumber", "name": "PONumber", "width": "100px"},
+                { "data": "ProductName" },
+                { "data": "RequiredQtyTxt" },
+                { "data": "CATNo", "name": "CATNo" , "width": "150px"},
+                { "data": "CASNo", "name": "CASNo" , "width": "150px"},
+                { "data": "BatchNo", "name": "BatchNo", "width": "150px"},
+                { "data": "ScientistStatustext", "name": "ScientistStatustext"},
+                { "data": "EstimateCompleteDateText", "orderable": false, "autoWidth": true },
+                { "data": "LastUploadDateStr", "orderable": false, "autoWidth": true },
+                { "data": "COADownloadLink", "name": "COADownloadLink", "autoWidth": true },
+                { "data": "AnalyticalDataLink", "name": "AnalyticalDataLink", "autoWidth": true },
+                { "data": "AttachedDataList", "name": "AttachedDataList", "width": "120px"},
+                { "data": "ClientRemarkText", "name": "ClientRemarkText", "autoWidth": true },
+                { "data": "ClientAddressText", "name": "ClientAddressText", "autoWidth": true }
+
+            ]
+        });
+        }
+    }
+
+    function SaveAll() {
+        var ids = [];
+        $('#alltbl').find('.svcheck').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+    toastr.error('Please select atleast one Product.');
+            return false;
+        }
+
+        var count = 1;
+        $('#alltbl').find('.svcheck').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                var status = $('#clientstatus_' + id).val();
+                var currentStatus = $("#scientistStatus_" + id).val();
+                var lastStatus = $("#lastStatus_" + id).val();
+                var clientremark = $("#clientremark_" + id).val();
+                var clientaddress = $("#clientaddress_" + id).val();
+                $.ajax({
+                    url: '/Form/SaveClientModuleInfo?id=' + id + '&clientstatus=' + status + '&currentStatus=' + currentStatus + '&clientremark=' + clientremark + '&clientaddress=' + clientaddress,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                    },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function Editclientremarks(id)
+    {
+        $.ajax({
+            url: '/Form/AddClientRemark?id='+id +'&isClientSection='+true,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#clientremarkModal .modal-body').html(data.html);
+                $('#clientremarkModal').modal({ show: true });
+                $("#clientremarkModal .modal-content").css("width", "1080px");
+            }
+        });
+    }
+
+    function successAlert(count, forloopcount) {
+        if (count === forloopcount) {
+    toastr.success("Information Saved Successfully.");
+            setTimeout(function () { window.location.reload(true); }, 2000);
+        }
+    }
+
+
+    function Printrecords() {
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        var ids = [];
+        $('#alltbl').find('.svcheck').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/PrintProjectRecord',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#myModal .modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $("#myModal .modal-dialog").css("width", "1080px");
+            }
+        });
+    }
+</script>
+<div id="clientremarkModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content" style="width:700px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal</h4>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 15px;text-align: center;color: #1d3f72;font-weight: 800;">Please wait few minutes...</p>
+                <div style="text-align:center">
+                    <img src="@Url.Content("~/images/loader.svg")" />
+                </div>
+            </div>
+            @*<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>*@
+        </div>
+
+    </div>
+</div>

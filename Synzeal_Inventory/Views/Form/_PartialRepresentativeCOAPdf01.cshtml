@@ -1,0 +1,943 @@
+﻿@model Synzeal_Inventory.Entity.SZ_ChildCOA
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+
+    var productsData = (Synzeal_Inventory.Models.ProductDetailsModel)ViewBag.Products;
+
+    bool isScanCopy = Convert.ToBoolean(ViewBag.isScanCopy);
+
+    string dateNow = DateTime.Now.ToShortDateString();
+
+    if (ViewBag.isQACoa == null)
+    {
+        ViewBag.isQACoa = false;
+    }
+
+    bool isQACoa = Convert.ToBoolean(ViewBag.isQACoa);
+}
+@using System.Text
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+<HTML>
+<HEAD>
+</HEAD>
+<BODY style="margin:0;">
+    <DIV>
+        <table width="100%">
+            <tr>
+                @if (Model.IsLogoAttached.HasValue && Model.IsLogoAttached.Value && isScanCopy)
+                {
+                    <td width="100%">
+
+                        <table width="100%">
+                            <tr>
+                                <td width="50%">
+                                    <img src="https://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" width="200px" class="logoattached" />
+                                </td>
+                                <td width="50%">
+                                    <div style="text-decoration: underline; font-size: 24px; font-family: andalus; text-align: right; font-weight: bold">CERTIFICATE OF ANALYSIS</div>
+                                    <div style="padding-left: 20px; text-align: right; font-family: andalus">(Certificate No. @Model.RefNo)</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                }
+                else
+                {
+                    <td width="100%">
+                        <br />  <br />
+                        <div style="text-decoration: underline; font-size: 24px; font-family: andalus; text-align: right; font-weight: bold">CERTIFICATE OF ANALYSIS</div>
+                        <div style="padding-left: 20px; text-align: right; font-family: andalus">(Certificate No. @Model.RefNo)</div>
+                    </td>
+                }
+            </tr>
+            <tr>
+                <td style="margin: 0px 0 0 0">
+                    <br />
+                    <table width="100%" style="font-size: 15px;">
+                        <tr>
+                            <td width="28%">
+                                <b style="font-family: andalus;">Analysis Date</b>:
+                                <span style="font-family: andalus;">
+                                    @if (Model.AnalysisDate.HasValue)
+                                    {
+                                        @Model.AnalysisDate.Value.ToShortDateString()
+                                    }
+                                </span>
+                            </td>
+                            <td width="44%"></td>
+                            <td style="text-align: right" width="28%">
+                                <b style="font-family: andalus;">Re-test Date</b>:
+                                <span style="font-family: andalus;">
+                                    @if (Model.ReTestDate.HasValue)
+                                    {
+                                        @Model.ReTestDate.Value.ToShortDateString()
+                                    }
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <hr style="margin:0;padding:0;" />
+
+        @{
+            string coaTitle = string.Empty;
+            if (Model.EPChk.HasValue && Model.EPChk.Value)
+            {
+                coaTitle = Model.EP;
+            }
+            if (Model.USPChk.HasValue && Model.USPChk.Value)
+            {
+                coaTitle = Model.USP;
+            }
+            if (Model.IUPACChk.HasValue && Model.IUPACChk.Value)
+            {
+                coaTitle = Model.IUPAC;
+            }
+
+            if (Model.ChkEPChemicalName.HasValue && Model.ChkEPChemicalName.Value)
+            {
+                coaTitle = Model.EPChemicalName;
+            }
+            if (Model.ChkUSPChemicalName.HasValue && Model.ChkUSPChemicalName.Value)
+            {
+                coaTitle = Model.USPChemicalName;
+            }
+            if (Model.ChkOtherNameOne.HasValue && Model.ChkOtherNameOne.Value)
+            {
+                coaTitle = Model.OtherNameOne;
+            }
+            if (Model.ChkOtherNameSecond.HasValue && Model.ChkOtherNameSecond.Value)
+            {
+                coaTitle = Model.OtherNameSecond;
+            }
+            if (Model.ChkOtherNameThird.HasValue && Model.ChkOtherNameThird.Value)
+            {
+                coaTitle = Model.OtherNameThird;
+            }
+        }
+        <p style="margin:0px;padding:0px;text-align:center;font-weight:bold; font-family: andalus;font-size:18px;">@Model.ProductName</p>
+        <hr style="margin:0;padding:0;" />
+        @{
+            List<string> chemicalName = new List<string>();
+            if (Model.ChkChemEP.HasValue && Model.ChkChemEP.Value)
+            {
+                chemicalName.Add(Model.ChemEP);
+            }
+            if (Model.ChkChemUSP.HasValue && Model.ChkChemUSP.Value)
+            {
+                chemicalName.Add(Model.ChemUSP);
+            }
+            if (Model.ChkChemIUPAC.HasValue && Model.ChkChemIUPAC.Value)
+            {
+                chemicalName.Add(Model.ChemIUPAC);
+            }
+
+            if (Model.ChemChkEPChemicalName.HasValue && Model.ChemChkEPChemicalName.Value)
+            {
+                chemicalName.Add(Model.ChemEP);
+            }
+            if (Model.ChemChkUSPChemicalName.HasValue && Model.ChemChkUSPChemicalName.Value)
+            {
+                chemicalName.Add(Model.ChemUSPChemicalName);
+            }
+            if (Model.ChemChkOtherNameOne.HasValue && Model.ChemChkOtherNameOne.Value)
+            {
+                chemicalName.Add(Model.ChemOtherNameOne);
+            }
+            if (Model.ChemChkOtherNameSecond.HasValue && Model.ChemChkOtherNameSecond.Value)
+            {
+                chemicalName.Add(Model.ChemOtherNameSecond);
+            }
+            if (Model.ChemChkOtherNameThird.HasValue && Model.ChemChkOtherNameThird.Value)
+            {
+                chemicalName.Add(Model.ChemOtherNameThird);
+            }
+
+            string unicodeString = Model.Chemicalname;
+
+            // Create two different encodings.
+            Encoding ascii = Encoding.UTF32;
+            Encoding unicode = Encoding.UTF8;
+
+            // Convert the string into a byte array.
+            byte[] unicodeBytes = unicode.GetBytes(unicodeString);
+
+            // Perform the conversion from one encoding to the other.
+            byte[] asciiBytes = Encoding.Convert(unicode, ascii, unicodeBytes);
+
+            // Convert the new byte[] into a char[] and then into a string.
+            char[] asciiChars = new char[ascii.GetCharCount(asciiBytes, 0, asciiBytes.Length)];
+            ascii.GetChars(asciiBytes, 0, asciiBytes.Length, asciiChars, 0);
+            string asciiString = new string(asciiChars);
+
+            byte[] utf8 = Encoding.Convert(Encoding.Default, Encoding.UTF7, unicodeBytes);
+            string textFromPage = Encoding.UTF8.GetString(utf8);
+        }
+        <div>
+            <b style="text-decoration:underline;font-size:20px;font-family: andalus;">Identification</b>
+
+        </div>
+        <div style="padding: 0 15px;margin:0">
+            <table width="100%" style="margin:6px 13px 13px 13px;" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="19.4%" style="font-size:15px;font-family: andalus;vertical-align:middle" valign="middle">
+                        <b>Chemical Name</b>
+                    </td>
+                    <td width="1.6%">:</td>
+                    <td width="79%" style="font-size:15px;font-family: andalus;">
+                        @Html.Raw(asciiString)
+                    </td>
+                </tr>
+            </table>
+            <table width="100%" style="font-size:15px;">
+                <tr style="line-height:27px;">
+                    <td width="62%">
+
+                        <table width="100%" style="font-size:15px;line-height:30px;margin:13px;">
+                            <tr style="line-height:30px; ">
+                                <td width="31%" style="font-size:15px;font-family: andalus;">
+                                    <b>CAT No.</b>
+                                </td>
+                                <td width="2%">:</td>
+                                <td width="67%" style="font-size:15px;font-family: andalus;">
+                                    @productsData.Sku
+                                </td>
+                            </tr>
+                        </table>
+                        <table width="100%" style="font-size:15px;line-height:30px;margin:13px;">
+                            <tr style="line-height:30px; ">
+                                <td width="31%" style="font-size:15px;font-family: andalus;">
+                                    <b>CAS No.</b>
+                                </td>
+                                <td width="2%">:</td>
+                                <td width="67%" style="font-size:15px;font-family: andalus;">@*@productsData.ManufacturerPartNumber*@ @Model.CASNo</td>
+                            </tr>
+                        </table>
+                        <table width="100%" style="font-size:15px;line-height:30px;margin:13px;">
+                            <tr style="line-height:30px; ">
+                                <td width="31%" style="font-size:15px;font-family: andalus;">
+                                    <b>Molecular Formula</b>
+                                </td>
+                                <td width="2%">:</td>
+                                <td width="67%" style="font-size:15px;font-family: andalus;">@*@productsData.Gtin*@ @Model.MolFormula</td>
+                            </tr>
+                        </table>
+                        <table width="100%" style="font-size:15px;line-height:30px;margin:13px;">
+                            <tr style="line-height:30px; ">
+                                <td width="31%" style="font-size:15px;font-family: andalus;">
+                                    <b>Molecular Weight</b>
+                                </td>
+                                <td width="2%">:</td>
+                                <td width="67%" style="font-size:15px;font-family: andalus;">
+                                    @*@if (!string.IsNullOrEmpty(Model.MolecularWeight))
+                                        {
+                                            try
+                                            {
+                                                @Convert.ToDecimal(Model.MolecularWeight).ToString("0.0")
+                                            }
+                                            catch (Exception)
+                                            {
+                                                @Model.MolecularWeight
+                                            }
+                                        }*@
+                                    @Model.MolecularWeight
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="38%" style="text-align:left;border:5px solid #DCDCDC">
+                        @if (Model.IsImageUpload.HasValue)
+                        {
+                            <img width="250" src="@System.Web.Hosting.HostingEnvironment.MapPath(Model.ImagePath)" />
+                        }
+                        else
+                        {
+                            <img width="250" src="@productsData.DefaultPictureModel.FullSizeImageUrl" />
+                        }
+
+
+                    </td>
+                </tr>
+            </table>
+
+            @{
+                List<string> Synonym = new List<string>();
+                if (Model.ChkSynEP.HasValue && Model.ChkSynEP.Value)
+                {
+                    Synonym.Add(Model.SynEP);
+                }
+                if (Model.ChkSynUSP.HasValue && Model.ChkSynUSP.Value)
+                {
+                    Synonym.Add(Model.SynUSP);
+                }
+                if (Model.ChkSynIUPAC.HasValue && Model.ChkSynIUPAC.Value)
+                {
+                    Synonym.Add(Model.SynIUPAC);
+                }
+                if (Model.SynChkEPChemicalName.HasValue && Model.SynChkEPChemicalName.Value)
+                {
+                    Synonym.Add(Model.SynEPChemicalName);
+                }
+                if (Model.SynChkUSPChemicalName.HasValue && Model.SynChkUSPChemicalName.Value)
+                {
+                    Synonym.Add(Model.SynUSPChemicalName);
+                }
+                if (Model.SynChkOtherNameOne.HasValue && Model.SynChkOtherNameOne.Value)
+                {
+                    Synonym.Add(Model.SynOtherNameOne);
+                }
+                if (Model.SynChkOtherNameSecond.HasValue && Model.SynChkOtherNameSecond.Value)
+                {
+                    Synonym.Add(Model.SynOtherNameSecond);
+                }
+                if (Model.SynChkOtherNameThird.HasValue && Model.SynChkOtherNameThird.Value)
+                {
+                    Synonym.Add(Model.SynOtherNameThird);
+                }
+            }
+
+            @if (!string.IsNullOrEmpty(Model.Synonym))
+            {
+                <table width="100%" style="margin:8px 13px 0px 13px;" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td width="19.4%" style="font-size:15px;font-family: andalus;vertical-align:middle" valign="middle">
+                            <b>Synonyms</b>
+                        </td>
+                        <td width="1.6%">:</td>
+                        <td width="79%" style="font-size:15px;font-family: andalus;">
+                            @Model.Synonym
+                        </td>
+                    </tr>
+                </table>
+            }
+        </div>
+        <hr style="margin:8px 0px 0px 0px; padding:0" />
+        <div style="font-size:10px;line-height:25px; width:100%">
+            <b style="text-decoration:underline;font-size:20px;font-family: andalus;">Analytical Information</b>
+            <br />
+            @{
+                int count = 0;
+                bool issecond = false;
+            }
+
+
+            <div style="width:100%;padding-left:13px;">
+                <div style="width:60%;float:left;">
+                    <div style="height:30px;font-size:15px;">
+                        <table>
+                            <tr>
+                                <td width="20%" style="font-size:15px;font-family: andalus;">
+                                    <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;Batch Code</b>
+                                </td>
+                                <td width="3%">:</td>
+                                <td style="font-size:15px;font-family: andalus;">@Model.BatchNo</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="height:30px;font-size:15px;">
+                        <table>
+                            <tr>
+                                <td width="20%" style="font-size:15px;font-family: andalus;">
+                                    <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;Solubility</b>
+                                </td>
+                                <td width="3%">:</td>
+                                <td style="font-size:15px;font-family: andalus;">@Model.SOLUBILITY</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="height:30px;font-size:15px;">
+                        <table>
+                            <tr>
+                                <td width="20%" style="font-size:15px;font-family: andalus;">
+                                    <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;Appearance of product</b>
+                                </td>
+                                <td width="3%">:</td>
+                                <td style="font-size:15px;font-family: andalus;">@Model.AppearanceProduct</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="height:30px;font-size:16px;">
+                        <table>
+                            <tr>
+                                <td width="20%" style="font-size:15px;font-family: andalus;">
+                                    <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;Long Term Storage</b>
+                                </td>
+                                <td width="3%">:</td>
+                                <td style="font-size:15px;font-family: andalus;">@Model.StorageCon</td>
+                            </tr>
+                        </table>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.TGALoss))
+                    {
+                        <div style="height:30px;font-size:15px;">
+                            <table>
+                                <tr>
+                                    <td width="20%" style="font-size:15px;font-family: andalus;">
+                                        <b>
+                                            <img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp; @if (Model.WegithLossBy == "KF")
+                                            {
+                                                <span>Water Content By @Model.WegithLossBy</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Weight Loss By @Model.WegithLossBy</span>
+                                            }
+                                        </b>
+                                    </td>
+                                    <td width="3%">:</td>
+                                    <td style="font-size:15px;font-family: andalus;">@Model.TGALoss %</td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ResidueOnIgnition))
+                    {
+                        <div style="height:30px;font-size:15px;">
+                            <table>
+                                <tr>
+                                    <td width="20%" style="font-size:15px;font-family: andalus;">
+                                        <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;Residue On Ignition</b>
+                                    </td>
+                                    <td width="3%">:</td>
+                                    <td style="font-size:15px;font-family: andalus;">@Model.ResidueOnIgnition %</td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Potency))
+                    {
+                        <div style="height:30px;font-size:15px;">
+                            <table>
+                                <tr>
+                                    <td width="20%" style="font-size:15px;font-family: andalus;">
+                                        <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;Chiral Purity</b>
+                                    </td>
+                                    <td width="3%">:</td>
+                                    <td style="font-size:15px;font-family: andalus;">@Model.Potency %</td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.MeltingPoint))
+                    {
+                        <div style="height:30px;font-size:15px;">
+                            <table>
+                                <tr>
+                                    <td width="18%" style="font-size:15px;font-family: andalus;">
+                                        <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;Melting Point</b>
+                                    </td>
+                                    <td width="3%">:</td>
+                                    <td style="font-size:15px;font-family: andalus;">@Model.MeltingPoint</td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+                </div>
+                <div style="width:40%;float:left;">
+                    <div style="height:30px;font-size:15px;">
+                        @if (Model.Purity == "Other")
+                        {
+                            <table>
+                                <tr>
+                                    <td width="18%" style="font-size:15px;font-family: andalus;">
+                                        <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;@Model.OtherValue Purity</b>
+                                    </td>
+                                    <td width="3%">:</td>
+                                    @if (System.Text.RegularExpressions.Regex.IsMatch(Model.HPLCGCELSD, @"^\-{0,1}\d+(.\d+){0,1}$"))
+                                    {
+                                        <td style="font-size:15px;font-family: andalus;">@Model.HPLCGCELSD %</td>
+                                    }
+                                    else
+                                    {
+                                        <td style="font-size:15px;font-family: andalus;">@Model.HPLCGCELSD</td>
+                                    }
+                                </tr>
+                            </table>
+                        }
+                        else
+                        {
+                            <table>
+                                <tr>
+                                    <td width="18%" style="font-size:15px;font-family: andalus;">
+                                        <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;@Model.Purity Purity</b>
+                                    </td>
+                                    <td width="3%">:</td>
+                                    @if (System.Text.RegularExpressions.Regex.IsMatch(Model.HPLCGCELSD, @"^\-{0,1}\d+(.\d+){0,1}$"))
+                                    {
+                                        <td style="font-size:15px;font-family: andalus;">@Model.HPLCGCELSD %</td>
+                                    }
+                                    else
+                                    {
+                                        <td style="font-size:15px;font-family: andalus;">@Model.HPLCGCELSD</td>
+                                    }
+
+                                </tr>
+                            </table>
+                        }
+
+                    </div>
+                    <div style="height:30px;font-size:15px;">
+                        <table>
+                            <tr>
+                                <td width="18%" style="font-size:15px;font-family: andalus;">
+                                    <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;Mass</b>
+                                </td>
+                                <td width="3%">:</td>
+                                <td style="font-size:15px;font-family: andalus;">@Model.Mass</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="height:30px;font-size:15px;">
+                        <table>
+                            <tr>
+                                <td width="18%" style="font-size:15px;font-family: andalus;">
+                                    <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;IR Analysis</b>
+                                </td>
+                                <td width="3%">:</td>
+                                <td style="font-size:15px;font-family: andalus;">@Model.IR</td>
+                            </tr>
+                        </table>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.NMR))
+                    {
+                        <div style="height:30px;font-size:15px;">
+                            <table>
+                                <tr>
+                                    <td width="18%" style="font-size:15px;font-family: andalus;">
+                                        <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;1H NMR</b>
+                                    </td>
+                                    <td width="3%">:</td>
+                                    <td style="font-size:15px;font-family: andalus;">@Model.NMR</td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.CMR))
+                    {
+                        <div style="height:30px;font-size:15px;">
+                            <table>
+                                <tr>
+                                    <td width="18%" style="font-size:15px;font-family: andalus;">
+                                        <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;13C NMR</b>
+                                    </td>
+                                    <td width="3%">:</td>
+                                    <td style="font-size:15px;font-family: andalus;">@Model.CMR</td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Dept))
+                    {
+                        <div style="height:30px;font-size:15px;">
+                            <table>
+                                <tr>
+                                    <td width="18%" style="font-size:15px;font-family: andalus;">
+                                        <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;DEPT Analysis</b>
+                                    </td>
+                                    <td width="3%">:</td>
+                                    <td style="font-size:15px;font-family: andalus;">@Model.Dept</td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.PhysicalState))
+                    {
+                        <div style="height:30px;font-size:15px;">
+                            <table>
+                                <tr>
+                                    <td width="18%" style="font-size:15px;font-family: andalus;">
+                                        <b><img src="https://cdn.iconscout.com/public/images/icon/free/png-512/square-rounded-3eaa8d277013e167-512x512.png" height="8px" width="8px" style="" />&nbsp;&nbsp;Appearance</b>
+                                    </td>
+                                    <td width="3%">:</td>
+                                    <td style="font-size:15px;font-family: andalus;">@Model.PhysicalState</td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+
+
+                </div>
+                <div style="clear:both"></div>
+            </div>
+            <div style="clear:both"></div>
+        </div>
+
+        @*@if ((Model.IsEquation.HasValue && Model.IsEquation.Value) || !string.IsNullOrEmpty(Model.AdditionalInfor))
+            {*@
+        <table style="font-size:10px;font-family:Calibri">
+            <tr>
+                <td>
+                    <b style="text-decoration:underline;font-size:20px;font-family: andalus;">Additional Information</b>
+                </td>
+            </tr>
+        </table>
+        <div style="padding-left:20px; font-size:15px;font-family: andalus;margin-bottom:7px;">
+
+            <div style="width:80%;float:left;">
+
+
+                @{ if (string.IsNullOrEmpty(Model.TGALoss))
+                    {
+                        Model.TGALoss = "0.00";
+                    }
+                    if (string.IsNullOrEmpty(Model.ResidueOnIgnition))
+                    {
+                        Model.ResidueOnIgnition = "0.00";
+                    }
+                    if (string.IsNullOrEmpty(Model.ResidueOnIgnition))
+                    {
+                        Model.ResidueOnIgnition = "0.00";
+                    }
+                    if (Model.IsEquation.HasValue && Model.IsEquation.Value)
+                    {
+                        decimal answer = 0;
+                        decimal partialAnswer = 0;
+
+                        try
+                        {
+                            answer = ((100 - decimal.Parse(Model.TGALoss) - decimal.Parse(Model.ResidueOnIgnition)) * Convert.ToDecimal(Model.HPLCGCELSD, new System.Globalization.CultureInfo("en-US"))) / 100;
+                            partialAnswer = ((100 - decimal.Parse(Model.TGALoss)) * decimal.Parse(Model.HPLCGCELSD)) / 100;
+                        }
+                        catch
+                        {
+
+                        }
+
+                        if (string.IsNullOrEmpty(Model.EquationType))
+                        {
+                            <p>
+                                <span>
+                                    % Potency = [(100 - @Model.TGALoss<span>
+                                        (@if (Model.WegithLossBy == "KF")
+                                        {
+                                            <span>Water Content By @Model.WegithLossBy</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Wt loss by @Model.WegithLossBy</span>
+                                        })
+                                    </span> - @Model.ResidueOnIgnition<span>(ROI) </span>) * @Model.HPLCGCELSD<span>(@Model.Purity Purity) </span>] / 100 = @answer %
+                                </span>
+                            </p>
+                        }
+                        if (!string.IsNullOrEmpty(Model.EquationType))
+                        {
+                            if (Model.EquationType == "Full")
+                            {
+                                <p>
+                                    <span>
+                                        % Potency = [100 - @Model.TGALoss<span>
+                                            (@if (Model.WegithLossBy == "KF")
+                                            {
+                                                <span>Water Content By @Model.WegithLossBy</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Wt loss by @Model.WegithLossBy</span>
+                                            })
+                                        </span> - @Model.ResidueOnIgnition<span>(ROI) ] X [</span>@Model.HPLCGCELSD<span> (@Model.Purity Purity) </span>] / 100 = @answer.ToString("F") %
+                                    </span>
+                                </p>
+                            }
+                            else if (Model.EquationType == "qnmr")
+                            {
+                                <p>
+                                    <span>
+                                        % Potency (Determined by qNMR) = @Model.qNMR <span>%</span>
+                                    </span>
+                                </p>
+                            }
+                            else
+                            {
+                                <p>
+                                    <span>
+                                        % Potency = [100 - @Model.TGALoss<span>
+                                            (@if (Model.WegithLossBy == "KF")
+                                            {
+                                                <span>Water Content By @Model.WegithLossBy</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Wt loss by @Model.WegithLossBy</span>
+                                            })] X [
+                                        </span>@Model.HPLCGCELSD
+                                    </span><span>(@Model.Purity Purity)] / 100 = @partialAnswer.ToString("F") %</span>
+                                </p>
+                            }
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(Model.AdditionalInfor))
+                    {
+                        @Html.Raw(Model.AdditionalInfor)
+                    }
+                    <div>
+                        <table width="100%">
+                            @if (!string.IsNullOrEmpty(Model.CTheroretical) ||
+                                !string.IsNullOrEmpty(Model.HTheroretical) ||
+                                !string.IsNullOrEmpty(Model.NTheroretical) ||
+                                !string.IsNullOrEmpty(Model.STheroretical))
+                            {
+                                <tr>
+                                    <td width="40%"><b style="font-size: 15px; "><span style="font-family: andalus;">Elemental Analysis</span><span style="font-family: andalus;"> (Theoretical)</span></b></td>
+                                    <td width="4%" style="font-family: Arial;">:</td>
+                                    <td width="56%" style="font-size: 15px; ">
+                                        @if (!string.IsNullOrEmpty(Model.CTheroretical))
+                                        {
+                                            <span>%C<span style="font-family: Arial;">:</span> @Model.CTheroretical</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.HTheroretical))
+                                        {
+                                            <span>%H<span style="font-family: Arial;">:</span> @Model.HTheroretical</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.NTheroretical))
+                                        {
+                                            <span>%N<span style="font-family: Arial;">:</span> @Model.NTheroretical</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.STheroretical))
+                                        {
+                                            <span>%S<span style="font-family: Arial;">:</span> @Model.STheroretical</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.CPractical) ||
+                                !string.IsNullOrEmpty(Model.HPractical) ||
+                                !string.IsNullOrEmpty(Model.NPractical) ||
+                                !string.IsNullOrEmpty(Model.SPractical))
+                            {
+                                <tr>
+                                    <td width="40%"><b style="font-size: 15px; "><span style="font-family: andalus;">Elemental Analysis</span><span style="font-family: andalus;"> (Practical)</span></b></td>
+                                    <td width="4%" style="font-family: Arial;">:</td>
+                                    <td width="56%" style="font-size: 15px; ">
+                                        @if (!string.IsNullOrEmpty(Model.CPractical))
+                                        {
+                                            <span>%C<span style="font-family: Arial;">:</span> @Model.CPractical</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.HPractical))
+                                        {
+                                            <span>%H<span style="font-family: Arial;">:</span> @Model.HPractical</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.NPractical))
+                                        {
+                                            <span>%N<span style="font-family: Arial;">:</span> @Model.NPractical</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.SPractical))
+                                        {
+                                            <span>%S<span style="font-family: Arial;">:</span> @Model.SPractical</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            <tr>
+                                <td width="27.5%"><b style="font-size: 15px; font-family: andalus;">Recommendation</b></td>
+                                <td width="4%" style="font-family: Arial;">:</td>
+                                <td width="69.5%" style="font-size: 15px; font-family: andalus;"> Released</td>
+                            </tr>
+                        </table>
+                    </div>
+                }
+            </div>
+            <div style="width: 20%; float: left; padding-top: -30px;">
+                @if (isScanCopy)
+                {
+                    <img src="http://spms.synzeal.com/images/stamp.png" width="100px" height="100px" style="padding-top: -30px;" />
+                }
+            </div>
+        </div>
+        @*}*@
+        @*<div style="font-size: 15px;">
+                <table width="100%">
+                    <tr>
+                        <td width="24%"><b style="font-size: 15px; font-family: andalus;">Recommendation</b></td>
+                        <td width="3%">:</td>
+                        <td width="73%" style="font-size: 15px; font-family: andalus;"> Released</td>
+                    </tr>
+                </table>
+            </div>*@
+        <hr style="margin:6px 0px 0px 0px;padding:0;margin-bottom:7px" />
+
+        <table width="100%" style="font-size: 15px; font-family: andalus;">
+            <thead style="margin:0;">
+                @if (isQACoa)
+                {
+                    <tr>
+                        <th width="28%" style="border: 1px solid #000;">
+
+                        </th>
+                        <th width="28%" style="border: 1px solid #000; text-align: center; font-weight: bold">Department</th>
+                        <th width="20%" style="border: 1px solid #000; text-align: center; font-weight: bold">Signature</th>
+                        <th width="24%" style="border: 1px solid #000; text-align: center; font-weight: bold">Date</th>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <th width="28%">
+
+                        </th>
+                        <th width="28%" style="text-align: center; font-weight: bold">Department</th>
+                        <th width="20%" style="text-align: center; font-weight: bold">Signature</th>
+                        <th width="24%" style="text-align: center; font-weight: bold">Date</th>
+                    </tr>
+                }
+            </thead>
+            <tbody>
+                @if (isQACoa)
+                {
+                    //QA
+                    <tr>
+                        <td style="width: 25%;border:1px solid #000;height:45px;vertical-align:middle">
+                            <div style="padding-left: 10px; font-weight:bold;">Prepared by</div>
+                        </td>
+                        <td style="width: 25%;border:1px solid #000;padding-left:10px">
+                            Quality Assurance
+                        </td>
+                        <td style="width: 20%;border:1px solid #000;padding-top:5px;padding-bottom:5px;padding-left:9px;">
+                        </td>
+                        <td style="border:1px solid #000;text-align:center">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 25%;border:1px solid #000;height:45px;vertical-align:middle">
+                            <div style="padding-left: 10px; font-weight:bold;">Checked by</div>
+                        </td>
+                        <td style="width: 25%;border:1px solid #000;padding-left:10px">
+                            Quality Assurance
+                        </td>
+                        <td style="width: 20%;border:1px solid #000;padding-top:5px;padding-bottom:5px;padding-left:9px;">
+                        </td>
+                        <td style="border:1px solid #000;text-align:center">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 25%; border:1px solid #000;height:45px; vertical-align: middle;padding-left:10px">
+                            <div style="font-weight:bold;">Approved By</div>
+                        </td>
+                        <td style="width: 25%; border:1px solid #000; padding-left:10px">
+                            Quality Assurance
+                        </td>
+                        <td style="width: 20%;border:1px solid #000;padding-top:5px;padding-bottom:5px;padding-left:9px;">
+                        </td>
+                        <td style="border:1px solid #000;text-align:center">
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td style="width: 25%;border:1px solid #000;height:45px;vertical-align:middle">
+                            <div style="padding-left: 10px; font-weight:bold;">Prepared and Reviewed by</div>
+                        </td>
+                        <td style="width: 25%;border:1px solid #000;padding-left:10px">
+                            Analytical
+                        </td>
+                        <td style="width: 20%;border:1px solid #000;padding-top:5px;padding-bottom:5px;padding-left:9px;">
+                            @if (isScanCopy)
+                            {
+                                <img src="http://spms.synzeal.com/images/chirag.png" height="35px" width="80%" />
+                            }
+                        </td>
+                        <td style="border:1px solid #000;text-align:center">
+                            @if (isScanCopy)
+                            {
+                                @dateNow
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 25%; border:1px solid #000;height:45px; vertical-align: middle;padding-left:10px">
+                            <div style="font-weight:bold;">Approved By</div>
+                        </td>
+                        <td style="width: 25%; border:1px solid #000; padding-left:10px">
+                            Quality Control
+                        </td>
+                        <td style="width: 20%;border:1px solid #000;padding-top:5px;padding-bottom:5px;padding-left:9px;">
+                            @if (isScanCopy)
+                            {
+                                <img src="http://spms.synzeal.com/images/drjitendrakaila.png" width="80%" height="55px" />
+                            }
+                        </td>
+                        <td style="border:1px solid #000;text-align:center">
+                            @if (isScanCopy)
+                            {
+                                @dateNow
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div>
+            <table width="100%" style="font-size: 15px;">
+                <tr>
+                    <td width="22%"><b style="font-size: 15px; font-family: andalus;">Attachments</b></td>
+                    <td width="4%">:</td>
+                    <td width="75%" style="font-size: 15px; ">
+                        <div style="float:left;font-family: andalus;">
+                            @{
+                                string attachmentstr = Model.Attachment.Replace("HPLC", Model.Purity).Replace("TGA", Model.WegithLossBy);
+                            }
+
+                            @attachmentstr
+                        </div>
+
+                        @if (Model.IsManufacture.HasValue && Model.IsManufacture.Value)
+                        {
+                            <div style="float:right; width:40%;">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <b style="font-family: andalus;">Mfg Date </b>:
+                                            <span style="font-family: andalus;">
+                                                @if (Model.ManufactureDate.HasValue)
+                                                {
+                                                    @Model.ManufactureDate.Value.ToShortDateString()
+                                                }
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        }
+                    </td>
+                </tr>
+                @if (Model.IsShipping.HasValue && Model.IsShipping.Value)
+                {
+                    <tr>
+                        <td width="22%"><b style="font-size: 15px; font-family: andalus;">Shipping Condition</b></td>
+                        <td width="4%">:</td>
+                        <td width="75%" style="font-size: 15px; font-family: andalus;">
+                            All Products are stable to be shipped at room temperature, unless otherwise specified.
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </DIV>
+</BODY>
+</HTML>

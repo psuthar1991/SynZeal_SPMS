@@ -1,0 +1,539 @@
+﻿@{
+    ViewBag.Title = "Company";
+    Layout = null;
+}
+@model  Synzeal_Inventory.Entity.SZ_ChildCOA
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Add New COA</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form role="form" id="formaddmastercoarepresentative">
+            <div class="box-body">
+                <div class="col-md-4">
+                    <h4>Product Information</h4>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">CAT No : </label>
+                        <span>
+                            <input type="hidden" id="uniqueId" value="@Guid.NewGuid().ToString()" />
+                            <input type="text" id="catno" name="catno" style="width: 50%;" class="form-control" /><i class="fa fa-refresh" style="margin-left:10px;" onclick="getProductData()"></i>
+                        </span>
+                    </div>
+                    <img id="imgsrcproduct" name="imgsrcproduct" src="@ViewBag.ImagePath" width="110%" /> <br /> <br />
+                    <input type="hidden" id="imgsynzealsrcproduct" name="imgsynzealsrcproduct" />
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Upload Image : </label>
+                        <span>
+                            <input type="file" id="fileupload" name="fileupload" />
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-5">
+                            <label for="exampleInputEmail1" style="    padding-top: 10px;">Product Name : </label>
+                        </div>
+                        <div class="col-md-7">
+                            <span>
+                                <input type="text" id="productname" name="productname" class="form-control" width="100%" value="@Model.ProductName" />
+                            </span>
+                        </div>
+                        <input type="hidden" id="batchId" name="batchId" value="@Model.BatchNo" />
+                        <input type="hidden" id="sku" name="sku" value="@ViewBag.CATNo" />
+                        @Html.HiddenFor(model => model.Id)
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-5">
+                            <label for="exampleInputEmail1" style="    padding-top: 10px;">Chemical No : </label>
+                        </div>
+                        <div class="col-md-7">
+                            <span>
+                                <input type="text" id="chemicalname" name="chemicalname" class="form-control" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-5">
+                            <label for="exampleInputEmail1" style="    padding-top: 10px;">CAS No : </label>
+                        </div>
+                        <div class="col-md-7">
+                            <span>
+                                <input type="text" id="casno" name="casno" value="@ViewBag.CASNo" class="form-control" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-5">
+                            <label for="exampleInputEmail1" style="    padding-top: 10px;">Mol Formula : </label>
+                        </div>
+                        <div class="col-md-7">
+                            <span>
+                                <input type="text" id="molecularformula" name="molecularformula" value="@ViewBag.MolFormula" class="form-control" />
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-5">
+                            <label for="exampleInputEmail1" style="    padding-top: 10px;">Mol Weight : </label>
+                        </div>
+                        <div class="col-md-7">
+                            <span>
+                                <input type="text" id="molecularweight" name="molecularweight" value="@ViewBag.MolecularWeight" class="form-control" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <h4>Analytical Information</h4>
+
+                    <div class="form-group">
+                        <label for="exampleInputEmail1" class="col-md-5" style="padding-top:15px">Solubility : </label>
+                        <div class="col-md-7">
+                            <input type="text" id="SOLUBILITY" name="SOLUBILITY" value="@Model.SOLUBILITY" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1" class="col-md-5" style="padding-top:11px">Appearance of product : </label>
+                        <div class="col-md-7">
+                            <input type="text" id="AppearanceProduct" name="AppearanceProduct" value="@Model.AppearanceProduct" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1" class="col-md-5" style="padding-top:15px">Long Term Storage : </label>
+                        <div class="col-md-7">
+                            <input type="text" id="StorageCon" name="StorageCon" value="2-8°C for long term storage" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1" class="col-md-5" style="padding-top:15px">13C NMR : </label>
+                        <div class="col-md-7">
+                            <input type="text" id="CMR" name="CMR" value="@Model.CMR" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1" class="col-md-5" style="padding-top:15px">ROI : </label>
+                        <div class="col-md-7">
+                            <input type="text" id="ResidueOnIgnition" name="ResidueOnIgnition" value="@Model.ResidueOnIgnition" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="exampleInputEmail1" class="col-md-5" style="padding-top:15px">Mass : </label>
+                        <div class="col-md-7">
+                            <input type="text" id="Mass" name="Mass" value="@Model.Mass" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1" class="col-md-5" style="padding-top:15px">IR : </label>
+                        <div class="col-md-7">
+                            <input type="text" id="IR" name="IR" value="@Model.IR" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1" class="col-md-5" style="padding-top:15px">Purity : </label>
+                        <div class="col-md-7">
+                            <select id="Purity" name="Purity" data-value="@Model.Purity" class="form-control" style="    width: 47%;    float: left;">
+                                <option value="HPLC">HPLC</option>
+                                <option value="GC">GC</option>
+                                <option value="ELSD">ELSD</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <input type="text" id="HPLCGCELSD" name="HPLCGCELSD" value="@Model.HPLCGCELSD" style="width: 29%;margin-top: 0;margin-left: 5%;" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="exampleInputEmail1" class="col-md-5" style="padding-top:15px">Dept : </label>
+                        <div class="col-md-7">
+                            <input type="text" id="Dept" name="Dept" value="@Model.Dept" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1" class="col-md-5" style="padding-top:15px">1H NMR : </label>
+                        <div class="col-md-7">
+                            <input type="text" id="NMR" name="NMR" value="@Model.NMR" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1" class="col-md-5" style="padding-top:15px">Chiral Purity : </label>
+                        <div class="col-md-7">
+                            <input type="text" id="Potency" name="Potency" value="@Model.Potency" class="form-control" />
+                        </div>
+                    </div>
+                    
+
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1"> Additional Information : </label>
+                        <textarea id="AdditionalInfor" name="AdditionalInfor" rows="10" cols="60"></textarea>
+                    </div>
+
+                </div>
+
+                <div class="clear"></div>
+                <div class="col-md-12">
+
+                </div>
+                <div class="clear"></div>
+                <div class="form-group" style="text-align:right">
+                    <button type="button" onclick="addMasterCOARepresentative()" class="btn btn-primary" style="float: right;margin: 10px;">Save</button>
+                </div>
+            </div>
+            <div class="clear">
+            </div>
+
+        </form>
+    </div>
+</div>
+<script src="@Url.Content("~/Content/bower_components/ckeditor/ckeditor.js")"></script>
+
+<script>
+
+    function getProductData() {
+        if ($("#catno").val().trim() === "") {
+            toastr.error("Please enter CAT No.");
+            return false;
+        }
+        $.ajax({
+            type: "GET",
+            url: "/Form/ProductDetailsBySku",
+            datatype: 'json',
+            ContentType: 'application/json;utf-8',
+            data: {
+                sku: $("#catno").val()
+            },
+            success: function (results) {
+                if (!results.success) {
+                    toastr.error("Product information is not available for this CAT No.");
+                    return false;
+                }
+                else {
+                    if (results.data.DefaultPictureModel != null) {
+                        $("#imgsrcproduct").attr('src', results.data.DefaultPictureModel.ImageUrl);
+                        $("#imgsynzealsrcproduct").val(results.data.DefaultPictureModel.ImageUrl);
+
+                    }
+                    $("#chemicalname").val(results.data.Synonym);
+                    $("#productname").val(results.data.Name);
+                    $("#casno").val(results.data.ManufacturerPartNumber);
+                    $("#molecularformula").val(results.data.Gtin);
+                    $("#molecularweight").val(results.data.MolecularWeight);
+                }
+            }
+        });
+    }
+
+
+
+    $(function () {
+        CKEDITOR.replace('AdditionalInfor');
+    });
+    var entityMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+        '/': '&#x2F;',
+        '`': '&#x60;',
+        '=': '&#x3D;'
+    };
+
+    function escapeHtml(string) {
+        return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+            return entityMap[s];
+        });
+    }
+    $.fn.serializeObject = function () {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function () {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                else {
+                    o[this.name].push(this.value || '');
+                }
+            } else {
+
+                o[this.name] = this.value || '';
+
+            }
+        });
+        return o;
+    };
+
+    $('input.chkfirst').on('change', function () {
+        $('input.chkfirst').not(this).prop('checked', false);
+    });
+
+    //$('input.chksecond').on('change', function () {
+    //    $('input.chksecond').not(this).prop('checked', false);
+    //});
+    function addMasterCOARepresentative() {
+        $(".errorcls").each(function () {
+            $(this).removeClass('errorcls');
+        });
+
+        var lengthfile = $('#fileupload').get(0).files.length;
+        if (lengthfile !== 0) {
+            var formData = new FormData();
+            var file = document.getElementById("fileupload").files[0];
+            formData.append("uniqueId", $("#uniqueId").val());
+            formData.append("fileupload", file);
+            $.ajax({
+                type: "POST",
+                url: '/Form/UploadRepresentativeCOAImage',
+                data: formData,
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                success: function () {
+                    var Message = CKEDITOR.instances['AdditionalInfor'].getData();
+                    var passData = {
+                        'Id': 0,
+                        'Message': Message,
+                    };
+                    $.ajax({
+                        type: "POST",
+                        url: "/Form/AddNewCOARepresentative",
+                        datatype: 'json',
+                        ContentType: 'application/json;utf-8',
+                        data: {
+                            form: $("#formaddmastercoarepresentative").serializeObject(),
+                            passdata: passData
+                        },
+                        success: function (results) {
+                            debugger;
+                            if (!results.success) {
+                                toastr.error(results.message);
+                                return false;
+                            }
+
+
+
+
+                            window.open(
+                                "/Form/DownloadFile?path=" + results.path,
+                                '_blank'
+                            );
+                            toastr.success("Representative COA generated.");
+                            $('#myModal').modal('hide');
+
+                        }
+                    });
+                }
+            });
+        }
+        else {
+            var Message = CKEDITOR.instances['AdditionalInfor'].getData();
+            var passData = {
+                'Id': 0,
+                'Message': Message,
+            };
+            $.ajax({
+                type: "POST",
+                url: "/Form/AddNewCOARepresentative",
+                datatype: 'json',
+                ContentType: 'application/json;utf-8',
+                data: {
+                    form: $("#formaddmastercoarepresentative").serializeObject(),
+                    passdata: passData
+                },
+                success: function (results) {
+                    if (!results.success) {
+                        toastr.error(results.message);
+                        return false;
+                    }
+
+
+                    setTimeout(function () {
+                        toastr.success("Representative COA generated.");
+                        $('#myModal').modal('hide');
+                        window.open(
+                            "/Form/DownloadFile?path=" + results.path,
+                            '_blank'
+                        );
+                    }, 2000);
+
+                }
+            });
+        }
+
+
+
+    }
+
+
+    function imageUpload(childId) {
+        var formData = new FormData();
+        var file = document.getElementById("fileupload").files[0];
+        formData.append("childId", childId);
+        formData.append("fileupload", file);
+        $.ajax({
+            type: "POST",
+            url: '/Form/ChildCOAFileUpload',
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false
+        });
+    }
+</script>
+
+@if (Model.IsRepresentative)
+{
+    <text>
+        <script type="text/javascript">
+        if('@Model.IsLogoAttached' == 'True')
+        {
+            $("#IsLogoAttached").attr('checked', true);
+            }
+            if('@Model.IsEquation' == 'True')
+        {
+                $("#IsEquation").attr('checked', true);
+        }
+
+
+          //COA title
+        if('@Model.EPChk' == 'True')
+        {
+            $("#EPchk").attr('checked', true);
+        }
+        if('@Model.USPChk' == 'True')
+        {
+            $("#USPchk").attr('checked', true);
+        }
+        if('@Model.ChkEPChemicalName' == 'True')
+        {
+            $("#ChkEPChemicalName").attr('checked', true);
+        }
+        if('@Model.ChkUSPChemicalName' == 'True')
+        {
+            $("#ChkUSPChemicalName").attr('checked', true);
+        }
+        if('@Model.IUPACChk' == 'True')
+        {
+            $("#IUPACchk").attr('checked', true);
+        }
+        if('@Model.ChkOtherNameOne' == 'True')
+        {
+            $("#ChkOtherNameOne").attr('checked', true);
+        }
+        if('@Model.ChkOtherNameSecond' == 'True')
+        {
+            $("#ChkOtherNameSecond").attr('checked', true);
+        }
+        if('@Model.ChkOtherNameThird' == 'True')
+        {
+            $("#ChkOtherNameThird").attr('checked', true);
+        }
+
+        //Chemical name
+        if('@Model.ChkChemEP' == 'True')
+        {
+            $("#ChkChemEP").attr('checked', true);
+        }
+        if('@Model.ChkChemUSP' == 'True')
+        {
+            $("#ChkChemUSP").attr('checked', true);
+        }
+        if('@Model.ChemChkEPChemicalName' == 'True')
+        {
+            $("#ChemChkEPChemicalName").attr('checked', true);
+        }
+        if('@Model.ChemChkUSPChemicalName' == 'True')
+        {
+            $("#ChemChkUSPChemicalName").attr('checked', true);
+        }
+        if('@Model.ChkChemIUPAC' == 'True')
+        {
+            $("#ChkChemIUPAC").attr('checked', true);
+        }
+        if('@Model.ChemChkOtherNameOne' == 'True')
+        {
+            $("#ChemChkOtherNameOne").attr('checked', true);
+        }
+        if('@Model.ChemChkOtherNameSecond' == 'True')
+        {
+            $("#ChemChkOtherNameSecond").attr('checked', true);
+        }
+        if('@Model.ChemChkOtherNameThird' == 'True')
+        {
+            $("#ChemChkOtherNameThird").attr('checked', true);
+        }
+
+         //Syn name
+        if('@Model.ChkSynEP' == 'True')
+        {
+            $("#ChkSynEP").attr('checked', true);
+        }
+        if('@Model.ChkSynUSP' == 'True')
+        {
+            $("#ChkSynUSP").attr('checked', true);
+        }
+        if('@Model.SynChkEPChemicalName' == 'True')
+        {
+            $("#SynChkEPChemicalName").attr('checked', true);
+        }
+        if('@Model.SynChkUSPChemicalName' == 'True')
+        {
+            $("#SynChkUSPChemicalName").attr('checked', true);
+        }
+        if('@Model.ChkSynIUPAC' == 'True')
+        {
+            $("#ChkSynIUPAC").attr('checked', true);
+        }
+        if('@Model.SynChkOtherNameOne' == 'True')
+        {
+            $("#SynChkOtherNameOne").attr('checked', true);
+        }
+        if('@Model.SynChkOtherNameSecond' == 'True')
+        {
+            $("#SynChkOtherNameSecond").attr('checked', true);
+        }
+        if('@Model.SynChkOtherNameThird' == 'True')
+        {
+            $("#SynChkOtherNameThird").attr('checked', true);
+        }
+
+        if('@Model.ReviewdBy' !== '' && '@Model.ReviewdBy' !== null)
+        {
+            $('#reviewedby').val('@Model.ReviewdBy');
+        }
+        if('@Model.PreparedBy' !== '' && '@Model.PreparedBy' !== null)
+        {
+            $('#preparedby').val('@Model.PreparedBy');
+        }
+        if('@Model.ApprovedBy' !== '' && '@Model.ApprovedBy' !== null)
+        {
+            $('#approvedby').val('@Model.ApprovedBy');
+        }
+
+
+        </script>
+    </text>
+}
+@*@if(!string.IsNullOrEmpty(Model.AdditionalInfor))
+    {
+        <text>
+        <script type="text/javascript">
+
+            CKEDITOR.instances['AdditionalInfor'].setData(@Server.HtmlDecode(Model.AdditionalInfor));
+        </script>
+        </text>
+    }*@
+
+<style type="text/css">
+
+    input[type=text] {
+        width: 80%;
+        display: inline-block;
+        margin: 10px 0 10px 0;
+    }
+</style>

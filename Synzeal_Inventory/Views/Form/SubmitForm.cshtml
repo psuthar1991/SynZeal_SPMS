@@ -1,0 +1,1814 @@
+﻿@{
+    ViewBag.Title = "SubmitForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int quotationDetailsId = ViewBag.QuotationDetailsId;
+
+    var formQuotationData = new SZ_QuoteDetailForm();
+    if (ViewBag.FormId != null && ViewBag.FormId != 0)
+    {
+        formQuotationData = ViewBag.FormData as SZ_QuoteDetailForm;
+    }
+    string correctionstatus = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ApprovedStatus.QCCorrection);
+    bool Isdispatch = Convert.ToBoolean(ViewBag.Isdispatch);
+    bool isPrint = Convert.ToBoolean(ViewBag.IsPrint);
+    var comments = ViewBag.QuoteDetailsComment as List<SZ_QuoteDetailsComment>;
+    var islock = Convert.ToBoolean(ViewBag.islockForm);
+    bool IsNewProductMaster = Convert.ToBoolean(ViewBag.NewProductMaster);
+}
+@model SZ_QuotationDetail
+@using Synzeal_Inventory.Entity
+
+<section class="content-header">
+    <h1>
+        Product Submission Form
+        @if (!string.IsNullOrEmpty(formQuotationData.Ref))
+        {
+            <span style="color: #448dba; font-weight: bold">(REF # @formQuotationData.Ref)</span>
+        }
+
+        @if (IsNewProductMaster)
+        {
+            <a class="btn btn-primary" style="float:right" href="/Form/ProductMaster">Back</a>
+        }
+        else
+        {
+            <a class="btn btn-primary" style="float:right" href="/Form/ScientistNewForm">Cancel</a>
+            <a class="btn btn-primary" style="float:right;margin-right:7px;" href="/Form/ViewForm/@quotationDetailsId">Back to List</a>
+        }
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                @if (formQuotationData.ApprovalStatus == Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ApprovedStatus.QCCorrection))
+                {
+                    <div style="background: #f57575; color: #fff; padding: 6px 20px; font-size: 17px; font-weight: bold;">QC Team submitted this form with correction. Please review comments below and resolved it.</div>
+                }
+                @if (formQuotationData.ApprovalStatus == Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ApprovedStatus.QCApproved))
+                {
+                    <div style="background: #71d271; color: #000; padding: 6px 20px; font-size: 17px; font-weight: bold;">QC Team approved this form.</div>
+                }
+                <!-- /.box-header -->
+                <!-- form start -->
+                <form role="form" id="makeform" enctype="multipart/form-data">
+                    <div class="box-body">
+                        <div class="col-md-12" style="font-size: 18px; margin-bottom: 10px;">
+                            <b>
+                                Submission Details
+                            </b>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <input type="hidden" id="IsNewProductMaster" name="IsNewProductMaster" value="@IsNewProductMaster" />
+                            <input type="hidden" id="QuotationDetailsId" name="QuotationDetailsId" value="@ViewBag.QuotationDetailsId" />
+                            <input type="hidden" id="QuotationDetailsFormId" name="QuotationDetailsFormId" value="@ViewBag.FormId" />
+                            <label for="exampleInputEmail1">Submission Date :</label>
+                            <input type="text" class="form-control" id="SubmissionDate" name="SubmissionDate" placeholder="Submission Date" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">Journal Date :</label>
+                            <input type="text" class="form-control" id="JournalDate" name="JournalDate" placeholder="Journal Date" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">TL Name:</label>
+                            <input type="email" class="form-control" id="TLName" name="TLName" placeholder="TL Name" value="@Synzeal_Inventory.Models.SessionCookieManagement.UserName">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">Project Name:</label>
+                            <input type="text" class="form-control" id="ProjectName" name="ProjectName" placeholder="Project Name" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">Sci. Name:</label>
+                            <input type="email" class="form-control" id="NameOfScientist" name="NameOfScientist" placeholder="Name Of Scientist" value="@Model.SubScientistName">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">Quantity Submitted (in mg):<sup style="color:red">(*)</sup></label>
+                            <input type="text" class="form-control" id="QuantitySubmitted" name="QuantitySubmitted" placeholder="Quantity Submitted">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">
+                                No Of Steps of Final Route:<sup style="color:red">(*)</sup>
+                            </label>
+                            <input type="number" class="form-control" id="NoOfFinalStep" name="NoOfFinalStep" />
+                        </div>
+
+                        @*<div class="form-group col-md-3">
+                                <label for="exampleInputPassword1">Ref. 1H/HPLC/MS Code:<sup style="color:red">(*)</sup></label>
+                                <input type="email" class="form-control" id="DatePurity" name="DatePurity" placeholder="Ref. 1H/HPLC/MS Code" required>
+                            </div>*@
+                        <div class="form-group col-md-2">
+                            <label for="exampleInputPassword1">
+                                Earlier Synthesized:<sup style="color:red">(*)</sup>
+                            </label>
+                            <br />
+                            <label style="padding-right:25px;">
+                                <input type="radio" name="rbEarlierSynthesized" value="Yes">
+                                Yes
+                            </label>
+                            <label>
+                                <input type="radio" name="rbEarlierSynthesized" value="No">
+                                No
+                            </label>
+
+                        </div>
+                        <div class="clearfix"></div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">
+                                Chemist :
+                            </label>
+
+                            <input type="text" class="form-control" id="Chemist" name="Chemist" />
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="exampleInputPassword1">
+                                ELN Receipt:@*<sup style="color:red">(*)</sup>*@
+                            </label>
+
+                            <input type="text" class="form-control" id="ELNReceiptNumber" name="ELNReceiptNumber" />
+                        </div>
+                        <div class="col-md-5">
+                            <label for="exampleInputEmail1">Type Of Compound:<sup style="color:red">(*)</sup></label>
+                            <br />
+                            <label style="padding-right:25px;">
+                                <input type="radio" name="rbTypeCompound" value="Impurity" checked>
+                                Impurity
+                            </label>
+                            <label style="padding-right:25px;">
+                                <input type="radio" name="rbTypeCompound" value="Intermediate">
+                                Intermediate
+                            </label>
+                            <label style="padding-right:25px;">
+                                <input type="radio" name="rbTypeCompound" value="StableIsotopes">
+                                Stable Isotopes
+                            </label>
+                            <label>
+                                <input type="radio" name="rbTypeCompound" value="Metabolites">
+                                Metabolites
+                            </label>
+                            <label>
+                                <input type="radio" name="rbTypeCompound" value="Working Standard">
+                                Working Standard
+                            </label>
+                            <label>
+                                <input type="radio" name="rbTypeCompound" value="Traceable Standard">
+                                Traceable Standard
+                            </label>
+                        </div>
+                        <div class="clear"></div>
+                        <hr style="width: 100%;" />
+
+                        <div class="col-md-12" style="font-size: 18px; margin-bottom: 10px;">
+                            <b>Product Details</b>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label" style="padding-top:6px;" for="exampleInputPassword1">Catelogue No. :</label>
+                                <div class="col-sm-9" style="margin-bottom:10px;">
+                                    <input type="text" readonly style="width:95%" class="form-control" id="CatelogueNo" name="CatelogueNo" placeholder="Catelogue No." required>
+                                    <i class="fa fa-x fa-refresh" onclick="GetInforFromCatNo()" style="position: relative;margin-top: -24px;float: right;"></i>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label" style="padding-top:6px;" for="exampleInputPassword1">Product Name :</label>
+                                <div class="col-sm-9" style="margin-bottom:10px;">
+                                    <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label" style="padding-top:6px;" for="exampleInputPassword1">CAS No. :</label>
+                                <div class="col-sm-9" style="margin-bottom:10px;">
+                                    <input type="text" class="form-control" id="CASNo" name="CASNo" placeholder="CAS No." required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label" style="padding-top:6px;" for="exampleInputPassword1">M.W. :</label>
+                                <div class="col-sm-4" style="margin-bottom:10px;">
+                                    <input type="text" class="form-control" id="MoleWeight" name="MoleWeight" placeholder="Mole. Weight" required>
+                                </div>
+                                <label class="col-sm-1 control-label" style="padding-top:6px;" for="exampleInputPassword1">M.F. :</label>
+                                <div class="col-sm-4" style="margin-bottom:10px;">
+                                    <input type="text" class="form-control" id="MolecularFormula" name="MolecularFormula" placeholder="Mole. Formula" required>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="exampleInputEmail1" class="col-sm-5 control-label" style="padding-top: 6px;padding-left:0">Light:<sup style="color:red">(*)</sup> <input type="checkbox" id="IsLight" name="IsLight" /></label>
+
+                                <div class="col-sm-7" style="margin-bottom:10px;">
+
+                                    @*<input type="text" class="form-control" id="rbStateOfCompound" name="rbStateOfCompound" placeholder="Appreance of Product">*@
+                                    <label style="padding-top:7px;">Color:</label>
+                                    <select class="form-control" id="rbStateOfCompound" name="rbStateOfCompound" style="float: right; width: 65%; margin-left: 5px;">
+                                        <option>Select</option>
+                                        <option value="White">White</option>
+                                        <option value="Off-White">Off-White</option>
+                                        @*<option value="Beige">Beige</option>*@
+                                        <option value="Light Brown">Light Brown</option>
+                                        <option value="Brown">Brown</option>
+                                        <option value="Light Green">Light Green</option>
+                                        <option value="Green">Green</option>
+                                        <option value="Light Yellow">Light Yellow</option>
+                                        <option value="Yellow">Yellow</option>
+                                        <option value="Pale Yellow">Pale Yellow</option>
+                                        <option value="Light Orange">Light Orange</option>
+                                        <option value="Orange">Orange</option>
+                                        <option value="Red">Red</option>
+                                        <option value="Light Blue">Light Blue</option>
+                                        <option value="Blue">Blue</option>
+                                        <option value="Colourless">Colourless</option>
+                                        <option value="Grey">Grey</option>
+                                        <option value="Light Pink">Light Pink</option>
+                                        <option value="Pink">Pink</option>
+                                        <option value="Light Violet">Light Violet</option>
+                                        <option value="Violet">Violet</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1" style="padding-top: 6px;padding-left:0">Physical State:<sup style="color:red">(*)</sup></label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <select class="form-control" id="State" name="State">
+                                        <option value="">--Select--</option>
+                                        <option value="Solid">Solid</option>
+                                        <option value="Semi Solid">Semi Solid</option>
+                                        <option value="Sticky Solid">Sticky Solid</option>
+                                        <option value="Hygroscopic Solid">Hygroscopic Solid</option>
+                                        <option value="Liquid">Liquid</option>
+                                        <option value="Oil">Oil</option>
+                                        <option value="Thick Oil">Thick Oil</option>
+                                        <option value="Sticky Oil">Sticky Oil</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="exampleInputEmail1" class="col-sm-3 control-label" style="padding-top: 6px;padding-left:0">Batch Code :</label>
+                                <div class="col-sm-4" style="margin-bottom:10px;">
+                                    <input type="text" class="form-control" id="BatchCode" name="BatchCode" placeholder="BatchCode" required>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label style="padding-top: 6px;" for="exampleInputPassword1">If Salt Mention the Name:<sup style="color:red">(*)</sup></label>
+                            </div>
+                            <div class="form-group col-md-3 radio">
+                                <label style="padding-right:25px;">
+                                    <input type="radio" name="rbSaltMentionName" value="Salt">
+                                    Salt
+                                </label>
+                                <label>
+                                    <input type="radio" name="rbSaltMentionName" value="Free">
+                                    Free
+                                </label>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <input type="text" class="form-control" id="SaltName" name="SaltName" placeholder="If Salt Mention the Name" required>
+                            </div>
+
+                            <div class="form-group col-md-12" style="padding-right:25px;">
+                                <div class="col-md-2">
+                                    <input type="checkbox" id="chkHygroscopic" name="chkHygroscopic" value="true">
+                                    Hygroscopic
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="checkbox" id="TempSensitive" name="TempSensitive" value="true">
+                                    Temp Sensitive
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="checkbox" id="Lacrymatory" name="Lacrymatory" value="true">
+                                    Lacrymatory
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="checkbox" id="LightSensitivity" name="LightSensitivity" value="true">
+                                    Light Sensitivity
+                                </div>
+                                @*<div class="col-md-2">
+                                        <input type="checkbox" id="Photostability" name="Photostability" value="true">
+                                        Photostability
+                                    </div>*@
+                            </div>
+                        </div>
+
+                        <div class="col-md-5" style="text-align:center">
+                            <img id="detFromDBImagesrc" src="https://www.synzeal.com/content/images/thumbs/default-image_350.png" width="100%" />
+                            <input type="hidden" id="detFromDBImage" name="detFromDBImage" value="https://www.synzeal.com/content/images/thumbs/default-image_350.png" />
+                        </div>
+                        <div class="clear"></div>
+                        <hr style="width:100%" />
+                        <div class="col-md-12" style="font-size: 18px; margin-bottom: 10px;">
+                            <b>Stability Related</b>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group col-md-3">
+                                <label for="exampleInputPassword1">Stability data in solution form after 7 days:<sup style="color:red">(*)</sup></label>
+                            </div>
+                            <div class="form-group col-md-9">
+                                <input type="radio" name="SolutionForm" value="Stable" /> Stable
+                                <input type="radio" name="SolutionForm" value="Unstable" /> Unstable
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group col-md-3">
+                                <label for="exampleInputPassword1">Stability data in solid form after 7 days:<sup style="color:red">(*)</sup></label>
+                            </div>
+                            <div class="form-group col-md-9">
+                                <input type="radio" name="SolidForm" value="Stable" /> Stable
+                                <input type="radio" name="SolidForm" value="Unstable" /> Unstable
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                        <hr style="width:100%" />
+                        <div class="col-md-12" style="font-size: 18px; margin-bottom: 10px;">
+                            <b>Analysis Data:</b>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">1H Status:<sup style="color:red">(*)</sup></label>
+                            @*<input type="email" class="form-control" id="NMRCodeStatus" name="NMRCodeStatus" placeholder="1H Status" required>*@
+                            <select class="form-control" id="NMRCodeStatus" name="NMRCodeStatus">
+                                <option value="">--Select--</option>
+                                <option value="SER Submitted">SER Submitted</option>
+                                <option value="SER Pending">SER Pending</option>
+                                <option value="NMR Pending">NMR Pending</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">HPLC/GC/ELSD Date:<sup style="color:red">(*)</sup></label>
+                            <input type="email" class="form-control" id="HPLCDate" name="HPLCDate" placeholder="HPLC Date" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">Chromatography:<sup style="color:red">(*)</sup></label>
+                            <input type="text" class="form-control" id="HPLCPurity" name="HPLCPurity" placeholder="Chromatography" required style="width:95%"> <span style="float: right;margin-top: -27px;">%</span>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">MS Analysis:<sup style="color:red">(*)</sup></label>
+                            @*<input type="email" class="form-control" id="CodeESIAPCI" name="CodeESIAPCI" placeholder="MS Analysis" required>*@
+                            <select class="form-control" id="CodeESIAPCI" name="CodeESIAPCI">
+                                <option value="">--Select--</option>
+                                <option value="ESI">ESI</option>
+                                <option value="APCI">APCI</option>
+                                <option value="OTHER">OTHER</option>
+                            </select>
+                        </div>
+                        <div class="clear"></div>
+                        <hr style="width:100%" />
+                        <div class="clear"></div>
+                        <div class="col-md-6">
+                            <div class="form-group col-md-6">
+                                <label for="exampleInputEmail1" style="padding-top: 6px;">
+                                    Stability Related Comment :
+                                </label>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>
+                                    <input type="text" class="form-control" id="StabilityRelatedComment" name="StabilityRelatedComment" placeholder="Stability Related Comment" style="float:left">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <div class="form-group col-md-3">
+                                <label for="exampleInputPassword1">Stability :</label>
+                            </div>
+                            <div class="form-group col-md-9">
+                                <select class="form-control" id="State" name="State">
+                                    <option value="">--Select--</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Stable">Stable</option>
+                                    <option value="Less Stable">Less Stable</option>
+                                </select>
+                            </div>
+                        </div>
+                        <hr style="width:100%" />
+                        <div class="clear"></div>
+                        <div class="col-md-12">
+                            <div class="form-group col-md-12">
+                                <label for="exampleInputEmail1" style="padding-top: 6px;">Additional Analysis :</label>
+                            </div>
+                            <div class="form-group col-md-12 checkbox">
+                                <div style="width:25%; float: left">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="IR">
+                                    IR<sup style="color:red">(*)</sup>
+
+                                    <a href="javascript:void(0)" id="attchIR" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="IRAttachment" name="IRAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="Mass">
+                                    Mass<sup style="color:red">(*)</sup>
+
+                                    <a href="javascript:void(0)" id="attchMass" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="MassAttachment" name="MassAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="HPLC/GC/ELSD">
+                                    HPLC/GC/ELSD<sup style="color:red">(*)</sup>
+
+                                    <a href="javascript:void(0)" id="attchHPLC" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="PLCAttachment" name="PLCAttachment" style="display: inline-flex; margin-left: 13px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="NMR">
+                                    1H NMR<sup style="color:red">(*)</sup>
+
+                                    <a href="javascript:void(0)" id="attchNMR" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="NMRAttchment" name="NMRAttchment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="qNMR">
+                                    qNMR
+
+                                    <a href="javascript:void(0)" id="attchQNMR" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="QNMRAttchment" name="QNMRAttchment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="TGA">
+                                    TGA/KF
+
+                                    <a href="javascript:void(0)" id="attchTGA" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="TGAAttachment" name="TGAAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="CMR">
+                                    13C NMR
+
+                                    <a href="javascript:void(0)" id="attchCMR" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="CMRAttchment" name="CMRAttchment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="DEPT">
+                                    DEPT
+
+                                    <a href="javascript:void(0)" id="attchDEPT" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="DEPTAttachment" name="DEPTAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="HRMS">
+                                    HRMS
+
+                                    <a href="javascript:void(0)" id="attchHRMS" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="HRMSAttachment" name="HRMSAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="ROI">
+                                    ROI
+
+                                    <a href="javascript:void(0)" id="attchROI" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="ROIAttachment" name="ROIAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                @*<label style="width:24%">
+                                        <input type="checkbox" name="radioAdditionalAnalysis" value="Elemental">
+                                        Elemental
+                                    </label>*@
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="CMR Interpretaion">
+                                    CMR Assign
+
+                                    <a href="javascript:void(0)" id="attchCMRInterpretaion" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="SERAttachment" name="SERAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="APCI Mass">
+                                    Mass Assign<sup style="color:red">(*)</sup>
+
+                                    <a href="javascript:void(0)" id="attchMASSInterpretaion" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="APCIMassAttachment" name="APCIMassAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="NMR Interpretaion">
+                                    NMR Assign<sup style="color:red">(*)</sup>
+
+                                    <a href="javascript:void(0)" id="attchNMRInterpretaion" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="NMRInterpretaionAttachment" name="NMRInterpretaionAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                @*<label style="width:24%">
+                                        <input type="checkbox" name="radioAdditionalAnalysis" value="GC">
+                                        GC
+                                    </label>
+                                    <label style="width:24%">
+                                        <input type="checkbox" name="radioAdditionalAnalysis" value="ELSD">
+                                        ELSD
+                                    </label>*@
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="ChiralChr">
+                                    Chiral Chr
+
+                                    <a href="javascript:void(0)" id="attchChiral" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="ChiralAttachmenrt" name="ChiralAttachmenrt" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+
+                                @*<label style="width:24%">
+                                        <input type="checkbox" name="radioAdditionalAnalysis" value="2D NMR">
+                                        2D NMR
+                                    </label>*@
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="COSY">
+                                    COSY
+
+                                    <a href="javascript:void(0)" id="attchCOSY" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="COSYAttachment" name="COSYAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="CHNS">
+                                    CHNS
+
+                                    <a href="javascript:void(0)" id="attchCHNS" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="CHNSAttachment" name="CHNSAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="Stability Data">
+                                    <div style="width: 28%; display: inline-block;">Stability Data</div>
+
+                                    <a href="javascript:void(0)" id="attchStabilitydata" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="StabilitydataAttachment" name="StabilitydataAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                                <div style="width: 25%; float: left ">
+                                    <input type="checkbox" name="radioAdditionalAnalysis" value="LCMS">
+                                    LCMS
+
+                                    <a href="javascript:void(0)" id="attchLCMSdata" style="display:none"><i class="fa fa-download"></i></a>
+                                    <input type="file" id="LCMSAttachment" name="LCMSAttachment" style="display: inline-flex; margin-left: 15px; float: right" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr style="width:100%" />
+                        <div class="clear"></div>
+                        <br />
+                        @*<div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        IR Attach.:<sup style="color:red">(*)</sup>
+                                        <a href="javascript:void(0)" id="attchIR" style="display:none"><i class="fa fa-download"></i></a>
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="IRAttachment" name="IRAttachment" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        Mass Attach.:<sup style="color:red">(*)</sup>
+                                        <a href="javascript:void(0)" id="attchMass" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="MassAttachment" name="MassAttachment" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        HPLC Attach.:<sup style="color:red">(*)</sup>
+                                        <a href="javascript:void(0)" id="attchHPLC" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="PLCAttachment" name="PLCAttachment" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        NMR Attach.:<sup style="color:red">(*)</sup>
+                                        <a href="javascript:void(0)" id="attchNMR" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="NMRAttchment" name="NMRAttchment" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        QNMR Attach.:
+                                        <a href="javascript:void(0)" id="attchQNMR" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="QNMRAttchment" name="QNMRAttchment" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        TGA Attach.:
+                                        <a href="javascript:void(0)" id="attchTGA" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="TGAAttachment" name="TGAAttachment" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        CMR Attach.:
+                                        <a href="javascript:void(0)" id="attchCMR" style="display:none"><i class="fa fa-download"></i></a>
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="CMRAttchment" name="CMRAttchment" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        DEPT Attach.:
+                                        <a href="javascript:void(0)" id="attchDEPT" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="DEPTAttachment" name="DEPTAttachment" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        HRMS Attach.:
+                                        <a href="javascript:void(0)" id="attchHRMS" style="display:none"><i class="fa fa-download"></i></a>
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="HRMSAttachment" name="HRMSAttachment" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        ROI Attach.:
+                                        <a href="javascript:void(0)" id="attchROI" style="display:none"><i class="fa fa-download"></i></a>
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="ROIAttachment" name="ROIAttachment" />
+                                </div>
+                            </div>*@
+                        @*<div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        Element Attach.:
+                                        <a href="javascript:void(0)" id="attchElement" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="ElementralAttachment" name="ElementralAttachment" />
+                                </div>
+                            </div>*@
+                        @*<div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        CMR Interpretaion Attach.:
+                                        <a href="javascript:void(0)" id="attchCMRInterpretaion" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="SERAttachment" name="SERAttachment" />
+                                </div>
+                            </div>*@
+                        @*<div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        GC Attach.:
+                                        <a href="javascript:void(0)" id="attchGC" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="GCAttachment" name="GCAttachment" />
+                                </div>
+                            </div>*@
+                        @*<div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        ELSD Attach.:
+                                        <a href="javascript:void(0)" id="attchELSD" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="ELSDAttachment" name="ELSDAttachment" />
+                                </div>
+                            </div>*@
+                        @*<div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        Chiral Attach.:
+                                        <a href="javascript:void(0)" id="attchChiral" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="ChiralAttachmenrt" name="ChiralAttachmenrt" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        MASS Assign Attach.:<sup style="color:red">(*)</sup>
+                                        <a href="javascript:void(0)" id="attchMASSInterpretaion" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="APCIMassAttachment" name="APCIMassAttachment" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleInputPassword1">
+                                        NMR Assign Attach.:<sup style="color:red">(*)</sup>
+                                        <a href="javascript:void(0)" id="attchNMRInterpretaion" style="display:none"><i class="fa fa-download"></i></a>
+
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="file" id="NMRInterpretaionAttachment" name="NMRInterpretaionAttachment" />
+                                </div>
+                            </div>*@
+                        @*<div class="col-md-4">
+                                <div class="form-group col-md-5">
+                                    <label for="exampleInputPassword1">
+                                        2D NMR :
+                                        <a href="javascript:void(0)" id="attch2DNMR" style="display:none"><i class="fa fa-download"></i></a>
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-7">
+                                    <input type="file" id="2DNMR" name="2DNMR" />
+                                </div>
+                            </div>*@
+
+                        @*<div class="col-md-4">
+                                <div class="form-group col-md-5">
+                                    <label for="exampleInputPassword1">
+                                        COSY :
+                                        <a href="javascript:void(0)" id="attchCOSY" style="display:none"><i class="fa fa-download"></i></a>
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-7">
+                                    <input type="file" id="COSYAttachment" name="COSYAttachment" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group col-md-5">
+                                    <label for="exampleInputPassword1">
+                                        CHNS :
+                                        <a href="javascript:void(0)" id="attchCHNS" style="display:none"><i class="fa fa-download"></i></a>
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-7">
+                                    <input type="file" id="CHNSAttachment" name="CHNSAttachment" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group col-md-5">
+                                    <label for="exampleInputPassword1">
+                                        LCMS :
+                                        <a href="javascript:void(0)" id="attchLCMSdata" style="display:none"><i class="fa fa-download"></i></a>
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-7">
+                                    <input type="file" id="LCMSAttachment" name="LCMSAttachment" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group col-md-5">
+                                    <label for="exampleInputPassword1">
+                                        Stability Data :
+                                        <a href="javascript:void(0)" id="attchStabilitydata" style="display:none"><i class="fa fa-download"></i></a>
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-7">
+                                    <input type="file" id="StabilitydataAttachment" name="StabilitydataAttachment" />
+                                </div>
+                            </div>*@
+                        <div class="col-md-12">
+                            <div class="form-group col-md-3">
+                                <label for="exampleInputPassword1">Remark :</label>
+                            </div>
+                            <div class="form-group col-md-9">
+                                @*<input type="email" class="form-control" id="AnalysisCode" name="AnalysisCode" placeholder="Describe anything related to this product" required>*@
+<textarea rows="6" class="form-control" id="AnalysisCode" name="AnalysisCode" placeholder="Describe anything related to this product"></textarea>
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                        <hr style="width:100%" />
+                        <div class="col-md-12" style="font-size: 18px; margin-bottom: 10px;">
+                            <b>Purification Related</b>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group col-md-5">
+                                <label for="exampleInputPassword1">Any of last 3 step NMR done ?:<sup style="color:red">(*)</sup></label>
+                            </div>
+                            <div class="form-group col-md-7">
+                                <input type="checkbox" name="chkNMRDone" />
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group col-md-5">
+                                <label for="exampleInputPassword1">Any of last 2 step crystallization done ?:<sup style="color:red">(*)</sup></label>
+                            </div>
+                            <div class="form-group col-md-7">
+                                <input type="checkbox" name="chkCrystallizationDone" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group col-md-3">
+                                <label for="exampleInputPassword1">
+                                    Purification By:<sup style="color:red">(*)</sup>
+                                </label>
+                            </div>
+                            <div class="form-group col-md-9">
+                                <select id="PurificationBy" name="PurificationBy" class="form-control" required>
+                                    <option value="">Select</option>
+                                    <option value="Column Purification">Column Purification</option>
+                                    <option value="Flash Chromatography">Flash Chromatography</option>
+                                    <option value="Preparative HPLC">Preparative HPLC</option>
+                                    <option value="Recrystalization">Recrystalization</option>
+                                    <option value="Trituration">Trituration</option>
+                                    <option value="Precipitation">Precipitation</option>
+                                    <option value="Acid-base Purification">Acid-base Purification</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4" style="display:none">
+                            <div class="form-group col-md-5">
+                                <label for="exampleInputPassword1">
+                                    Spectral Data Attachment :
+                                </label>
+                            </div>
+                            <div class="form-group col-md-7">
+                                <input type="file" id="SpectralDataAttachment" name="SpectralDataAttachment" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group col-md-5">
+                                <label for="exampleInputPassword1">
+                                    Chemdraw File Attachment :
+                                </label>
+                            </div>
+                            <div class="form-group col-md-7">
+                                <input type="file" id="ChemdrawFileAttachment" name="ChemdrawFileAttachment" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group col-md-5">
+                                <label for="exampleInputPassword1">
+                                    UV-Spectra :
+                                </label>
+                            </div>
+                            <div class="form-group col-md-7">
+                                <input type="file" id="UVSpectra" name="UVSpectra" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group col-md-5">
+                                <label for="exampleInputPassword1">
+                                    Other Analysis Attachment :
+                                </label>
+                            </div>
+                            <div class="form-group col-md-7">
+                                <input type="file" id="OtherAnalysisAttachment" name="OtherAnalysisAttachment" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group col-md-5">
+                                <label for="exampleInputPassword1">
+                                    Weighting Slip Attachment :
+                                </label>
+                            </div>
+                            <div class="form-group col-md-7">
+                                <input type="file" id="WeightingSlipAttachment" name="WeightingSlipAttachment" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group col-md-5">
+                                <label for="exampleInputPassword1">
+                                    N-1 NMR :
+                                </label>
+                            </div>
+                            <div class="form-group col-md-7">
+                                <input type="file" id="N1NMR" name="N1NMR" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group col-md-5">
+                                <label for="exampleInputPassword1">
+                                    Chiral HPLC :
+                                </label>
+                            </div>
+                            <div class="form-group col-md-7">
+                                <input type="file" id="ChiralHPLC" name="ChiralHPLC" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group col-md-5">
+                                <label for="exampleInputPassword1">
+                                    Isotropic Purity :
+                                </label>
+                            </div>
+                            <div class="form-group col-md-7">
+                                <input type="file" id="Isotropicpurity" name="Isotropicpurity" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group col-md-5">
+                                <label for="exampleInputPassword1">
+                                    Type :
+                                </label>
+                            </div>
+                            <div class="form-group col-md-7">
+                                <select class="form-control" id="Isboughtout">
+                                    <option>--Select--</option>
+                                    <option value="false">Synthesis</option>
+                                    <option value="true">Bought Out</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="divboughtout" style="display:none">
+                            <div class="col-md-4">
+                                <div class="form-group col-md-5">
+                                    <label for="exampleInputPassword1">
+                                        Source :
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-7">
+                                    <input type="text" id="Source" name="Source" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group col-md-5">
+                                    <label for="exampleInputPassword1">
+                                        Reviewer :
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-7">
+                                    <input type="text" id="Reviewer" name="Reviewer" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group col-md-5">
+                                    <label for="exampleInputPassword1">
+                                        Approver :
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-7">
+                                    <input type="text" id="Approver" name="Approver" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        @*<div class="col-md-4">
+                                <div class="form-group col-md-5">
+                                    <label for="exampleInputPassword1">
+                                        2D NMR :
+                                    </label>
+                                </div>
+                                <div class="form-group col-md-7">
+                                    <input type="file" id="2DNMR" name="2DNMR" />
+                                </div>
+                            </div>*@
+
+                        @if (comments != null && comments.Count > 0)
+                        {
+                            <div class="clear"></div>
+                            <hr style="width:100%" />
+                            <div class="col-md-12" style="font-size: 18px; margin-bottom: 10px;">
+                                <b>Comments From QC</b>
+                            </div>
+                            foreach (var item in comments)
+                            {
+                                <div class="col-md-12" style=" border: 1px solid #08c; margin: 5px 8px;">
+                                    <b>@item.GeneratedUserName <p style="text-align: right; margin-top: -16px;">@item.CreatedDate.ToString("F")</p></b>
+                                    <div>
+                                        @Html.Raw(item.ApprovedComment)
+                                    </div>
+                                </div>
+                            }
+                            <p>
+                                <b style="margin-left: 20px;">Add Your Comment: <i class='fa fa-pencil' onclick='approCommentGenerate(@Model.Id)'></i></b>
+                            </p>
+                        }
+                    </div>
+                    <div class="box-body">
+                        <div class="form-group col-md-12" style="text-align: center;">
+                            <div class="box-footer">
+                                <button type="button" class="btn btn-primary" onclick="SaveForm()" id="btndraft">Save Draft - Send to QC</button>
+                                <button type="button" class="btn btn-primary" onclick="SaveForm()" id="btnsavechange" style="display:none">Save Changes</button>
+                                <button type="button" class="btn btn-primary" onclick="SubmitForm()" id="btnsubmit" style="display:none">Submit Form</button>
+                                <button type="button" class="btn btn-primary" onclick="ResetForm()">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="@Url.Content("~/Content/bower_components/ckeditor/ckeditor.js")"></script>
+<script>
+    $(function () {
+        CKEDITOR.replace('AnalysisCode');
+    });
+    $("#Isboughtout").change(function () {
+        var value = $(this).val();
+        if (value === 'true') {
+            $("#divboughtout").show();
+        }
+        else {
+            $("#divboughtout").false();
+        }
+    });
+    function approCommentGenerate(id) {
+        $.ajax({
+            url: '/Form/AddApprovComment?id=' + id + '&isScientist=true',
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+                // $("#invoiceQueryModal .modal-content").css("width", "1080px");
+            }
+        });
+    }
+
+$(function() {
+    $("#SubmissionDate").datepicker({
+        format: 'dd/mm/yyyy'
+    });
+    $("#SubmissionDate").datepicker().datepicker("setDate", new Date());
+
+    $("#JournalDate").datepicker({
+        format: 'dd/mm/yyyy'
+    });
+    $("#HPLCDate").datepicker({
+        format: 'dd/mm/yyyy'
+    });
+});
+
+function GetInforFromCatNo()
+{
+   $.ajax({
+        type: 'GET',
+        url: '/Form/ProductDetailsBySku?sku='+$('#CatelogueNo').val(),
+        data: {},
+        success: function (results) {
+            if (!results.success) {
+                toastr.error("No Data Found");
+                return false;
+            }
+            if(results.data != null)
+            {
+                $("#MoleWeight").val(results.data.MolecularWeight);
+                $("#MolecularFormula").val(results.data.Gtin);
+                $("#ProductName").val(results.data.Name);
+                $("#ProjectName").val(results.data.MainCatName);
+                $("#CASNo").val(results.data.ManufacturerPartNumber);
+                if (results.data.PictureModels !== undefined && results.data.PictureModels !== null && results.data.PictureModels.length > 0) {
+                    $("#detFromDBImagesrc").attr('src', results.data.PictureModels[0].FullSizeImageUrl);
+                    $("#detFromDBImage").val(results.data.PictureModels[0].FullSizeImageUrl);
+                }
+            }
+        }
+    });
+}
+$(document).ready(function() {
+    $("#QuantitySubmitted").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+});
+
+    function fileElementValidation(element, errorcnt) {
+        if (document.getElementById(element).files.length == 0) {
+            $('#' + element).css('border', '1px solid red');
+            errorcnt += 1;
+        }
+        return errorcnt;
+    }
+
+    function SubmitForm() {
+        var formid = $("#QuotationDetailsFormId").val();
+        $.ajax({
+            url: '/Form/ApprovedsubmittedFormInventoryData?formid=' + formid,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                toastr.success(data.message);
+            }
+        });
+    }
+
+    function SaveForm() {
+        var formid = $("#QuotationDetailsFormId").val();
+        $('#JournalDate').css('border', '');
+        $('#BatchCode').css('border', '');
+        $('#QuantitySubmitted').css('border', '');
+        $('#SpectralDataAttachment').css('border', '');
+        $('#IRAttachment').css('border', '');
+        $('#MassAttachment').css('border', '');
+        $('#PLCAttachment').css('border', '');
+        $('#NMRAttchment').css('border', '');
+        $('#QNMRAttchment').css('border', '');
+        $('#TGAAttachment').css('border', '');
+        $('#CMRAttchment').css('border', '');
+        $('#DEPTAttachment').css('border', '');
+        $('#HRMSAttachment').css('border', '');
+        $('#ROIAttachment').css('border', '');
+        $('#ElementralAttachment').css('border', '');
+        $('#SERAttachment').css('border', '');
+        $('#APCIMassAttachment').css('border', '');
+        $('#NMRInterpretaionAttachment').css('border', '');
+        $('#ELNReceiptNumber').css('border', '');
+        $('#NoOfFinalStep').css('border', '');
+        $('#PurificationBy').css('border', '');
+        $('#DatePurity').css('border', '');
+        $('#State').css('border', '');
+        var errorcnt = 0;
+        if ($('#JournalDate').val() === '') {
+            $('#JournalDate').css('border', '1px solid red');
+            errorcnt += 1;
+        }
+    if ($('#BatchCode').val() === '') {
+        $('#BatchCode').css('border', '1px solid red');
+        errorcnt += 1;
+    }
+    if ($('#QuantitySubmitted').val() === '') {
+        $('#QuantitySubmitted').css('border', '1px solid red');
+        errorcnt += 1;
+        }
+        //if ($('#ELNReceiptNumber').val() === '') {
+        //    toastr.error("Please select ELN Receipt Number");
+        //    $('#ELNReceiptNumber').css('border', '1px solid red');
+        //    errorcnt += 1;
+        //}
+        if ($('#PurificationBy').val() === '') {
+            $('#PurificationBy').css('border', '1px solid red');
+            errorcnt += 1;
+        }
+        //if ($('#DatePurity').val() === '') {
+        //    $('#DatePurity').css('border', '1px solid red');
+        //    errorcnt += 1;
+        //}
+        if ($('#NoOfFinalStep').val() === '') {
+            $('#NoOfFinalStep').css('border', '1px solid red');
+            errorcnt += 1;
+        }
+        if ($('#State').val() === '') {
+            $('#State').css('border', '1px solid red');
+            errorcnt += 1;
+        }
+        if ($('#rbStateOfCompound').val() === '') {
+            $('#rbStateOfCompound').css('border', '1px solid red');
+            errorcnt += 1;
+        }
+
+
+        if ($("input[name='rbEarlierSynthesized']:checked").val() === '' || $("input[name='rbEarlierSynthesized']:checked").val() === undefined) {
+            toastr.error("Please select Earlier Synthesized");
+            errorcnt += 1;
+        }
+        if ($("input[name='rbTypeCompound']:checked").val() === '' || $("input[name='rbTypeCompound']:checked").val() === undefined) {
+            toastr.error("Please select Type Of Compound");
+            errorcnt += 1;
+        }
+
+        if (formid === 0) {
+            if (document.getElementById("SpectralDataAttachment").files.length == 0) {
+                $('#SpectralDataAttachment').css('border', '1px solid red');
+                errorcnt += 1;
+            }
+        }
+
+        var radioAdditionalAnalysis = $('input[name=radioAdditionalAnalysis]:checked').val();
+
+        var dataradioAdditionalAnalysis = new Array();
+        $("input[name='radioAdditionalAnalysis']:checked").each(function (i) {
+            dataradioAdditionalAnalysis.push($(this).val());
+        });
+        if (dataradioAdditionalAnalysis.length == 0) {
+            toastr.error("Please select Additional Analysis");
+            errorcnt += 1;
+        }
+        else {
+            if($.inArray("IR", dataradioAdditionalAnalysis) === -1)
+            {
+                toastr.error("Please select 'IR' in Additional Analysis");
+                errorcnt += 1;
+            }
+            if ($.inArray("Mass", dataradioAdditionalAnalysis) === -1) {
+                toastr.error("Please select 'Mass' in Additional Analysis");
+                errorcnt += 1;
+            }
+            if ($.inArray("HPLC/GC/ELSD", dataradioAdditionalAnalysis) === -1) {
+                toastr.error("Please select 'HPLC/GC/ELSD' in Additional Analysis");
+                errorcnt += 1;
+            }
+            if ($.inArray("NMR", dataradioAdditionalAnalysis) === -1) {
+                toastr.error("Please select 'NMR' in Additional Analysis");
+                errorcnt += 1;
+            }
+            if ($.inArray("APCI Mass", dataradioAdditionalAnalysis) === -1) {
+                toastr.error("Please select 'Mass Interpretaion' in Additional Analysis");
+                errorcnt += 1;
+            }
+            if ($.inArray("NMR Interpretaion", dataradioAdditionalAnalysis) === -1) {
+                toastr.error("Please select 'NMR Interpretaion' in Additional Analysis");
+                errorcnt += 1;
+            }
+        }
+        if (formid === "0") {
+            $(dataradioAdditionalAnalysis).each(function (v, i) {
+                if (i === 'IR') { errorcnt += fileElementValidation('IRAttachment', errorcnt); }
+                if (i === 'Mass') { errorcnt += fileElementValidation('MassAttachment', errorcnt); }
+                if (i === 'HPLC/GC/ELSD') { errorcnt += fileElementValidation('PLCAttachment', errorcnt); }
+                if (i === 'NMR') { errorcnt += fileElementValidation('NMRAttchment', errorcnt); }
+                if (i === 'qNMR') { errorcnt += fileElementValidation('QNMRAttchment', errorcnt); }
+                if (i === 'TGA') { errorcnt += fileElementValidation('TGAAttachment', errorcnt); }
+                if (i === 'CMR') { errorcnt += fileElementValidation('CMRAttchment', errorcnt); }
+                if (i === 'DEPT') { errorcnt += fileElementValidation('DEPTAttachment', errorcnt); }
+                if (i === 'HRMS') { errorcnt += fileElementValidation('HRMSAttachment', errorcnt); }
+                if (i === 'ROI') { errorcnt += fileElementValidation('ROIAttachment', errorcnt); }
+                //if (i === 'Elemental') { errorcnt += fileElementValidation('ElementralAttachment', errorcnt); }
+                if (i === 'CMR Interpretaion') { errorcnt += fileElementValidation('SERAttachment', errorcnt); }
+                if (i === 'APCI Mass') { errorcnt += fileElementValidation('APCIMassAttachment', errorcnt); }
+                if (i === 'NMR Interpretaion') { errorcnt += fileElementValidation('NMRInterpretaionAttachment', errorcnt); }
+                //if (i === '2D NMR') { errorcnt += fileElementValidation('2DNMR', errorcnt); }
+                if (i === 'COSY') { errorcnt += fileElementValidation('COSYAttachment', errorcnt); }
+                if (i === 'CHNS') { errorcnt += fileElementValidation('CHNSAttachment', errorcnt); }
+                if (i === 'Stability Data') { errorcnt += fileElementValidation('StabilitydataAttachment', errorcnt); }
+                if (i === 'LCMS') { errorcnt += fileElementValidation('LCMSAttachment', errorcnt); }
+            });
+        }
+    if (errorcnt > 0) {
+        return false;
+    }
+        document.getElementById("btndraft").disabled = true;
+
+    var form = document.getElementById("makeform");
+    var formData = new FormData();
+    for (var i = 0; i < form.elements.length; i++) {
+        var e = form.elements[i];
+        console.log(e.name + "=" + e.value);
+        if (e.name === 'rbTypeCompound')
+        {
+            formData.append(e.name, $('input[name=rbTypeCompound]:checked').val());
+        }
+        else if (e.name === "chkHygroscopic") {
+            if ($('#chkHygroscopic').is(':checked')) {
+                formData.append(e.name, "true");
+            }
+            else {
+                formData.append(e.name, "false");
+            }
+
+        }
+        else if (e.name === "chkCrystallizationDone") {
+            if ($('#chkCrystallizationDone').is(':checked')) {
+                formData.append(e.name, "true");
+            }
+            else {
+                formData.append(e.name, "false");
+            }
+
+        }
+        else if (e.name === "chkNMRDone") {
+            if ($('#chkNMRDone').is(':checked')) {
+                formData.append(e.name, "true");
+            }
+            else {
+                formData.append(e.name, "false");
+            }
+        }
+        else if (e.name === "TempSensitive") {
+            if ($('#TempSensitive').is(':checked')) {
+                formData.append(e.name, "true");
+            }
+            else {
+                formData.append(e.name, "false");
+            }
+        }
+        else if (e.name === "IsLight") {
+            if ($('#IsLight').is(':checked')) {
+                formData.append(e.name, "true");
+            }
+            else {
+                formData.append(e.name, "false");
+            }
+        }
+        else if (e.name === "Lacrymatory") {
+            if ($('#Lacrymatory').is(':checked')) {
+                formData.append(e.name, "true");
+            }
+            else {
+                formData.append(e.name, "false");
+            }
+        }
+        else if (e.name === "LightSensitivity") {
+            if ($('#LightSensitivity').is(':checked')) {
+                formData.append(e.name, "true");
+            }
+            else {
+                formData.append(e.name, "false");
+            }
+        }
+        else if (e.name === "Photostability") {
+            if ($('#Photostability').is(':checked')) {
+                formData.append(e.name, "true");
+            }
+            else {
+                formData.append(e.name, "false");
+            }
+        }
+        else{
+            formData.append(e.name, e.value);
+        }
+    }
+    var radiorbTypeCompound = $('input[name=rbTypeCompound]:checked').val();
+    //var radiorbStateOfCompound = $('input[name=rbStateOfCompound]:checked').val();
+    var radiorbStateOfCompound = $('#rbStateOfCompound').val();
+    var radiorbSaltMentionName = $('input[name=rbSaltMentionName]:checked').val();
+    if ('@Isdispatch' === 'True') {
+        formData.append("submitedFormDispatch", true);
+    }
+    else {
+        formData.append("submitedFormDispatch", false);
+    }
+    formData.append("radiorbTypeCompound", radiorbTypeCompound);
+    formData.append("radiorbStateOfCompound", radiorbStateOfCompound);
+    formData.append("radiorbSaltMentionName", radiorbSaltMentionName);
+    formData.append("radiorbAdditionalAnalysis", dataradioAdditionalAnalysis.join());
+    formData.append("radioSolutionForm", $('input[name=SolutionForm]:checked').val());
+    formData.append("radioSolidForm", $('input[name=SolidForm]:checked').val());
+        formData.append("ddlState", $('#State').val());
+        formData.append("AnalysisCode", CKEDITOR.instances['AnalysisCode'].getData());
+    var radioEarlierSynthesized = $('input[name=rbEarlierSynthesized]:checked').val();
+    formData.append("radioEarlierSynthesized", radioEarlierSynthesized);
+    var files = $("#SpectralDataAttachment").get(0).files;
+    if (files.length > 0) {
+        formData.append("SpectralDataAttachment", files[0]);
+    }
+
+     var files1 = $("#IRAttachment").get(0).files;
+     if (files1.length > 0) {
+        formData.append("IRAttachment", files1[0]);
+     }
+        var files2 = $("#MassAttachment").get(0).files;
+        if (files2.length > 0) {
+            formData.append("MassAttachment", files2[0]);
+        }
+
+        var files3 = $("#PLCAttachment").get(0).files;
+        if (files3.length > 0) {
+            formData.append("PLCAttachment", files3[0]);
+        }
+
+        var files4 = $("#NMRAttchment").get(0).files;
+        if (files4.length > 0) {
+            formData.append("NMRAttchment", files4[0]);
+        }
+
+        var files5 = $("#QNMRAttchment").get(0).files;
+        if (files5.length > 0) {
+            formData.append("QNMRAttchment", files5[0]);
+        }
+
+        var files6 = $("#TGAAttachment").get(0).files;
+        if (files6.length > 0) {
+            formData.append("TGAAttachment", files6[0]);
+        }
+
+        var files7 = $("#CMRAttchment").get(0).files;
+        if (files7.length > 0) {
+            formData.append("CMRAttchment", files7[0]);
+        }
+
+        var files8 = $("#DEPTAttachment").get(0).files;
+        if (files8.length > 0) {
+            formData.append("DEPTAttachment", files8[0]);
+        }
+
+        var files9 = $("#HRMSAttachment").get(0).files;
+        if (files9.length > 0) {
+            formData.append("HRMSAttachment", files9[0]);
+        }
+
+        var files10 = $("#ROIAttachment").get(0).files;
+        if (files10.length > 0) {
+            formData.append("ROIAttachment", files10[0]);
+        }
+        //var files11 = $("#ElementralAttachment").get(0).files;
+        //if (files11.length > 0) {
+        //    formData.append("ElementralAttachment", files11[0]);
+        //}
+        var files12 = $("#SERAttachment").get(0).files;
+        if (files12.length > 0) {
+            formData.append("SERAttachment", files12[0]);
+        }
+
+        //var files13 = $("#GCAttachment").get(0).files;
+        //if (files13.length > 0) {
+        //    formData.append("GCAttachment", files13[0]);
+        //}
+        //var files14 = $("#ELSDAttachment").get(0).files;
+        //if (files14.length > 0) {
+        //    formData.append("ELSDAttachment", files14[0]);
+        //}
+        var files15 = $("#ChiralAttachmenrt").get(0).files;
+        if (files15.length > 0) {
+            formData.append("ChiralAttachmenrt", files15[0]);
+        }
+
+        var files16 = $("#APCIMassAttachment").get(0).files;
+        if (files16.length > 0) {
+            formData.append("APCIMassAttachment", files16[0]);
+        }
+        var files17 = $("#NMRInterpretaionAttachment").get(0).files;
+        if (files17.length > 0) {
+            formData.append("NMRInterpretaionAttachment", files17[0]);
+        }
+
+        var files18 = $("#ChemdrawFileAttachment").get(0).files;
+        if (files18.length > 0) {
+            formData.append("ChemdrawFileAttachment", files18[0]);
+        }
+        var files19 = $("#WeightingSlipAttachment").get(0).files;
+        if (files19.length > 0) {
+            formData.append("WeightingSlipAttachment", files19[0]);
+        }
+
+        var files20 = $("#UVSpectra").get(0).files;
+        if (files20.length > 0) {
+            formData.append("UVSpectra", files20[0]);
+        }
+        var files21 = $("#OtherAnalysisAttachment").get(0).files;
+        if (files21.length > 0) {
+            formData.append("OtherAnalysisAttachment", files21[0]);
+        }
+
+        var files22 = $("#N1NMR").get(0).files;
+        if (files22.length > 0) {
+            formData.append("N1NMR", files22[0]);
+        }
+
+        var files23 = $("#ChiralHPLC").get(0).files;
+        if (files23.length > 0) {
+            formData.append("ChiralHPLC", files23[0]);
+        }
+        var files24 = $("#Isotropicpurity").get(0).files;
+        if (files24.length > 0) {
+            formData.append("Isotropicpurity", files24[0]);
+        }
+        //var files25 = $("#2DNMR").get(0).files;
+        //if (files25.length > 0) {
+        //    formData.append("2DNMR", files25[0]);
+        //}
+
+        var files26 = $("#COSYAttachment").get(0).files;
+        if (files26.length > 0) {
+            formData.append("COSYAttachment", files26[0]);
+        }
+        var files27 = $("#CHNSAttachment").get(0).files;
+        if (files27.length > 0) {
+            formData.append("CHNSAttachment", files27[0]);
+        }
+        var files28 = $("#StabilitydataAttachment").get(0).files;
+        if (files28.length > 0) {
+            formData.append("StabilitydataAttachment", files28[0]);
+        }
+        var files29 = $("#LCMSAttachment").get(0).files;
+        if (files29.length > 0) {
+            formData.append("LCMSAttachment", files29[0]);
+        }
+
+        formData.append("Isboughtout", $("#Isboughtout").val());
+        //formData.append("Source", $("#Source").val());
+        //formData.append("Reviewer", $("#Reviewer").val());
+        //formData.append("Approver", $("#Approver").val());
+
+    var stringofConfirm = "<table width='100%' border='1'><tr><td>"+$("#BatchCode").val()+"</td><td>"+$("#QuantitySubmitted").val()+"</td></tr>";
+    stringofConfirm += "<tr><td><b>HPLC Purity</b></td><td>"+$("#HPLCPurity").val()+" %</td>";
+    stringofConfirm += "<tr><td><b>Physical State</b></td><td>"+$("#State").val()+"</td></table>";
+
+    swal({
+        title: "Please confirm below details before submit.</br>" + stringofConfirm,
+        text: "",
+        html: true,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonClass: "btn-danger",
+        confirmButtonText: "Yes, Confirm it!",
+        cancelButtonText: "No, cancel!",
+        closeOnConfirm: true,
+        closeOnCancel: true
+    },
+        function (isConfirm) {
+            if (isConfirm) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/Form/SubmitForm',
+                    data: formData,
+                    enctype: 'multipart/form-data',
+                    processData: false,
+                    contentType: false,
+                    success: function (results) {
+                        if (!results.success) {
+                            document.getElementById("btndraft").disabled = false;
+                            toastr.error(results.message);
+                            return false;
+                        }
+                        toastr.success("You have created a new form.");
+
+                        if ('@Isdispatch' === 'True') {
+                            window.location.href = '/Form/Dispatch';
+                        }
+
+                        if ('@IsNewProductMaster' === 'True') {
+                            window.location.href = '/Form/ProductMaster';
+                        }
+
+                        if ('@isPrint' === 'True') {
+                            window.location.href = '/Form/PrintForm/' + results.formId;
+                        }
+                        else {
+                            window.location.href = '/Form/ViewForm/@quotationDetailsId';
+                        }
+                    }
+                });
+            } else {
+                document.getElementById("btndraft").disabled = false;
+                toastr.error("Please change the batch no :)");
+            }
+        });
+}
+
+   $('input[type=radio][name=rbSaltMentionName]').change(function() {
+        if (this.value == 'Free') {
+    $("#SaltName").val('');
+            $("#SaltName").attr('readonly',true);
+        }
+        else {
+            $("#SaltName").attr('readonly',false);
+        }
+    });
+</script>
+
+@if (ViewBag.FormId != null && ViewBag.FormId != 0)
+{
+    <text>
+        <script>
+            $("#JournalDate").datepicker({
+                format: 'dd/mm/yyyy'
+            });
+            $("#JournalDate").datepicker("setDate", '@formQuotationData.JournalDate');
+
+            $("#SubmissionDate").datepicker({
+                format: 'dd/mm/yyyy'
+            });
+            $("#SubmissionDate").datepicker("setDate", '@formQuotationData.SubmissionDate');
+            $("#HPLCDate").datepicker({
+                format: 'dd/mm/yyyy'
+            });
+            $("#HPLCDate").datepicker("setDate", '@formQuotationData.HPLCDate');
+            $("#TLName").val('@formQuotationData.TLName');
+            $("#NameOfScientist").val('@formQuotationData.ScientistName');
+            $("#CatelogueNo").val('@formQuotationData.CATNo');
+            $("#ProjectName").val('@formQuotationData.ProjectName');
+            $("#ProductName").val('@formQuotationData.ProductName');
+            $("#CASNo").val('@formQuotationData.CASNo');
+            $("#MoleWeight").val('@formQuotationData.MolWeight');
+            $("#MolecularFormula").val('@formQuotationData.MolFormula');
+
+            $("#BatchCode").val('@formQuotationData.BatchCode');
+            $("#QuantitySubmitted").val('@formQuotationData.Qty');
+            $("#DatePurity").val('@formQuotationData.HPCLCode');
+            $("#NMRCodeStatus").val('@formQuotationData.NMRCode');
+            $("#HPLCPurity").val('@formQuotationData.HPLCPurity');
+            $("#CodeESIAPCI").val('@formQuotationData.MSCode');
+
+            $("#rbStateOfCompound").val('@formQuotationData.StateCompound');
+            $("#State").val('@formQuotationData.State');
+            $("#SaltName").val('@formQuotationData.SaltName');
+            @*$("#AnalysisCode").val('@formQuotationData.OtherAnalysis');*@
+            debugger;
+            @*CKEDITOR.instances['AnalysisCode'].setData('@formQuotationData.OtherAnalysis');*@
+            $("input[name=rbSaltMentionName][value='@formQuotationData.RbSaltMentionName']").prop("checked", true);
+            $("input[name=rbTypeCompound][value='@formQuotationData.TypeCompound']").prop("checked", true);
+            if ('@formQuotationData.ChkHygroscopic' === 'True') {
+                $("#chkHygroscopic").attr("checked", true);
+            }
+            if ('@formQuotationData.Photostability' === 'True') {
+                $("#Photostability").attr("checked", true);
+            }
+           if ('@formQuotationData.LightSensitivity' === 'True') {
+                $("#LightSensitivity").attr("checked", true);
+            }
+            if ('@formQuotationData.ChkHygroscopic' === 'True') {
+                $("#chkHygroscopic").attr("checked", true);
+            }
+            if ('@formQuotationData.TempSensitive' === 'True') {
+                $("#TempSensitive").attr("checked", true);
+            }
+            if ('@formQuotationData.IsLight' === 'True') {
+                $("#IsLight").attr("checked", true);
+            }
+            if ('@formQuotationData.Lacrymatory' === 'True') {
+                $("#Lacrymatory").attr("checked", true);
+            }
+
+            if ('@formQuotationData.RbAdditionalAnalysis' !== '') {
+                var splirec = '@formQuotationData.RbAdditionalAnalysis'.split(',');
+                $(splirec).each(function (i, v) {
+                    $("input[name=radioAdditionalAnalysis][value='"+v+"']").prop("checked", true);
+                });
+            }
+            $("input[name=SolutionForm][value='@formQuotationData.SolutionForm']").prop("checked", true);
+            $("input[name=SolidForm][value='@formQuotationData.SolidForm']").prop("checked", true);
+
+            $("#PurificationBy").val('@formQuotationData.PurificationBy');
+            $("#NoOfFinalStep").val('@formQuotationData.NoOfFinalStep');
+            $("#Chemist").val('@formQuotationData.Chemist');
+            $("#ELNReceiptNumber").val('@formQuotationData.ELNReceiptNumber');
+            $("input[name=rbEarlierSynthesized][value='@formQuotationData.EarlierSynthesized']").prop("checked", true);
+
+            if ('@formQuotationData.chkNMRDone' === 'True') {
+                $("#chkNMRDone").attr("checked", false);
+            }
+            if ('@formQuotationData.chkCrystallizationDone' === 'True') {
+                $("#chkCrystallizationDone").attr("checked", false);
+            }
+
+            $("#detFromDBImagesrc").attr('src', '@formQuotationData.StructurePath');
+            if ('@formQuotationData.IRAttachment' !== '') {
+                $("#attchIR").attr('src', '@formQuotationData.IRAttachment');
+                $("#attchIR").show();
+            }
+
+            if ('@formQuotationData.MassAttachment' !== '') {
+                $("#attchMass").attr('src', '@formQuotationData.MassAttachment');
+                $("#attchMass").show();
+            }
+            if ('@formQuotationData.PLCAttachment' !== '') {
+                $("#attchHPLC").attr('src', '@formQuotationData.PLCAttachment');
+                $("#attchHPLC").show();
+            }
+            if ('@formQuotationData.NMRAttchment' !== '') {
+                $("#attchNMR").attr('src', '@formQuotationData.NMRAttchment');
+                $("#attchNMR").show();
+            }
+            if ('@formQuotationData.QNMRAttchment' !== '') {
+                $("#attchQNMR").attr('src', '@formQuotationData.QNMRAttchment');
+                $("#attchQNMR").show();
+            }
+            if ('@formQuotationData.TGAAttachment' !== '') {
+                $("#attchTGA").attr('src', '@formQuotationData.TGAAttachment');
+                $("#attchTGA").show();
+            }
+            if ('@formQuotationData.CMRAttchment' !== '') {
+                $("#attchCMR").attr('src', '@formQuotationData.CMRAttchment');
+                $("#attchCMR").show();
+            }
+            if ('@formQuotationData.DEPTAttachment' !== '') {
+                $("#attchDEPT").attr('src', '@formQuotationData.DEPTAttachment');
+                $("#attchDEPT").show();
+            }
+            if ('@formQuotationData.HRMSAttachment' !== '') {
+                $("#attchHRMS").attr('src', '@formQuotationData.HRMSAttachment');
+                $("#attchHRMS").show();
+            }
+            if ('@formQuotationData.ROIAttachment' !== '') {
+                $("#attchROI").attr('src', '@formQuotationData.ROIAttachment');
+                $("#attchROI").show();
+            }
+            @*if ('@formQuotationData.ElementralAttachment' !== '') {
+                $("#attchElement").attr('src', '@formQuotationData.ElementralAttachment');
+                $("#attchElement").show();
+            }*@
+            if ('@formQuotationData.SERAttachment' !== '') {
+                $("#attchCMRInterpretaion").attr('src', '@formQuotationData.SERAttachment');
+                $("#attchCMRInterpretaion").show();
+            }
+
+            @*if ('@formQuotationData.GCAttachment' !== '') {
+                $("#attchGC").attr('src', '@formQuotationData.GCAttachment');
+                $("#attchGC").show();
+            }
+            if ('@formQuotationData.ELSDAttachment' !== '') {
+                $("#attchELSD").attr('src', '@formQuotationData.ELSDAttachment');
+                $("#attchELSD").show();
+            }*@
+            if ('@formQuotationData.ChiralAttachmenrt' !== '') {
+                $("#attchChiral").attr('src', '@formQuotationData.ChiralAttachmenrt');
+                $("#attchChiral").show();
+            }
+            if ('@formQuotationData.APCIMassAttachment' !== '') {
+                $("#attchMASSInterpretaion").attr('src', '@formQuotationData.APCIMassAttachment');
+                $("#attchMASSInterpretaion").show();
+            }
+            if ('@formQuotationData.NMRInterpretaionAttachment' !== '') {
+                $("#attchNMRInterpretaion").attr('src', '@formQuotationData.NMRInterpretaionAttachment');
+                $("#attchNMRInterpretaion").show();
+            }
+
+            if ('@formQuotationData.TwoDNMRAttachment' !== '') {
+                $("#attch2DNMR").attr('src', '@formQuotationData.TwoDNMRAttachment');
+                $("#attch2DNMR").show();
+            }
+            if ('@formQuotationData.COSYAttachment' !== '') {
+                $("#attchCOSY").attr('src', '@formQuotationData.COSYAttachment');
+                $("#attchCOSY").show();
+            }
+            if ('@formQuotationData.CHNSAttachment' !== '') {
+                $("#attchCHNS").attr('src', '@formQuotationData.CHNSAttachment');
+                $("#attchCHNS").show();
+            }
+            if ('@formQuotationData.StabilitydataAttachment' !== '') {
+                $("#attchStabilitydata").attr('src', '@formQuotationData.StabilitydataAttachment');
+                $("#attchStabilitydata").show();
+            }
+            if ('@formQuotationData.LCMSAttachment' !== '') {
+                $("#attchLCMSdata").attr('src', '@formQuotationData.LCMSAttachment');
+                $("#attchLCMSdata").show();
+            }
+            debugger;
+            if ('@formQuotationData.Isboughtout' === 'True') {
+                $("#Isboughtout").val('true');
+                $("#divboughtout").show();
+            }
+            else {
+                $("#Isboughtout").val('false'); $("#divboughtout").hide();
+            }
+
+            $("#Source").val('@formQuotationData.Source');
+            $("#Reviewer").val('@formQuotationData.Reviewer');
+            $("#Approver").val('@formQuotationData.Approver');
+
+        </script>
+    </text>
+}
+
+@if (ViewBag.FormId == 0)
+{
+    <text>
+        <script>
+            $("#CatelogueNo").val('@Model.CATNo');
+            GetInforFromCatNo();
+        </script>
+    </text>
+}
+
+@if (formQuotationData.ApprovalStatus == Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ApprovedStatus.QCApproved))
+{
+    <text>
+        <script>
+            $("#btndraft").hide();
+            $("#btnsubmit").show();
+        </script>
+    </text>
+}
+
+@if (islock)
+{
+    <text>
+        <script>
+            $("#btndraft").hide();
+            $("#btnsubmit").hide();
+            $("#btnsavechange").show();
+        </script>
+    </text>
+}

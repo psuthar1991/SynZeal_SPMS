@@ -1,0 +1,159 @@
+﻿@using Synzeal_Inventory.Models;
+@model List<MonthWiseUserDashboardDto>
+@{
+    ViewBag.Title = "GenerateYearWiseBDteamreport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="col-md-12 clsmonthreport">
+    <!-- left column -->
+    <div class="col-md-12">
+        <!-- general form elements -->
+        <div>
+            <!-- /.box-header -->
+            <!-- form start -->
+            <form role="form">
+
+
+                @foreach (var mainModel in Model)
+                {
+                    <div class="box  collapsed-box">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">@mainModel.MonthName <span> - </span> @mainModel.Year</h3>
+
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table class="table table-reponsive">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Sr. No
+                                        </th>
+                                        <th>
+                                            Teammate
+                                        </th>
+                                        <th colspan="6" style="text-align:center">
+                                            Products Added
+                                        </th>
+                                        <th colspan="4" style="text-align:center">
+                                            Products Error
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th>
+                                            All details
+                                        </th>
+                                        <th>
+                                            Without Cat No
+                                        </th>
+                                        @*<th>
+                                                Without CAS No
+                                            </th>*@
+                                        <th>
+                                            Without Price
+                                        </th>
+                                        <th>
+                                            Total Added
+                                        </th>
+                                        <th>
+                                            Correction(%)
+                                        </th>
+                                        <th>
+                                            Cat No Revision
+                                        </th>
+                                        @*<th>
+                                                CAS No revision
+                                            </th>*@
+                                        <th>
+                                            Price Revision
+                                        </th>
+                                        @*<th></th>*@
+                                        <th>
+                                            Price Revision(%)
+                                        </th>
+                                        <th>
+                                            CAT Revision(%)
+                                        </th>
+                                        <th>
+                                            Revision Correction(%)
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int loops = 1;
+                                        foreach (var item in mainModel.UserDashboardModel)
+                                        {
+                                            if (item.Username.ToLower().Contains("ketan")
+                                            || item.Username.ToLower().Contains("mayur")
+                                            || item.Username.ToLower().Contains("sagar")
+                                            || item.Username.ToLower().Contains("nisha")
+                                            || item.Username.ToLower().Contains("prateeksha")
+                                            || item.Username.ToLower().Contains("harshil"))
+                                            {
+                                                continue;
+                                            }
+                                            <tr>
+                                                <td>@loops</td>
+                                                <td>@item.Username</td>
+                                                <td>@item.AllDetails</td>
+                                                <td>@item.WithoutCatNo</td>
+                                                @*<td>@item.WithoutCasNo</td>*@
+                                                <td>@item.WithoutPrice</td>
+                                                <td>@item.TotalAdded</td>
+                                                <td>
+                                                    @if (item.TotalAdded.HasValue && item.TotalAdded.Value != 0)
+                                                    {
+                                                        var missingperc = ((Convert.ToDecimal(item.TotalAdded) - Convert.ToDecimal(item.AllDetails)) / item.TotalAdded) * 100;
+                                                        @missingperc.Value.ToString("0.00") <span>%</span>
+                                                    }
+                                                </td>
+                                                <td>@item.RevisionCatNo</td>
+                                                @*<td>@item.RevisionCasNo</td>*@
+                                                <td>@item.RevisionPrice</td>
+                                                @*<td>@item.TotalRevisionProduct</td>*@
+                                                <td>
+                                                    @if (item.TotalAdded.HasValue && item.TotalAdded.Value != 0)
+                                                    {
+                                                        var revisionperc = ((Convert.ToDecimal(item.TotalAdded) - Convert.ToDecimal(item.RevisionPrice)) / item.TotalAdded) * 100;
+                                                        @revisionperc.Value.ToString("0.00") <span>%</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (item.TotalAdded.HasValue && item.TotalAdded.Value != 0)
+                                                    {
+                                                        var revisionperc = ((Convert.ToDecimal(item.TotalAdded) - Convert.ToDecimal(item.RevisionCatNo)) / item.TotalAdded) * 100;
+                                                        @revisionperc.Value.ToString("0.00") <span>%</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (item.TotalAdded.HasValue && item.TotalAdded.Value != 0)
+                                                    {
+                                                        var revisionperc = ((Convert.ToDecimal(item.TotalAdded) - Convert.ToDecimal(item.TotalRevisionProduct)) / item.TotalAdded) * 100;
+                                                        @revisionperc.Value.ToString("0.00") <span>%</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                            loops += 1;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                }
+
+            </form>
+        </div>
+    </div>
+</div>

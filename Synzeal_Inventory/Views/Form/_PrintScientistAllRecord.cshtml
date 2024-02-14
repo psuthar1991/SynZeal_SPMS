@@ -1,0 +1,57 @@
+﻿@model List<Synzeal_Inventory.Models.QuotationListModel>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    string quoteDate = Model.Select(x => x.CreatedDate).FirstOrDefault().HasValue ?
+        Model.Select(x => x.CreatedDate).FirstOrDefault().Value.GetOrdinalDate(true) : "";
+
+    int count = 1;
+
+    bool isMailSend = false;
+    if (ViewBag.ISMailSend != null)
+    {
+        isMailSend = Convert.ToBoolean(ViewBag.ISMailSend);
+    }
+
+}
+@using Synzeal_Inventory.Models
+<div class="box-body form-horizontal">
+   
+    <table width="100%" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Sr. No</th>
+                <th>Products Name</th>
+                <th>
+                    CAS No
+                </th>
+                <th>SZ Cat No</th>
+                <th>Qty</th>
+                <th>Ass. Date</th>
+                <th>Est. Com. Date</th>
+                <th>Lead time</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody id="tblfollowupbody">
+            @foreach (var k in Model)
+            {
+            <tr data-quotedetails="@k.QuoteDetailsId">
+                <td>
+                    @count
+                </td>
+                <td>@k.ProductName</td>
+                <td>@k.CASNo</td>
+                <td>@k.CATNo</td>
+                <td>@k.RequiredQty</td>
+                <td>@k.MoveToScientistDate</td>
+                <td>@k.EstimateCompleteDate</td>
+                <td>@k.LeadTime</td>
+                <td>
+                    @k.DataRemark
+                </td>
+            </tr>
+                count += 1;
+            }
+        </tbody>
+    </table>
+</div>

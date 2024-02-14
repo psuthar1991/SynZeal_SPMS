@@ -1,0 +1,87 @@
+﻿@model List<Synzeal_Inventory.Entity.MissiveResponse>
+
+<div class="box-body form-horizontal" style="border:1px solid #ececec">
+
+    <div class="col-md-12">
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+            <div class="col-sm-10">
+                @Html.DropDownList("responseId", (IEnumerable<SelectListItem>)ViewBag.termsList, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="hidden" id="quoteId" name="quoteId" value="@ViewBag.QuoteId" />
+            <label for="inputEmail3" class="col-sm-2 control-label">Description</label>
+            <div class="col-sm-10">
+                <textarea id="editor1" name="editor1" rows="20" cols="130"></textarea>
+            </div>
+            <br />
+            <b>Tokens: %quoteref% , %username%</b>
+        </div>
+        <a href="javascript:void(0)" class="btn btn-primary" id="btnsendemailquote" onclick="SendEmail()">
+            Send
+        </a>
+    </div>
+</div>
+<script src="@Url.Content("~/Content/bower_components/ckeditor/ckeditor.js")"></script>
+<script>
+$("#alertsuccess").hide();
+$(function () {
+        CKEDITOR.replace('editor1');
+});
+
+$("#responseId").change(function () {
+        if ($("#responseId").val() === "" || $("#responseId").val() === undefined) {
+            CKEDITOR.instances['editor1'].setData('');
+            return false;
+        }
+        $.ajax({
+            type: "GET",
+            url: "/Form/GetMissiveResponseById?id=" + $("#responseId").val(),
+            success: function (results) {
+                CKEDITOR.instances['editor1'].setData(results.data.Description);
+            }
+        });
+});
+
+    function SendEmail() {
+        debugger;
+        $("#btnsendemailquote").hide();
+        $(".error-msg").hide();
+        var body = CKEDITOR.instances['editor1'].getData();
+        var id = $("#responseId").val();
+        if ($("#responseId").val() === "" || $("#responseId").val() === undefined) {
+            id = 0;
+        }
+
+        var passData = {
+            'Id': id,
+            'QuoteId': $("#quoteId").val(),
+            'Message': body,
+        };
+        $.ajax({
+            type: "POST",
+            url: "/Form/SendQuoteEmail",
+            data: passData,
+            success: function (results) {
+                $("#btnsendemailquote").show();
+                if (results.success) {
+                    toastr.success("Send mail successfully.");
+                    $('#myModal').modal('hide');
+
+                    setTimeout(function () {
+                        window.location.reload(true);
+                    }, 3000);
+                }
+                else {
+                    toastr.error("Something went wrong.");
+                    return false;
+                }
+                //$("#alertsuccess").show();
+                //setTimeout(function () {
+                //    $("#alertsuccess").fadeOut();
+                //}, 3000);
+            }
+        });
+}
+</script>

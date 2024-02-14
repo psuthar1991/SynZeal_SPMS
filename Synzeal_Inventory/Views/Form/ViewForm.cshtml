@@ -1,0 +1,137 @@
+﻿@{
+    ViewBag.Title = "ScientistForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<Synzeal_Inventory.Entity.SZ_QuoteDetailForm>
+@using Synzeal_Inventory.Models
+<section class="content-header">
+    <h1>
+        View Form :: @ViewBag.ProductName
+        <a class="btn btn-primary" style="float:right" href="/Form/ScientistNewForm?tab=completed">Back</a>
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                @*<th>Sr No.</th>*@
+                                <th>Batch No</th>
+                                <th>Qty (mg)</th>
+                                <th>CAS No</th>
+                                <th>CAT No</th>
+                                <th>M. W.</th>
+                                <th>M. F.</th>
+                                <th>Submittion Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Count > 0)
+                            {
+                                int forloop = 1;
+                                foreach (var k in Model)
+                                {
+                                    var classname = "";
+                                    if (k.ApprovalStatus == Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ApprovedStatus.QCCorrection))
+                                    {
+                                        classname = "yellow";
+                                    }
+                                    if (k.ApprovalStatus == Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ApprovedStatus.QCApproved))
+                                    {
+                                        classname = "green";
+                                    }
+                                    if (string.IsNullOrEmpty(k.ApprovalStatus))
+                                    {
+                                        classname = "skyblue";
+                                    }
+
+                                    <tr id="tr_@k.Id" class="clsRow @classname">
+                                        @*<td>@forloop</td>*@
+                                        <td><label>@k.BatchCode</label> </td>
+                                        <td><label>@k.Qty</label></td>
+                                        <td><label>@k.CASNo</label> </td>
+                                        <td><label>@k.CATNo</label> </td>
+                                        <td><label>@k.MolWeight</label> </td>
+                                        <td><label>@k.MolFormula</label> </td>
+                                        <td>
+                                            <label>
+                                                @if (k.SubmissionDate != null)
+                                                {
+                                                    @k.SubmissionDate.ToShortDateString()
+                                                }
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <a href="/Form/SubmitForm/@ViewBag.ProcessId?formid=@k.Id" target="_blank">Edit</a> |
+                                            @if (classname == "green")
+                                            {
+                                                <a href="/Form/PrintForm/@k.Id" target="_blank">Submit & Print</a> <span> |</span>
+                                            }
+                                            @if (classname != "green")
+                                            {
+                                                <a href="javascript:void(0)" onclick="deleteform(@k.Id)">Delete</a>
+                                            } @*<a href="/Form/DeleteSubmittedForm/@k.Id">Delete</a>*@
+                                        </td>
+                                    </tr>
+                                    forloop += 1;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    function deleteform(id) {
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this product!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Form/DeleteSubmittedForm?id=" + id,
+                        data: {},
+                        success: function (results) {
+                            if (results) {
+                                window.location.reload();
+                                toastr.success("Your form has been deleted.");
+                            }
+                        }
+                    });
+
+                } else {
+                    toastr.error("Your added product is safe :)");
+                }
+            });
+    }
+</script>
+<style>
+    .yellow {
+        background: #f3f373 !important
+    }
+
+    .green {
+        background: #74f674 !important
+    }
+
+    .skyblue {
+        background: #b0e8ff !important
+    }
+</style>

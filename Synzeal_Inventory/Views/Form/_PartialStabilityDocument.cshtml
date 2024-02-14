@@ -1,0 +1,108 @@
+﻿@model List<Synzeal_Inventory.Entity.SZ_ChildCOA>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    var loop = 1;
+
+}
+@using Newtonsoft.Json
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+
+<div style="width:100%">
+    <img src="http://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" width="190px" />
+    <br /><br />
+    <span style="text-align:center; font-size:12px">
+        <b>Date:</b> @DateTime.Now.ToShortDateString()
+    </span>
+    <br /><br />
+</div>
+<div style="text-align:center; font-size:14px">
+    <b>Stability Statement for the Batch No @ViewBag.BatchNo</b>
+    <br /><br />
+</div>
+<div style="font-size: 12px">
+    Following is the summary of the analysis done for batch No @ViewBag.BatchNo <br /><br />
+</div>
+<div style="width: 100%; font-size: 11px;">
+    <table width="100%" border="1" cellpadding="5" cellspacing="0" style="padding:5px; font-size:10px;">
+        <thead>
+            <tr>
+                <th style="text-align:center; font-weight:bold; font-size:12px">Sr. No.</th>
+                <th style="text-align:center; font-weight:bold; font-size:12px"> Batch No</th>
+                <th style="text-align:center; font-weight:bold; font-size:12px"> HPLC Purity</th>
+                <th style="text-align:center; font-weight:bold; font-size:12px"> Analysis Date</th>
+                <th style="text-align:center; font-weight:bold; font-size:12px"> Certificate No</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                List<string> datestr = new List<string>();
+                foreach (var item in Model)
+                {
+                    if (item.ReTestDate.HasValue)
+                    {
+                        if (!datestr.Contains(item.ReTestDate.Value.AddYears(-2).ToShortDateString()))
+                        {
+                            datestr.Add(item.ReTestDate.Value.AddYears(-2).ToShortDateString());
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+
+                    <tr>
+                        <td style="text-align:center; font-size:11px">@loop</td>
+                        <td style="text-align: center; font-size: 11px">@item.BatchNo</td>
+                        <td style="text-align: center; font-size: 11px">@item.HPLCGCELSD %</td>
+                        <td style="text-align: center; font-size: 11px">
+                            @if (item.ReTestDate.HasValue)
+                            {
+                                @item.ReTestDate.Value.AddYears(-2).ToShortDateString()
+                            }
+                        </td>
+                        <td style="text-align: center; font-size: 11px">@item.RefNo</td>
+                    </tr>
+
+                    loop += 1;
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<table width="100%">
+    <tr>
+        <td style="width: 100%; font-size: 11px; color: #000; padding: 5px;">
+            <br /><br />
+            Based on the above analysis at different intervals product is stable at storage conditions mentioned
+            in the COA. The validity of the COA can be extended up to two years from the latest purity test.
+            <br /> <br />
+            Note # Purity test performed using our in-house method of analysis. There are chances of variations
+            in purity by +/- 1-2 %.
+            <br /> <br />
+            SynZeal Research Private Limited <br /> <br />
+            Authorized Signature
+        </td>
+    </tr>
+</table>
+

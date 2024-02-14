@@ -1,0 +1,98 @@
+﻿@{
+    ViewBag.Title = "Popup";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model  Synzeal_Inventory.Entity.SZ_PopupGroup
+<!-- left column -->
+
+
+<section class="content-header">
+    <h1>
+        Add New Popup Group
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+
+                <!-- /.box-header -->
+                <!-- form start -->
+                <form role="form">
+                    <div class="box-body col-md-8">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Name</label>
+                            <input type="text" class="form-control" id="GroupName" name="GroupName" placeholder="Group Name" required value="@Model.GroupName">
+                            <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">User Name</label>
+                            @Html.DropDownList("UserId", (IEnumerable<SelectListItem>)ViewBag.userList, new { @class = "form-control", @multiple = "" })
+                        </div>
+                        <div class="form-group" style="text-align:right">
+                            <button type="button" onclick="InsertPopUpGroupData()" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+
+                    <div class="clearfix"></div>
+                </form>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+    </div>
+</section>
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/davidstutz/bootstrap-multiselect@master/dist/js/bootstrap-multiselect.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/davidstutz/bootstrap-multiselect@master/dist/css/bootstrap-multiselect.css">
+
+
+<script>
+    function InsertPopUpGroupData() {
+        debugger;
+        var UserId = $("#UserId").val().join(',');
+        var Id = $("#Id").val();
+        var GroupName = $("#GroupName").val();
+        if ($("#GroupName").val() === "") {
+            toastr.error("Please enter group name");
+            return false;
+        }
+
+        var model = JSON.stringify({
+            GroupName: GroupName,
+            Id: Id,
+            UserId: UserId
+        })
+        $.ajax({
+            type: "POST",
+            url: "/Form/AddPopupGroupData",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: 'POST',
+            traditional: true, // add this
+            data: model,
+            success: function (result) {
+
+            }
+        });
+    }
+    jQuery('#UserId').multiselect({
+        columns: 1,
+        placeholder: 'Select User',
+        search: true
+    });
+</script>
+@if (Model.Id != 0)
+{
+    <script>
+        debugger;
+        var selectedOptions = '@ViewBag.UserId'.split(",");
+                for (var i in selectedOptions) {
+                    var optionVal = selectedOptions[i];
+                    $("#UserId").find("option[value=" + optionVal + "]").prop("selected", "selected");
+                }
+    $("#UserId").multiselect('reload');
+    </script>
+}

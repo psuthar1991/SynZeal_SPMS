@@ -1,0 +1,188 @@
+﻿@{
+    ViewBag.Title = "PR Request";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model  Synzeal_Inventory.Entity.SZ_PRRequest
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">New PR Request</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body col-md-12">
+                <b style="text-decoration:underline">
+                    Scientist Information:
+                </b>
+                <div class="clearfix"></div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">PR Raised By</label>
+                    <input type="text" class="form-control" id="RaisedBy" name="RaisedBy" placeholder="RaisedBy" readonly value="@Synzeal_Inventory.Models.SessionCookieManagement.UserName">
+                    <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+                    <input type="hidden" id="ProductId" name="ProductId" value="@Model.ProductId" />
+                    <input type="hidden" id="APIID" name="APIID" value="@Model.APIID" />
+                    <input type="hidden" id="RaisedByUserId" name="RaisedByUserId" value="@Model.RaisedByUserId" />
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Lab No</label>
+                    @Html.DropDownList("Labno", (IEnumerable<SelectListItem>)ViewBag.lablistItems, new { @class = "form-control" })
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Tead Leader</label>
+                    @Html.DropDownList("SubscientistId", (IEnumerable<SelectListItem>)ViewBag.scientistItems, new { @class = "form-control" })
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Employee Code</label>
+                    <input type="text" class="form-control" id="EmployeeCode" name="EmployeeCode" placeholder="Employee Code" required value="@Model.EmployeeCode">
+                </div>
+
+                <b style="text-decoration:underline">Material Information</b>
+                <div class="clearfix"></div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">SZ-CAT No</label>
+                    <input type="text" class="form-control" id="CATNo" name="CATNo" placeholder="SZ CAT No" required value="@Model.CATNo" style="width:90%; float:left"> <i class="fa fa-refresh" style="margin: 8px; float: left; cursor:pointer" onclick="GetCatInfromation()"></i>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">CAS No</label>
+                    <input type="text" class="form-control" id="CASNo" name="CASNo" placeholder="CAS No" required value="@Model.CASNo">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Project Name</label>
+                    <input type="text" class="form-control" id="APIName" name="APIName" placeholder="Project Name" required value="@Model.APIName">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Material Name</label>
+                    <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Material Name" value="@Model.ProductName">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Mol Formula</label>
+                    <input type="text" class="form-control" id="MolFormula" name="MolFormula" placeholder="Molecular Formula" value="@Model.MolFormula">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Mol Weight</label>
+                    <input type="text" class="form-control" id="MolWeight" name="MolWeight" placeholder="Molecular Weight" value="@Model.MolWeight">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Density</label>
+                    <input type="text" class="form-control" id="Density" name="Density" placeholder="Density" value="@Model.Density">
+                </div>
+                <div class="clearfix">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Pack Size</label>
+                    <input type="number" class="form-control" id="PackSize" name="PackSize" placeholder="Pack Size" value="@Model.PackSize">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">No of Pack</label>
+                    <input type="number" class="form-control" id="NoofPack" name="NoofPack" placeholder="No of Pack" value="@Model.NoofPack">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Total Qty</label>
+                    <input type="number" class="form-control" id="TotalQty" name="TotalQty" placeholder="Total Qty" value="@Model.TotalQty">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">UoM</label>
+                    <select class="form-control" id="UoM" name="UoM">
+                        <option value="mg">MG</option>
+                        <option value="gm">GM</option>
+                        <option value="kg">KG</option>
+                        <option value="ml">ML</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Make</label>
+                    <input type="text" class="form-control" id="Make" name="Make" placeholder="Make" value="@Model.Make">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Supplier Ref CAT/Link</label>
+                    <input type="text" class="form-control" id="SupplierRef" name="SupplierRef" placeholder="Supplier Ref" value="@Model.SupplierRef">
+                </div>
+                <div style="float: right; margin-top: 24px;">
+                    <button type="button" class="btn btn-primary" id="btnmail" onclick="Quote.savePRRequest()">Save</button>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </form>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+<script>
+    $('#NoofPack').keyup(function () {
+        var noofpack = $(this).val();
+        var packsize = $('#PackSize').val();
+        $('#TotalQty').val(noofpack * packsize);
+    });
+    $('#PackSize').keyup(function () {
+        var packsize = $(this).val();
+        var noofpack = $('#NoofPack').val();
+        $('#TotalQty').val(noofpack * packsize);
+    });
+
+    function GetCatInfromation() {
+        var catno = $('#CATNo').val();
+        if (catno == '') {
+            toastr.error('Please enter SynZeal CAT no.');
+            return false;
+        }
+
+        $.ajax({
+            type: "GET",
+            url: '/Form/GetProductByCATNo?catno=' + catno,
+            data: {},
+            success: function (result) {
+                $('#ProductId').val(result.Id);
+                $('#ProductName').val(result.Name);
+                $('#APIName').val(result.APIName);
+                $('#APIID').val(result.APIID);
+                $('#CATNo').val(result.CATNo);
+                $('#CASNo').val(result.CASNo);
+                $('#MolWeight').val(result.MolWeight);
+                $('#MolFormula').val(result.MolFormula);
+            },
+            error: function (xhr, status, p3, p4) {
+
+            }
+        });
+    }
+</script>
+
+@*@if(Model.Id != 0)
+    {
+        <text>
+            <script type="text/javascript">
+
+                $('textarea#AnalyticalData').html('@Model.AnalyticalData');
+                $('textarea#ClientSuggestedComment').html('@Model.ClientSuggestedComment');
+
+        if ("@Model.IsPaymentPending" === "True") {
+            $("#IsPaymentPending").prop("checked", true);
+        }
+        if ("@Model.IsBlockCompany" === "True") {
+            $("#IsBlockCompany").prop("checked", true);
+        }
+        if ("@Model.IsConversionReport" === "True") {
+            $("#IsConversionReport").prop("checked", true);
+         }
+        $("#address").val('@Model.Address');
+        $("#TermsId").val('@Model.TermsId');
+        if('@Model.CountryType' != null && '@Model.CountryType' != "")
+        {
+            $("input[name=CountryType][value=" + '@Model.CountryType' + "]").prop('checked', true);
+        }
+        if('@Model.UserDistType' != null && '@Model.UserDistType' != "")
+        {
+            $("input[name=UserDistType][value=" + '@Model.UserDistType' + "]").prop('checked', true);
+        }
+        if ('@Model.PaymentTerms' !== '') {
+            $("#PaymentTerms").val('@Model.PaymentTerms');
+        }
+
+         $("#BDTeam").val('@Model.BDTeam');
+        $("#ProjectTeam").val('@Model.ProjectTeam');
+            </script>
+    </text>
+    }*@

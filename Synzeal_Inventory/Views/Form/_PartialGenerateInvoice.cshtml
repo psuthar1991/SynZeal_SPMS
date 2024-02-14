@@ -1,0 +1,459 @@
+﻿@using Synzeal_Inventory.Entity;
+@model List<Synzeal_Inventory.Models.QuotationListModel>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    decimal totalRecord = 0;
+    var company = ViewBag.Company as SZ_CompanyList;
+    int loop = 1;
+}
+@using Synzeal_Inventory.Models
+<div class="box-body form-horizontal">
+    <div class="col-md-6">
+        <b>Company Name :</b>  <input type="text" id="CompanyName" name="CompanyName" class="form-control" value="@ViewBag.CompanyName" /><br />
+        <b>Email :</b> @ViewBag.Email <br />
+    </div>
+    <div class="col-md-6">
+        <b>PO No :</b> @ViewBag.PONo <br />
+        <b>PO Date :</b> @ViewBag.PODate <br />
+    </div>
+    <div class="clearfix"></div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Invoice No:</label>
+            <div class="col-md-9">
+                <input type="text" id="InvoiceNo" name="InvoiceNo" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Invoice Date:</label>
+            <div class="col-md-9">
+                <input type="text" id="InvoiceDate" name="InvoiceDate" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Type:</label>
+            <div class="col-md-9">
+                <input type="radio" class="clstype" name="type" value="CPT" checked /> CPT
+                <input type="radio" class="clstype" name="type" value="EXW" /> EXW
+            </div>
+        </div>
+        <hr />
+        <b>Billing Address:</b>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Add1:</label>
+            <div class="col-md-9">
+                <input type="text" id="Add1" name="Add1" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Add2:</label>
+            <div class="col-md-9">
+                <input type="text" id="Add2" name="Add2" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">City:</label>
+            <div class="col-md-9">
+                <input type="text" id="City" name="City" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">State:</label>
+            <div class="col-md-9">
+                <input type="text" id="State" name="State" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Country:</label>
+            <div class="col-md-9">
+                @Html.DropDownList("Country", (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Post Code:</label>
+            <div class="col-md-9">
+                <input type="text" id="PostCode" name="PostCode" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Telno:</label>
+            <div class="col-md-9">
+                <input type="text" id="Telno" name="Telno" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Copy bill to ship?:</label>
+            <div class="col-md-9">
+                <input type="checkbox" id="chkbilltoship" name="chkbilltoship" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Shipping Cost:</label>
+            <div class="col-md-9">
+                <input type="text" id="ShippingCost" name="ShippingCost" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Temperature:</label>
+            <div class="col-md-9">
+                <input type="text" id="Temperature" name="Temperature" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Gross Weight :</label>
+            <div class="col-md-9">
+                <input type="text" id="GrossWeight" name="GrossWeight" class="form-control" />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Tracking No:</label>
+            <div class="col-md-9">
+                <input type="text" id="TrackingNo" name="TrackingNo" class="form-control" value="@ViewBag.TrackingNo" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Terms:</label>
+            <div class="col-md-9">
+                @Html.DropDownList("PaymentTerms", (IEnumerable<SelectListItem>)ViewBag.listPaymentTermsItems, new { @class = "form-control" })
+            </div>
+        </div>
+        <hr />
+        <b>Shipping Address:</b>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Add1:</label>
+            <div class="col-md-9">
+                <input type="text" id="ShipAdd1" name="ShipAdd1" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Add2:</label>
+            <div class="col-md-9">
+                <input type="text" id="ShipAdd2" name="ShipAdd2" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">City:</label>
+            <div class="col-md-9">
+                <input type="text" id="ShipCity" name="ShipCity" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">State:</label>
+            <div class="col-md-9">
+                <input type="text" id="ShipState" name="ShipState" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Country:</label>
+            <div class="col-md-9">
+                @Html.DropDownList("ShipCountry", (IEnumerable<SelectListItem>)ViewBag.CountryList, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Post Code:</label>
+            <div class="col-md-9">
+                <input type="text" id="ShipPostCode" name="ShipPostCode" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3" style="margin-top: 7px;">Telno:</label>
+            <div class="col-md-9">
+                <input type="text" id="ShipTelno" name="ShipTelno" class="form-control" />
+            </div>
+        </div>
+
+    </div>
+    <div class="form-group"></div>
+    <div class="form-group"></div>
+    <table width="100%" class="table table-bordered table-striped" id="tblorderconf">
+        <thead>
+            <tr>
+                <th>PO No.</th>
+                <th>Product Name</th>
+                <th>Batch No</th>
+                <th>
+                    CAS No
+                </th>
+                <th>
+                    CAT No
+                </th>
+                <th>
+                    HSN
+                </th>
+                <th>QTY.</th>
+                <th>ADC QTY</th>
+                <th>
+                    DSL/DMI. No.
+                </th>
+                <th>
+                    Unit
+                </th>
+                <th>
+                    Rate
+                </th>
+                <th>FOB Value INR</th>
+                <th>Total Value</th>
+                <th>Remarks/ CHA Details.</th>
+            </tr>
+        </thead>
+        @foreach (var k in Model)
+        {
+            <tr>
+                <td>@loop</td>
+                <td>@k.ProductName</td>
+                <td>@k.BatchNo</td>
+                <td>@k.CASNo</td>
+                <td>@k.CATNo</td>
+                <td><input type="text" style="width:90px;" value="38229010" data-quotedetailsid="@k.QuoteDetailsId" id="hsn_@k.QuoteDetailsId" /></td>
+                <td>@k.RequiredQty</td>
+                <td>
+                    <input type="text" style="width:90px;" data-quotedetailsid="@k.QuoteDetailsId" id="adc_@k.QuoteDetailsId" />
+                </td>
+                <td>
+                    <input type="text" style="width:90px;" data-quotedetailsid="@k.QuoteDetailsId" id="dsl_@k.QuoteDetailsId" />
+                </td>
+                <td>MG</td>
+                <td>
+                    @{
+                        string permg = "";
+                        var price = "";
+                        if (!string.IsNullOrEmpty(k.FinalPrice))
+                        {
+                            price = System.Text.RegularExpressions.Regex.Match(k.FinalPrice, @"\d+").Value;
+                            if (!string.IsNullOrEmpty(price))
+                            {
+                                permg = Convert.ToString(Convert.ToDecimal(price) / Convert.ToInt32(k.RequiredQty));
+                            }
+                        }
+
+                        if (string.IsNullOrEmpty(permg))
+                        {
+                            var splitdatas = k.Price.Split(',');
+                            if (splitdatas != null && splitdatas.Count() > 0)
+                            {
+                                foreach (var pri in splitdatas)
+                                {
+                                    var checkpri = System.Text.RegularExpressions.Regex.Match(pri.Split('@')[0], @"\d+").Value;
+                                    if (checkpri == Convert.ToString(k.RequiredQty))
+                                    {
+                                        price = System.Text.RegularExpressions.Regex.Match(pri.Split('@')[1], @"\d+").Value;
+                                        if (!string.IsNullOrEmpty(price))
+                                        {
+                                            permg = Convert.ToString(Convert.ToDecimal(price) / Convert.ToInt32(k.RequiredQty));
+                                        }
+                                    }
+                                }
+                            }
+
+                            //price = System.Text.RegularExpressions.Regex.Match(k.Price.Split('@')[1], @"\d+").Value;
+                            //if (!string.IsNullOrEmpty(price))
+                            //{
+                            //    permg = Convert.ToString(Convert.ToDecimal(price) / Convert.ToInt32(k.RequiredQty));
+                            //}
+                        }
+                    }
+
+                    <input type="number" style="width:90px;" data-qty="@k.RequiredQty" data-quotedetailsid="@k.QuoteDetailsId" value="@permg" class="clspermgrate" id="permgrate_@k.QuoteDetailsId" />
+                </td>
+                <td>
+                    <input type="text" style="width:90px;" data-quotedetailsid="@k.QuoteDetailsId" id="fob_@k.QuoteDetailsId" />
+                </td>
+                <td>
+                    @*<span class="clsfinpri" style="width:90px;" id="finpri_@k.QuoteDetailsId">@price</span>*@
+                    <input type="number" style="width:90px;" data-quotedetailsid="@k.QuoteDetailsId" value="@price" class="clsfinpri" id="finpri_@k.QuoteDetailsId" />
+                </td>
+                <td>
+                    <input type="text" style="width:90px;" data-quotedetailsid="@k.QuoteDetailsId" id="remark_@k.QuoteDetailsId" />
+                </td>
+            </tr>
+            loop += 1;
+        }
+    </table>
+</div>
+<div>
+    <a href="javascript:void(0)" class="btn btn-primary" onclick="GenerateInvoice()">Generate</a>
+    <label id="totalrecordcount" style="float:right;margin-right:3%;">Total : @totalRecord</label>
+</div>
+
+<script>
+
+    $("#myModal").find(".clstype").change(function () {
+        var value = $(this).val();
+        if (value == "CPT") {
+            $("#myModal").find("#ShippingCost").val('0');
+        }
+        else {
+            $("#myModal").find("#ShippingCost").val('100');
+        }
+    })
+
+    calculateTotal();
+
+    $(".clsfinpri").keyup(function () {
+        calculateTotal();
+    });
+
+    $(".clspermgrate").keyup(function () {
+        var permg = $(this).val();
+        var qty = $(this).attr('data-qty');
+        var quotedetailsid = $(this).attr('data-quotedetailsid');
+        if (permg == "" || permg == undefined || permg == null) {
+            toastr.error("Please enter per mg rate.");
+            return false;
+        }
+        $("#myModal").find("#finpri_" + quotedetailsid).text(parseInt(qty) * parseInt(permg));
+        calculateTotal();
+    });
+    $("#myModal").find('#InvoiceDate').datepicker({
+        format: 'dd/mm/yyyy'
+    });
+
+    function calculateTotal() {
+        var total = 0;
+        $("#myModal").find(".clsfinpri").each(function () {
+            var val = $(this).val();
+            if (val !== "") {
+                total += parseInt(val);
+            }
+        });
+        $("#myModal").find("#totalrecordcount").text("Total : " + total);
+    }
+
+    function GenerateInvoice() {
+        var errorcnt = 0;
+        $("#myModal").find(".clspermgrate").each(function () {
+
+            var val = $(this).val();
+            if (val === "") {
+                errorcnt += 1;
+            }
+        });
+        if (errorcnt > 0) {
+            toastr.error("Please enter rate for all products");
+            return false;
+        }
+
+        var submodeldata = [];
+        $("#myModal").find(".clspermgrate").each(function () {
+            var val = $(this).val();
+            var quotedetailsid = $(this).attr("data-quotedetailsid");
+            var qty = $(this).attr("data-qty");
+            var obj = {
+                "Rate": val,
+                "QuoteDetailId": quotedetailsid,
+                "Qty": qty,
+                "ADCQty": $("#myModal").find("#adc_" + quotedetailsid).val(),
+                "DSLNo": $("#myModal").find("#dsl_" + quotedetailsid).val(),
+                "FOB": $("#myModal").find("#fob_" + quotedetailsid).val(),
+                "Remark": $("#myModal").find("#remark_" + quotedetailsid).val(),
+                "HSN": $("#myModal").find("#hsn_" + quotedetailsid).val(),
+                "Total": $("#myModal").find("#finpri_" + quotedetailsid).val(),
+            };
+            submodeldata.push(obj);
+        });
+        var passData = {
+            "QuoteId": '@ViewBag.QuoteId',
+            "CompanyId": '@ViewBag.CompanyId',
+            "PONo": '@ViewBag.PONo',
+            "CompanyName": $("#myModal").find("#CompanyName").val(),
+            "InvoiceNo": $("#myModal").find("#InvoiceNo").val(),
+            "TrackingNo": $("#myModal").find("#TrackingNo").val(),
+            "InvoiceDate": $("#myModal").find("#InvoiceDate").val(),
+            "TermsId": $("#myModal").find("#PaymentTerms").val(),
+            "Add1": $("#myModal").find("#Add1").val(),
+            "Add2": $("#myModal").find("#Add2").val(),
+            "City": $("#myModal").find("#City").val(),
+            "State": $("#myModal").find("#State").val(),
+            "Country": $("#myModal").find("#Country").val(),
+            "Telno": $("#myModal").find("#Telno").val(),
+            "ShipAdd1": $("#myModal").find("#ShipAdd1").val(),
+            "ShipAdd2": $("#myModal").find("#ShipAdd2").val(),
+            "ShipCity": $("#myModal").find("#ShipCity").val(),
+            "ShipState": $("#myModal").find("#ShipState").val(),
+            "ShipCountry": $("#myModal").find("#ShipCountry").val(),
+            "ShipTelno": $("#myModal").find("#ShipTelno").val(),
+            "PostCode": $("#myModal").find("#PostCode").val(),
+            "ShipPostCode": $("#myModal").find("#ShipPostCode").val(),
+            "QuoteDetailsModel": submodeldata,
+            "Type": $("#myModal").find('input[name="type"]:checked').val(),
+            "ShippingCost": $("#myModal").find("#ShippingCost").val(),
+            "Temperature": $("#myModal").find("#Temperature").val(),
+            "GrossWeight": $("#myModal").find("#GrossWeight").val()
+        };
+        $.ajax({
+            type: "POST",
+            url: "/Form/SaveInvoiceData",
+            data: JSON.stringify(passData),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            async: true,
+            success: function (results) {
+                if (!results.success) {
+                    toastr.error(results.message);
+                    return false;
+                }
+                else {
+                    $('#myModal').modal('hide');
+                    var win = window.open(results.path, '_blank');
+                    if (win) {
+                        win.focus();
+                    } else {
+                        alert('Please allow popups for this website');
+                    }
+
+                    var winendusercertificatefile = window.open(results.mergefile, '_blank');
+                    if (winendusercertificatefile) {
+                        winendusercertificatefile.focus();
+                    } else {
+                        alert('Please allow popups for this website');
+                    }
+
+                }
+            }
+        });
+    }
+
+    $("#myModal").find("#chkbilltoship").change(function () {
+        if ($(this).is(":checked")) {
+            $("#myModal").find("#ShipAdd1").val($("#myModal").find("#Add1").val());
+            $("#myModal").find("#ShipAdd2").val($("#myModal").find("#Add2").val());
+            $("#myModal").find("#ShipCity").val($("#myModal").find("#City").val());
+            $("#myModal").find("#ShipState").val($("#myModal").find("#State").val());
+            $("#myModal").find("#ShipCountry").val($("#myModal").find("#Country").val());
+            $("#myModal").find("#ShipPostCode").val($("#myModal").find("#PostCode").val());
+            $("#myModal").find("#ShipTelno").val($("#myModal").find("#Telno").val());
+        }
+        else {
+            $("#myModal").find("#ShipAdd1").val("");
+            $("#myModal").find("#ShipAdd2").val("");
+            $("#myModal").find("#ShipCity").val("");
+            $("#myModal").find("#ShipState").val("");
+            $("#myModal").find("#ShipCountry").val("");
+            $("#myModal").find("#ShipPostCode").val("");
+            $("#myModal").find("#ShipTelno").val("");
+        }
+    });
+</script>
+
+@if (company != null)
+{
+    <text>
+        <script type="text/javascript">
+            $("#myModal").find("#Add1").val('@company.Add1');
+            $("#myModal").find("#Add2").val('@company.Add2');
+            $("#myModal").find("#City").val('@company.City');
+            $("#myModal").find("#State").val('@company.State');
+            $("#myModal").find("#Country").val('@company.Country');
+            $("#myModal").find("#Telno").val('@company.Telno');
+            $("#myModal").find("#ShipAdd1").val('@company.ShipAdd1');
+            $("#myModal").find("#ShipAdd2").val('@company.ShipAdd2');
+            $("#myModal").find("#ShipCity").val('@company.ShipCity');
+            $("#myModal").find("#ShipState").val('@company.ShipState');
+            $("#myModal").find("#ShipCountry").val('@company.ShipCountry');
+            $("#myModal").find("#ShipTelno").val('@company.ShipTelno');
+            $("#myModal").find("#PaymentTerms").val('@company.PaymentTerms');
+        </script>
+    </text>
+}

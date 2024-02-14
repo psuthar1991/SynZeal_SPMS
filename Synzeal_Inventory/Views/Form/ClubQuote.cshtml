@@ -1,0 +1,88 @@
+﻿@{
+    ViewBag.Title = "ClubQuote";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<Synzeal_Inventory.Entity.SZ_QuotationDetail>
+
+<section class="content-header">
+    <h1>
+        Club Quote List
+        @if (Model.Count > 0)
+    {
+        <a data-toggle="modal" data-target="#myModal" href="@Url.Action("AddClubQuotation","Form")" style="float:right" class="btn btn-primary" onclick="">Generate</a>
+}
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <div class="box-body form-horizontal" id="profrm" style="overflow:scroll">
+                    @if (Model.Count > 0)
+                    {
+                        <table class="table table-bordered table-striped dataTable no-footer" id="example1">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Product Name
+                                    </th>
+                                    <th>
+                                        CAS No
+                                    </th>
+                                    <th>
+                                        CAT No
+                                    </th>
+                                    <th>
+                                        Price
+                                    </th>
+                                    <th>
+                                        Lead Time
+                                    </th>
+                                    <th>
+                                        Display Order
+                                    </th>
+                                    @*<th></th>*@
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var k in Model)
+                                {
+
+                                    <tr id="tr_@k.Id">
+                                        <td><label>@k.ProductName</label> <input type="text" id="productname_@k.Id" value="@k.ProductName" style="display:none;" /> </td>
+                                        <td><label>@k.CASNo</label> <input type="text" id="casno_@k.Id" value="@k.CASNo" style="display:none;" /> </td>
+                                        <td><label>@k.CATNo</label> <input type="text" id="catno_@k.Id" value="@k.CATNo" style="display:none;" /> </td>
+                                        <td><label>@k.Price</label> <input type="text" id="price_@k.Id" value="@k.Price" style="display:none;" /> </td>
+                                        <td><label>@k.LeadTime</label> <input type="text" id="leadtime_@k.Id" value="@k.LeadTime" style="display:none;" /> </td>
+                                        <td><label>@k.DisplayOrder</label> <input type="text" id="displayorder_@k.Id" value="@k.DisplayOrder" style="display:none;" /> </td>
+                                        @*<td>
+                                                <a href="javascript:void(0)" id="edit_@k.Id" onclick="EditProductDetails('@k.Id')"> Edit</a>
+                                                <a href="javascript:void(0)" id="save_@k.Id" onclick="SaveProductDetails('@k.Id','@k.QuoteId')" style="display:none"> Save</a>|
+                                                <a href="javascript:void(0)" onclick="Quote.deleteProductFromQuoteDetails('@k.Id')"> Delete</a>
+                                            </td>*@
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div style="text-align: center;color: lightgray;font-size: 36px;">
+                            <i class="fa fa-database" style="font-size:120px;"></i> <br />No Products Found!!!
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    
+    $(function () {
+        $('#example1').DataTable({
+            "pageLength": 25,
+            "order": [[1, "desc"]]
+        });
+    });
+    </script>

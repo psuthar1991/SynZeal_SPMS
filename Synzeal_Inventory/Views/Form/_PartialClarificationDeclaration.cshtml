@@ -1,0 +1,50 @@
+﻿@model  Synzeal_Inventory.Entity.SZ_InvoiceData
+@{
+    ViewBag.Title = "Company";
+    Layout = null;
+    string productName = "";
+    if (Model.SZ_InvoiceDetailsData != null && Model.SZ_InvoiceDetailsData.Count > 0)
+    {
+        foreach (var item in Model.SZ_InvoiceDetailsData)
+        {
+            productName += item.ProductName + ", ";
+        }
+    }
+}
+<div class="col-md-12" style="font-family:Cambria">
+    <div class="box box-primary" style="font-size:14px;color:#000;  line-height: 1.5;">
+        <div class="box-header with-border">
+            <img title="SynZeal" alt="SynZeal" style="width:280px; height:80px;" src="https://synzeal.com/Themes/DefaultClean/Content/images/logo.png" />
+        </div>
+        <p style="text-align:right; ">
+            <br />
+            Date: @Model.InvoiceDate.ToString("dd/MM/yyyy")
+        </p>
+        <p style="text-align:justify;">
+            THE AC/DC <br />
+            AHMEDABAD AIR CARGO<br />
+            AHMEDABAD
+        </p>
+        <p style="text-align:left; ">
+            SUBJECT: CLARIFICATION
+        </p>
+        <p style="text-align:left; ">
+            REF.NO. @Model.InvoiceNo &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DT: @Model.InvoiceDate.ToString("dd/MM/yyyy")
+        </p>
+        <p>
+            <br />
+            DEAR SIR,
+        </p>
+        <p>
+            <br />
+            THE CONSIGNMENT BEARING INVOICE NO. @Model.InvoiceNo DT. @Model.InvoiceDate.ToString("dd/MM/yyyy") CONTAINS PRODUCTS @productName DOES NOT FALL UNDER THE NOTIFICATION NUMBER.NTDN.07/15 & NOTIFICATION NO.08/2015-2020 DT.14.06.2021 ISSUED BY THE DGFT NEW DELHI
+        </p>
+        <p>
+            <br />
+            Thanking you, <br />
+            @*<b>Mayur Nandkar</b><br />*@
+            <b>Export Department</b><br />
+            <b>SynZeal Research Private Limited </b>
+        </p>
+    </div>
+</div>

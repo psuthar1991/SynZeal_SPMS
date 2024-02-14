@@ -1,0 +1,150 @@
+﻿@model List<SZ_Quotation>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+}
+@using Synzeal_Inventory.Entity;
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+
+    public string GetQuotePlace(SZ_Quotation q, SZ_QuotationDetail qd)
+    {
+        if (qd == null)
+        {
+            return "All";
+        }
+        var str = "";
+        if ((q.IsToBe == null || q.IsToBe == false) && (q.IsQuoteApproved == false || q.IsQuoteApproved == null) &&
+            (q.IsPark == false || q.IsPark == null) && !q.CompanyName.Contains("synzeal"))
+        {
+            str = "All";
+        }
+        if (q.IsToBe == true && (qd.IsSynthesisLog == null || qd.IsSynthesisLog == false) && (q.IsQuoteApproved == false || q.IsQuoteApproved == null) &&
+            (q.IsPark == false || q.IsPark == null) && q.UserDistType == "User")
+        {
+            str = "Pending User";
+        }
+        if (q.IsToBe == true && (qd.IsSynthesisLog == null || qd.IsSynthesisLog == false) && (q.IsQuoteApproved == false || q.IsQuoteApproved == null) &&
+            (q.IsPark == false || q.IsPark == null) && q.UserDistType == "Distributor")
+        {
+            str = "Pending Distributor";
+        }
+        if (q.IsQuoteApproved == true && (qd.IsSynthesisLog == null || qd.IsSynthesisLog == false)
+            && (q.IsPark == false || q.IsPark == null))
+        {
+            str = "Approved";
+        }
+        return str;
+    }
+}
+@using Synzeal_Inventory.Models
+
+<div style="margin:2% 33%;float:left;box-shadow:0 0 3px #aaa; height:auto;color:gray;">
+    <table width="100%">
+        <tr>
+            <td valign="top">
+                <img src="http://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" width="200px" />
+            </td>
+            <td style="float:right">
+                <span style="font-size:11px;float:right;padding:10px; text-align:right;color:gray;line-height:18px;">
+                    <b style="color:#000">Syn</b><b style="color: #00659e;">Zeal</b><b style="color:#000"> Research Pvt Ltd</b><br />
+                    Plot No. F, Shree Ganesh Industrial Estate,<br />
+                    423/24/8, Mahagujarat Industrial Estate,<br />
+                    Sarkhej-Bavla Road , Moraiya , India-382213<br />
+                    <b>Email:-</b> standards@synzeal.com<br />
+                    <b>Phone:-</b> +91-757-500-2050<br />
+                    <br />
+                </span>
+            </td>
+        </tr>
+    </table>
+    <br />
+    <hrline />
+    <h3 style="text-align:center">Quote Report</h3>
+    @if (Model != null && Model.Count > 0)
+    {
+        int loop = 1;
+
+        <div style="padding:0px; float:left;padding-top:10px;">
+            <table width="100%" class="proinfo" cellpadding="4" cellspacing="3" border="1">
+                <thead>
+                    <tr style="font-size:10px">
+                        <th width="10%">
+                            <b>#</b>
+                        </th>
+                        <th>
+                            <b>Date</b>
+                        </th>
+                        <th>
+                            <b>Quote #</b>
+                        </th>
+                        <th>
+                            <b>Location</b>
+                        </th>
+                        <th>
+                            <b>Company Name</b>
+                        </th>
+                        <th><b>Email</b></th>
+                        <th><b>Subject</b></th>
+                        <th><b>Product Name</b></th>
+                        <th><b>Made By</b></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int srno = 1;
+                        foreach (var item in Model)
+                        {
+                                        <tr style="color:#000;">
+                                            <td style="font-size:9px;text-align:center;" width="10%">
+                                                @srno
+                                            </td>
+                                            <td style="font-size:9px;text-align:center;">
+                                                @if (item.CreatedDate.HasValue)
+                                                {
+                                                    @item.CreatedDate.Value.ToShortDateString()
+                                                }
+                                            </td>
+                                            <td style="font-size:9px;text-align:center;">
+                                                @item.Ref
+                                            </td>
+                                            <td style="font-size:9px;">@GetQuotePlace(item, item.SZ_QuotationDetail.OrderBy(x => x.DisplayOrder).FirstOrDefault())</td>
+                                            <td style="font-size:9px;">@Html.Raw(item.CompanyName)</td>
+                                            <td style="font-size:9px;">@item.EmailAddress</td>
+                                            <td style="font-size:9px;">@item.ClientRef</td>
+                                            <td style="font-size:9px;">@item.SZ_QuotationDetail.OrderBy(x => x.DisplayOrder).Select(x => x.ProductName.Split(' ')[0]).FirstOrDefault()</td>
+                                            <td style="font-size:9px;">@item.CreatedBy</td>
+
+                                        </tr>
+                            srno += 1;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        loop += 1;
+    }
+    else
+    {
+        <div style="text-align:center;padding-top:80px;">
+            NO DATA FOUND
+        </div>
+    }
+</div>

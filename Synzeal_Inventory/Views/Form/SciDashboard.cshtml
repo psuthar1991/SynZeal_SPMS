@@ -1,0 +1,512 @@
+﻿@using Synzeal_Inventory.Models
+@model List<SZ_QuotationModel>
+@using Newtonsoft.Json;
+@{
+
+    var chartModel = ViewBag.chartModel as List<ChartModel>;
+    var overviewSciDashboard = ViewBag.OverSciModel as List<OverviewSciDashboard>;
+    var strChartModel = JsonConvert.SerializeObject(chartModel);
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string inhouseProjectType = Convert.ToString((int)EnumList.ProjectType.InHouse);
+}
+<script src="~/Content/bower_components/chart.js/Chart.min.js"></script>
+
+<section class="content-wrapper" style="min-height: 960px;">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1 style="width: 50%; float: left;">
+            Scientist Dashboard
+        </h1>
+        <div style="width: 50%; float: right; text-align:right">
+            <a href="/Form/ExportScientistData" class="btn btn-primary">Export Report</a>
+        </div>
+    </section>
+    <div class="clearfix"></div>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/ScientistNewForm?tab=noprocess">
+                        <span class="info-box-icon bg-aqua"><i class="ion ion-document"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="font-size: 18px;color: #000;">No Action</span>
+                            <span class="info-box-number">@ViewBag.NoActionCount</span>
+                        </div>
+                    </a>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/ScientistNewForm?tab=all">
+                        <span class="info-box-icon bg-red"><i class="ion ion-ios-people-outline"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="font-size: 18px;color: #000;">New-Syn</span>
+                            <span class="info-box-number">@ViewBag.All</span>
+                        </div>
+                    </a>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/ScientistNewForm?tab=reprocess">
+                        <span class="info-box-icon bg-red"><i class="ion ion-ios-people-outline"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="        font-size: 18px;
+        color: #000;">Reprocess</span>
+                            <span class="info-box-number">@ViewBag.Reprocess</span>
+                        </div>
+                    </a>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/ScientistNewForm?tab=complete">
+                        <span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="font-size: 18px;color:#000;">Completed<br /> Dashboard</span>
+                            <span class="info-box-number">@ViewBag.Completed</span>
+                        </div>
+                    </a>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/ScientistNewForm?tab=scaleup">
+                        <span class="info-box-icon bg-yellow"><i class="ion ion-ios-gear-outline"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="        font-size: 18px;
+        color: #000;">Scale-Up</span>
+                            <span class="info-box-number">@ViewBag.Scaleup</span>
+                        </div>
+                    </a>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/ScientistNewForm?tab=cancelled">
+                        <span class="info-box-icon bg-yellow"><i class="ion ion-ios-gear-outline"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="font-size: 18px;color: #000;">CANCELLED</span>
+                            <span class="info-box-number">@ViewBag.Cancelled</span>
+                        </div>
+                    </a>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <a href="/Form/ScientistNewForm?tab=synthesislog">
+                        <span class="info-box-icon bg-yellow"><i class="ion ion-ios-gear-outline"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text" style="font-size: 18px;color: #000;">SYNTHESIS LOG</span>
+                            <span class="info-box-number">@ViewBag.SynthesisLog</span>
+                        </div>
+                    </a>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+        </div>
+        <div class="col-md-12 box-body box box-primary">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            Time Track
+                        </th>
+                        @foreach (EnumList.DifficultyLevel r in Enum.GetValues(typeof(EnumList.DifficultyLevel)))
+                        {
+                            var item = Enum.GetName(typeof(EnumList.DifficultyLevel), r);
+                            var test = r.ToString();
+                            string text = SZ_Helper.GetEnumDescription((EnumList.DifficultyLevel)(int)r);
+                            <th>@text</th>
+                        }
+                        <th>
+                            Not assigned D
+                        </th>
+                        <th>
+                            Total
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int totaltoal = 0;
+                        for (int iLoop = 1; iLoop < 7; iLoop++)
+                        {
+                            int totalCount = 0;
+                            var rowString = "";
+                            if (iLoop == 1)
+                            {
+                                rowString = "On Track";
+                            }
+                            if (iLoop == 2)
+                            {
+                                rowString = "Delayed";
+                            }
+                            if (iLoop == 3)
+                            {
+                                rowString = "Significant Delayed";
+                            }
+                            if (iLoop == 4)
+                            {
+                                rowString = "Attention";
+                            }
+                            if (iLoop == 5)
+                            {
+                                rowString = "Temp Hold";
+                            }
+                            if (iLoop == 6)
+                            {
+                                rowString = "Cancelled";
+                            }
+                            <tr>
+                                <td>
+                                    @rowString
+                                </td>
+
+                                @foreach (EnumList.DifficultyLevel r in Enum.GetValues(typeof(EnumList.DifficultyLevel)))
+                                {
+                                    var itemname = Enum.GetName(typeof(EnumList.DifficultyLevel), r);
+                                    var test = r.ToString();
+                                    string text = SZ_Helper.GetEnumDescription((EnumList.DifficultyLevel)(int)r);
+                                    var countofdata = overviewSciDashboard.Where(x => x.RowName == rowString && x.CoumnName == text).Select(x => x.ProductCount).FirstOrDefault();
+                                    <td>
+                                        @countofdata
+                                    </td>
+                                    totalCount += countofdata;
+                                }
+
+                                <td>
+                                    @{
+                                        var countofdlabeldata = overviewSciDashboard.Where(x => x.RowName == rowString && x.CoumnName == "Not assigned D").Select(x => x.ProductCount).FirstOrDefault();
+                                        totalCount += countofdlabeldata;
+                                    }
+                                    @countofdlabeldata
+                                </td>
+
+                                <td>@totalCount</td>
+
+                            </tr>
+                            totaltoal += totalCount;
+                        }
+                    }
+                    <tr style="font-weight:bold">
+                        <td>Total</td>
+                        @foreach (EnumList.DifficultyLevel r in Enum.GetValues(typeof(EnumList.DifficultyLevel)))
+                        {
+                            var itemname = Enum.GetName(typeof(EnumList.DifficultyLevel), r);
+                            var test = r.ToString();
+                            string text = SZ_Helper.GetEnumDescription((EnumList.DifficultyLevel)(int)r);
+                            var countofdata = overviewSciDashboard.Where(x => x.CoumnName == text).Select(x => x.ProductCount).Sum();
+                            <td>
+                                @countofdata
+                            </td>
+                        }
+                        <td>
+                            @{
+                                var countofdlabeldatatotal = overviewSciDashboard.Where(x => x.CoumnName == "Not assigned D").Select(x => x.ProductCount).Sum();
+                            }
+                            @countofdlabeldatatotal
+                        </td>
+                        <td>@totaltoal</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-6">
+            <div class="box box-primary">
+                <canvas id="chart-area" height="400" style="width:100%"></canvas>
+            </div>
+        </div>
+        <div id="noaction" class="col-md-6 col-sm-6 col-xs-12">
+
+            <!-- /.box-header -->
+            <div class="box-body box box-primary" style="overflow:scroll;height:400px">
+                <h4 style="margin:0">Overdue Products</h4>
+                <table id="tblnoaction" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Product Name</th>
+                            <th>CAS No</th>
+                            <th>CAT No</th>
+                            <th>Team leader</th>
+                            <th>Esti. Com. Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Count > 0)
+                        {
+                            int loop = 0;
+                            foreach (var i in Model)
+                            {
+                                foreach (var k in i.SZ_QuotationProductModel.Where(x => (x.EstimateCompleteDate == null || x.EstimateCompleteDate.Value.Date < DateTime.Now.Date) && x.ReadyToDeliverScientistStatusId != x.ScientistStatus && x.ProjectType != inhouseProjectType && (x.IsOnHold == false || x.IsOnHold == null) && string.IsNullOrEmpty(x.TrackingNo)).OrderByDescending(x => x.MoveToScientistDate))
+                                {
+                                    loop += 1;
+                                    <tr id="tr_@k.QuoteDetailsId" data-status="@k.ScientistStatus" class="clsRow " data-protype="@k.ProjectType">
+                                        <td>@loop</td>
+                                        <td>
+                                            @k.ProductName
+                                        </td>
+                                        <td>@k.CASNo</td>
+                                        <td>@Html.Raw(k.CATText) </td>
+                                        <td>
+                                            @k.SubScientistName
+                                        </td>
+
+                                        <td>
+                                            <label>
+                                                @if (k.EstimateCompleteDate.HasValue)
+                                                {
+                                                    @k.EstimateCompleteDate.Value.ToShortDateString()
+                                                }
+                                            </label>
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <div class="clearfix"></div>
+    </section>
+
+</section>
+<script>
+    $(function () {
+        $('#example1').DataTable({
+            "pageLength": 25,
+            "order": [[0, "asc"]]
+        })
+    });
+
+
+    function InStockAction(companyId) {
+
+        $.ajax({
+            url: '/Form/InStockAction',
+            data: { id: companyId },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1200px");
+            }
+        });
+    }
+
+    function PendingAction(companyId) {
+        $.ajax({
+            url: '/Form/PendingAction',
+            data: { id: companyId },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1080px");
+            }
+        });
+    }
+
+    function PurchaseAction(companyId) {
+        $.ajax({
+            url: '/Form/PurchaseAction',
+            data: { id: companyId },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1200px");
+            }
+        });
+    }
+
+
+    function SaveAllPendingActions() {
+        var ids = [];
+
+        $('.clsSaveAll').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+
+        var count = 1;
+        $('.clsSaveAll').each(function () {
+            var id = $(this).val();
+            //$("#qty_" + id).css('border', '');
+            if ($(this).is(':checked')) {
+
+                var scactionId = $("#ScientistIdaction_" + id).val();
+                var projectactionType = $("#Projecttypeaction_" + id).val();
+
+                $('.clsProjType').each(function (i, v) {
+
+                    var attr = $(this).attr("data-quoteDetailsId");
+                    if (attr === id) {
+                        projectactionType = $(this).val();
+                    }
+                });
+
+                $('.scientist').each(function (i, v) {
+
+                    var attr = $(this).attr("quotedetailsid");
+                    if (attr === id) {
+                        scactionId = $(this).val();
+                    }
+                });
+                //var qty = $("#qty_" + id).val();
+                //var batchno = $("#batchno_" + id).val();
+                //var additionalBatch = $("#additionalBatch_" + id).val();
+                //var remark = $("#remark_" + id).val();
+                //if (qty === "" && qty !== "0") {
+                //    $("#qty_" + id).css('border', '1px solid red');
+                //    return false;
+                //}
+                $.ajax({
+                    url: '/Form/SavePendingAction?scId=' + scactionId + '&projectType=' + projectactionType + '&id=' + id, /* + '&batchno=' + batchno + '&remark=' + remark + '&additionalBatch=' + additionalBatch + '&scientistStatus=' + scientistStatus,*/
+                    data: {},
+                    type: 'POST',
+                    async: false,
+                    success: function (data) {
+                    },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function successAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product information.");
+            setTimeout(function () { window.location.reload(true); }, 2000);
+        }
+    }
+</script>
+
+@if (chartModel != null)
+{
+    <text>
+        <script type="text/javascript">
+            var jsonstring = '@Html.Raw(strChartModel)' ;
+            var datas = JSON.parse(jsonstring);
+            var myPie;
+            var myPieScienDashboardLoad = false;
+            var chartdata = [];
+            var chartColor = [];
+            var chartlabel = [];
+
+            $(datas).each(function (i, v) {
+                chartlabel.push(v.LabelName);
+                chartdata.push(v.Count);
+                chartColor.push(getRandomColor());
+            });
+            var randomScalingFactor = function () {
+                return Math.round(Math.random() * 100);
+            };
+
+            var datasetchartdata = [];
+            datasetchartdata.push({
+                data: chartdata,
+                labels: chartlabel,
+                backgroundColor: "#3c8dbc",
+                borderColor: "#3c8dbc",
+                borderWidth: 1,
+                //backgroundColor: chartColor,
+                label: 'Products'
+            });
+            var config = {
+                type: 'bar',
+                data: {
+                    datasets: datasetchartdata,
+                    labels: chartlabel
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Overdue Products'
+                    }
+                }
+            };
+            var ctx = document.getElementById('chart-area').getContext('2d');
+            var barChartData = {
+                labels: chartlabel,
+                datasets: [{
+                    label: 'Overdue Products',
+                    backgroundColor: "#3c8dbc",
+                    borderColor: "#3c8dbc",
+                    borderWidth: 1,
+                    data: [
+                        randomScalingFactor(),
+                        randomScalingFactor(),
+                        randomScalingFactor(),
+                        randomScalingFactor(),
+                        randomScalingFactor(),
+                        randomScalingFactor(),
+                        randomScalingFactor()
+                    ]
+                }]
+            };
+            if (!myPieScienDashboardLoad) {
+                myPieScienDashboardLoad = true;
+                myPie = new Chart(ctx, config);
+            }
+            else {
+                myPie.data.labels = chartlabel;
+                myPie.data.datasets = datasetchartdata;
+                myPie.update();
+            }
+        </script>
+    </text>
+
+
+}
+
+<style type="text/css">
+    #example1 td {
+        font-size: 18px;
+    }
+
+        #example1 td a {
+            font-size: 18px;
+        }
+</style>

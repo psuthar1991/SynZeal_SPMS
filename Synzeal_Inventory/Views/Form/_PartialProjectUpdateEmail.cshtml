@@ -1,0 +1,84 @@
+﻿
+@model List<Synzeal_Inventory.Models.QuotationListModel>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    int loop = 1;
+}
+@using Synzeal_Inventory.Models
+<style>
+    .table{
+        border:!px solid red;
+    }
+</style>
+<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+<div style="font-family:'Roboto', sans-serif;">
+    <p>
+        Hi @Model[0].CompanyName,
+    </p>
+
+    <p>
+        Please find below updated status about PO No @Model[0].PONumber dated PO Receipt Dt @Model[0].PODate.Value.GetOrdinalDate() .
+    </p>
+
+
+    <div class="box-body form-horizontal">
+        <table width="100%" class="table table-bordered table-striped" border="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Sr No</th>
+                    <th>PO No.</th>
+                    <th>Product Name</th>
+                    <th>CAS No</th>
+                    <th>CAT No</th>
+                    <th>PO Date</th>
+                    <th>Lead Time</th>
+                    <th>Batch No</th>
+                    <th>QTY. (mg)</th>
+                    <th>Current Status</th>
+                    <th>Estimate Comp. Date	</th>
+                </tr>
+            </thead>
+            @foreach (var k in Model)
+            {
+                <tr>
+                    <td>@loop</td>
+                    <td>@k.PONumber</td>
+                    <td>@k.ProductName</td>
+                    <td>@k.CASNo</td>
+                    <td>@k.CATNo</td>
+                    <td>
+                        @if (k.PODate.HasValue)
+                        {
+                            @k.PODate.Value.GetOrdinalDate()
+                        }
+                    </td>
+                    <td>@k.LeadTime</td>
+                    <td>@k.BatchNo</td>
+                    <td>@k.RequiredQty</td>
+                    <td>@k.AdminScientistStatus</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(k.EstimateCompleteDate))
+                        {
+                            DateTime estdate = Convert.ToDateTime(k.EstimateCompleteDate);
+                            @estdate.GetOrdinalDate()
+                        }
+                    </td>
+                </tr>
+
+                loop += 1;
+            }
+        </table>
+    </div>
+    <p>
+        Should you have any queries, kindly update the Remarks column in returned to this e-mail.
+    </p>
+    <p>
+        Let me know if you have any comments/suggestions.
+    </p>
+    <p>
+        Sincerely,<br />
+        Project Management Team<br />
+        SynZeal Research Pvt Ltd<br />
+        http://www.synzeal.com
+    </p>
+</div>

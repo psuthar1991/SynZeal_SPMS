@@ -1,0 +1,45 @@
+<div>
+	<table cellspacing="0" rules="all" border="1" style="border-collapse:collapse;">
+		<tr>
+			<th scope="col">CategoryName</th><th scope="col">ProductName</th><th scope="col">Synonym</th><th scope="col">MolF</th><th scope="col">MolW</th><th scope="col">InventoryStatus</th><th scope="col">ImagePath</th><th scope="col">CATNo</th><th scope="col">CASNo</th>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib adduct -2</td><td>&nbsp;</td><td>C28H28N4O6S</td><td>548.6</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067124_axitinib-adduct-2.png</td><td>SZ-A073011</td><td>NA</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib Impurity 1</td><td>&nbsp;</td><td>C28H24N4O4S</td><td>512.6</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067125_axitinib-impurity-1.png</td><td>SZ-A073012</td><td>NA</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib N-Oxide</td><td>&nbsp;</td><td>C22H18N4O2S</td><td>402.5</td><td>In Stock</td><td>https://www.synzeal.com/content/images/thumbs/0067126_axitinib-n-oxide.png</td><td>SZ-A073013</td><td>NA</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib Impurity 3</td><td>&nbsp;</td><td>C22H18N4O3S</td><td>418.5</td><td>Limited Stock</td><td>https://www.synzeal.com/content/images/thumbs/0067127_axitinib-impurity-3.png</td><td>SZ-A073014</td><td>1348044-24-5</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib Impurity 4</td><td>&nbsp;</td><td> C22H18N4O4S</td><td>434.5</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067128_axitinib-impurity-4.png</td><td>SZ-A073015</td><td>NA</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib Impurity 5</td><td>&nbsp;</td><td>C22H18N4O5S</td><td>450.5</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067129_axitinib-impurity-5.png</td><td>SZ-A073016</td><td>NA</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib Impurity 6</td><td>&nbsp;</td><td>C22H18N4O4S</td><td>434.5</td><td>In Stock</td><td>https://www.synzeal.com/content/images/thumbs/0067130_axitinib-impurity-6.png</td><td>SZ-A073017</td><td>NA</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib dimer impurity 1</td><td>&nbsp;</td><td>C44H36N8O2S2</td><td>773</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067131_axitinib-dimer-impurity-1.png</td><td>SZ-A073019</td><td>1428728-84-0</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib </td><td>&nbsp;</td><td>C22H18N4OS</td><td>386.5</td><td>In Stock, 3-4 days for Dispatch</td><td>https://www.synzeal.com/content/images/thumbs/0067114_axitinib.png</td><td>SZ-A073001</td><td>319460-85-0</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Cis-axitinib</td><td>&nbsp;</td><td>C22H18N4OS</td><td>386.5</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067115_cis-axitinib.png</td><td>SZ-A073002</td><td>885126-40-9</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib Acid</td><td>&nbsp;</td><td>C21H15N3O2S</td><td>373.4</td><td>In Stock</td><td>https://www.synzeal.com/content/images/thumbs/0067116_axitinib-acid.png</td><td>SZ-A073003</td><td>319462-34-5</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib Amide</td><td>&nbsp;</td><td>C21H16N4OS</td><td>372.4</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067117_axitinib-amide.png</td><td>SZ-A073004</td><td>319462-41-4</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib N-Formyl Impurity</td><td>&nbsp;</td><td>C23H18N4O2S</td><td>&#160;414.5</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067118_axitinib-n-formyl-impurity.png</td><td>SZ-A073005</td><td>NA</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib N-Hydroxymethyl Impurity</td><td>&nbsp;</td><td>C23H20N4O2S</td><td>416.5</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067119_axitinib-n-hydroxymethyl-impurity.png</td><td>SZ-A073006</td><td>NA</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib Sulfone</td><td>&nbsp;</td><td>C22H18N4O3S</td><td>418.5</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067120_axitinib-sulfone.png</td><td>SZ-A073007</td><td>1348536-59-3</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib Sulfoxide</td><td>&nbsp;</td><td>C22H18N4O2S</td><td>402.5</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067121_axitinib-sulfoxide.png</td><td>SZ-A073008</td><td>1347304-18-0</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib N-Methyl Impurity&#160;</td><td>&nbsp;</td><td>C23H20N4OS</td><td>400.5</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067122_axitinib-n-methyl-impurity.png</td><td>SZ-A073009</td><td>NA</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib adduct -1</td><td>&nbsp;</td><td>C34H38N4O11S</td><td>710.8</td><td>Custom Synthesis</td><td>https://www.synzeal.com/content/images/thumbs/0067123_axitinib-adduct-1.png</td><td>SZ-A073010</td><td>NA</td>
+		</tr><tr>
+			<td> Axitinib </td><td>Axitinib dimer impurity 2</td><td>&nbsp;</td><td>C44H36N8O2S2</td><td>773</td><td>In Stock</td><td>https://www.synzeal.com/content/images/thumbs/0067132_axitinib-dimer-impurity-2.png</td><td>SZ-A073020</td><td>1428728-83-9</td>
+		</tr>
+	</table>
+</div>

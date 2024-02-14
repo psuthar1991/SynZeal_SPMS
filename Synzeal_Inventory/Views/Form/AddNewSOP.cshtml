@@ -1,0 +1,63 @@
+﻿@{
+    ViewBag.Title = "Add New SOP";
+    Layout = null;
+}
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Add New SOP</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body">
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <label for="exampleInputEmail1">Department</label>
+                    </div>
+                    <div class="col-md-9">
+                        <select id="DepartmentName" name="DepartmentName" class="form-control">
+                            <option value="">--SELECT--</option>
+                            <option value="QAD">QAD</option>
+                            <option value="QCD">QCD</option>
+                            <option value="ITD">ITD</option>
+                            <option value="HRD">HRD</option>
+                            <option value="RND">RND</option>
+                            <option value="EHS">EHS</option>
+                            <option value="ENG">ENG</option>
+                        </select>
+                    </div>
+                </div><br /><br />
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <label for="exampleInputEmail1">File Name</label>
+                    </div>
+                    <div class="col-md-9">
+                        <input type="text" id="FileName" name="FileName" class="form-control" />
+                    </div>
+                </div><br /><br />
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <label for="exampleInputEmail1">File Upload</label>
+                    </div>
+                    <div class="col-md-9">
+                        <input type="file" id="FilePath" name="FilePath" class="form-control" />
+                    </div>
+                </div><br /> <br />
+
+                <div class="form-group" style="text-align:right">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="button" onclick="Quote.addSOPData()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<style>
+    label {
+        padding-top: 7px;
+    }
+</style>

@@ -1,0 +1,157 @@
+﻿@{
+    ViewBag.Title = "SOP";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<Synzeal_Inventory.Entity.SZ_SOP>
+@using Synzeal_Inventory.Models
+<section class="content-header">
+    <h1>
+        SOP
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <ul class="nav nav-tabs" id="tabullist">
+                    <li class="active"><a data-toggle="tab" href="#home">QAD</a></li>
+                    <li><a data-toggle="tab" href="#QCD">QCD</a></li>
+                    <li><a data-toggle="tab" href="#ITD">ITD</a></li>
+                    <li><a data-toggle="tab" href="#HRD">HRD</a></li>
+                    <li><a data-toggle="tab" href="#RND">RND</a></li>
+                    <li><a data-toggle="tab" href="#EHS">EHS</a></li>
+                    <li><a data-toggle="tab" href="#ENG">ENG</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="home" class="tab-pane fade in active">
+
+                        <div class="content">
+                            @if (Model != null && Model.Where(x => x.DepartmentName == "QAD").Count() > 0)
+                            {
+                                foreach (var item in Model.Where(x => x.DepartmentName == "QAD").ToList())
+                                {
+                                    <div class="col-md-4">
+                                        @*<a data-toggle="modal" data-target="#myModal" class="btn btn-primary" href="@item.FilePath">@item.FileName</a>*@
+                                        <a href="javascript:void(0)" onclick="openpopup('@item.FilePath')">
+                                            @item.FileName
+                                        </a>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <span>No Data Found</span>
+                            }
+                        </div>
+                        @*<iframe src="~/Content/SOP/Quality_Assurance.pdf#toolbar=0" style="width:100%; height:700px;" frameborder="0"></iframe>*@
+                    </div>
+                    <div id="QCD" class="tab-pane fade in">
+                        <div class="content">
+                            @if (Model != null && Model.Where(x => x.DepartmentName == "QCD").Count() > 0)
+                            {
+                                foreach (var item in Model.Where(x => x.DepartmentName == "QCD").ToList())
+                                {<a href="javascript:void(0)" onclick="openpopup('@item.FilePath')">
+                                        @item.FileName
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <span>No Data Found</span>
+                            }
+                        </div>
+                    </div>
+                    <div id="ITD" class="tab-pane fade in">
+                        <div class="content">
+                            @if (Model != null && Model.Where(x => x.DepartmentName == "ITD").Count() > 0)
+                            {
+                                foreach (var item in Model.Where(x => x.DepartmentName == "ITD").ToList())
+                                {<a href="javascript:void(0)" onclick="openpopup('@item.FilePath')">
+                                        @item.FileName
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <span>No Data Found</span>
+                            }
+                        </div>
+                    </div>
+                    <div id="HRD" class="tab-pane fade in">
+                        <div class="content">
+                            @if (Model != null && Model.Where(x => x.DepartmentName == "HRD").Count() > 0)
+                            {
+                                foreach (var item in Model.Where(x => x.DepartmentName == "HRD").ToList())
+                                {<a href="javascript:void(0)" onclick="openpopup('@item.FilePath')">
+                                        @item.FileName
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <span>No Data Found</span>
+                            }
+                        </div>
+                    </div>
+                    <div id="RND" class="tab-pane fade in">
+                        <div class="content">
+                            @if (Model != null && Model.Where(x => x.DepartmentName == "RND").Count() > 0)
+                            {
+                                foreach (var item in Model.Where(x => x.DepartmentName == "RND").ToList())
+                                {<a href="javascript:void(0)" onclick="openpopup('@item.FilePath')">
+                                        @item.FileName
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <span>No Data Found</span>
+                            }
+                        </div>
+                    </div>
+                    <div id="EHS" class="tab-pane fade in">
+                        <div class="content">
+                            @if (Model != null && Model.Where(x => x.DepartmentName == "EHS").Count() > 0)
+                            {
+                                foreach (var item in Model.Where(x => x.DepartmentName == "EHS").ToList())
+                                {
+                                    <a href="javascript:void(0)" onclick="openpopup('@item.FilePath')">
+                                        @item.FileName
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <span>No Data Found</span>
+                            }
+                        </div>
+                    </div>
+                    <div id="ENG" class="tab-pane fade in">
+                        <div class="content">
+                            @if (Model != null && Model.Where(x => x.DepartmentName == "ENG").Count() > 0)
+                            {
+                                foreach (var item in Model.Where(x => x.DepartmentName == "ENG").ToList())
+                                {<a href="javascript:void(0)" onclick="openpopup('@item.FilePath')">
+                                        @item.FileName
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <span>No Data Found</span>
+                            }
+                        </div>
+                    </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    function openpopup(filepath) {
+        $('#myModal').find('.modal-body').html('<iframe id="iframesop" src="' + filepath + '#toolbar=0" style="width:100%; height:600px;" frameborder="0"></iframe>');
+        $('#myModal').modal({ show: true });
+        $('#myModal').find(".modal-dialog").css("width", "780px");
+    }
+</script>

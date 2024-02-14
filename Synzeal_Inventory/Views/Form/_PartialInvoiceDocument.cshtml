@@ -1,0 +1,122 @@
+﻿@{
+    ViewBag.Title = "Upload Document And Data";
+    Layout = null;
+}
+@model  Synzeal_Inventory.Entity.SZ_InvoiceDocument
+@using Synzeal_Inventory.Entity
+@{
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    var documentdata = db.SZ_InvoiceDocument.Where(x => x.InvoiceNo == Model.InvoiceNo).ToList();
+}
+
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <form role="form" id="formuploaddoc">
+            <div class="box-body">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Company : </label>
+                        @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.CompanyList, new { @class = "form-control" })
+                        <br />
+                        <label for="exampleInputEmail1">Invoice No : </label>
+                        <input type="text" id="InvoiceNo" name="InvoiceNo" class="form-control" value="@Model.InvoiceNo" />
+                        <br />
+                        <label for="exampleInputEmail1">Invoice Document : </label>
+                        <span><input type="file" multiple="multiple" class="form-control" id="invoicessdocument" name="invoicessdocument" /></span>
+                        <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+
+                    </div>
+                </div>
+                <div class="form-group" style="text-align:right">
+                    <button type="button" onclick="uploadinvoicedocumentdata()" class="btn btn-primary">Save</button>
+                </div>
+                <div class="col-md-12">
+                    @if(documentdata != null && documentdata.Count > 0)
+                    {
+                        int forcount = 1;
+                        <table class="table">
+                            <tr>
+                                <th>#</th>
+                                <th>Download</th>
+                            </tr>
+                            @foreach (var item in documentdata)
+                            {
+                                <tr>
+                                    <td>@forcount</td>
+                                    <td>
+                                        <a href="@item.Path" download="">
+                                            <i class="fa fa-file-pdf-o"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                forcount += 1;
+                            }
+                        </table>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="clearfix"></div>
+<script>
+    $.fn.serializeObject = function () {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function () {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+    function uploadinvoicedocumentdata() {
+        $(".errorcls").each(function () {
+            $(this).removeClass('errorcls');
+        });
+        var model = $("#formuploaddoc").serializeObject();
+        var formData = new FormData();
+        var file = $("#myModal").find("#invoicessdocument")[0].files[0];
+        formData.append("Id", $("#myModal").find("#Id").val());
+        //formData.append("invoicedocument", file);
+        var ins = $("#myModal").find("#invoicessdocument")[0].files.length;
+        for (var x = 0; x < ins; x++) {
+            formData.append("files[]", $("#myModal").find("#invoicessdocument")[0].files[x]);
+        }
+        formData.append("InvoiceNo", $("#myModal").find("#InvoiceNo").val());
+        formData.append("CompanyId", $("#myModal").find("#CompanyId").val());
+        $.ajax({
+            type: "POST",
+            url: "/Form/UploadInvoiceDocument",
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            success: function (results) {
+                if (results === "Success") {
+                    $("#myModal").modal('hide');
+                    $("#myModal").find(".modal-body").html("");
+                    toastr.success("Information Saved Successfully.");
+                }
+            }
+        });
+    }
+
+
+    function delcoafn() {
+        $('#delcoa').val('true');
+        $('#divdelcoa').hide();
+    }
+    function deldatafn() {
+        $('#deldata').val('true');
+        $('#divdeldata').hide();
+    }
+</script>

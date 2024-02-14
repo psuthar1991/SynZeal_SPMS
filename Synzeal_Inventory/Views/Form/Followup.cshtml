@@ -1,0 +1,710 @@
+﻿@{
+    ViewBag.Title = "QuotationList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<Synzeal_Inventory.Models.SZ_QuotationModel>
+
+
+<section class="content-header">
+    <h1>
+        Follow Up List
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#tabquotefollowup" data-tabname="followup">FOLLOW UP</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div id="tabquotefollowup" class="tab-pane fade in active">
+                        <div style="    float: right;margin-right: 8px;margin: 10px 28px 5px 0;">
+                            <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Printrecords()">Copy</a>
+                        </div>
+                        <div class="clearfix"></div>
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote" style="overflow:scroll;" id="divQuote">
+
+
+                            <table id="tblfollowup" class="table table-bordered table-striped" style="width:100% !important;">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <input type="checkbox" id="selectallchk" />
+                                        </th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th>Ref#</th>
+                                        <th>Company Name</th>
+                                        <th>Email</th>
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Price/Qty</th>
+                                        <th>Lead Time</th>
+                                        <th>Product Remark</th>
+                                        <th>Followup Remark</th>
+                                        <th>Followup Remark</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    $(".divQuote").css('height', window.innerHeight - 200);
+    $(document).ready(function () {
+
+        //console.log('inside the function');
+
+        $('#example1').DataTable({
+            //"fixedHeader": {
+            //    header: true
+            //},
+            "ordering": false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "orderMulti": false, // for disable multiple column at once
+            "pageLength": 25,
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+            "ajax": {
+                "url": "../Form/LoadQuotationData?tabname=all",
+                "type": "POST",
+                "datatype": "json"
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                    $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                }
+            },
+            "columnDefs":
+                [
+                ],
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+            },
+            "columns": [
+                { "data": "ChkFirstRow", "autoWidth": true, "orderable": false },
+                { "data": "MoveToProjectText", "autoWidth": true, "orderable": false },
+                { "data": "DownloadSampleRow", "autoWidth": true, "orderable": false },
+                { "data": "DownloadRow", "autoWidth": true, "orderable": false },
+                { "data": "Ref", "name": "Ref", "width": "100px" },
+                { "data": "CompanyName", "name": "CompanyName", "width": "200px" },
+                { "data": "PONumberText", "name": "PONumber", "width": "100px" },
+                { "data": "ProductNameText", "name": "ProductName", "width": "18%" },
+                { "data": "CASNoText", "name": "CASNo", "width": "6%" },
+                { "data": "CATNoText", "name": "CATNo", "width": "6%" },
+                { "data": "PriceText", "name": "Price", "width": "250px" },
+                { "data": "LeadTimeText", "name": "LeadTime", "autoWidth": true },
+                { "data": "AdditionalBatchNoText", "name": "AdditionalBatchNoText" },
+                { "data": "ProductRemark", "orderable": false, "width": "100px" },
+                { "data": "ActionRow", "orderable": false, "width": "130px" }
+            ]
+
+        });
+    });
+    function setFollowUpRemark(ids) {
+        $.ajax({
+            url: '/Form/SetFollowupRecord',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                //$('#tblfollowup').DataTable().ajax.reload();
+            }
+        });
+    }
+    function EditProductDetails(id) {
+
+     var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'all') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'tobe') {
+            tableId = 'tbltobe';
+        }
+        else if(menulink === 'followup')
+        {
+            tableId = 'tblfollowup';
+        }
+        else {
+            tableId = 'tblinhouse';
+        }
+
+
+
+        $('#' + tableId).find("#edit_" + id).hide();
+        $('#' + tableId).find("#save_" + id).show();
+        $('#' + tableId).find("#tr_" + id).find("label").hide();
+        $('#' + tableId).find("#tr_" + id).find("input").show();
+    }
+
+
+    function SaveProductDetails(id) {
+    var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'all') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'tobe') {
+            tableId = 'tbltobe';
+        }
+        else if(menulink === 'followup')
+        {
+            tableId = 'tblfollowup';
+        }
+        else {
+            tableId = 'tblinhouse';
+        }
+        var ponumber = $('#' + tableId).find("#ponumber_" + id).val();
+        var productname = $('#' + tableId).find("#productname_" + id).val();
+        var price = $('#' + tableId).find("#price_" + id).val();
+        var casno = $('#' + tableId).find("#casno_" + id).val();
+        var catno = $('#' + tableId).find("#catno_" + id).val();
+        var leadtime = $('#' + tableId).find("#leadtime_" + id).val();
+        var ProductRemark = $('#' + tableId).find("#ProductRemark_" + id).val();
+
+        var followUpRemark = $('#' + tableId).find("#followUpRemark_" + id).val();
+        var followUpRemarkSecond = $('#' + tableId).find("#followUpRemarkSecond_" + id).val();
+
+        $.ajax({
+            url: '/Form/UpdateProductInfo?ProductName=' + productname + '&casno=' + casno + '&catNo=' + catno + '&price=' + price + '&leadtime=' + leadtime + '&id=' + id + '&ponumber=' + ponumber + '&productremark=' + ProductRemark + '&followUpRemark=' + followUpRemark + '&followUpRemarkSecond=' + followUpRemarkSecond,
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                if (data.success) {
+                    window.location.href = "/Form/QuotationList";
+                }
+            }
+        });
+    }
+
+    //Move to InHouse
+    function MoveToInHouse() {
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'all') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'tobe') {
+            tableId = 'tbltobe';
+        }
+        else if(menulink === 'followup')
+        {
+            tableId = 'tblfollowup';
+        }
+        else {
+            tableId = 'tblinhouse';
+        }
+        var ids = [];
+
+        $('#' + tableId).find('.clsMoveProject').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+    toastr.error("Please select atleast one Product.");
+            
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/MoveToInHouse',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+    toastr.success("You have moved selected products into in-house list.");
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+
+    ///Move To Club Quote
+    function MoveToClubQuote() {
+        var ids = [];
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'all') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'tobe') {
+            tableId = 'tbltobe';
+        }
+    else if(menulink === 'followup')
+        {
+            tableId = 'tblfollowup';
+        }
+        else {
+            tableId = 'tblinhouse';
+        }
+        var ids = [];
+
+        $('#' + tableId).find('.clsclubQuote').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product.");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/MoveToClubQuote',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                     toastr.success("You have moved selected products into club quotation list.");
+                    $('.clsclubQuote').each(function () {
+                        if ($(this).is(':checked')) {
+                            $(this).prop('checked', false);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    ///Movbe to project screen
+    function MoveToProject() {
+        var ids = [];
+        var countrytype = [];
+        var menulink = '';
+        $('.nav').find('li').each(function () {
+            if ($(this).hasClass('active')) {
+                menulink = $(this).find('a').attr('data-tabname');
+            }
+        });
+
+        var tableId = '';
+        if (menulink === 'all') {
+            tableId = 'example1';
+        }
+        else if (menulink === 'tobe') {
+            tableId = 'tbltobe';
+        }
+        else {
+            tableId = 'tblinhouse';
+        }
+
+        $('#' + tableId).find('.clsMoveProject').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+                if ($(this).attr("data-export") !== "") {
+                    countrytype.push($(this).val());
+                }
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product.");
+            return false;
+        }
+        if (ids.length !== countrytype.length) {
+            toastr.error("Some quote has not selected export or domastic. Please select it.");
+            return false;
+        }
+
+        var proorInvo = 'project';
+
+        var POAvailable = [];
+        var str = "<table><tr><th>PO No</th><th>Company Name</th><th>Product Name</th><th>CAS No</th><th>CAT No</th></tr>";
+        $(ids).each(function (i, v) {
+            var poNo = $("#tr_" + v + " td:nth-child(7)").text();
+            var compName = $("#tr_" + v + " td:nth-child(6)").text();
+            var productName = $("#tr_" + v + " td:nth-child(8)").text();
+            var casNo = $("#tr_" + v + " td:nth-child(9)").text();
+            var catNo = $("#tr_" + v + " td:nth-child(10)").text();
+            var isAlreadyInProject = $("#tr_" + v + " td:nth-child(2)").find('input').attr("data-alreadyinprojectscreen");
+            if (isAlreadyInProject === "True") {
+                var added = false;
+                $.map(POAvailable, function (elementOfArray, indexInArray) {
+                    if (elementOfArray == poNo) {
+                        added = true;
+                    }
+                });
+                if (!added) {
+                    POAvailable.push(poNo);
+                }
+            }
+
+            var isAlreadyInInvoice = $("#tr_" + v + " td:nth-child(2)").find('input').attr("data-alreadyInInvoiceScreen");
+            if (isAlreadyInInvoice === "True") {
+                proorInvo = 'invoice';
+            }
+
+            str += "<tr><td>" + poNo + "</td><td>" + compName + "</td><td>" + productName + "</td><td>" + casNo + "</td><td>" + catNo + "</td></tr>";
+        }); str += "</table>";
+
+        if (POAvailable.length > 0) {
+            str = "<p style='color:red;font-size: 15px;font-weight: bold;'>Note: " + POAvailable.join() + " PO Already available in "+proorInvo+" screen.</p>" + str;
+        }
+
+        swal({
+            title: "Are you sure want to move this quotation product to project screen?",
+            text: str,
+            type: "warning",
+            showCancelButton: true,
+            html: true,
+            customClass: 'swalwide',
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, move it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: '/Form/MoveToProject',
+                        data: { id: ids },
+                        type: 'POST',
+                        traditional: true, // add this
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.success) {
+                                window.location.href = "/Form/Project";
+                            }
+                            else {
+                                toastr.error(data.message);
+                                return false;
+                            }
+                        }
+                    });
+
+                }
+            });
+    }
+
+
+    var tobeload = false;
+    var inhousequoload = false;
+    var followupload = false;
+    function Tobequotetab() {
+        if (tobeload === false) {
+            $('#tbltobe').DataTable({
+                //"fixedHeader": {
+                //    header: true
+                //},
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadQuotationData?tabname=tobe",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                    }
+                },
+                "fnDrawCallback": function (oSettings) {
+                    tobeload = true;
+                },
+                "columnDefs":
+                    [
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                },
+                "columns": [
+                    { "data": "ChkFirstRow", "autoWidth": true, "orderable": false },
+                    { "data": "MoveToProjectText", "autoWidth": true, "orderable": false },
+                    { "data": "DownloadSampleRow", "autoWidth": true, "orderable": false },
+                    { "data": "DownloadRow", "autoWidth": true, "orderable": false },
+                    { "data": "Ref", "name": "Ref", "width": "100px" },
+                    { "data": "CompanyName", "name": "CompanyName", "width": "200px" },
+                    { "data": "PONumberText", "name": "PONumber", "width": "100px" },
+                    { "data": "ProductNameText", "name": "ProductName", "width": "18%" },
+                    { "data": "CASNoText", "name": "CASNo", "width": "6%" },
+                    { "data": "CATNoText", "name": "CATNo", "width": "6%" },
+                    { "data": "PriceText", "name": "Price", "width": "250px" },
+                    { "data": "LeadTimeText", "name": "LeadTime", "autoWidth": true },
+                    { "data": "AdditionalBatchNoText", "name": "AdditionalBatchNoText" },
+                    { "data": "ProductRemark", "orderable": false, "width": "100px" },
+                    { "data": "ActionRow", "orderable": false, "width": "130px" }
+                ]
+
+            });
+        }
+    }
+
+
+    function followuptab()
+    {
+        if (followupload === false) {
+
+           var testtbl =  $('#tblfollowup').DataTable({
+                //"fixedHeader": {
+                //    header: true
+                //},
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadQuotationData?tabname=followup",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                    }
+
+
+                },
+                "fnDrawCallback": function (oSettings) {
+                    followupload = true;
+
+                        var api = this.api();
+                        var rows = api.rows({ page: 'current' }).nodes();
+                        var last = null;
+
+                    api.column(4, { page: 'current' }).data().each(function (group, i) {
+
+                            if (last !== group) {
+                                $(rows).eq(i).before(
+                                    '<td class="group" colspan="16" style="BACKGROUND-COLOR:#3c8dbc;font-weight:700;color:#fff;padding:10px;">' + group + " | " + rows[i].attributes["data-company"].value + " | " + rows[i].attributes["data-email"].value + '</td>'
+                                );
+                                last = group;
+                            }
+                    });
+
+                    testtbl.columns.adjust()
+                },
+                "columnDefs":
+                    [
+                        { targets: 4, visible: false },
+                        { targets: 5, visible: false },
+                        { targets: 6, visible: false }
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-email',  data.EmailAddress);
+                    $(row).attr('data-company', data.CompanyName);
+                },
+                "columns": [
+                    { "data": "ChkFirstRow", "orderable": false },
+                    { "data": "MoveToProjectText", "orderable": false },
+                    { "data": "DownloadSampleRow", "orderable": false },
+                    { "data": "DownloadRow", "autoWidth": true, "orderable": false },
+                    { "data": "Ref", "name": "Ref", "width": "100px" },
+                    { "data": "CompanyName", "name": "CompanyName", "width": "00px" },
+                     { "data": "EmailAddress", "name": "EmailAddress", "width": "00px" },
+                    { "data": "ProductNameText", "name": "ProductName", "width": "250px" },
+                    { "data": "CASNoText", "name": "CASNo" },
+                    { "data": "CATNoText", "name": "CATNo" },
+                    { "data": "PriceText", "name": "Price" },
+                    { "data": "LeadTimeText", "name": "LeadTime", "autoWidth": true },
+                    { "data": "ProductRemark", "orderable": false, "swidth": "100px" },
+                    { "data": "FollowUpRemark", "orderable": false, "swidth": "300px" },
+                    { "data": "FollowUpRemarkSecond", "orderable": false, "swidth": "300px" },
+                    { "data": "ActionRow", "orderable": false}
+                ]
+
+            });
+        }
+    }
+
+
+    function inhousequotetab() {
+        if (inhousequoload === false) {
+            $('#tblinhouse').DataTable({
+                //"fixedHeader": {
+                //    header: true
+                //},
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadQuotationData?tabname=inhouse",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                    }
+                },
+                "fnDrawCallback": function (oSettings) {
+                    inhousequoload = true;
+                },
+                "columnDefs":
+                    [
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                },
+                "columns": [
+                    { "data": "ChkFirstRow", "autoWidth": true, "orderable": false },
+                    { "data": "MoveToProjectText", "autoWidth": true, "orderable": false },
+                    { "data": "DownloadSampleRow", "autoWidth": true, "orderable": false },
+                    { "data": "DownloadRow", "autoWidth": true, "orderable": false },
+                    { "data": "Ref", "name": "Ref", "width": "100px" },
+                    { "data": "CompanyName", "name": "CompanyName", "width": "200px" },
+                    { "data": "PONumberText", "name": "PONumber", "width": "100px" },
+                    { "data": "ProductNameText", "name": "ProductName", "width": "18%" },
+                    { "data": "CASNoText", "name": "CASNo", "width": "6%" },
+                    { "data": "CATNoText", "name": "CATNo", "width": "6%" },
+                    { "data": "PriceText", "name": "Price", "width": "250px" },
+                    { "data": "LeadTimeText", "name": "LeadTime", "autoWidth": true },
+                    { "data": "AdditionalBatchNoText", "name": "AdditionalBatchNoText" },
+                    { "data": "ProductRemark", "orderable": false, "width": "100px" },
+                    { "data": "ActionRow", "orderable": false, "width": "130px" }
+                ]
+
+            });
+        }
+    }
+
+    function Printrecords() {
+        var ids = [];
+        var refNoarr = [];
+        $("#tblfollowup").find('.clsclubQuote').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+                var ref = $(this).attr('data-refno');
+                var added=false;
+                $.map(refNoarr, function (elementOfArray, indexInArray) {
+                    if (elementOfArray == ref) {
+                       added = true;
+                     }
+                });
+                if (!added) {
+                    refNoarr.push(ref);
+                }
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product.");
+            return false;
+        }
+        if (refNoarr.length > 1)
+        {
+            toastr.error("Please select only one ref no quote.");
+            return false;
+        }
+
+        //var dataURL = "http://localhost:1360";
+        //$('.modal-body').load(dataURL, function () {
+        //    $('#myModal').modal({ show: true });
+        //});
+        //$('#myModal').modal('show');
+
+        $.ajax({
+            url: '/Form/PrintFollowupRecord',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1080px");
+
+                $('#myModal').find(".modal-footer").show();
+                $('#myModal').find(".modal-footer").attr('onclick', 'setFollowUpRemark("' + ids +'")');
+            }
+        });
+    }
+
+    $("#tblfollowup").find('#selectallchk').change(function () {
+
+        if ($(this).is(':checked')) {
+            $("#tblfollowup").find('.clsclubQuote').each(function () {
+                $(this).prop('checked', true);
+            });
+        }
+        else {
+            $("#tblfollowup").find('.clsclubQuote').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    followuptab();
+</script>
+<style type="text/css">
+    #example1_processing {
+        top: 2%;
+    }
+
+    .dataTables_wrapper .col-sm-5, .dataTables_info {
+        float: right;
+    }
+
+    .pagination {
+        float: left;
+    }
+</style>

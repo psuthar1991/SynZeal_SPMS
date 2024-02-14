@@ -1,0 +1,198 @@
+﻿@{
+    ViewBag.Title = "SampleRequestList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<SZ_SampleRequestDetail>
+@using Synzeal_Inventory.Entity
+
+<section class="content-header">
+    <h1>
+        Sample Request List
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <ul class="nav nav-tabs" id="tabullist">
+                    <li class="active"><a data-toggle="tab" href="#home" data-tabname="all">PENDING</a></li>
+                    <li><a data-toggle="tab" href="#tabdispatch" onclick="completedtab()" data-tabname="completed">COMPLETED</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="home" class="tab-pane fade in active">
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote">
+                            <div class="clearfix"></div>
+                            <table id="example1" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Request No</th>
+                                        <th>Request Date</th>
+                                        <th>Name</th>
+                                        <th>Department</th>
+                                        <th>Product Name</th>
+                                        <th>CAT No</th>
+                                        <th>CAS No</th>
+                                        <th>Batch No</th>
+                                        <th>QTY</th>
+                                        <th>Reason</th>
+                                        <th style="text-align:center">Approved</th>
+                                        <th style="text-align:center">Reject</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Count > 0)
+                                    {
+                                        int sr = 1;
+                                        foreach (var item in Model.Where(x => x.IsApproved == null))
+                                        {
+                                            <tr>
+                                                <td>@sr</td>
+                                                <td>@item.SZ_SampleRequest.RequestNo</td>
+                                                <td>@item.SZ_SampleRequest.RequestDate.ToShortDateString()</td>
+                                                <td>@item.SZ_SampleRequest.Name</td>
+                                                <td>@item.SZ_SampleRequest.Department</td>
+                                                <td>@item.ProductName</td>
+                                                <td>@item.CATNo</td>
+                                                <td>@item.CASNo</td>
+                                                <td>@item.BatchCode</td>
+                                                <td>@item.Qty</td>
+                                                <td>@item.Reason</td>
+                                                <td style="text-align:center">
+                                                    <a href="javascript:void(0)" onclick="ApprovedSampleRequest(@item.Id)"><i class="fa fa-check"></i></a>
+                                                </td>
+                                                <td style="text-align:center">
+                                                    <a href="javascript:void(0)" onclick="RejectedSampleRequest(@item.Id)"><i class="fa fa-times  "></i></a>
+                                                </td>
+                                            </tr>
+                                            sr += 1;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <div id="tabdispatch" class="tab-pane fade">
+                        <!-- /.box-header -->
+                        <div class="box-body divQuote">
+                            <div class="clearfix"></div>
+                            <table id="tblcompleted" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Request No</th>
+                                        <th>Request Date</th>
+                                        <th>Name</th>
+                                        <th>Department</th>
+                                        <th>Product Name</th>
+                                        <th>CAT No</th>
+                                        <th>CAS No</th>
+                                        <th>Batch No</th>
+                                        <th>QTY</th>
+                                        <th>Reason</th>
+                                        <th style="text-align:center">Approved</th>
+                                        <th style="text-align:center">Rejected Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Count > 0)
+                                    {
+                                        int sr = 1;
+                                        foreach (var item in Model.Where(x => x.IsApproved.HasValue))
+                                        {
+                                            <tr>
+                                                <td>@sr</td>
+                                                <td>@item.SZ_SampleRequest.RequestNo</td>
+                                                <td>@item.SZ_SampleRequest.RequestDate.ToShortDateString()</td>
+                                                <td>@item.SZ_SampleRequest.Name</td>
+                                                <td>@item.SZ_SampleRequest.Department</td>
+                                                <td>@item.ProductName</td>
+                                                <td>@item.CATNo</td>
+                                                <td>@item.CASNo</td>
+                                                <td>@item.BatchCode</td>
+                                                <td>@item.Qty</td>
+                                                <td>@item.Reason</td>
+                                                <td style="text-align:center">
+                                                    @if (item.IsApproved.HasValue && item.IsApproved.Value)
+                                                    {
+                                                        <i class="fa fa-check"  style="color:green"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fa fa-times" style="color:red"></i>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @item.RejectReason
+                                                </td>
+                                            </tr>
+                                            sr += 1;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script type="">
+    $('#example1').DataTable()
+    $('#tblcompleted').DataTable()
+
+
+    function ApprovedSampleRequest(id) {
+        $.ajax({
+            type: "GET",
+            url: "/Form/ApprovedSampleRequest?id=" + id,
+            dataType: "json",
+            traditional: true,
+            data: {},
+            success: function (result) {
+                window.location.reload(true);
+            }
+        });
+    }
+
+    function RejectedSampleRequest(id) {
+        var str = "<div class='row'><div class='col-md-12'><p>Please enter park reason:<p> <textarea id='txtparkreason' style='width:100%'></textarea></div></div>";
+        swal({
+            title: "Are you sure want to reject it?",
+            text: str,
+            html: true,
+            type: "warning", customClass: 'swalwide',
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    var reason = $('#txtparkreason').val();
+                    if (reason === "") {
+                        toastr.error("Please enter reject reason.");
+                        return false;
+                    }
+                    $.ajax({
+                        type: "GET",
+                        url: "/Form/RejectedSampleRequest?id=" + id + "&reason=" + reason,
+                        dataType: "json",
+                        traditional: true,
+                        data: {},
+                        success: function (result) {
+                            window.location.reload(true);
+                        }
+                    });
+                } else {
+                    toastr.error("Your added sample is safe :)");
+                }
+            });
+    }
+</script>

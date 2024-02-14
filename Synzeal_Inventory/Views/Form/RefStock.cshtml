@@ -1,0 +1,222 @@
+﻿@{
+    ViewBag.Title = "ScientistForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<SZ_QuotationModel>
+@using Synzeal_Inventory.Models
+<section class="content-header">
+    <h1>
+        Ref. Stock List
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12" style="text-align:center">
+            @for (char c = 'A'; c <= 'Z'; c++)
+            {
+                <div class="letter " data-letter="@c" onclick="SelectInventoryChar('@c')">@c</div>
+            }
+        </div>
+        <div class="col-md-12" style="margin: 10px;">
+            <div class="form-group">
+                <label class="col-md-1" style="padding-top: 6px;">Select API :</label>
+                <div class="col-md-2">
+                    <select id="loadapiselect" class="form-control">
+                        <option value="0">--Select--</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <input type="button" value="Search" class="btn btn-primary" onclick="searchinventory()" />
+                </div>
+                <div class="col-md-7">
+
+                </div>
+                <div class="col-md-1">
+                    <input type="button" value="Save All" class="btn btn-primary" onclick="saveAll()" />
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="col-xs-12" >
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Product Name</th>
+                                <th>CAS No</th>
+                                <th>CAT No</th>
+                                <th>Ref. Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    
+     function searchinventory() {
+        var value = $('#loadapiselect').val();
+        if (value === "0") {
+            swal("Please select API.")
+            return false;
+        }
+        RefstockGrid(value);
+    }
+
+    var firsttimeload = false;
+    function RefstockGrid(val)
+    {
+        if(firsttimeload)
+    {
+        $('#example1').DataTable().clear();
+        $('#example1').DataTable().destroy();
+    }
+    firsttimeload = true;
+        $('#example1').DataTable({
+            //"fixedHeader": {
+            //    header: true
+            //},
+            "ordering": false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "orderMulti": false, // for disable multiple column at once
+            "pageLength": 25,
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "ajax": {
+                "url": "../Form/LoadRefstockData?apiname="+val,
+                "type": "POST",
+                "datatype": "json"
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+               
+            },
+            "columnDefs":
+                [
+                ],
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+            },
+            "columns": [
+                { "data": "Smile", "autoWidth": true, "orderable": false },
+                { "data": "Name", "autoWidth": true, "orderable": false },
+                { "data": "Sku", "autoWidth": true, "orderable": false },
+                { "data": "Gtin", "autoWidth": true, "orderable": false },
+                { "data": "RefStockPrice", "autoWidth": true, "orderable": false }
+            ]
+
+        });
+        
+    }
+
+    function SelectInventoryChar(char) {
+        $('.letter').removeClass('letter-active');
+        $('.letter').each(function () {
+            var attr = $(this).attr('data-letter');
+            if (attr == char) {
+                $(this).addClass('letter-active');
+            }
+        })
+
+        $.ajax({
+            type: "GET",
+            url: "/Form/MainCategory/",
+            data: { 'id': char },
+            dataType: "json",
+            success: function (response) {
+                if (response.records.length > 0) {
+                    $('#loadapiselect').empty();
+                    var str = "";
+                    str += "<option value='0'>--Select--</option>";
+                    $(response.records).each(function (i, v) {
+                        //str += "<div class='span2' onclick='InventoryGrid(&#39;" + v.Name + "&#39;)'>" + v.Name + "</div>";
+                        str += "<option value='" + v.Name + "'>" + v.Name + "</option>";
+                    });
+                    $('#loadapiselect').append(str);
+                }
+            },
+            error: function (response) {
+                alert("Error:" + response);
+            }
+        });
+    }
+
+    function SaveScientistProductDetails(id) {
+        var scStatus = $("#scientistStatus_" + id).val();
+        var batchcode1 = $("#batchcode1_" + id).val();
+        var qty1 = $("#qty1_" + id).val();
+        var batchcode2 = "";
+        var qty2 = "";
+        var esticompleteDate = $("#esticompleteDate_" + id).val();
+        $.ajax({
+            url: '/Form/UpdateScientistProjectInfo',
+            data: {
+                scStatus: scStatus,
+                batchcode1: batchcode1,
+                qty1: qty1,
+                batchcode2: batchcode2,
+                qty2: qty2,
+                id: id,
+                esticompleteDate:esticompleteDate
+            },
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have updated product information.");
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (scStatus === readytodeliverId) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+
+    function saveAll()
+    {
+        $('.clsSaverow').each(function () {
+                var id = $(this).val();
+                if ($(this).is(':checked')) {
+                    $.ajax({
+                        url: '/Form/UpdateRefStock?id=' + id + '&refstock=' + $("#RefStockPrice_"+id).val(),
+                        data: {},
+                        type: 'POST',
+                        success: function (data) {
+                            swal("Good job!", "You have updated ref. stock information.", "success");
+                            $('.clsSaverow').prop('checked',false);
+                        }
+                    });
+                }
+        });
+    }
+</script>
+
+<style type="text/css">
+    .letter {
+        float: left;
+        padding: 10px 14px;
+        background: #3c8dbc;
+        margin: 5px 10px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .letter:hover, .letter-active {
+            background: #2d729a;
+        }
+</style>

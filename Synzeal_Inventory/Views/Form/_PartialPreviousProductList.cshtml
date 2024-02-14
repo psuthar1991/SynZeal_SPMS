@@ -1,0 +1,664 @@
+﻿@model List<Synzeal_Inventory.Entity.SZ_QuotationDetail>
+@{
+    var catno = string.Empty;
+    if (Model.Count > 0)
+    {
+        catno = Model[0].CATNo;
+    }
+    var isapi = Convert.ToBoolean(ViewBag.isApi);
+    string currentquotedetailsprice = string.Empty;
+    if (ViewBag.CurrentQuoteDetailsPrice != null)
+    {
+        currentquotedetailsprice = Convert.ToString(ViewBag.CurrentQuoteDetailsPrice);
+    }
+}
+<script>
+
+    var yearList = [];
+    for (var i = 2018; i <= (new Date().getFullYear() - 2); i++) {
+        yearList.push(i);
+    }
+</script>
+<div class="row">
+    <div class="col-md-5">
+        <div style="background: #308720; border: 1px solid #ececec; font-size: 16px; height: 16px; width: 25px; float: left; margin: 6px 10px 0 50px;"></div>
+        <div style="float: left;font-size: 16px;margin-top: 5px;"> Recent Same Company</div>
+
+        <div style="background: blue; border: 1px solid #ececec; font-size: 16px; height: 16px; width: 25px; float: left; margin: 6px 10px 0 50px;"></div>
+        <div style="float: left;font-size: 16px;margin-top: 5px;"> Recent Other Company</div>
+
+        <div style="background: #dce7e8; border: 1px solid #ececec; font-size: 16px; height: 16px; width: 25px; float: left; margin: 6px 10px 0 50px; "></div>
+        <div style="float: left;font-size: 16px;margin-top: 5px;"> Recent Company Same Qty</div>
+        <input type="text" id="txtcomqty" name="txtcomqty" placeholder="QTY" style="width: 50px; margin-left: 25px;" />
+    </div>
+    <div class="form-group" style="margin-left:20px">
+        <b class="col-md-1" style="width:4%">Type : </b>
+        <select class="col-md-1" id="filtype" style="margin-top:2px;" onchange="$('#previousproducttable').DataTable().draw();" >
+            <option value="">All</option>
+            <option value="Domestic">Domestic</option>
+            <option value="Export">Export</option>
+        </select>
+        <b class="col-md-1" style="width: 6%; text-align: right">Company : </b>
+        <select class="col-md-1" id="filcompany" style="margin-top:2px;" onchange="$('#previousproducttable').DataTable().draw();">
+            <option value="">All</option>
+            @foreach (var k in Model.Select(x => x.SZ_Quotation.CompanyName).OrderBy(x => x).Distinct().ToList())
+            {
+                <option value="@k">@k</option>
+            }
+        </select>
+        <div class="col-md-1" style="width: 6%">
+            <b style="text-align:right">Show All?</b>
+            <input type="checkbox" id="chkShowall" onchange="$('#previousproducttable').DataTable().draw();" />
+        </div>
+        <div class="col-md-1" style=" width: 11%;">
+            <b style="text-align:right">Same Company Quote?</b>
+            <input type="checkbox" id="chkquotecomp" onchange="selectquotecompany();" />
+        </div>
+        <div class="col-md-1" style=" width: 5%;">
+            <b style="text-align:right">API?</b>
+            <input type="checkbox" id="chkisapi" onchange="apiQuoteHistrory('@catno');" />
+        </div>
+        <div class="col-md-1">
+            <b style="text-align:right">Indicative Price:</b><i class="fa fa-history" title="Suggested Price" onclick="GetSuggestedPrice()"></i>
+            <span id="txtsuggestedprice" style=" font-weight: 600; font-size: 16px;"></span>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(ViewBag.SynzealPrice))
+    {
+        <div class="col-md-12" style="text-align: center;margin-top: 0.5%; z-index: 999;">
+            <b style="font-size: 16px;"> <span style="color: #3c8dbc ">SynZeal Master Price : </span>@ViewBag.SynzealPrice</b>
+        </div>
+    }
+</div>
+<div class="box-body form-horizontal" id="profrm">
+    @if (!string.IsNullOrEmpty(ViewBag.ClientsuggestedComment))
+    {
+        <div class="col-md-12" style="color: #af7021; text-align: center ">
+            <b>Client suggested Comment: @ViewBag.ClientsuggestedComment</b>
+        </div>
+    }
+    @if (Model.Count > 0)
+    {
+        <table class="table table-bordered table-striped dataTable no-footer " id="previousproducttable">
+            <thead>
+                <tr>
+
+                    <th width="5%">
+                        Quote Date
+                    </th>
+                    <th width="7%">
+                        Quote Id
+                    </th>
+                    <th width="10%">
+                        Company Name
+                    </th>
+                    <th width="7%">
+                        PO No
+                    </th>
+                    <th width="15%">
+                        Product Name
+                    </th>
+                    <th width="5.5%">
+                        CAS No
+                    </th>
+                    <th width="5.5%">
+                        CAT No
+                    </th>
+                    <th width="20%">
+                        Price
+                        <input type="text" id="txtfltprice" style=" width: 150px; padding: 0px;" />
+                    </th>
+                    <th>
+                        Final Price
+                    </th>
+                    <th width="1%"></th>
+                    <th width="1%">PO Qty</th>
+                    <th width="4%">
+                        Lead Time
+                    </th>
+                    <th width="2%">
+                        Type
+                    </th>
+                    <th width="2%">
+                        Product Remark
+                    </th>
+                    <th width="3%">Location</th>
+                    <th width="3%">App. By</th>
+                    <th>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="tbodypreviousproduct">
+                @{
+                    DateTime lastoneyeardate = DateTime.Now.AddYears(-1);
+                    var latestSameCompanyData = Model.Where(x => x.SZ_Quotation.CompanyId == ViewBag.QuoteCompanyId).OrderByDescending(x => x.SZ_Quotation.CreatedDate).FirstOrDefault();
+                    var latestDiffCompanyData = Model.Where(x => x.SZ_Quotation.CompanyId != ViewBag.QuoteCompanyId).OrderByDescending(x => x.SZ_Quotation.CreatedDate).FirstOrDefault();
+                    bool setQtyRule = false;
+                    int loopcount = 0;
+                    //int threeUserCount = Model.OrderByDescending(x => x.CreatedDate).Take(3).Where(x => x.SZ_Quotation.UserDistType == "User").Count();
+                    //int threeNoMovedProjectCount = Model.OrderByDescending(x => x.CreatedDate).Take(3).Where(x => !string.IsNullOrEmpty(x.SZ_Quotation.PONo)).Count();
+                    //int fiveNoMovedProjectCount = Model.OrderByDescending(x => x.CreatedDate).Take(5).Where(x => !string.IsNullOrEmpty(x.SZ_Quotation.PONo)).Count();
+                }
+                @foreach (var k in Model)
+                {
+                    string isRedUser = "";
+                    string backgroundcls = "";
+                    string samecompanyhighlightcls = "";
+                    string othercompanyhighlightcls = "";
+                    string othercompanysameqtyhighlightcls = "";
+
+                    if (k.MoveToProject.HasValue && k.MoveToProject.Value && k.SZ_Quotation.PONo != null && !string.IsNullOrEmpty(k.SZ_Quotation.PONo.Trim()))
+                    {
+                        backgroundcls = "clsbgwhiteclass";
+                    }
+                    else
+                    {
+                        backgroundcls = "clsbggreyclass";
+                    }
+                    if (latestSameCompanyData != null && latestSameCompanyData.Id == k.Id)
+                    {
+                        samecompanyhighlightcls = "samecompanyhighlightcls";
+                    }
+                    if (latestDiffCompanyData != null && latestDiffCompanyData.Id == k.Id)
+                    {
+                        othercompanyhighlightcls = "othercompanyhighlightcls";
+                    }
+
+                    if (!string.IsNullOrEmpty(currentquotedetailsprice))
+                    {
+                        othercompanysameqtyhighlightcls = "";
+                        var priList = new List<string>();
+                        foreach (var pri in currentquotedetailsprice.Split(','))
+                        {
+                            priList.Add(pri.Trim().Split(' ')[0]);
+                        }
+
+                        if (!string.IsNullOrEmpty(k.Price))
+                        {
+                            foreach (var priitem in priList)
+                            {
+                                bool isValidQtyRule = k.Price.Contains(priitem + " mg@");
+                                if (isValidQtyRule && !setQtyRule)
+                                {
+                                    setQtyRule = true;
+                                    othercompanysameqtyhighlightcls = "othercompanysameqtyhighlightcls";
+                                }
+                            }
+                        }
+                    }
+                    loopcount += 1;
+
+                    if(k.CreatedDate >= lastoneyeardate)
+                    {
+                        isRedUser = "border: 2px solid black !important;";
+                    }
+                    //if (loopcount < 4)
+                    //{
+                    //    if (threeUserCount == 3)
+                    //    {
+                    //        isRedUser = "border: 1px solid red !important;";
+                    //    }
+                    //    if (threeNoMovedProjectCount == 3)
+                    //    {
+                    //        isRedUser = "border:1px solid orange !important;";
+                    //    }
+                    //    if (fiveNoMovedProjectCount == 3)
+                    //    {
+                    //        isRedUser = "border:1px solid blue !important;";
+                    //    }
+
+                    //}
+                    <tr id="tr_@k.Id" data-companyId="@k.SZ_Quotation.CompanyId" class="quoteHistory @backgroundcls @samecompanyhighlightcls @othercompanyhighlightcls" data-createdyear="@(k.SZ_Quotation.CreatedDate.HasValue ? k.SZ_Quotation.CreatedDate.Value.Year : 0)">
+                         <td style="@isRedUser">
+                            @if (k.SZ_Quotation.CreatedDate.HasValue)
+                            {
+                                @k.SZ_Quotation.CreatedDate.Value.ToShortDateString()
+                            }
+                        </td>
+                        <td style="@isRedUser">
+                            <input type="hidden" value="@k.SZ_Quotation.CountryType" />
+                            <a href="@Url.Action("Quote", "Form", new { id = k.QuoteId })" target="_blank"> @k.SZ_Quotation.Ref </a>
+                        </td>
+                        <td style="@isRedUser">@k.SZ_Quotation.CompanyName</td>
+                        <td style="@isRedUser">
+                            @if (k.MoveToProject.HasValue && k.MoveToProject.Value)
+                            {
+                                @k.SZ_Quotation.PONo
+                            }
+                        </td>
+                        <td style="@isRedUser"><label>@k.ProductName.Trim()</label> <input type="text" id="productname_@k.Id" value="@k.ProductName.Trim()" style="display:none;" /> </td>
+                        <td style="@isRedUser"><label>@k.CASNo</label> <input type="text" id="casno_@k.Id" value="@k.CASNo" style="display:none;" /> </td>
+                        <td style="@isRedUser"><label>@k.CATNo</label> <input type="text" id="catno_@k.Id" value="@k.CATNo" style="display:none;" /> </td>
+                        <td class="@othercompanysameqtyhighlightcls" style="@isRedUser">
+                            @if (!string.IsNullOrEmpty(k.Price))
+                            {
+                                var allprices = k.Price.Split(',');
+                                foreach (var prices in allprices)
+                                {
+                                    var pri = prices.Split('@');
+                                    if (pri.Count() > 1)
+                                    {
+                                        if (pri[1].Contains("X"))
+                                        {
+                                            var pripri = pri[1].Split('X');
+                                            @System.Text.RegularExpressions.Regex.Match(pri[0], @"\d+").Value <span> - </span>
+                                            @System.Text.RegularExpressions.Regex.Match(pripri[0], @"\d+").Value <span> X </span>
+                                            if (pripri[1].Contains('='))
+                                            {
+                                                @System.Text.RegularExpressions.Regex.Match(pripri[1].Split('=')[0], @"\d+").Value <span> = </span>
+                                                @System.Text.RegularExpressions.Regex.Match(pripri[1].Split('=')[1], @"\d+").Value
+                                            }
+                                            else
+                                            {
+                                                @pripri[1]
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <a href="javascript:void(0)" onclick="openselectcategoryprice(@System.Text.RegularExpressions.Regex.Match(pri[0], @"\d+").Value,@System.Text.RegularExpressions.Regex.Match(pri[1], @"\d+").Value,'@k.SZ_Quotation.CountryType')">
+                                                @System.Text.RegularExpressions.Regex.Match(pri[0], @"\d+").Value <span> - </span>
+                                                @System.Text.RegularExpressions.Regex.Match(pri[1], @"\d+").Value
+                                            </a>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @pri[0]
+                                    }
+                                    <span> | </span>
+                                }
+                            }
+                            <input type="text" id="price_@k.Id" value="@k.Price" style="display:none;" />
+                        </td>
+                        <td style="@isRedUser">
+                            <label>
+                                @if (!string.IsNullOrEmpty(k.FinalPrice))
+                                {
+                                    @k.FinalPrice
+                                }
+                            </label>
+                            <input type="text" id="finalprice_@k.Id" style="display:none;" value="@k.FinalPrice" />
+                        </td>
+                        <td style="@isRedUser">
+                            <button type="button" onclick="Quote.copyProduct('@k.Id')"><i class="fa fa-clipboard"></i></button>
+                            @if (ViewBag.QuoteId != null && ViewBag.QuoteId != 0)
+                            {
+                                <button type="button" onclick="Quote.addPreviousProduct('@k.Id')"><i class="fa fa-plus"></i></button>
+                            }
+                        </td>
+                        <td style="@isRedUser">
+                            @if (!string.IsNullOrEmpty(k.SZ_Quotation.PONo) && k.SZ_Quotation.PONo.Trim() != "")
+                            {
+                                @k.RequiredQty
+                            }
+                        </td>
+                        <td style="@isRedUser"> <label>@k.LeadTime</label> <input type="text" id="leadtime_@k.Id" value="@k.LeadTime" style="display:none;" /> </td>
+                        <td style="@isRedUser"><label>@k.SZ_Quotation.CountryType</label></td>
+                        <td style="@isRedUser">
+                            @if (!string.IsNullOrEmpty(k.ProductRemark))
+                            {
+                                <label>@k.ProductRemark <input type="hidden" id="ProductRemark_@k.Id" value="@k.ProductRemark" /> <i class="fa fa-clipboard" onclick="copymasterRecord('ProductRemark_@k.Id')"></i></label>
+                            }
+                        </td>
+                        <td style="@isRedUser">
+                            @if (k.SZ_Quotation.Auction.HasValue && k.SZ_Quotation.Auction.Value)
+                            {
+                                <label>Auction</label>
+                            }
+                            else if (k.SZ_Quotation.IsToBe.HasValue && k.SZ_Quotation.IsToBe.Value)
+                            {
+                                <label>@k.SZ_Quotation.UserDistType</label>
+                            }
+                            else if (k.SZ_Quotation.IsQuoteApproved.HasValue && k.SZ_Quotation.IsQuoteApproved.Value)
+                            {
+                                <label>Approved</label>
+                            }
+                            else if (k.ProStatus == Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProStatusDDL.TempHold))
+                            {
+                                <label>Hold</label>
+                            }
+                            else if (k.SZ_Quotation.IsPark.HasValue && k.SZ_Quotation.IsPark.Value)
+                            {
+                                <label>Park</label>
+                            }
+                            else if (k.IsOnHold == true)
+                            {
+                                <label>Cancelled</label>
+                            }
+                            else if (k.MoveToInvoice == true)
+                            {
+                                <label>Invoice</label>
+                            }
+                            else if (k.MoveToDispatch == true)
+                            {
+                                <label>Dispatch</label>
+                            }
+                            else if (k.MoveToProject == true)
+                            {
+                                <label>Project</label>
+                            }
+                            else
+                            {
+                                <label>All</label>
+                            }
+                        </td>
+                        <td style="@isRedUser">
+                            @if (k.ProductId.HasValue)
+                            {
+                                @k.SZ_Quotation.ApprovedBy
+                            }
+                        </td>
+                        <td>
+                            <input type="checkbox" value="@k.Id" class="clsprepro" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <script>
+            if ('@isapi' === 'True') {
+                $('#chkisapi').attr('checked', true);
+            }
+            function apiQuoteHistrory(catNo) {
+                if ($('#chkisapi').is(":checked")) {
+                    Quote.getPreviousInfoFromDB(true, catNo);
+                }
+                else {
+                   // Quote.getPreviousInfoFromDB(false, catNo);
+                    Quote.getPreviousQuoteInformationByCatNo(suggestedPriceSearchValue, '', $("#QuoteId").val(), suggestedquotedetailsid);
+                }
+            }
+            jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+                "extract-date-pre": function (value) {
+                    var date = value.split('/');
+                    return Date.parse(date[1] + '/' + date[0] + '/' + date[2])
+                },
+                "extract-date-asc": function (a, b) {
+                    return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+                },
+                "extract-date-desc": function (a, b) {
+                    return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+                }
+            });
+            /* Custom filtering function which will search data in column four between two values */
+            $.fn.dataTable.ext.search.push(
+                function (settings, data, dataIndex) {
+                    var filtype = $('#filtype').val();
+                    var filcompany = $('#filcompany').val();
+                    var type = data[12];
+                    var company = data[2];
+
+                    var isprocess = false;
+                    if (filtype == "" && filcompany == "") {
+                        isprocess = true;
+                    }
+                    if (filtype !== "" && filcompany !== "" && filtype == type && company == filcompany) {
+                        isprocess = true;
+                    }
+                    if (filtype !== "" && filcompany === "" && filtype == type) {
+                        isprocess = true;
+                    }
+                    if (filtype == "" && filcompany !== "" && company == filcompany) {
+                        isprocess = true;
+                    }
+
+                    if ($("#chkShowall").is(":checked")) {
+                        var d = data[0].toString().trim().split('/');
+                        var f = new Date(d[2], d[1] - 1, d[0])
+                        var year = parseInt(d[2]);
+                        /*if (year == 2018 || year == 2019) {*/
+                        if (yearList.indexOf(year) !== -1) {
+                            $(this).css('display', '');
+                        }
+                    }
+                    else {
+                        var d = data[0].toString().trim().split('/');
+                        var f = new Date(d[2], d[1] - 1, d[0])
+                        var year = parseInt(d[2]);
+                        /* if (year == 2018 || year == 2019) {*/
+                        if (yearList.indexOf(year) !== -1) {
+                            isprocess = false;
+                        }
+                    }
+                    $('.quoteHistory').each(function () {
+                        var compId = $("#CompanyId").val();
+                        var attrcompId = $(this).attr('data-companyId');
+                        if (compId === attrcompId) {
+                            /*$(this).css('background', '#d0e9f3');*/
+                            $(this).attr('style', 'background: #d0e9f3 !important');
+                        }
+                    });
+
+
+                    return isprocess;
+                }
+            );
+
+            var table = $("#previousproducttable").DataTable({
+                "order": [],
+                "pageLength": 25,
+                "columnDefs": [{
+                    type: 'extract-date',
+                    targets: [0]
+                }]
+            });
+            //setTimeout(function () {
+            //    selectquotecompany();
+            //}, 1000);
+            
+        </script>
+    }
+    else
+    {
+        <div style="text-align: center;color: lightgray;font-size: 36px;">
+            <i class="fa fa-database" style="font-size:120px;"></i> <br />No Products Found!!!
+        </div>
+    }
+</div>
+<style type="text/css">
+
+    .clsbgwhiteclass {
+        background-color: #fff !important;
+    }
+
+    .clsbggreyclass {
+        background-color: #f5f5f5 !important;
+    }
+
+    .samecompanyhighlightcls, .samecompanyhighlightcls a, .samecompanyhighlightcls label {
+        color: #3f8133;
+        font-weight: bold !important;
+    }
+
+    .othercompanyhighlightcls, .othercompanyhighlightcls a, .othercompanyhighlightcls label {
+        color: #6161da;
+        font-weight: bold !important;
+    }
+
+    /*.samecompanyhighlightcls .othercompanysameqtyhighlightcls, .samecompanyhighlightcls .othercompanysameqtyhighlightcls a,
+        .othercompanyhighlightcls .othercompanysameqtyhighlightcls, .othercompanyhighlightcls .othercompanysameqtyhighlightcls a{
+            background-color: #dce7e8 !important;
+        }*/
+
+    .othercompanysameqtyhighlightcls, .othercompanysameqtyhighlightcls a {
+        background-color: #dce7e8 !important;
+    }
+</style>
+<script type="text/javascript">
+    function selectquotecompany() {
+        $("#filcompany").val('');
+        if ($('#chkquotecomp').is(':checked')) {
+            var text = $("#CompanyId option:selected").text();
+            if (text !== '') {
+                text = text.trim();
+                text = text.substring(0, text.indexOf('(')).trim();
+            }
+            var exists = false;
+            $('#filcompany option').each(function () {
+                if (this.value !== '') {
+                    this.value = this.value.trim();
+                }
+                if (this.value == text) {
+                    exists = true;
+                    return false;
+                }
+            });
+            if (exists) {
+                $("#filcompany").val(text);
+                $('#previousproducttable').DataTable().draw();
+            }
+            else {
+                toastr.error("Company quote history not available.");
+            }
+        }
+        else {
+            $('#previousproducttable').DataTable().draw();
+        }
+    }
+
+    $("#chkShowall").change(function () {
+    });
+
+    $('.quoteHistory').each(function () {
+        var compId = $("#CompanyId").val();
+        var attrcompId = $(this).attr('data-companyId');
+        if (compId === attrcompId) {
+            $(this).css('background', '#d0e9f3');
+        }
+
+        var year = $(this).attr('data-createdyear');
+        if (yearList.indexOf(year) !== -1) {
+            $(this).css('display', 'none');
+        }
+    });
+
+
+    function filteractionpreviousproduct() {
+        $("#previousproducttable").find("tr").show();
+        var input = document.getElementById("myInput");
+        var compvalue = $("#filcompany").val().toLowerCase();
+        var typevalue = $("#filtype").val().toLowerCase();
+        var table = document.getElementById("tbodypreviousproduct");
+        var tr = table.getElementsByTagName("tr");
+
+        for (var i = 0; i < tr.length; i++) {
+            var showall = $("#chkShowall").is(":checked");
+            if (showall) {
+                var recordfetch = false;
+                // if both has value
+                if (compvalue !== "" && typevalue !== "") {
+
+                    if (tr[i].children[2].innerText.toLowerCase() === compvalue && tr[i].children[11].innerText.toLowerCase() === typevalue) {
+                        tr[i].style.display = "";
+                        recordfetch = true;
+                    }
+                }
+                else {
+                    if (compvalue !== "" && tr[i].children[2].innerText.toLowerCase() === compvalue) {
+                        tr[i].style.display = "";
+                        recordfetch = true;
+                    }
+                    if (typevalue !== "" && tr[i].children[11].innerText.toLowerCase() === typevalue) {
+                        tr[i].style.display = "";
+                        recordfetch = true;
+                    }
+                }
+
+                if (typevalue === "" && compvalue === "") {
+                    tr[i].style.display = "";
+                    recordfetch = true;
+                }
+                if (!recordfetch) {
+                    tr[i].style.display = "none";
+                }
+            }
+            else {
+
+                var year = tr[i].dataset.createdyear;
+                /*if (year == 2018 || year == 2019) {*/
+                if (yearList.indexOf(year) !== -1) {
+                    tr[i].style.display = "none";
+                }
+                else {
+                    var recordfetch = false;
+                    // if both has value
+                    if (compvalue !== "" && typevalue !== "") {
+
+                        if (tr[i].children[2].innerText.toLowerCase() === compvalue && tr[i].children[11].innerText.toLowerCase() === typevalue) {
+                            tr[i].style.display = "";
+                            recordfetch = true;
+                        }
+                    }
+                    else {
+                        if (compvalue !== "" && tr[i].children[2].innerText.toLowerCase() === compvalue) {
+                            tr[i].style.display = "";
+                            recordfetch = true;
+                        }
+                        if (typevalue !== "" && tr[i].children[11].innerText.toLowerCase() === typevalue) {
+                            tr[i].style.display = "";
+                            recordfetch = true;
+                        }
+                    }
+
+                    if (typevalue === "" && compvalue === "") {
+                        tr[i].style.display = "";
+                        recordfetch = true;
+                    }
+                    if (!recordfetch) {
+                        tr[i].style.display = "none";
+                    }
+
+
+                    //if (compvalue !== "" && tr[i].textContent.toLowerCase().indexOf(compvalue) > -1) {
+                    //    tr[i].style.display = "";
+                    //}
+                    //else if (typevalue !== "" && tr[i].textContent.toLowerCase().indexOf(typevalue) > -1) {
+                    //    tr[i].style.display = "";
+                    //}
+                    //else if (typevalue === "" && compvalue === "") {
+                    //    tr[i].style.display = "";
+                    //}
+                    //else {
+                    //    tr[i].style.display = "none";
+                    //}
+                }
+            }
+        }
+
+        $('.quoteHistory').each(function () {
+            var compId = $("#CompanyId").val();
+            var attrcompId = $(this).attr('data-companyId');
+            if (compId === attrcompId) {
+                $(this).css('background', '#d0e9f3 !important');
+            }
+        });
+    }
+
+
+    $(document).on("keyup", '#txtcomqty', function () {
+        var value = $(this).val();
+        $(".quoteHistory").each(function (i, v) {
+            var test = 0;
+            var values = v.children[7].innerText;
+            if (values.indexOf("|") !== -1) {
+                var arr = values.split("|");
+                $(arr).each(function (i, k) {
+                    var mg = k.split('-')[0].trim();
+                    if (mg == value) {
+                        test = 1;
+                    }
+                });
+            }
+            else {
+                test = 0;
+            }
+            if (test === 1) {
+                $(this).css('display', '');
+            }
+            else {
+                $(this).css('display', 'none');
+            }
+        });
+    }); 
+</script>

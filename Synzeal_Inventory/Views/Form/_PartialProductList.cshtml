@@ -1,0 +1,404 @@
+﻿@model List<Synzeal_Inventory.Entity.SZ_QuotationDetail>
+@using Synzeal_Inventory.Entity;
+@{
+    int loopCnt = 1;
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    string synthesis = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProjectType.Synthesis);
+    string pursynthesis = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProjectType.PurSynthesis);
+    string purchase = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProjectType.Purchase);
+    var duplicates = Model.GroupBy(s => s.CATNo).SelectMany(grp => grp.Skip(1));
+
+    var isHistoryLayout = false;
+    if (ViewBag.isHistoryLayout != null)
+    {
+        isHistoryLayout = Convert.ToBoolean(ViewBag.isHistoryLayout);
+    }
+}
+<style type="text/css">
+</style>
+<div class="box-body form-horizontal" id="profrm" style="overflow:scroll">
+    @if (Model.Count > 0)
+    {
+        if (ViewBag.Layout == "Custom")
+        {
+            <div class="fc-title">
+                <h5>
+                    <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Copyrecords('tblalready')">Copy</a>
+                    <input type="button" value="Delete All" class="btn btn-warning" onclick="deleteallalreadyProduct()" style="float: right;margin-bottom: 5px;margin-right:10px" />
+                    <input type="button" class="btn btn-success" value="Save All" onclick="saveallalreadyProduct(false)" style="float: right;margin-bottom: 5px;margin-right:10px" />
+                </h5>
+            </div>
+            <table class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+                <thead>
+                    <tr>
+                        <th width="1%">
+                            <input type="checkbox" id="chksaveallalready" />
+                        </th>
+                        <th width="1%">
+                            <input type="checkbox" id="chksynthesisallalready" />
+                        </th>
+                        <th width="1%">
+                            #
+                        </th>
+                        <th width="18%">
+                            Product Name
+                        </th>
+                        <th width="7%">
+                            CAS No
+                        </th>
+                        <th width="7%">
+                            CAT No
+                        </th>
+                        <th width="16.5%">
+                            Price
+                        </th>
+                        <th width="6%">
+                            Lead Time
+                        </th>
+                        <th width="10%">
+                            Product Remark
+                        </th>
+                        <th>
+                            Final Price
+                        </th>
+                        <th></th>
+                        <th width="5%">
+                            Batch / Qty
+                        </th>
+                        <th width="1%"></th>
+                        <th width="1%"></th>
+                        <th width="3%">
+                            Display
+                        </th>
+                        <th width="3%">
+                            PO/Quotation
+                        </th>
+                        <th width="3%">
+                            EDD
+                        </th>
+                        <th width="1%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var k in Model)
+                    {
+                        var quotePrice = db.Products.Where(x => x.Id == k.ProductId).Select(x => x.QuotePrice).FirstOrDefault();
+                        var query = db.SZ_QueryModule.Where(x => x.CATNo == k.CATNo).Count();
+                        var isAvailableProductDetails = new List<SZ_QuotationDetail>();
+                        if (!string.IsNullOrEmpty(k.CATNo) && k.CATNo != "na" && k.CATNo != "NA" && k.CATNo != "N/A")
+                        {
+                            isAvailableProductDetails = db.SZ_QuotationDetail.Where(x => x.ProductId == k.ProductId && x.Id != k.Id
+                            && x.MoveToProject == true && (x.MoveToDispatch == false || x.MoveToDispatch == null) && string.IsNullOrEmpty(x.TrackingNo)
+                            && (x.ProjectType == synthesis || x.ProjectType == pursynthesis || x.ProjectType == purchase)).ToList();
+                        }
+                        string titletag = "";
+                        string clsname = "";
+                        if (isAvailableProductDetails.Count > 0)
+                        {
+                            titletag = "PO No: ";
+                            foreach (var item in isAvailableProductDetails)
+                            {
+                                titletag += item.SZ_Quotation.PONo + "(" + item.SZ_Quotation.CompanyName + ", " + item.RequiredQty + "), ";
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(quotePrice))
+                        {
+                            clsname = "lightred";
+                        }
+                        string dupliccls = duplicates.Any(x => x.CATNo == k.CATNo) ? "clsorange" : "";
+                        <tr id="tr_@k.Id" data-quoteid="@k.QuoteId" data-id="@k.Id">
+                            <td class="@dupliccls"><input type="checkbox" class="delclass" value="@k.Id" /> </td>
+                            <td>
+                                <label>
+                                    @if (k.IsSynthesisLog.HasValue && k.IsSynthesisLog.Value)
+                                    {
+                                        <i class="fa fa-check-square" style="color:lightseagreen"></i>
+                                    }
+                                </label> <input type="checkbox" class="clssynthesislog" id="synthesislog_@k.Id" name="synthesislog_@k.Id" style="display: none;" data-value="@k.IsSynthesisLog" />
+                            </td>
+                            <td>@loopCnt</td>
+                            <td><label>@k.ProductName</label> <input type="text" id="productname_@k.Id" value="@k.ProductName" style="display: none;" title="@k.ProductName" /> </td>
+                            <td><label>@k.CASNo</label> <input type="text" id="casno_@k.Id" value="@k.CASNo" style="display: none; " title="@k.CASNo" /> </td>
+                            <td class="@clsname">
+                                <label>
+                                    @k.CATNo
+                                </label> <span>
+                                    <input type="text" id="catno_@k.Id" value="@k.CATNo" style="display: none;width: 80%; " class="tempCatNo" onkeyup="changeCatNo(@k.Id)" />
+                                    @if (query != 0)
+                                    {
+                                        <i class="clstooltip fa fa-info" title="Already Generated Query."></i>
+                                    }
+                                    @if (!string.IsNullOrEmpty(titletag))
+                                    {
+                                        <i class="clstooltip fa fa-info-circle" title="@Html.Raw(titletag)" style="float:right" onclick="showpopupInfo('@k.ProductId', '@k.Id')"></i>
+                                    }
+                                    @if (!string.IsNullOrEmpty(k.CATNo))
+                                    {
+                                        <i class="clstooltip fa fa-pencil" style="float:right;margin-top: 5px;" onclick="AllQuotePrice('@k.ProductId')"></i>
+                                    }
+                                </span>
+                            </td>
+                            <td><label style="width: 200px;">@k.Price</label> <input type="text" class="clsalreadyprice" id="price_@k.Id" value="@k.Price" style="display: none;" /> </td>
+                            <td><label>@k.LeadTime</label> <input type="text" class="clstblleadtime" id="leadtime_@k.Id" value="@k.LeadTime" style="display: none;" title="@k.LeadTime" /> </td>
+                            <td><label>@k.ProductRemark</label> <input type="text" id="productremark_@k.Id" value="@k.ProductRemark" style="display: none;" title="@k.ProductRemark" /> </td>
+                            <td><label style="width: 200px;">@k.FinalPrice</label> <input type="text" id="finalprice_@k.Id" value="@k.FinalPrice" style="display: none;" /> </td>
+                            <td>
+                                <input type="text" id="discount_@k.Id" value="@k.ItemDiscount" />
+                            </td>
+                            <td>
+                                <select id="batchno_@k.Id" class="clspartiallistbatchnos">
+                                    @if (TempData["BatchNo_" + k.ProductId] != null)
+                                    {
+                                        string[] bno = TempData["BatchNo_" + k.ProductId].ToString().Split(',');
+                                        if (bno.Length == 1 && bno[0] == "")
+                                        {
+                                            <option value="0">No Data</option>
+                                        }
+                                        else
+                                        {
+                                            int batchloop = 1;
+                                            bool selected = false;
+                                            if (k.QuoteBatchNo == "0")
+                                            {
+                                                selected = true;
+                                                <option value="0" selected>--Select--</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="0">--Select--</option>
+                                            }
+
+                                            foreach (var b in bno)
+                                            {
+
+                                                if (!string.IsNullOrEmpty(k.QuoteBatchNo) && b.Trim().StartsWith(k.QuoteBatchNo.Trim()))
+                                                {
+
+                                                    selected = true;
+                                                    <option selected value="@b.Trim()">@b.Trim()</option>
+                                                }
+                                                else
+                                                {
+                                                    if (batchloop == bno.Count())
+                                                    {
+                                                        if (selected)
+                                                        {
+                                                            <option value="@b.Trim()">@b.Trim()</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option selected value="@b.Trim()">@b.Trim()</option>
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+
+                                                        <option value="@b.Trim()">@b.Trim()</option>
+
+                                                    }
+                                                }
+                                                batchloop += 1;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="0">No Data</option>
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                @if (k.ProductId.HasValue)
+                                {
+                                    <i class="fa fa-clone" title="Move to Re-Test" onclick="GetAllBatchNo('@k.ProductId')"></i>
+                                }
+                            </td>
+                            <td>
+                              <a style="color:#000" href="javascript:void(0)" onclick="Quote.getPreviousQuoteInformationByCatNo('@k.CATNo', '@k.CASNo', '@k.QuoteId', '0', '@k.ProductId')">
+                                    <i class="fa fa-cube" title="Get Details"></i>
+                                </a>
+                            </td>
+                            <td><label>@k.DisplayOrder</label> <input type="text" id="displayorder_@k.Id" value="@k.DisplayOrder" style="display: none; " /> </td>
+
+                            <td>
+                                @if (!string.IsNullOrEmpty(k.CATNo))
+                                {
+                                    @TempData["WithPO_" + k.Id]<span>/</span>@TempData["WithoutPO_" + k.Id] 
+                                }
+                            </td>
+
+                            <td>
+                                <label>
+                                    @if (k.EstimateDispatchDate.HasValue)
+                                    {
+                                        @k.EstimateDispatchDate.Value.ToShortDateString()
+                                    }
+                                </label> <input type="text" id="estimateDispatchDate_@k.Id" class="estdiscls" data-value="@k.EstimateDispatchDate" style="display: none;" />
+                            </td>
+                            <td>
+                                <i class="fa fa-history" title="Check Log" onclick="GetAuditLogForQuoteDetail('@k.Id')"></i>
+                            </td>
+                        </tr>
+                        loopCnt += 1;
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            if (isHistoryLayout)
+            {
+                @Html.Partial("_PartialStandardHistoryLayout", Model)
+            }
+            else
+            {
+                @Html.Partial("_PartialNewStandardLayout", Model)
+            }
+        }
+    }
+    else
+    {
+        <div style="text-align: center;color: lightgray;font-size: 36px;">
+            <i class="fa fa-database" style="font-size:120px;"></i> <br />No Products Found!!!
+        </div>
+    }
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.estdiscls').datepicker({
+            format: 'dd/mm/yyyy'
+        });
+
+        $('.estdiscls').each(function () {
+            var dateValue = $(this).attr('data-value');
+            if (dateValue !== '') {
+                dateValue = dateValue.toString().replace(' 00:00:00', '');
+                $(this).datepicker("setDate", dateValue);
+            }
+        });
+        $('.clssynthesislog').each(function () {
+            var dateValue = $(this).attr('data-value');
+            if (dateValue === "True") {
+                $(this).attr('checked', true);
+            }
+        });
+
+        $('.clscontrolledsubstanceproduct').each(function () {
+            var dateValue = $(this).attr('data-value');
+            if (dateValue === "True") {
+                $(this).attr('checked', true);
+            }
+        }); 
+
+        editallalreadyProduct();
+    });
+
+    $("#chksaveallalready").click(function () {
+        if ($(this).is(":checked")) {
+            $("#tblalready").find('.delclass').each(function () {
+                $(this).prop("checked", true);
+            });
+        }
+        else {
+            $("#tblalready").find(".delclass").each(function () {
+                $(this).prop("checked", false);
+            });
+        }
+    });
+
+    $("#chksynthesisallalready").click(function () {
+        if ($(this).is(":checked")) {
+            $("#tblalready").find('.clssynthesislog').each(function () {
+                $(this).prop("checked", true);
+            });
+        }
+        else {
+            $("#tblalready").find(".clssynthesislog").each(function () {
+                $(this).prop("checked", false);
+            });
+        }
+    });
+
+    function EditProductDetails(id) {
+        $("#edit_" + id).hide();
+        $("#save_" + id).show();
+        $("#tr_" + id).find("label").hide();
+        $("#tr_" + id).find("input").show();
+    }
+    var typingTimer;                //timer identifier
+    var doneTypingInterval = 2000;
+    var tempId = 0;
+    function changeCatNo(id) {
+        tempId = id;
+        clearTimeout(typingTimer);
+        $("#batchno_" + tempId).html('<option value="0">Loading</option>');
+        typingTimer = setTimeout(doneTyping, doneTypingInterval);
+
+    }
+    function doneTyping() {
+        //do something
+        $.ajax({
+            url: '/Form/FindBatchNoDetailsByCatNo?catNo=' + $("#catno_" + tempId).val(),
+            data: {},
+            type: 'GET',
+            async: true,
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                var str = '<option value="0">--Select--</option>';
+                var batchlst = data.split(',');
+                $(batchlst).each(function (i, v) {
+                    str += '<option value="' + v + '">' + v + '</option>';
+                })
+
+                $("#batchno_" + tempId).html(str);
+            }
+        });
+    }
+
+    function SaveProductDetails(id, quoteId) {
+        var productname = $("#productname_" + id).val();
+        var price = $("#price_" + id).val();
+        var finalprice = $("#finalprice_" + id).val();
+        var casno = $("#casno_" + id).val();
+        var catno = $("#catno_" + id).val();
+        var leadtime = $("#leadtime_" + id).val();
+        var displayorder = $("#displayorder_" + id).val();
+        var productremark = $("#productremark_" + id).val();
+        var estimateDispatchDate = $("#estimateDispatchDate_" + id).val();
+        var synthesislog = $("#synthesislog_" + id).is(':checked');
+        var obj = {
+            ProductName: productname,
+            casno: casno,
+            catNo: catno,
+            price: price,
+            finalprice: finalprice,
+            leadtime: leadtime,
+            displayOrder: displayorder,
+            productremark: productremark,
+            estimateDispatchDate: estimateDispatchDate,
+            id: id,
+            synthesislog: synthesislog,
+            actionname: 'partialproductupdate'
+        };
+
+        $.ajax({
+            url: '/Form/UpdateProductInfo',
+            //url: '/Form/UpdateProductInfo?ProductName=' + productname + '&casno=' + casno + '&catNo=' + catno + '&price=' + price.toString() + '&leadtime=' + leadtime + '&id=' + id,
+            data: JSON.stringify({ model: obj }),
+            type: 'POST',
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                if (data.success) {
+                    Quote.getProductListForQuote(quoteId);
+                    //window.location.href = "/Form/Quotation/" + quoteId;
+                }
+            }
+        });
+    }
+</script>
+<style>
+    .clsorange {
+        background: #f39c12;
+    }
+</style>

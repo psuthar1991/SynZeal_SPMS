@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "GetInfo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section class="content-header">
+    <h1>
+        Get Info
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-4">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <h2> Computer IP : </h2> @Html.Raw(ViewBag.GetCompIp)
+            </div>
+            <div class="box box-primary">
+                <h2> Computer Internet IP : </h2>  @Html.Raw(ViewBag.GetCompInternetIp)
+            </div>
+            <div class="box box-primary">
+                <h2> Computer MAC Address : </h2>  @Html.Raw(ViewBag.GetMACAddress)
+            </div>
+        </div>
+    </div>
+</section>

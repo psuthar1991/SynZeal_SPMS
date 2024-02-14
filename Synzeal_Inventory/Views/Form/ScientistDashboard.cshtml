@@ -1,0 +1,163 @@
+﻿@{
+    ViewBag.Title = "Scientist Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<Synzeal_Inventory.Models.ScientistModel>
+<section class="content-header">
+    <h1>
+        Scientist's dashboard <a href="/Form/Dashboard" class="btn btn-primary" style="float:right">Go to Dashboard</a>
+    </h1>
+</section>
+<script src="~/Content/bower_components/chart.js/Chart.min.js"></script>
+<section class="content">
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-6">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                
+                <!-- /.box-header -->
+                <!-- form start -->
+                <form role="form">
+                    <div class="box-body">
+                        <div style="margin-bottom:10px">
+                            <div class="col-md-3">
+                                <label>Year: </label>
+                                @Html.DropDownList("filterYear", (IEnumerable<SelectListItem>)ViewBag.YearItems, null, new { @class = "form-control" })
+                            </div>
+                            <div class="col-md-3">
+                                <label>Month: </label>
+                                @Html.DropDownList("filterMonth", (IEnumerable<SelectListItem>)ViewBag.MonthItems, null, new { @class = "form-control" })
+                            </div>
+                            <div class="col-md-3">
+                                <input type="button" class="btn btn-primary" value="Search" onclick="$('#alltbl').DataTable().draw()" style="margin-top: 26px" />
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <table id="alltbl" class="table table-bordered table-striped" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Team leader</th>
+                                    <th>A</th>
+                                    <th>B</th>
+                                    <th>C</th>
+                                    <th>D</th>
+                                    <th>E</th>
+                                    <th>Products</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="box box-primary">
+                <canvas id="chart-area" height="500" style="width:100%"></canvas>
+            </div>
+        </div>
+    </div>
+    <!-- /.row -->
+</section>
+<script type="text/javascript">
+    var myPie;
+    var myPieScienDashboardLoad = false;
+    $(function () {
+
+        var alltbl = $('#alltbl').DataTable({
+            "ordering": false,
+            "scrollX": true,
+            "scrollY": "550px",
+            //"autoWidth" : false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "pageLength": 25,
+
+            "fnDrawCallback": function (oSettings) {
+
+                var chartdata = [];
+                var chartColor = [];
+                var chartlabel = [];
+
+                $(oSettings.aoData).each(function (i, v) {
+                    chartlabel.push(v._aData.ScientistName);
+                    chartdata.push(v._aData.TotalProduct);
+                    chartColor.push(getRandomColor());
+                });
+                var randomScalingFactor = function () {
+                    return Math.round(Math.random() * 100);
+                };
+
+                var datasetchartdata = [];
+                datasetchartdata.push({
+                    data: chartdata,
+                    backgroundColor: chartColor,
+                    label: 'Scientist Dashboard'
+                });
+                var config = {
+                    type: 'pie',
+                    data: {
+                        datasets: datasetchartdata,
+                        labels: chartlabel
+                    },
+                    options: {
+                        responsive: true
+                    }
+                };
+                var ctx = document.getElementById('chart-area').getContext('2d');
+                if (!myPieScienDashboardLoad) {
+                    myPieScienDashboardLoad = true;
+                    myPie = new Chart(ctx, config);
+                }
+                else {
+                    myPie.data.labels = chartlabel;
+                    myPie.data.datasets = datasetchartdata;
+                    myPie.update();
+                }
+            },
+            "columnDefs":
+                [
+
+                ],
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "initComplete": function (settings, json) {
+
+            },
+            "ajax": {
+                "url": "../Form/LoadScientistDashboard",
+                "type": "POST",
+                "datatype": "json",
+                "data": function (d) {
+                    d.filterYear = $("#filterYear").val();
+                    d.filterWeek = $("#filterWeek").val();
+                    d.filterMonth = $("#filterMonth").val();
+                }
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                $("td:first", nRow).html(iDisplayIndex + 1);
+                return nRow;
+            },
+
+            "createdRow": function (row, data, dataIndex) {
+
+            },
+            "columns": [
+                { "data": null },
+                { "data": "ScientistName" },
+                { "data": "A" },
+                { "data": "B" },
+                { "data": "C" },
+                { "data": "D" },
+                { "data": "E" },
+                { "data": "TotalProduct" },
+                { "data": "ActionRow" }
+            ]
+
+        });
+
+    });
+
+</script>

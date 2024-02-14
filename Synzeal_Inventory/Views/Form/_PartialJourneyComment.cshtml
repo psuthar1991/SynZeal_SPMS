@@ -1,0 +1,34 @@
+﻿@model  Synzeal_Inventory.Entity.SZ_QuotationDetail
+@{
+    ViewBag.Title = "Company";
+    Layout = null;
+    string sectionName = ViewBag.sectionName;
+
+}
+<div class="col-md-12">
+    <div class="box">
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body">
+                 <div class="form-group">
+                     <label for="exampleInputEmail1">Journey Comment</label>
+                    <textarea class="form-control" id="JourneyCommentText" name="JourneyCommentText" rows="25" value="@Model.JourneyComment"></textarea>
+                    <input type="hidden" id="JourneyCommentid" name="JourneyCommentid" value="@Model.Id" />
+                </div>
+                <div class="form-group" style="text-align: right">
+                    <button type="button" onclick="Quote.addJourneyComment()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.JourneyComment))
+{
+    <text>
+        <script type="text/javascript">
+            var test = $("#JourneyCommentText").attr('value');
+            document.getElementById("JourneyCommentText").value = test;
+        </script>
+    </text>
+}

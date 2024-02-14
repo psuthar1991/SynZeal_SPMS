@@ -1,0 +1,192 @@
+﻿@{
+    ViewBag.Title = "Bug";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model SZ_Bug
+@using Synzeal_Inventory.Entity
+@using Synzeal_Inventory.Models
+
+<section class="content-header">
+    <h1>
+        Bug Form
+        <a class="btn btn-primary" style="float:right" href="/Form/BugList">Back</a>
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <!-- form start -->
+                <form role="form" id="makeform" enctype="multipart/form-data">
+                    <div class="box-body">
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">Ticket # :</label>
+                            <input type="text" class="form-control" id="BugNo" name="BugNo" placeholder="Request Date" readonly value="@Model.BugNo">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+                            <label for="exampleInputEmail1">Subject :</label>
+                            <input type="text" class="form-control" id="Subject" name="Subject" placeholder="Subject" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">URL :</label>
+                            <input type="text" class="form-control" id="URL" name="URL" placeholder="URL">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">Name:</label>
+                            <input type="text" class="form-control" id="Name" name="Name" placeholder="Name" readonly value="@Synzeal_Inventory.Models.SessionCookieManagement.UserName">
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <label for="exampleInputEmail1">Description :</label>
+                            <textarea class="form-control" id="Description" rows="10" style="width:100%" name="Description" placeholder="Description">
+
+                            </textarea>
+                            <input type="hidden" id="hdnDescription" value="@Model.Description" />
+
+                        </div>
+                        <div>
+                            <div class="form-group col-md-3">
+                                <label>Attachment</label>
+                                <input type="file" id="SolutionAttachment" name="SolutionAttachment" multiple />
+
+                                @if (SessionCookieManagement.UserEmail == "parthsuthar2010@gmail.com")
+                                {
+                                    if (!string.IsNullOrEmpty(Model.Attachment))
+                                    {
+                                        <a href="@Url.Content(Model.Attachment.Replace("..","~").Replace(",",""))" download class="btn btn-primary">Download</a>
+                                    }
+                                }
+
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="exampleInputPassword1">Contact No:</label>
+                                <input type="text" class="form-control" id="ContactUs" name="ContactUs" placeholder="Contact Number" />
+                            </div>
+                            @if (SessionCookieManagement.UserEmail == "parthsuthar2010@gmail.com")
+                            {
+                                <div class="form-group col-md-3">
+                                    <label for="exampleInputPassword1">Status</label>
+                                    <select id="Status" name="Status" class="form-control">
+                                        <option value="OPEN">OPEN</option>
+                                        <option value="IN PROCESS">IN PROCESS</option>
+                                        <option value="HOLD">HOLD</option>
+                                        <option value="CLOSED">CLOSED</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-3">
+                                    <label for="exampleInputPassword1">Est. Date:</label>
+                                    <input type="text" data-value="@Model.EstDate" class="form-control" id="EstDate" name="EstDate" />
+                                </div>
+                            }
+                        </div>
+                        <div class="clear"></div>
+                         
+                        @if (SessionCookieManagement.UserEmail != "parthsuthar2010@gmail.com" || Model.Status != "CLOSED")
+                        {
+                            <div class="col-md-12 col-sm-12">
+                                <div class="submit-button">
+                                    <br />
+                                    <input type="button" id="btnsave" onclick="SaveForm()" value="Submit" class="btn btn-primary">
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+@if (Model.Id != 0)
+{
+    <text>
+        <script type="text/javascript">
+            $("#Subject").val('@Model.Subject');
+            $("#URL").val('@Model.URL');
+            $("#Description").html($("#hdnDescription").val());
+            $("#Status").val('@Model.Status');
+            $("#ContactUs").val('@Model.ContactUs');
+
+            var dateValue = $("#EstDate").attr('data-value');
+            if (dateValue !== '') {
+                dateValue = dateValue.toString().replace(' 00:00:00', '');
+                $("#EstDate").datepicker("setDate", dateValue);
+            }
+        </script>
+    </text>
+}
+
+<script>
+    $('#EstDate').datepicker({
+        format: 'dd/mm/yyyy',
+        onSelect: function (dateText, inst) {
+
+        }
+    });
+
+    function SaveForm() {
+        if (window.FormData !== undefined) {
+            // Create FormData object
+            var fileData = new FormData();
+
+            var fileUpload = $("#SolutionAttachment").get(0);
+            if (fileUpload !== undefined) {
+                var files = $("input[name='SolutionAttachment']")[0].files;
+
+                // Looping over all files and add it to FormData object
+                for (var i = 0; i < files.length; i++) {
+                    fileData.append(files[i].name, files[i]);
+                }
+            }
+
+            if ($("#Subject").val() === "") {
+                toastr.error("Please enter Subject.");
+                return false;
+            }
+            if ($("#URL").val() === "") {
+                toastr.error("Please enter URL.");
+                return false;
+            }
+            if ($("textarea[name='Description']").val() === "") {
+                toastr.error("Please enter Description.");
+                return false;
+            }
+            if ($("#ContactUs").val() === "") {
+                toastr.error("Please enter Contact Number.");
+                return false;
+            }
+
+            $("#btnsave").prop('disabled', true);
+
+            // Adding one more key to FormData object
+            fileData.append('Subject', $("#Subject").val());
+            fileData.append('URL', $("#URL").val());
+            fileData.append('ContactUs', $("#ContactUs").val());
+            fileData.append('Description', $("#Description").val());
+            fileData.append('Id', $("#Id").val());
+            fileData.append('Status', $("#Status").val());
+            fileData.append('EstDate', $("#EstDate").val());
+            $.ajax({
+                url: '/Form/SaveBugData?id=@Model.Id',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                data: fileData,
+                success: function (result) {
+                    toastr.success("You have added bug. We will back to you shortly.");
+                    window.location.href = "/Form/BugList";
+                },
+                error: function (err) {
+                    $("#btnsave").prop('disabled', false);
+                    alert(err.statusText);
+                }
+            });
+        } else {
+            alert("FormData is not supported.");
+        }
+    }
+</script>

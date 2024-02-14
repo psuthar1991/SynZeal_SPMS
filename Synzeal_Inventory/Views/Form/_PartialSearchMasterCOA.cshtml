@@ -1,0 +1,298 @@
+﻿@model List<MasterCOAModel>
+@using Synzeal_Inventory.Models
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    int loopCont = 1;
+}
+<div class="box-body form-horizontal">
+    @*<div>
+            <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="SaveAll()">Save All</a> <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="MoveToDispatchList()">Move to Dispatch</a>
+            <div class="clear"></div>
+            <br /><br />
+        </div>*@
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr><th></th>
+                <th>Sr No.</th>
+                <th>Product Name</th>
+                <th style="width:100px;">Batch No.</th>
+                <th>Qty (mg)</th>
+                <th>Ana. Dt</th>
+                <th>Re. Dt</th>
+                <th>Purity</th>
+                <th>Value (%)</th>
+                <th>Mass</th>
+                <th>1H NMR</th>
+                <th>13C NMR</th>
+                <th>DEPT</th>
+                <th>IR</th>
+                <th>TGA Loss (%)</th>
+                <th>ROI (%)</th>
+                <th>Chiral (%)</th>
+                <th>Physical State</th>
+                <th>Solubility</th>
+                <th>Storage Con.</th>
+                <th>Instruction</th>
+                <th>Remark 1</th>
+                <th>Remark 2</th>
+                
+            </tr>
+        </thead>
+        @foreach (var i in Model)
+        {
+        <tr class="clsrows" data-Purity="@i.Purity" data-id="@i.Id">
+            <td style="width:400px;    white-space: nowrap;">
+                <a href="javascript:void(0)" onclick="saveMasterRecord('@i.Id')">Save</a>
+                @if (i.COAId != 0)
+                {
+                    <span>
+                        @*| <a data-toggle="modal" data-target="#myModal" href="@Url.Action("AddMasterCOARepresentative","Form",new { id = i.Id})">+</a>*@
+                        | <a href="javascript:void(0)" onclick="copyMasterRecord('@i.Id')">Copy</a>
+                        @*| <a href="/Form/DownloadMasterCOA/@i.Id"> PDF </a>*@
+                    </span>
+                }
+            </td>
+            <td>@loopCont</td>
+            <td style="width:200px;">@i.ProductName</td>
+            <td style="width:400px;    white-space: nowrap;">@i.BatchNo</td>
+            <td>
+                @i.QuantityAvailable
+                <input type="hidden" id="availablequantity_@i.Id" name="availablequantity_@i.Id" value="@i.QuantityAvailable" />
+            </td>
+            <td><input type="text" id="analysisdate_@i.Id" name="analysisdate_@i.Id" value="@(i.AnalysisDate.HasValue ? i.AnalysisDate.Value.ToShortDateString() : "")" class="dpmana" style="width: 80px;" /></td>
+            <td><input type="text" id="ReTestDate_@i.Id" name="ReTestDate_@i.Id" value="@(i.ReTestDate.HasValue ? i.ReTestDate.Value.ToShortDateString() : "")" class="dpm" style="width: 80px;" /></td>
+            <td>
+                <select id="Purity_@i.Id" name="Purity_@i.Id">
+                    <option value="">--Select--</option>
+                    <option value="HPLC">HPLC</option>
+                    <option value="GC">GC</option>
+                    <option value="ELSD">ELSD</option>
+                </select>
+                @*<input type="text" id="Purity_@i.Id" name="Purity_@i.Id" value="@i.Purity" />*@
+            </td>
+            <td><input type="text" id="HPLCGCELSD_@i.Id" name="HPLCGCELSD_@i.Id" value="@i.HPLCGCELSD" style="width: 80px;" onkeypress="return isNumber(event)" /></td>
+            <td><input type="text" id="Mass_@i.Id" name="Mass_@i.Id" value="@i.Mass" style="width: 80px;" /></td>
+            <td><input type="text" id="NMR_@i.Id" name="NMR_@i.Id" value="@i.NMR" style="width: 80px;" /></td>
+            <td><input type="text" id="CMR_@i.Id" name="CMR_@i.Id" value="@i.CMR" style="width: 80px;" /></td>
+            <td><input type="text" id="Dept_@i.Id" name="Dept_@i.Id" value="@i.Dept" style="width: 80px;" /></td>
+            <td><input type="text" id="IR_@i.Id" name="IR_@i.Id" value="@i.IR" style="width: 80px;" /></td>
+            <td><input type="text" id="TGALoss_@i.Id" name="TGALoss_@i.Id" value="@i.TGALoss" style="width: 80px;" onkeypress="return isNumber(event)"/></td>
+            <td><input type="text" id="ResidueOnIgnition_@i.Id" name="ResidueOnIgnition_@i.Id" value="@i.ResidueOnIgnition" style="width: 80px;" onkeypress="return isNumber(event)" /></td>
+            <td><input type="text" id="Potency_@i.Id" name="Potency_@i.Id" value="@i.Potency" style="width: 80px;" onkeypress="return isNumber(event)"/></td>
+            <td><input type="text" id="PhysicalState_@i.Id" name="PhysicalState_@i.Id" value="@i.PhysicalState" style="width: 80px;" /></td>
+            <td>
+                
+                <select id="SOLUBILITY_@i.Id" name="SOLUBILITY_@i.Id" style="width: 80px;"  class="clssolu" data-value="@i.SOLUBILITY">
+                    <option value="Acetonitrile">Acetonitrile</option>
+                    <option value="Methanole">Methanole</option>
+                    <option value="Water">Water</option>
+                </select>
+
+                @*<input type="text" id="SOLUBILITY_@i.Id" name="SOLUBILITY_@i.Id" value="@i.SOLUBILITY" style="width: 80px;"/>*@
+            </td>
+            <td><input type="text" id="StorageCon_@i.Id" name="StorageCon_@i.Id" value="@i.StorageCon" style="width: 80px;" /></td>
+            <td><input type="text" id="SpecialInstruction_@i.Id" name="SpecialInstruction_@i.Id" value="@i.SpecialInstruction" style="width: 80px;" /></td>
+            <td><input type="text" id="Remark1_@i.Id" name="Remark1_@i.Id" value="@i.Remark1" style="width: 80px;" /></td>
+            <td><input type="text" id="Remark2_@i.Id" name="Remark2_@i.Id" value="@i.Remark2" style="width: 80px;" /></td>
+            @*<td><input type="text" id="HPLC_@i.Id" name="HPLC_@i.Id" value="@i.HPLC" /></td>*@
+            @*<td><input type="text" id="TGA_@i.Id" name="TGA_@i.Id" value="@i.TGA" /></td>*@
+
+        </tr>
+            loopCont += 1;
+        }
+    </table>
+</div>
+
+<script type="text/javascript">
+
+    $('.clsrows').each(function(){
+        var id = $(this).attr('data-id');
+        var purity = $(this).attr('data-Purity');
+        if(purity !== '' && purity !== null && purity !== undefined)
+        {
+            $("#Purity_"+id).val(purity);
+        }
+    });
+
+    $('.clssolu').each(function () {
+        var val = $(this).attr('data-value');
+        $(this).val(val);
+    });
+    
+    $(document).ready(function() {
+        $(".dpm").datepicker({
+                format: 'dd/mm/yyyy'
+            });
+        $(".dpmana").datepicker({
+            format: 'dd/mm/yyyy'
+        }).on("changeDate", function(e) {
+            var id = $(this).attr('id').replace('analysisdate_','');
+            var myDate = new Date(e.date);
+            myDate.setFullYear(myDate.getFullYear() + 3);
+            $("#ReTestDate_"+ id).datepicker("setDate", formate(myDate));
+            
+        });
+        
+    });
+   
+
+    function OpenRepresentativeMaster(id)
+    {
+
+    }
+
+    function copyMasterRecord(id)
+    {
+         $.ajax({
+            url: '/Form/CopyMasterCOATOChildCOA',
+            data: { id: id },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    ReloadChildMaster();
+                    toastr.success("You have copied master COA information.");
+                }
+                else{
+                    toastr.error(data.message);
+                    return false;
+                }
+            }
+        });
+    }
+
+    function ReloadChildMaster()
+    {
+        var value = $("#txtSearch").val();
+        if (value === "") {
+    toastr.error('Please enter catalog number.');
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/ReloadChild?value=' + value,
+            data: { },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                        $("#divchildcoa").html(data.childHtml);
+                }
+            }
+        });
+    }
+    function saveMasterRecord(id) {
+        $.ajax({
+            url: '/Form/SaveMasterRecord?availablequantity=' + $("#availablequantity_" + id).val()
+                + '&analysisdate=' + $("#analysisdate_" + id).val() + '&HPLCGCELSD=' + $("#HPLCGCELSD_" + id).val()
+                + '&TGALoss=' + $("#TGALoss_" + id).val() + '&ResidueOnIgnition=' + $("#ResidueOnIgnition_" + id).val()
+                + '&Potency=' + $("#Potency_" + id).val() + '&PhysicalState=' + $("#PhysicalState_" + id).val()
+                + '&SOLUBILITY=' + $("#SOLUBILITY_" + id).val() + '&IR=' + $("#IR_" + id).val()
+                + '&Mass=' + $("#Mass_" + id).val() + '&HPLC=' + $("#HPLC_" + id).val()
+                + '&NMR=' + $("#NMR_" + id).val() + '&CMR=' + $("#CMR_" + id).val()
+                + '&Dept=' + $("#Dept_" + id).val() + '&TGA=' + $("#TGA_" + id).val()
+                + '&StorageCon=' + $("#StorageCon_" + id).val() + '&ReTestDate=' + $("#ReTestDate_" + id).val()
+                + '&SpecialInstruction=' + $("#SpecialInstruction_" + id).val() + '&Remark1=' + $("#Remark1_" + id).val()
+                + '&Remark2=' + $("#Remark2_" + id).val() + '&id=' + id+ '&Purity=' + $("#Purity_" + id).val(),
+            data: {},
+            type: 'POST',
+            async: false,
+            success: function (data) {
+                SearchRecords();
+                toastr.success("You have updated master COA information.");
+            }
+        });
+    }
+
+
+    function MoveToDispatchList() {
+        var ids = [];
+
+        $('.clsMoveDispatch').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+        $.ajax({
+            url: '/Form/MoveToDispatchList',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+
+                if (data.success) {
+                    window.location.href = "/Form/Project";
+                }
+            }
+        });
+
+    }
+
+
+    function SaveAll() {
+        var ids = [];
+
+        $('.clsSaveall').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+
+        var count = 1;
+        $('.clsSaveall').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                var additionalBatch = $('#additionalBatch_' + id).val();
+
+                var batchNo = $("#BatchNo_" + id).val();
+
+                $('.additionalbatchcls').each(function (i, v) {
+
+                    var attr = $(this).attr("quotedetailsid");
+                    if (attr === id) {
+                        additionalBatch = $(this).val();
+                    }
+                });
+
+                $('.batchNoCls').each(function (i, v) {
+
+                    var attr = $(this).attr("quotedetailsid");
+                    if (attr === id) {
+                        batchNo = $(this).val();
+                    }
+                });
+                $.ajax({
+                    url: '/Form/SaveInstockPurchaseAction?additionalBatch=' + additionalBatch + '&batchNo=' + batchNo + '&id=' + id, /* + '&batchno=' + batchno + '&remark=' + remark + '&additionalBatch=' + additionalBatch + '&scientistStatus=' + scientistStatus,*/
+                    data: {},
+                    type: 'POST',
+                    async: false,
+                    success: function (data) {
+                    },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function successAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product information.");
+            setTimeout(function () { window.location.reload(true); }, 2000);
+        }
+    }
+</script>

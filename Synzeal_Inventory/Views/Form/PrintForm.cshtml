@@ -1,0 +1,271 @@
+﻿@{
+    ViewBag.Title = "SubmitForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model Synzeal_Inventory.Entity.SZ_QuoteDetailForm
+<link href="~/css/PrintForm.css" rel="stylesheet" />
+<section class="content-header">
+    <h1>
+        Product Submission Form
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <img width="250px" src="http://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" style="float:left;" />
+                <div class="clearfix"></div>
+                <div style="margin-top:-140px;">
+                    <h2>PRODUCT SUBMISSION FORM </h2>
+                </div>
+                <hr style="width:100%" />
+                <!-- form start -->
+                <form role="form" id="makeform" enctype="multipart/form-data">
+                    <div class="box-body">
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputEmail1">Ref <span style="float:right;margin-right:20px;">:</span></label>
+                            @Model.Ref
+                        </div>
+                        <div class="clearfix"></div>
+
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputEmail1">Submission Date <span style="float:right;margin-right:20px;">:</span></label>
+                            @if (Model.SubmissionDate != null)
+                            {
+                                @Model.SubmissionDate.ToShortDateString()
+                            }
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputEmail1">Scientist Name <span style="float:right;margin-right:20px;">:</span> </label>@Model.ScientistName
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputEmail1">Journal Date <span style="float:right;margin-right:20px;">:</span> </label>
+                            @if (Model.JournalDate != null)
+                            {
+                                @Model.JournalDate.ToShortDateString()
+                            }
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">Team Leader Name <span style="float:right;margin-right:20px;">:</span> </label>@Model.TLName
+                        </div>
+                        <hr style="width:100%" />
+                        <div class="form-group col-md-8">
+                            <label class="form-group" for="exampleInputPassword1">Chemist <span style="float:right;margin-right:20px;">:</span> </label>@Model.Chemist <br />
+                            <label class="form-group" for="exampleInputPassword1">Catelogue No. <span style="float:right;margin-right:20px;">:</span> </label>@Model.CATNo <br />
+                            <label class="form-group" for="exampleInputEmail1">Project Name <span style="float:right;margin-right:20px;">:</span> </label>@Model.ProjectName <br />
+                            <label class="form-group" for="exampleInputPassword1">Product Name <span style="float:right;margin-right:20px;">:</span> </label>@Model.ProductName<br />
+                            <label class="form-group" for="exampleInputPassword1">CAS No. <span style="float:right;margin-right:20px;">:</span> </label>@Model.CASNo <br />
+                            <label class="form-group" for="exampleInputEmail1">Mole. Weight <span style="float:right;margin-right:20px;">:</span></label>@Model.MolWeight <br />
+                            <label class="form-group" for="exampleInputPassword1">Mole. Formula <span style="float:right;margin-right:20px;">:</span> </label>@Model.MolFormula
+                        </div>
+                        <div class="form-group col-md-4">
+                            <img id="drwstructure" src="@Model.StructurePath" width="100%" />
+                        </div>
+                        <div style="clear:both"></div>
+                        <hr style="width:100%" />
+
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputEmail1">Batch Code <span style="float:right;margin-right:20px;">:</span> </label>@Model.BatchCode
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">Quantity Submitted <span style="float:right;margin-right:20px;">:</span></label>@Model.Qty In MG
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">Ref. 1H/HPLC/MS Code<span style="float:right;margin-right:20px;">:</span> </label>@Model.HPCLCode
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">1H Status <span style="float:right;margin-right:20px;">:</span> </label>@Model.NMRCode
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">HPLC/GC/ELSD Date <span style="float:right;margin-right:20px;">:</span> </label>@Model.HPLCDate
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">Chromatography <span style="float:right;margin-right:20px;">:</span> </label>@Model.HPLCPurity %
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">MS Analysis <span style="float:right;margin-right:20px;">:</span> </label>@Model.MSCode
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputEmail1">Type Of Compound <span style="float:right;margin-right:20px;">:</span> </label>@Model.TypeCompound
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputEmail1">State Of Compound <span style="float:right;margin-right:20px;">:</span> </label>@Model.StateCompound
+                            @if (Model.ChkHygroscopic.HasValue && Model.ChkHygroscopic.Value)
+                            {
+                                <b>(Hygroscopic)</b>
+                            }
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">
+                                If Salt Mention the Name<span style="float:right;margin-right:20px;">:</span>
+                            </label> @Model.RbSaltMentionName
+                            @if (!string.IsNullOrEmpty(Model.SaltName))
+                            {
+                                <b>(@Model.SaltName)</b>
+                            }
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">
+                                No Of Steps of Final Route<span style="float:right;margin-right:20px;">:</span>
+                            </label> @Model.NoOfFinalStep
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">
+                                Earlier Synthesized<span style="float:right;margin-right:20px;">:</span>
+                            </label> @Model.EarlierSynthesized
+                        </div>
+                        <div style="clear:both"></div>
+                        <div class="form-group col-md-12">
+                            <label for="exampleInputPassword1">
+                                @if (Model.ChkHygroscopic.HasValue && Model.ChkHygroscopic.Value)
+                                {
+                                    <span>Hygroscopic &nbsp;&nbsp;</span>
+                                }
+                                @if (Model.TempSensitive.HasValue && Model.TempSensitive.Value)
+                                {
+                                    <span>Temp Sensitive &nbsp;&nbsp;</span>
+                                }
+                                @if (Model.Lacrymatory.HasValue && Model.Lacrymatory.Value)
+                                {
+                                    <span>Lacrymatory &nbsp;&nbsp;</span>
+                                }
+                                @if (Model.LightSensitivity.HasValue && Model.LightSensitivity.Value)
+                                {
+                                    <span>Light Sensitivity &nbsp;&nbsp;</span>
+                                }
+                                @if (Model.Photostability.HasValue && Model.Photostability.Value)
+                                {
+                                    <span>Photostability &nbsp;&nbsp;</span>
+                                }
+                            </label>
+                        </div>
+                        <div style="clear:both"></div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">Additional Analysis <span style="float:right;margin-right:20px;">:</span></label>
+                            @if (!string.IsNullOrEmpty(Model.RbAdditionalAnalysis))
+                            {
+                                @Model.RbAdditionalAnalysis
+                            }
+                            else
+                            {
+                                <span>None</span>
+                            }
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">Remark <span style="float:right;margin-right:20px;">:</span></label>@Html.Raw(Model.OtherAnalysis)
+                        </div>
+                        <div style="clear:both"></div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">Stability Related Comment <span style="float:right;margin-right:20px;">:</span></label>
+                            @Model.StabilityRelatedComment
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">Stability <span style="float:right;margin-right:20px;">:</span></label>@Model.Stability
+                        </div>
+                        <div style="clear:both"></div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">Stability data in solution form after 7 days :</label>
+                            <div style="border:1px solid #000;height:15px;width:15px;display:inline-block"></div>&nbsp;&nbsp;Stable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <div style="border:1px solid #000;height:15px;width:15px;display:inline-block"></div>&nbsp;&nbsp;Unstable
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputEmail1">Physical State<span style="float:right;margin-right:20px;">:</span> </label>
+                            @if (Model.IsLight.HasValue && Model.IsLight.Value)
+                            {
+                                <span>Light @Model.StateCompound @Model.State</span>
+                            }
+                            else
+                            {
+                                <span>@Model.StateCompound @Model.State</span>
+                            }
+                        </div><br />
+                        <div style="clear:both"></div>
+                        <div class="form-group col-md-12">
+                            <label for="exampleInputPassword1">Stability data in solid form after 7 days :</label>
+                            <div style="border:1px solid #000;height:15px;width:15px;display:inline-block"></div>&nbsp;&nbsp;Stable&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <div style="border:1px solid #000;height:15px;width:15px;display:inline-block"></div>&nbsp;&nbsp;Unstable
+                        </div>
+                        <div style="clear:both"></div>
+                        <div class="form-group col-md-12">
+                            <label for="exampleInputPassword1">Any of last 3 step NMR done ? :</label>
+                            @if (Model.chkNMRDone.HasValue && Model.chkNMRDone.Value)
+                            {
+                                <span>Yes</span>
+                            }
+                            else
+                            {
+                                <span>No</span>
+                            }
+                        </div>
+                        <div style="clear:both"></div>
+                        <div class="form-group col-md-12">
+                            <label for="exampleInputPassword1">Any of last 2 step crystallization done? :</label>
+                            @if (Model.chkCrystallizationDone.HasValue && Model.chkCrystallizationDone.Value)
+                            {
+                                <span>Yes</span>
+                            }
+                            else
+                            {
+                                <span>No</span>
+                            }
+                        </div>
+
+                        <div style="clear:both"></div>
+                        <div class="form-group col-md-12">
+                            <label for="exampleInputPassword1">Purification By :</label>
+                            @Model.PurificationBy
+                        </div>
+                    </div>
+                    <div style="clear:both"></div>
+                    <hr style="width:100%" />
+                    <div class="box-body">
+                        <div class="form-group col-md-6">
+                            <label for="exampleInputPassword1">
+                                Name & Sign of Scientist :
+                            </label>
+                            <div style="border-bottom: 1px solid #c7c0c0;width: 100%;height: 40px;padding: 20px 10px;text-transform: capitalize;"> @Model.ScientistName</div>
+                        </div>
+                        <div class="form-group col-md-6 clsfulllabel">
+                            <label for="exampleInputPassword1">
+                                Name & Sign of Team Leader :
+                            </label>
+                            <div style="border-bottom: 1px solid #c7c0c0;width: 100%;height: 40px;padding: 20px 10px;text-transform: capitalize;"> @Model.TLName</div>
+                        </div>
+                    </div>
+                    <div class="box-body" style="margin-top:15px;">
+                        <div class="form-group col-md-6 clsfulllabel">
+                            <label for="exampleInputPassword1">
+                                Sign of Quality Assurance Dept :
+                            </label>
+                            <div style="border-bottom: 1px solid #c7c0c0;width: 100%;height: 40px"></div>
+                        </div>
+                        <div class="form-group col-md-6 clsfulllabel">
+                            <label for="exampleInputPassword1">
+                                Name & Sign Of Reviewer with Date :
+                            </label>
+                            <div style="border-bottom: 1px solid #c7c0c0;width: 100%;height: 40px"></div>
+                        </div>
+                        @*<div class="form-group col-md-6">
+                                <label for="exampleInputPassword1">
+                                    Sign of Doc. Department :
+                                </label>
+                                <div style="border:1px solid #5c5c5c;width:100%;height:60px;"></div>
+                            </div>*@
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    setTimeout(function () {
+        window.print();
+    //    window.close();
+    }, 700);
+</script>

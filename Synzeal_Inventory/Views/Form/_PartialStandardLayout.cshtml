@@ -1,0 +1,901 @@
+﻿@using System.Linq;
+@model List<Synzeal_Inventory.Entity.SZ_QuotationDetail>
+@using Synzeal_Inventory.Entity;
+@{
+    int loopCnt = 1;
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    string synthesis = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProjectType.Synthesis);
+    string pursynthesis = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProjectType.PurSynthesis);
+    string purchase = Convert.ToString((int)Synzeal_Inventory.Models.EnumList.ProjectType.Purchase);
+    int priceone = 0;
+    int pricetwo = 0;
+    int pricethree = 0;
+    int pricefour = 0;
+    int pricefive = 0;
+    var duplicates = Model.Where(x => !string.IsNullOrEmpty(x.CATNo)).GroupBy(s => s.CATNo).SelectMany(grp => grp.Skip(1));
+    var catduplicate = duplicates.Select(x => x.CATNo).ToList();
+    var defaultData = new string[] { "10", "25", "50", "100" };
+    List<string> colorCodes = new List<string>();
+    for (int i = 0; i < catduplicate.Count(); i++)
+    {
+        string color = Synzeal_Inventory.Models.Common.GetRandomColour().Name.Replace("ff", "#");
+        colorCodes.Add(color);
+    }
+    int quoteId = Model.Select(x => x.QuoteId).FirstOrDefault();
+}
+<style type="text/css">
+</style>
+<div class="box-body form-horizontal" id="profrm" style="overflow:scroll">
+    @if (Model.Count > 0)
+    {
+        <div class="fc-title">
+            <h5>
+                <input type="checkbox" id="chkpredefined" /> Predefined Values
+                <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="discountrecord('tblalready')">Discount Price</a>
+                <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Copyrecords('tblalready')">Copy</a>
+                <input type="button" value="Delete All" class="btn btn-warning" onclick="deleteallalreadyProduct()" style="float: right;margin-bottom: 5px;margin-right:10px" />
+                <input type="button" class="btn btn-success" value="Save All" onclick="saveallalreadyProduct(false)" style="float: right;margin-bottom: 5px;margin-right:10px" />
+                <a href="javascript:void(0)" class="btn btn-success" onclick="LoadAllCategoryPrice()" style="float: right;margin-bottom: 5px;margin-right:10px">All Category Price</a>
+                <a href="javascript:void(0)" class="btn btn-success" onclick="UploadProducts()" style="float: right;margin-bottom: 5px;margin-right:10px">Upload</a>
+                <a href="javascript:void(0)" id="btnaddedproductlist" class="btn btn-success" onclick="PriceQuoteProducts()" style="float: right;margin-bottom: 5px;margin-right:10px">Price</a>
+                <a href="javascript:void(0)" class="btn btn-success" onclick="Exportallquoteproducts()" style="float: right;margin-bottom: 5px;margin-right:10px">Export</a>
+                <a href="javascript:void(0)" class="btn btn-success" onclick="ValidateQuoteProducts()" style="float: right;margin-bottom: 5px;margin-right:10px">Validate</a>
+            </h5>
+        </div>
+        <table class="table table-bordered table-striped dataTable no-footer" id="tblalready">
+            <thead>
+                <tr style="        vertical-align: middle">
+                    <th width="1%" rowspan="2" style="vertical-align: middle">
+                        Select<input type="checkbox" id="chksaveallalready" /> / # / Log
+                    </th>
+                    <th width="18%" style="        text-align: center;
+        vertical-align: middle" rowspan="2">
+                        Product Name / CAS No / CAT No
+                    </th>
+                    <th width="20%" colspan="5" style="text-align: center;
+        vertical-align: middle">
+                        Qty(In mg) / Price(INR/USD) / Pack Size
+                    </th>
+                    <th width="8%" style="        text-align: center;vertical-align: middle" rowspan="2">
+                        Lead Time <br /><input type="text" class="clsmasterleadtime" value="" />
+                    </th>
+                    <th width="16%" style="        text-align: center;
+        vertical-align: middle" rowspan="2">
+                        Product Remark <i class="fa fa-save" onclick="saveproductremark()"></i>
+                    </th>
+                    <th width="7%" style="text-align: center;vertical-align: middle" rowspan="2">
+                        Final Price
+                    </th>
+                    <th width="2.5%" style="text-align: center;
+        vertical-align: middle" rowspan="2">
+                        Dis.
+                    </th>
+                    <th width="5%" style="text-align: center;
+        vertical-align: middle" rowspan="2">
+                        Batch / Qty <br />
+                        <a href="javascript:void(0)" onclick="LastBatchSelectDefault()">Last Select</a>
+                    </th>
+                    <th width="1%" style="text-align: center;
+        vertical-align: middle" rowspan="2">
+                        Ord.
+                    </th>
+                    <th width="3%" style="text-align: center;
+        vertical-align: middle" rowspan="2">
+                        EDD
+                    </th>
+                    <th width="1%" rowspan="2"></th>
+                </tr>
+                <tr>
+                    <th><input type="number" class="clsmasterone" value="" /></th>
+                    <th><input type="number" class="clsmastertwo" value="" /></th>
+                    <th><input type="number" class="clsmasterthree" value="" /></th>
+                    <th><input type="number" class="clsmasterfour" value="" /></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model)
+                {
+                    var quotePrice = db.Products.Where(x => x.Id == k.ProductId).Select(x => x.QuotePrice).FirstOrDefault();
+                    var query = db.SZ_QueryModule.Where(x => x.CATNo == k.CATNo).Count();
+                    var isAvailableProductDetails = new List<SZ_QuotationDetail>();
+                    if (!string.IsNullOrEmpty(k.CATNo) && k.CATNo != "na" && k.CATNo != "NA" && k.CATNo != "N/A")
+                    {
+                        isAvailableProductDetails = db.SZ_QuotationDetail.Where(x => x.ProductId == k.ProductId && x.Id != k.Id
+                        && x.MoveToProject == true
+                        && (x.IsOnHold == false || x.IsOnHold == null)
+                        && (x.MoveToDispatch == false || x.MoveToDispatch == null) && string.IsNullOrEmpty(x.TrackingNo)
+                        && (x.ProjectType == synthesis || x.ProjectType == pursynthesis || x.ProjectType == purchase)).ToList();
+                    }
+                    string titletag = "";
+                    string clsname = "";
+                    if (isAvailableProductDetails.Count > 0)
+                    {
+                        titletag = "PO No: ";
+                        foreach (var item in isAvailableProductDetails)
+                        {
+                            titletag += item.SZ_Quotation.PONo + "(" + item.SZ_Quotation.CompanyName + ", " + item.RequiredQty + "), ";
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(quotePrice))
+                    {
+                        clsname = "lightred";
+                    }
+
+                    var fecthInfoCount = 0;
+                    var pendinginfocount = 4;
+                    var pList = new List<string>();
+                    var pricedt = k.Price;
+                    if (!string.IsNullOrEmpty(pricedt))
+                    {
+                        pList = pricedt.Split(',').ToList();
+                        fecthInfoCount = pList.Count;
+                        pendinginfocount -= fecthInfoCount;
+                    }
+                    //string dupliccls = duplicates.Any(x => x.CATNo == k.CATNo) ? "clsorange" : "";
+                    string dupliccls = "";
+                    int dupliacteInt = catduplicate.IndexOf(k.CATNo);
+                    if (dupliacteInt != -1)
+                    {
+                        dupliccls = "background-color:" + colorCodes[dupliacteInt];
+                    }
+
+                    List<int> priceListRecord = new List<int>();
+                    var isInSynthesis = Convert.ToBoolean(TempData["IsInSynthesis_" + k.Id]);
+
+                    var matchedRecord = TempData["MatchedProduct_" + k.Id] as List<SZ_QuotationDetail>;
+                    bool isMatched = false;
+                    bool isAnyPriceAvailable = false;
+                    string pricecontent = "";
+                    bool isRedMatched = Convert.ToBoolean(TempData["RedIcon_" + k.Id]);
+                    bool isBlueMatched = Convert.ToBoolean(TempData["BlueIcon_" + k.Id]);
+                    
+                    <tr id="tr_@k.Id" data-quoteid="@k.QuoteId" data-id="@k.Id">
+                        <td class="" style="text-align:center; @dupliccls">
+                            <input type="checkbox" class="delclass" value="@k.Id" title="Select" /> <br />@loopCnt <br />
+                            <label>
+                                @if (k.IsSynthesisLog.HasValue && k.IsSynthesisLog.Value)
+                                {
+                                    <i class="fa fa-check-square" style="color:lightseagreen"></i>
+                                }
+                            </label><input type="checkbox" title="Synthesis Log" class="clssynthesislog" id="synthesislog_@k.Id" name="synthesislog_@k.Id" style="display: none;" data-value="@k.IsSynthesisLog" />
+                        </td>
+                        <td class="@clsname">
+                            <label>@k.ProductName</label> <input type="text" id="productname_@k.Id" value="@k.ProductName" style="display: none;" title="@k.ProductName" />
+                            <label>@k.CASNo</label> <input placeholder="CAS No" type="text" id="casno_@k.Id" value="@k.CASNo" style="display: none;margin-top: 5px;" title="@k.CASNo" /><br />
+                            <label>
+                                @k.CATNo
+                            </label>
+                            <span>
+                                <input type="text" id="catno_@k.Id" placeholder="CAT No" value="@k.CATNo" style="display: none;width: 80%;margin-top: 5px;" class="tempCatNo" onkeyup="changeCatNo(@k.Id)" />
+                               
+                                @if (query != 0)
+                                {
+                                    <i class="clstooltip fa fa-info" onclick="QueryDetail('@k.CATNo')" title="Already Generated Query."></i>
+                                }
+                                @if (!string.IsNullOrEmpty(titletag))
+                                {
+                                    <i class="clstooltip fa fa-info-circle" title="@Html.Raw(titletag)" style="float:right" onclick="showpopupInfo('@k.ProductId', '@k.Id')"></i>
+                                }
+                                @if (!string.IsNullOrEmpty(k.CATNo))
+                                {
+                                    <i class="clstooltip fa fa-pencil" style="float:right;margin-top: 5px;" onclick="AllQuotePrice('@k.ProductId')"></i>
+                                }
+
+                            </span>
+                            <div class="clstrac clsextracost_@k.Id" style="display:none">
+                                <div style="padding-top: 10px; text-align: right; font-weight: bold; ">
+                                    Tracebility Cost:
+                                </div>
+                                <div style="padding-top: 10px; text-align: right; font-weight: bold; ">
+                                    Cold Shipment Cost:
+                                </div>
+                                <div style="padding-top: 10px; text-align: right; font-weight: bold; ">
+                                    Additional Test Cost:
+                                </div>
+                                
+                            </div>
+                        </td>
+
+                        @for (int i = 1; i <= fecthInfoCount; i++)
+                        {
+                            int qty = 0;
+                            var pstr = pList[i - 1].Split('@');
+                            var mgid = "pricemg_" + i + "_" + k.Id;
+                            var pid = "price_" + i + "_" + k.Id;
+                            var packsize = "packsize_" + i + "_" + k.Id;
+                            var classname = "";
+
+                            if (pstr.Count() > 1 && matchedRecord != null && matchedRecord.Count > 0)
+                            {
+                                var mgdata = pstr[0];
+                                isMatched = matchedRecord.Select(x => x.Price.Contains(mgdata)).Any();
+                                isAnyPriceAvailable = true;
+                                pricecontent += matchedRecord[0].SZ_Quotation.Ref + "-" + matchedRecord[0].SZ_Quotation.CompanyName + "-" + matchedRecord[0].Price + ", ";
+                            }
+                            //else
+                            //{
+                            //    isRedMatched = true;
+                            //}
+                            if (!string.IsNullOrEmpty(pstr[0]) && !pstr[0].Contains("No"))
+                            {
+                                if (!string.IsNullOrEmpty(pstr[0].Trim().Replace("mg", "")))
+                                {
+                                    try
+                                    {
+                                        qty = Convert.ToInt32(pstr[0].Trim().Replace("mg", ""));
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        qty = 0;
+                                    }
+                                }
+                            }
+                            if (i == 1)
+                            {
+                                if (pstr.Count() > 1 && pstr[1] != null && pstr[1].Trim().Split(' ')[0] != "")
+                                {
+                                    try
+                                    {
+                                        if (qty > 0)
+                                        {
+                                            priceone += (Convert.ToInt32(pstr[1].Trim().Split(' ')[0]) * qty);
+                                        }
+                                        else
+                                        {
+                                            priceone += Convert.ToInt32(pstr[1].Trim().Split(' ')[0]);
+                                        }
+
+                                        priceListRecord.Add(Convert.ToInt32(pstr[1].Trim().Split(' ')[0]));
+                                    }
+                                    catch
+                                    {
+                                        priceone += 0;
+                                        priceListRecord.Add(0);
+                                    }
+                                }
+                                classname = "clspriceone";
+
+                            }
+                            if (i == 2)
+                            {
+                                if (pstr.Count() > 1 && pstr[1] != null && pstr[1].Trim().Split(' ')[0] != "")
+                                {
+                                    try
+                                    {
+                                        if (qty > 0)
+                                        {
+                                            pricetwo += (Convert.ToInt32(pstr[1].Trim().Split(' ')[0]) * qty);
+                                        }
+                                        else
+                                        {
+                                            pricetwo += Convert.ToInt32(pstr[1].Trim().Split(' ')[0]);
+                                        }
+                                        priceListRecord.Add(Convert.ToInt32(pstr[1].Trim().Split(' ')[0]));
+                                    }
+                                    catch
+                                    {
+                                        pricetwo += 0; priceListRecord.Add(0);
+                                    }
+                                }
+                                classname = "clspricetwo";
+                            }
+                            if (i == 3)
+                            {
+                                if (pstr.Count() > 1 && pstr[1] != null && pstr[1].Trim().Split(' ')[0] != "")
+                                {
+                                    try
+                                    {
+                                        if (qty > 0)
+                                        {
+                                            pricethree += (Convert.ToInt32(pstr[1].Trim().Split(' ')[0]) * qty);
+                                        }
+                                        else
+                                        {
+                                            pricethree += Convert.ToInt32(pstr[1].Trim().Split(' ')[0]);
+                                        }
+                                        priceListRecord.Add(Convert.ToInt32(pstr[1].Trim().Split(' ')[0]));
+                                    }
+                                    catch
+                                    {
+                                        pricethree += 0; priceListRecord.Add(0);
+                                    }
+                                }
+                                classname = "clspricethree";
+                            }
+                            if (i == 4)
+                            {
+                                if (pstr.Count() > 1 && pstr[1] != null && pstr[1].Trim().Split(' ')[0] != "")
+                                {
+                                    try
+                                    {
+                                        if (qty > 0)
+                                        {
+                                            pricefour += (Convert.ToInt32(pstr[1].Trim().Split(' ')[0]) * qty);
+                                        }
+                                        else
+                                        {
+                                            pricefour += Convert.ToInt32(pstr[1].Trim().Split(' ')[0]);
+                                        }
+                                        priceListRecord.Add(Convert.ToInt32(pstr[1].Trim().Split(' ')[0]));
+                                    }
+                                    catch
+                                    {
+                                        pricefour += 0; priceListRecord.Add(0);
+                                    }
+                                }
+                                classname = "clspricefour";
+                            }
+                            if (i == 5)
+                            {
+                                if (pstr.Count() > 1 && pstr[1] != null && pstr[1].Trim().Split(' ')[0] != "")
+                                {
+                                    try
+                                    {
+                                        if (qty > 0)
+                                        {
+                                            pricefive += (Convert.ToInt32(pstr[1].Trim().Split(' ')[0]) * qty);
+                                        }
+                                        else
+                                        {
+                                            pricefive += Convert.ToInt32(pstr[1].Trim().Split(' ')[0]);
+                                        }
+                                        priceListRecord.Add(Convert.ToInt32(pstr[1].Trim().Split(' ')[0]));
+                                    }
+                                    catch
+                                    {
+                                        pricefive += 0;
+                                        priceListRecord.Add(0);
+                                    }
+                                }
+                                classname = "clspricefive";
+
+                            }
+                            string mgclassname = classname + "mg";
+                            string packclassname = classname + "pack";
+                            <td>
+                                <input type="number" style="width:80px" id="@mgid" class="@mgclassname" value="@qty" />
+
+                                @if (pstr.Count() > 1)
+                                {
+                                    if (!pstr[1].Trim().Split(' ')[0].Contains("USD") && !pstr[1].Trim().Split(' ')[0].Contains("INR") && !pstr[1].Trim().Split(' ')[0].Contains("EUR") && !pstr[1].Trim().Split(' ')[0].Contains("GBP"))
+                                    {
+                                        <input class="@classname" type="number" id="@pid" value="@pstr[1].Trim().Split(' ')[0]" style="margin-top: 5px;width: 80px" />
+                                        <br />
+                                        if (pstr[1].Trim().Contains("X"))
+                                        {
+                                            if (pstr[1].Trim().Contains("="))
+                                            {
+                                                <input type="number" class="@packclassname" id="@packsize" value="@pstr[1].Trim().Split('X')[1].Trim().Split(' ')[0]" placeholder="Size" style="        margin-top: 5px;width: 80px" />
+                                            }
+                                            else
+                                            {
+                                                <input type="number" class="@packclassname" id="@packsize" value="@pstr[1].Trim().Split('X')[1].Trim()" placeholder="Size" style="        margin-top: 5px;width: 80px" />
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <input type="number" class="@packclassname" id="@packsize" value="" placeholder="Size" style="margin-top: 5px;width: 80px" />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <input class="@classname" type="number" id="@pid" value="" style="margin-top: 5px;width: 80px" /><br />
+                                        <input type="number" class="@packclassname" id="@packsize" value="" placeholder="Size" style="margin-top: 5px;width: 80px" />
+                                    }
+                                }
+                                else
+                                {
+                                    <input class="@classname" type="number" id="@pid" value="" style="margin-top: 5px;width: 80px" /><br />
+                                    <input type="number" class="@packclassname" id="@packsize" value="" placeholder="Size" style="margin-top: 5px;width: 80px" />
+                                }
+
+                                @if (i == 1)
+                                {
+                                    <br />
+
+                                    <div style="display:none" data-id="@k.Id" class="clstrac clsextracost_@k.Id" id="clsextracost_@k.Id">
+                                        <input style="float:left;margin-top: 5px;" placeholder="Tracebility Cost" type="text" id="TracebilityCost_@k.Id" value="@k.TracebilityCost" title="@k.TracebilityCost" /><br />
+                                        <input placeholder="Cold Shipment Cost" type="text" id="ColdShipCost_@k.Id" value="@k.ColdShipCost" style="float:left;margin-top: 5px;" title="@k.ColdShipCost" /><br />
+                                        <input placeholder="Additional Test Cost" type="text" id="AddTestCost_@k.Id" value="@k.AddTestCost" style="float:left;margin-top: 5px;" title="@k.AddTestCost" />
+                                    </div>
+                                }
+                            </td>
+                        }
+                        @for (int i = 1; i <= pendinginfocount; i++)
+                        {
+                            var classname = "";
+                            var index = fecthInfoCount + i;
+                            var mgid = "pricemg_" + index + "_" + k.Id;
+                            var pid = "price_" + index + "_" + k.Id;
+                            var packsize = "packsize_" + index + "_" + k.Id;
+                            var mgvalue = "";
+                            if (index == 1)
+                            {
+                                classname = "clspriceone";
+                                // mgvalue = "10";
+                            }
+
+                            if (index == 2)
+                            {
+                                classname = "clspricetwo";
+                                // mgvalue = "25";
+                            }
+                            if (index == 3)
+                            {
+                                classname = "clspricethree";
+                                /// mgvalue = "50";
+                            }
+                            if (index == 4)
+                            {
+                                classname = "clspricefour";
+                                // mgvalue = "100";
+                            }
+                            if (index == 5)
+                            {
+                                // classname = "clspricefive";
+                            }
+                            if (pendinginfocount != 4)
+                            {
+                                mgvalue = "";
+                            }
+                            string mgclassname = classname + "mg";
+                            string packclassname = classname + "pack";
+                            <td>
+                                <input type="number" id="@mgid" value="@mgvalue" class="@mgclassname" style="width: 80px" /><br />
+                                <input type="number" class="@classname" id="@pid" style="margin-top: 5px;width: 80px" /><br />
+                                <input type="number" class="@packclassname" id="@packsize" value="" placeholder="Size" style="margin-top: 5px;width: 80px" />
+                                @if (index == 1)
+                                {
+                                    <br />
+                                    <div style="display:none" data-id="@k.Id" class="clstrac clsextracost_@k.Id" id="clsextracost_@k.Id">
+                                        <input style="float:left;margin-top: 5px;" placeholder="Tracebility Cost" type="text" id="TracebilityCost_@k.Id" value="@k.TracebilityCost" title="@k.TracebilityCost" /><br />
+                                        <input placeholder="Cold Shipment Cost" type="text" id="ColdShipCost_@k.Id" value="@k.ColdShipCost" style="float:left;margin-top: 5px;" title="@k.ColdShipCost" /><br />
+                                        <input placeholder="Additional Test Cost" type="text" id="AddTestCost_@k.Id" value="@k.AddTestCost" style="float:left;margin-top: 5px;" title="@k.AddTestCost" />
+                                    </div>
+                                }
+                            </td>
+                        }
+
+                        @*@{
+                            var cnt = 0;
+                        }
+                        @if (matchedRecord != null && matchedRecord.Count > 0)
+                        {
+                            cnt = matchedRecord.OrderByDescending(x => x.CreatedDate).Where(x => string.IsNullOrEmpty(x.SZ_Quotation.PONo) && x.MoveToProject == true).Count();
+
+                            var withpocount = matchedRecord.OrderByDescending(x => x.CreatedDate).Where(x => !string.IsNullOrEmpty(x.SZ_Quotation.PONo) && x.MoveToProject == true).Count();
+
+                            if (withpocount == 0 && cnt > 0)
+                            {
+                                isRedMatched = true;
+                            }
+
+                            var withpocountlastfive = matchedRecord.OrderByDescending(x => x.CreatedDate).Take(5).Where(x => !string.IsNullOrEmpty(x.SZ_Quotation.PONo) && x.MoveToProject == true).Count();
+
+                            if (withpocountlastfive == 0)
+                            {
+                                isRedMatched = true;
+                            }
+                        }*@
+
+                    <td>
+                       
+                        <i class="fa fa-copy" onclick="copypricerecord(@k.Id)"></i>
+                        <i class="fa fa-paste" onclick="pastepricerecord(@k.Id)"></i>
+                        @if (isAnyPriceAvailable && !isMatched && !isRedMatched)
+                        {
+                            <i style="color:blue" data-value="step1" class="clstooltip fa fa-info" title="@pricecontent"></i>
+                        }
+                        else if (isMatched && !isRedMatched)
+                        {
+                            <i class="clstooltip fa fa-info" data-value="step2" title="@pricecontent"></i>
+                        }
+                        else if (isBlueMatched)
+                        {
+                            <i style="color: blue" class="clstooltip fa fa-info" data-value="step4" title="NO PO RECEIVED"></i>
+                        }
+                        else if (isRedMatched)
+                        {
+                            <i style="color:red" class="clstooltip fa fa-info" data-value="step3" title="@pricecontent"></i>
+                        }
+
+                        @if (isInSynthesis)
+                        {
+                            <i style="color:black" class="clstooltip fa fa-info" title="Scientist is working on this product"></i>
+                        }
+                    </td>
+                        <td>
+                            <label>@k.LeadTime</label>
+                            <textarea class="clstblleadtime" id="leadtime_@k.Id" value="@k.LeadTime" title="@k.LeadTime" rows="5"></textarea>
+                        </td>
+                        <td>
+                            <label>@k.ProductRemark</label>
+                            <textarea id="productremark_@k.Id" value="@k.ProductRemark" cols="25" rows="5" title="@k.ProductRemark" style="max-width:100%" class="clsproductremarktext"></textarea>
+                            <div style="display:none" class="clsextracost_@k.Id" id="clsextracost_@k.Id">
+                                <input placeholder="Tracebility Cost Remark" type="text" id="TracebilityCostRemark_@k.Id" value="@k.TracebilityCostRemark" style="margin-top: 5px;" title="@k.TracebilityCostRemark" /><br />
+                                <input placeholder="Cold Shipment Cost Remark" type="text" id="ColdShipCostRemark_@k.Id" value="@k.ColdShipCostRemark" style="margin-top: 5px;" title="@k.ColdShipCostRemark" /><br />
+                                <input placeholder="Additional Test Cost Remark" type="text" id="AddTestCostRemark_@k.Id" value="@k.AddTestCostRemark" style="margin-top: 5px; width: 90%" title="@k.AddTestCostRemark" />
+                                <i class="fa fa-plus" onclick="selectaddtionaltest(@k.Id)"></i>
+                                <input placeholder="Technical Contact" type="text" id="TechnicalEmail_@k.Id" value="@k.TechnicalEmail" style="margin-top: 5px;" title="@k.TechnicalEmail" />
+                            </div>
+                        </td>
+
+                        <td><label style="width: 200px;">@k.FinalPrice</label> <input type="text" id="finalprice_@k.Id" value="@k.FinalPrice" style="display: none;" /> </td>
+                        <td>
+                            <input type="number" id="discount_@k.Id" class="clsdiscount" value="@k.Discount" />
+                        </td>
+                        <td>
+                            <select id="batchno_@k.Id" class="clspartiallistbatchnos">
+                                @if (TempData["BatchNo_" + k.ProductId] != null)
+                                {
+                                    string[] bno = TempData["BatchNo_" + k.ProductId].ToString().Split(',');
+                                    if (bno.Length == 1 && bno[0] == "")
+                                    {
+                                        <option value="0">No Data</option>
+                                    }
+                                    else
+                                    {
+                                        int batchloop = 1;
+                                        bool selected = false;
+                                        if (k.QuoteBatchNo == "0")
+                                        {
+                                            selected = true;
+                                            <option value="0" selected>--Select--</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="0">--Select--</option>
+                                        }
+                                        foreach (var b in bno)
+                                        {
+                                            if (!string.IsNullOrEmpty(k.QuoteBatchNo) && b.Trim().StartsWith(k.QuoteBatchNo.Trim()))
+                                            {
+                                                selected = true;
+                                                <option selected value="@b.Trim()">@b.Trim()</option>
+                                            }
+                                            else
+                                            {
+                                                if (batchloop == bno.Count())
+                                                {
+                                                    if (selected)
+                                                    {
+                                                        <option value="@b.Trim()">@b.Trim()</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option selected value="@b.Trim()">@b.Trim()</option>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <option value="@b.Trim()">@b.Trim()</option>
+                                                }
+                                            }
+                                            batchloop += 1;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="0">No Data</option>
+                                }
+                            </select>
+                        </td>
+                        <td><label>@k.DisplayOrder</label> <input type="text" id="displayorder_@k.Id" value="@k.DisplayOrder" style="display: none; " /> </td>
+                        <td>
+                            <label>
+                                @if (k.EstimateDispatchDate.HasValue)
+                                {
+                                    @k.EstimateDispatchDate.Value.ToShortDateString()
+                                }
+                            </label> <input type="text" id="estimateDispatchDate_@k.Id" class="estdiscls" data-value="@k.EstimateDispatchDate" style="display: none;" />
+                        </td>
+                        <td>
+                            <i class="fa fa-history" title="Check Log" onclick="GetAuditLogForQuoteDetail('@k.Id')"></i>
+                            @if (k.ProductId.HasValue)
+                            {
+                                <i class="fa fa-clone" title="Move to Re-Test" onclick="GetAllBatchNo('@k.ProductId')"></i>
+                            } @if (k.MoveToProject.HasValue && k.MoveToProject.Value)
+                            {
+                                <i class="clstooltip fa fa-remove" style="float:right;margin-top: 5px;color:red" onclick="DeleteMoveFromProject('@k.Id')"></i>
+                            }
+                            &nbsp;&nbsp;&nbsp;
+                            <a style="color:#000" href="javascript:void(0)" class="clshistory" onclick="Quote.getPreviousQuoteInformationByCatNo('@k.CATNo', '@k.CASNo', '@k.QuoteId', '@k.Id')">
+                                <i class="fa fa-cube" title="Get Details"></i>
+                            </a>
+                            @if (k.IsQC.HasValue && k.IsQC.Value)
+                            {
+                                <i class="fa fa-check-square" title="QC" style="color:lightseagreen" onclick="RemoveAsQC(@k.Id)"></i>
+                            }
+                            else
+                            {
+                                <input type="checkbox" title="QC" id="chkIsQc" onclick="MarkAsQC(@k.Id)" />
+                            }
+
+                            @if (k.IsPurchase.HasValue && k.IsPurchase.Value)
+                            {
+                                <i class="fa fa-check-square" title="Purchase" style="color:lightseagreen" onclick="RemoveAsPurchase(@k.Id)"></i>
+                            }
+                            else
+                            {
+                                <input type="checkbox" title="Purchase" id="chkIsPurchase" onclick="MarkAsPurchase(@k.Id)" />
+                            }
+
+                            <i class="fa fa-plus clsplusminus_@k.Id" onclick="showextracost(@k.Id)"></i>
+                        </td>
+                    </tr>
+                    var conditionValue = 0;
+                    if (k.SZ_Quotation.CountryType == "Export")
+                    {
+                        conditionValue = 750;
+                    }
+                    if (k.SZ_Quotation.CountryType == "Domestic")
+                    {
+                        conditionValue = 50000;
+                    }
+                    var greaterthan = priceListRecord.Where(x => x >= conditionValue).Count();
+                    loopCnt += 1;
+                    if (greaterthan > 0)
+                    {
+                        <text>
+                            <script type="text/javascript">
+                                $("#productname_" + @k.Id).addClass('clsgraterrecord');
+                            </script>
+                        </text>
+                    }
+                }
+
+                @if (Model != null && Model.Count > 0)
+                {
+                    <tr>
+                        <td colspan="2"></td>
+                        <td id="clspriceonetext" style="font-weight:bold">@priceone</td>
+                        <td id="clspricetwotext" style="font-weight:bold">@pricetwo</td>
+                        <td id="clspricethreetext" style="font-weight:bold">@pricethree</td>
+                        <td id="clspricefourtext" style="font-weight:bold">@pricefour</td>
+                        <td colspan="4"></td>
+                        <td style="font-weight:bold">
+                            <input type="text" class="clscommondiscount" />
+                        </td>
+                        <td colspan="6"></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div style="text-align: center;color: lightgray;font-size: 36px;">
+            <i class="fa fa-database" style="font-size:120px;"></i> <br />No Products Found!!!
+        </div>
+    }
+</div>
+<script>
+    $(document).ready(function () {
+        refreshHighlighted();
+
+        $(".clsproductremarktext").each(function () {
+            $(this).val($(this).attr('value'));
+        });
+
+        $(".clstblleadtime").each(function () {
+            $(this).val($(this).attr('value'));
+        });
+    })
+
+    function LoadAllCategoryPrice(mg, value, type) {
+        $.ajax({
+            url: '/Form/GetAllCategoryPricePopup?mg=' + mg + '&value=' + value + '&type=' + type,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+                $('#invoiceQueryModal').find(".modal-dialog").css("width", "1200px");
+                $('#invoiceQueryModal').find(".modal-content").css("width", "1200px");
+            }
+        });
+    }
+
+    function LastBatchSelectDefault() {
+        $(".clspartiallistbatchnos").each(function () {
+            var id = $(this).attr('id');
+            document.querySelector("#" + id).selectedIndex = document.querySelector("#" + id).length - 1;
+        });
+    }
+
+    $(".clstrac").each(function () {
+        var id = $(this).attr('data-id');
+        if ($("#TracebilityCost_" + id).val() !== "") {
+            $(".clsextracost_" + id).css('display', 'block');
+            $(".clsplusminus_" + id).removeClass('fa-plus');
+            $(".clsplusminus_" + id).addClass('fa-minus');
+        }
+        if ($("#ColdShipCost_" + id).val() !== "") {
+            $(".clsextracost_" + id).css('display', 'block');
+            $(".clsplusminus_" + id).removeClass('fa-plus');
+            $(".clsplusminus_" + id).addClass('fa-minus');
+        }
+        if ($("#AddTestCost_" + id).val() !== "") {
+            $(".clsextracost_" + id).css('display', 'block');
+            $(".clsplusminus_" + id).removeClass('fa-plus');
+            $(".clsplusminus_" + id).addClass('fa-minus');
+        }
+        if ($("#TechnicalEmail_" + id).val() !== "") {
+            $(".clsextracost_" + id).css('display', 'block');
+            $(".clsplusminus_" + id).removeClass('fa-plus');
+            $(".clsplusminus_" + id).addClass('fa-minus');
+        }
+
+        if ($("#AddTestCostRemark_" + id).val() !== "") {
+            $(".clsextracost_" + id).css('display', 'block');
+            $(".clsplusminus_" + id).removeClass('fa-plus');
+            $(".clsplusminus_" + id).addClass('fa-minus');
+        }
+    });
+
+    function showextracost(id) {
+        if ($(".clsplusminus_" + id).hasClass("fa-plus")) {
+            $(".clsplusminus_" + id).removeClass('fa-plus');
+            $(".clsplusminus_" + id).addClass('fa-minus');
+            $(".clsextracost_" + id).css('display', 'block');
+        }
+        else {
+            $(".clsplusminus_" + id).removeClass('fa-minus');
+            $(".clsplusminus_" + id).addClass('fa-plus');
+            $(".clsextracost_" + id).css('display', 'none');
+        }
+
+    }
+
+    function PriceQuoteProducts() {
+        var productpricearray = [];
+        var checkedCount = 0;
+        $(".delclass").each(function (i, v) {
+            if ($(this).is(":checked")) {
+                checkedCount += 1;
+            }
+        });
+
+        
+        $(".delclass").each(function (i, v) {
+            var isProcess = false;
+            if (checkedCount !== 0) {
+                if ($(this).is(":checked")) {
+                    isProcess = true;
+                }
+            }
+            else {
+                isProcess = true;
+            }
+
+            if (isProcess) {
+                var qty = '';
+                var id = $(this).val();
+                var mg1 = $("#pricemg_1_" + id).val();
+                var mg2 = $("#pricemg_2_" + id).val();
+                var mg3 = $("#pricemg_3_" + id).val();
+                var mg4 = $("#pricemg_4_" + id).val();
+                if (mg1 !== "") {
+                    qty += mg1 + ',';
+                }
+                if (mg2 !== "") {
+                    qty += mg2 + ',';
+                }
+                if (mg3 !== "") {
+                    qty += mg3 + ',';
+                }
+                if (mg4 !== "") {
+                    qty += mg4 + ',';
+                }
+                var obj = {
+                    "id": id,
+                    "quoteid": $("#QuoteId").val(),
+                    "qty": qty
+                };
+                productpricearray.push(obj);
+            }
+        });
+
+        suggestedpricemodel = JSON.stringify({ 'suggestedpricemodel': productpricearray });
+        $("#btnaddedproductlist").text('Loading...');
+        $.ajax({
+            url: '/Form/CheckPriceOfList',
+            data: suggestedpricemodel,
+            type: 'POST',
+            traditional: true,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (result) {
+                $("#btnaddedproductlist").text('Price');
+                if (result.data.length > 0) {
+                    $(result.data).each(function (i, v) {
+                        if (v.qty !== '') {
+                            var arr = [];
+                            var isloop = 1;
+                            var spliteddata = v.qty.split(',');
+                            $(spliteddata).each(function (is, vs) {
+                                debugger;
+                                if (vs.trim() !== "") {
+                                    var qtysplit = vs.split('-');
+                                    if (arr.indexOf(qtysplit[0]) !== -1) {
+                                        return false;
+                                    }
+                                    arr.push(qtysplit[0]);
+                                    $("#price_" + isloop + "_" + v.id).val(qtysplit[1].trim());
+                                    isloop += 1;
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    function Exportallquoteproducts() {
+        window.location.href = '/Form/ExportQuoteProducts/@quoteId';
+    }
+
+
+    function ValidateQuoteProducts() {
+        var productpricearray = [];
+        $(".delclass").each(function (i, v) {
+           
+                var qty = '';
+                var id = $(this).val();
+                var mg1 = $("#pricemg_1_" + id).val();
+                var mg2 = $("#pricemg_2_" + id).val();
+                var mg3 = $("#pricemg_3_" + id).val();
+                var mg4 = $("#pricemg_4_" + id).val();
+                if (mg1 !== "") {
+                    qty += mg1 + ',';
+                }
+                if (mg2 !== "") {
+                    qty += mg2 + ',';
+                }
+                if (mg3 !== "") {
+                    qty += mg3 + ',';
+                }
+                if (mg4 !== "") {
+                    qty += mg4 + ',';
+                }
+                var obj = {
+                    "id": id,
+                    "quoteid": $("#QuoteId").val(),
+                    "qty": qty
+                };
+                productpricearray.push(obj);
+            
+        });
+
+        suggestedpricemodel = JSON.stringify({ 'suggestedpricemodel': productpricearray });
+        $.ajax({
+            url: '/Form/ValidateQuoteProducts',
+            data: suggestedpricemodel,
+            type: 'POST',
+            traditional: true,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (result) {
+
+            }
+        });
+    }
+</script>
+<style>
+    #tblalready input[type=number] {
+        background-color: #f1f1f1;
+        width: 100%;
+        padding: 0px;
+    }
+
+    .clsgraterrecord {
+        color: #000;
+        font-weight: bold;
+    }
+
+</style>

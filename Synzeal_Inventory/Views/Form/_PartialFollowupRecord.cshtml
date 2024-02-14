@@ -1,0 +1,122 @@
+﻿@model List<Synzeal_Inventory.Models.QuotationListModel>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    string quoteDate = Model.Select(x => x.CreatedDate).FirstOrDefault().HasValue ?
+        Model.Select(x => x.CreatedDate).FirstOrDefault().Value.GetOrdinalDate(true) : "";
+
+    int count = 1;
+
+    bool isMailSend = false;
+    if (ViewBag.ISMailSend != null)
+    {
+        isMailSend = Convert.ToBoolean(ViewBag.ISMailSend);
+    }
+
+}
+@using Synzeal_Inventory.Models
+<div class="box-body form-horizontal">
+    <p>Dear Sir/Madam,</p>
+    @if (!isMailSend)
+    {
+        <div style="float: right;position: relative;margin-top: -25px;">
+            <a href="javascript:void(0)" style="background: #337ab7;color: #fff;padding: 10px;" onclick="sendEmail()">Send Mail</a>
+        </div>
+    }
+    <p>Greetings from SynZeal Research !!</p>
+    <p>
+        This is with reference to our submitted quotation no @Model.Select(x => x.Ref).FirstOrDefault() dated @Html.Raw(quoteDate)  for your prospective requirement.
+        @if (isMailSend)
+        {
+            int? qid = Model.Select(x => x.QuoteId).FirstOrDefault();
+            var quoteRecord = db.SZ_Quotation.Where(x => x.Id == qid).FirstOrDefault();
+            if (quoteRecord != null && !string.IsNullOrEmpty(quoteRecord.ClientRef))
+            {
+                <span>[Your Reference RFQ # @quoteRecord.ClientRef]</span>
+            }
+        }
+    </p>
+    <p>
+        @*Can you please update us feedback regarding our quotation submitted as below.*@
+        We request you to please update us with your valuable feedback on our submitted quotation.
+    </p>
+    <br />
+
+    <table width="100%" class="table table-bordered table-striped" @(isMailSend ? "border='1'" : "" )>
+        <thead>
+            <tr>
+                <th>Sr. No</th>
+                <th>
+                    SynZeal Quote ID
+
+                </th>
+                <th>Quotation Date</th>
+                <th>Products Name</th>
+                <th>
+                    CAS No
+                </th>
+                <th>SZ Cat No</th>
+                <th>Quotation</th>
+                <th>Lead time</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody id="tblfollowupbody">
+            @foreach (var k in Model)
+            {
+                <tr data-quotedetails="@k.QuoteDetailsId">
+                    <td>
+                        @count
+                    </td>
+                    <td>@k.Ref</td>
+                    <td>
+                        @if (k.CreatedDate.HasValue)
+                        {
+                            @Html.Raw(k.CreatedDate.Value.GetOrdinalDate(true))
+                        }
+                    </td>
+                    <td>@k.ProductName</td>
+                    <td>@k.CASNo</td>
+                    <td>@k.CATNo</td>
+                    <td>@k.Price</td>
+                    <td>@k.LeadTime</td>
+                    <td></td>
+                </tr>
+
+                count += 1;
+            }
+        </tbody>
+    </table>
+    <br />
+    <p>
+        We look forward to hearing from you soon.
+    </p>
+    <p>Kind Regards,</p>
+    <br />
+    @if (isMailSend)
+    {
+        <img src="http://spms.synzeal.com/images/email-footer.jpg" height="150px" />
+    }
+</div>
+
+<script type="text/javascript">
+    function sendEmail() {
+        var detailId = [];
+        $("#tblfollowupbody").find('tr').each(function () {
+            detailId.push($(this).attr('data-quotedetails'));
+        });
+
+        //ajax call for send mail
+        $.ajax({
+            url: '/Form/SendFollowUpMail',
+            data: { id: detailId },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    window.location.href = "/Form/QuotationList";
+                }
+            }
+        });
+    }
+</script>

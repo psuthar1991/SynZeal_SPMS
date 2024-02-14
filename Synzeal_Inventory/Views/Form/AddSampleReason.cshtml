@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "Add Sample Reason";
+    Layout = null;
+}
+@model  Synzeal_Inventory.Entity.SZ_SampleReason
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Add New Sample Reason</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Reason</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter Reason" required value="@Model.Name">
+                    <input type="hidden" id="compid" name="compid" value="@Model.Id" />
+                </div>
+                <div class="form-group" style="text-align:right">
+                    <button type="button" onclick="Quote.addSampleReasonList()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,102 @@
+﻿@{
+    ViewBag.Title = "Payment Term List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model List<Synzeal_Inventory.Entity.PaymentTerm>
+@using Synzeal_Inventory.Models
+<section class="content-header">
+    <h1>
+        Payment Term List  <a data-toggle="modal" data-target="#myModal" style="float:right" class="btn btn-primary" href="@Url.Action("AddPaymentTerm","Form")">Add Payment Term</a>
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <div class="box-body">
+
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Reminder Day</th>
+                                <th>Note</th>
+                                <th>Created Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Count > 0)
+                            {
+                                foreach (var i in Model)
+                                {
+                            <tr>
+                                <td>@i.Name</td>
+                                <td>@i.Day</td>
+                                <td>@i.Note</td>
+                                <td>@i.CreatedDate</td>
+                                <td>
+                                    <a data-toggle="modal" data-target="#myModal" href="@Url.Action("AddpaymentTerm","Form",new { id = i.Id})"> Edit</a> |
+                                    <a href="javascript:void(0)" onclick="deletePaymentTerm('@i.Id')"> Delete</a>
+                                </td>
+                            </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    $(function () {
+        $('#example1').DataTable({
+            "pageLength": 25,
+            "order": [[0, "asc"]]
+        })
+    });
+
+    function deletePaymentTerm(id) {
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this payment terms!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Form/DeletePaymentTerms?id=" + id,
+                        data: {},
+                        success: function (results) {
+                            if (results.success) {
+                                toastr.success("Payment Terms has been deleted.");
+                                setTimeout(function () { window.location.reload(true); }, 2000);
+                            }
+                            else {
+                                if (results.multiple) {
+                                    toastr.error("Payment Terms already assigned to quotation.");
+                                }
+
+                            }
+                        }
+                    });
+
+                } else {
+                    toastr.error("Your added Payment Terms is safe :)");
+                }
+            });
+    }
+</script>

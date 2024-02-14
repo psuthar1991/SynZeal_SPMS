@@ -1,0 +1,37 @@
+﻿@{
+    ViewBag.Title = "Cricket";
+}
+
+<h2>Cricket</h2>
+
+<label>Team 1 : </label>
+<textarea cols="10" rows="10" id="txtteama"></textarea>
+
+<label>Team 2 : </label>
+<textarea cols="10" rows="10" id="txtteamb"></textarea>
+
+<input type="button" onclick="calculate()" />
+
+<div id="result"></div>
+<script src="https://code.jquery.com/jquery-3.6.1.js"
+        integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI="
+        crossorigin="anonymous"></script>
+
+<script>
+    function calculate() {
+        var teamA = $("#txtteama").val();
+        var teamB = $("#txtteamb").val();
+        var splitTeamA = teamA.split(',');
+        var splitTeamB = teamB.split(',');
+        var str = "";
+        for (var i = 0; i < splitTeamA.length; i++) {
+            var captain = splitTeamA[i];
+            str += captain + " (C) , ";
+            for (var j = 0; j < splitTeamB.length; j++) {
+                str += " " + splitTeamB[j] +", ";
+            }
+            str += "\r\n";
+        }
+        $("#result").html(str);
+    }
+</script>

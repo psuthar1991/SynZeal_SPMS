@@ -1,0 +1,151 @@
+﻿@model List<Synzeal_Inventory.Models.QuotationListModel>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    string pageName = ViewBag.pageName;
+
+    List<int> quotedetailsId = Model.Select(x => x.QuoteDetailsId).ToList();
+}
+@using Synzeal_Inventory.Models
+<div class="box-body form-horizontal">
+    <table width="100%" class="table table-bordered table-striped">
+        <thead>
+            @if (pageName == "pendingupload")
+            {
+                <tr>
+
+                    <th>Product Name</th>
+                    <th>CAS No</th>
+                    <th>CAT No</th>
+                </tr>
+
+            }
+            else if (pageName == "copymail")
+            {
+                <tr>
+                    <th>PO No.</th>
+                    <th>Product Name</th>
+                    <th>CAS No</th>
+                    <th>CAT No</th>
+                    <th>QTY. (mg)</th>
+                    <th>Pack Size</th>
+                    <th>Current Status</th>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <th>PO No.</th>
+                    <th>Product Name</th>
+                    <th>CAS No</th>
+                    <th>CAT No</th>
+                    <th>PO Date</th>
+                    <th>Lead Time</th>
+                    <th>Batch No</th>
+                    <th>QTY. (mg)</th>
+                    <th>Pack Size</th>
+                    <th>Current Status</th>
+                    <th>Estimate Comp. Date </th>
+                </tr>
+
+            }
+        </thead>
+        @if (pageName == "pendingupload")
+        {
+            foreach (var k in Model)
+            {
+                <tr>
+                    <td>@k.ProductName</td>
+                    <td>@k.CASNo</td>
+                    <td>@k.CATNo</td>
+                </tr>
+            }
+        }
+        else if (pageName == "copymail")
+        {
+
+            foreach (var k in Model)
+            {
+                <tr>
+                    <td>@k.PONumber</td>
+                    <td>@k.ProductName</td>
+                    <td>@k.CASNo</td>
+                    <td>@k.CATNo</td>
+                    <td>@k.RequiredQty</td>
+                    <td>@k.OrderRemark</td>
+                    <td>@k.ExplainationSecond</td>
+                </tr>
+            }
+        }
+        else
+        {
+            foreach (var k in Model)
+            {
+                <tr>
+                    <td>@k.PONumber</td>
+                    <td>@k.ProductName</td>
+                    <td>@k.CASNo</td>
+                    <td>@k.CATNo</td>
+                    <td>
+                        @if (k.PODate.HasValue)
+                        {
+                            @k.PODate.Value.GetOrdinalDate()
+                        }
+                    </td>
+                    <td>@k.LeadTime</td>
+                    <td>@k.BatchNo</td>
+                    <td>@k.RequiredQty</td>
+                    <td>@k.OrderRemark</td>
+                    <td>@k.ExplainationSecond</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(k.EstimateCompleteDate))
+                        {
+                            DateTime estdate = Convert.ToDateTime(k.EstimateCompleteDate);
+                            @estdate.GetOrdinalDate()
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+
+    @if (pageName == "copymail")
+    {
+        <br />
+        <div class="pull-right">
+            <a href="javascript:void(0)" class="btn btn-primary" onclick="sendemailconfirmation()">Send Email</a>
+        </div>
+    }
+</div>
+
+<script>
+    function sendemailconfirmation() {
+        var ids = JSON.parse('@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(quotedetailsId))');
+        //var paramData
+        //$(ids).each(function (i, v) {
+        //    var obj = {
+        //        "QuoteDetailsId" : v
+        //    };
+        //    paramData.push(obj)
+        //});
+
+        var data = JSON.stringify({ "id": ids });
+    $.ajax({
+        url: '/Form/SendEmailForProjectUpdates',
+        data: data,
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        type: 'POST',
+        traditional: true, // add this
+        success: function (data) {
+            if (data.success) {
+                toastr.success("Send mail successfully");
+                $('#myModal').modal('hide');
+            }
+            else {
+                toastr.error(data.message);
+                return false;
+            }
+        }
+    });
+}
+</script>

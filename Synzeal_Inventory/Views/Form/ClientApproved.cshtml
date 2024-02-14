@@ -1,0 +1,368 @@
+﻿@{
+    ViewBag.Title = "ClientApproved";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="//cdn.datatables.net/plug-ins/1.10.22/pagination/select.js"></script>
+
+<style type="text/css">
+    #example1 input {
+        border: 0px;
+    }
+</style>
+<section class="content-header">
+    <h1>
+        <div style="float:left">Client Approved</div>
+        @*<a href="javascript:void(0)" style="float:right;" class="btn btn-primary" onclick="ApprovedAll()">Approved All</a>*@
+    </h1>
+    <div class="clearfix"></div>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary" id="home">
+                
+                        <!-- /.box-header -->
+                        <div class="box-body " id="divProj">
+                            <div style="margin: 8px 20px;box-shadow: 1px 1px 2px 2px #ececec;padding: 3px;">
+                                <div class="form-group" style="margin-bottom:0">
+                                    <div class="col-md-5" style="margin-top:6px">
+                                        <div class="radio">
+                                            <label>
+                                                <input type="radio" name="filterAll" id="optionsRadios2" value="ponumber">
+                                                PO #
+                                            </label>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <label>
+                                                <input type="radio" name="filterAll" id="optionsRadios2" value="company">
+                                                Company
+                                            </label>&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <label>
+                                                <input type="radio" name="filterAll" id="optionsRadios2" value="productname">
+                                                Product
+                                            </label>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <label>
+                                                <input type="radio" name="filterAll" id="optionsRadios2" value="cas">
+                                                CAS #
+                                            </label>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <label>
+                                                <input type="radio" name="filterAll" id="optionsRadios2" value="cat">
+                                                CAT #
+                                            </label>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <label>
+                                                <input type="radio" name="filterAll" id="optionsRadios2" value="batchno">
+                                                Batch #
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6" style="margin-top:9px">
+                                        <div>
+                                            <input class="form-control" id="allsearchbox" type="text" placeholder="Enter search string" style="width:300px; float:left">
+                                            <a href="javascript:void(0)" style="float:left;margin-left:8px;" class="btn btn-primary" onclick="$('#example1').DataTable().draw()">Search</a>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-2" style="margin-top:6px">
+                                        <label>Sci. Name : </label>
+                                        @Html.DropDownList("ScientistListItem", (IEnumerable<SelectListItem>)ViewBag.ScientistListItem, new { @class = "form-control", @onchange = "$('#example1').DataTable().draw()" })
+                                    </div>
+                                    <div class="col-md-2" style="margin-top:6px">
+                                        <label>Sub Sci. Name : </label>
+                                        @Html.DropDownList("SubScientistListItem", (IEnumerable<SelectListItem>)ViewBag.SubScientistListItem, new { @class = "form-control", @onchange = "$('#example1').DataTable().draw()" })
+                                    </div>
+                                    <div class="col-md-2" style="margin-top:6px">
+                                        <label>Activity : </label>
+                                        <select class="form-control" id="fltactivity" onchange="$('#example1').DataTable().draw()">
+
+                                            <option value=''>--Select--</option>
+                                            <option value='Approval First'>Approval First</option>
+                                            <option value='Repeat Order'>Repeat Order</option>
+                                            <option value='Repeat Order - Dispatch'>Repeat Order - Dispatch</option>
+                                            <option value='Repeat Order - Approval First'>Repeat Order - Approval First</option>
+                                            <option value='Short Qty Dispatch'>Short Qty Dispatch</option>
+                                            <option value='Short Qty Dispatched'>Short Qty Dispatched</option>
+                                            <option value='Sample Request'>Sample Request</option>
+                                            <option value='Sample Sent'>Sample Sent</option>
+                                            <option value='Sample Approved'>Sample Approved</option>
+                                            <option value='Quote - Data Sent'>Quote - Data Sent</option>
+                                            <option value='Quote - Data Approved'>Quote - Data Approved</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2" style="margin-top:6px">
+                                        <label>Status : </label>
+                                        @Html.DropDownList("fltprostatusItem", (IEnumerable<SelectListItem>)ViewBag.fltprostatusItem, new { @class = "form-control", @onchange = "$('#example1').DataTable().draw()" })
+                                    </div>
+                                    <div class="col-md-4" style=" margin-top: 30px; ">
+                                        @*<a href="javascript:void(0)" style="float:right" class="btn btn-primary" onclick="companyRecordsWithCount()">Company Record</a>
+                                        <a href="javascript:void(0)" style="float:right;margin-right:15px" class="btn btn-primary" onclick="sendorderemail()">Order Confirmation</a>*@
+
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br />
+                            <table id="example1" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAllclsSaverow" /></th>
+                                        <th>Approved</th>
+                                        <th></th>
+                                        <th>#</th>
+                                        <th>PO Date</th>
+                                        <th>Lead Time</th>
+                                        <th><span title="Priority">Pty</span></th>
+                                        <th>Diff</th>
+                                        <th>PO No</th>
+                                        <th>Company Name</th>
+                                        <th>Project Type</th>
+                                        <th>Scientist</th>
+                                        <th>Sub-Scientist</th>
+                                        <th>Sci. Assg.</th>
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th></th>
+                                        <th>Qty (mg)</th>
+                                        <th>Est. Date</th>
+                                        <th>Batch No</th>
+                                        <th>COA</th>
+                                        <th></th>
+                                        <th>Activity</th>
+                                        <th>Status</th>
+                                        <th>Sec. Exp.</th>
+                                        <th></th>
+                                        <th>Data Remark</th>
+                                        <th>Reason</th>
+                                        <th>Pack Size</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    $(function () {
+        //$(document).on("keyup", '#allpagenumber', function () {
+        //    GetExchangeRate();
+        //});
+        var alltbl = $('#example1').DataTable({
+            "searching": false,
+            "ordering": false,
+            "scrollX": true,
+            "scrollY": "550px",
+            "sPaginationType": "listbox",
+            //"autoWidth" : false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "pageLength": 25,
+            "fnDrawCallback": function (oSettings) {
+                $("#selectAllclsMoveDispatch").click(function () {
+                    if ($(this).is(":checked")) {
+                        $('.clsMoveDispatch').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $(".clsMoveDispatch").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+
+                $("#selectAllclsSaverow").click(function () {
+                    if ($(this).is(":checked")) {
+                        $('.clsSaverow').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $(".clsSaverow").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+                $('.datepicker').datepicker({
+                    format: 'dd/mm/yyyy'
+                });
+
+                $('.datepicker').each(function () {
+                    var dateValue = $(this).attr('data-value');
+                    if (dateValue !== '') {
+                        dateValue = dateValue.toString().replace(' 00:00:00', '');
+                        $(this).datepicker("setDate", dateValue);
+                    }
+                });
+
+                //var api = this.api();
+                //var rows = api.rows({ page: 'current' }).nodes();
+                //var last = null;
+                //var groupingCounts = [];
+                //var counter = 1;
+                //api.column(7, { page: 'current' }).data().each(function (group, i) {
+                //    if (last !== group) {
+                //        if (last !== undefined) {
+                //            groupingCounts[last] = counter;
+                //        }
+                //        $(rows).eq(i).before(
+                //            //'<td class="group" colspan="26" style="color:#fff;font-weight:700;padding:10px;' + (rows[i].attributes["data-IsPaymentPending"].value === "true" ? "BACKGROUND-COLOR:#e25b5b;" : "BACKGROUND-COLOR:#3c8dbc;") + '"><a style="color: #fff; text-decoration: underline;" target="_blank" href="/Form/Quote/' + rows[i].attributes["data-QuoteId"].value + '">' + group + "</a> | " + rows[i].attributes["data-company"].value + ' | ' + rows[i].attributes["data-podate"].value + ' ' + (rows[i].attributes["data-IsPaymentPending"].value === "true" ? "(Payment Pending)" : "") + " " + (rows[i].attributes["data-PaymentTerms"] === undefined || rows[i].attributes["data-PaymentTerms"].value === "" ? "" : " | Payment Terms : " + rows[i].attributes["data-PaymentTerms"].value)
+                //            '<td class="group" id="grouping_' + group.trim() + '" data-groupname="' + group + '" colspan="26" style="color:#fff;font-weight:700;padding:10px;">' + group + " | " + rows[i].attributes["data-company"].value + ' | ' + rows[i].attributes["data-podate"].value +'></i>'
+                //            + ' </td>'
+                //        );
+
+                //        last = group;
+                //        counter = 1;
+                //    } else {
+                //        counter++;
+                //    }
+                //});
+
+                alltbl.columns.adjust();
+                $('.clstooltip').tooltip();
+
+                //groupingCounts[last] = counter;
+                //CountRows(groupingCounts, 'example1');
+            },
+            "columnDefs":
+                [
+                    { targets: 3, visible: false },
+                    { targets: 7, visible: false },
+                    { targets: 8, visible: false }
+                ],
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "initComplete": function (settings, json) {
+
+            },
+            "ajax": {
+                "url": "../Form/LoadClientApprovedData",
+                "type": "POST",
+                "datatype": "json",
+                "data": function (d) {
+                    d.sciname = $("#home").find("#ScientistListItem").val();
+                    d.subsciname = $("#home").find("#SubScientistListItem").val();
+                    d.fltprostatusItem = $("#home").find("#fltprostatusItem").val();
+                    d.fltactivity = $("#home").find("#fltactivity").val();
+                    d.radiobuton = $("#home").find('input[name="filterAll"]:checked').val();
+                    d.searchbox = $("#home").find("#allsearchbox").val();
+                }
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.SelectedProjectType === "In-Stock") {
+                    $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                }
+                if (aData.SelectedProjectType === "In-Stock" && aData.MoveToDispatch != true) {
+                    $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                }
+                //if (aData.ReadyToDeliverScientistStatusId === aData.ScientistStatus) {
+                //    $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                //}
+                if (aData.MoveToDispatch && (aData.DispatchedStatus == "0" || aData.DispatchedStatus == null)) {
+                    $('td', nRow).css('background-color', '#ffe6b3');
+                }
+                if (aData.MoveToDispatch && aData.DispatchedStatus == "1") {
+                    $('td', nRow).css('background-color', 'rgb(250, 209, 255)');
+                }
+                if (aData.MoveToInvoice) {
+                    $('td', nRow).css('background-color', '#ff9999');
+                }
+            },
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                $(row).attr('data-email', data.EmailAddress);
+                $(row).attr('data-company', data.CompanyName);
+                $(row).attr('data-companyId', data.CompanyId);
+                $(row).attr('data-podate', data.MoveProjectDateText);
+                $(row).attr('data-pono', data.PONumber);
+                $(row).attr('data-ProductCount', data.ProductCount);
+                $(row).attr('data-PaymentTerms', data.PaymentTerms);
+                $(row).attr('data-QuoteId', data.QuoteId);
+                $(row).attr('data-IsPaymentPending', (data.IsPaymentPending == null ? false : data.IsPaymentPending));
+            },
+            "columns": [
+                { "data": "ChkSaveRow" },
+                { "data": "ChkFirstRow" },
+                { "data": "ClientChat" },
+                //{ "data": "LastRowText", "autoWidth": true },
+                { "data": "SrPo" },
+                { "data": "MoveProjectDateText", "name": "MoveProjectDateText" },
+                { "data": "LeadTime" },
+                { "data": "IsPriorityText" },
+                { "data": "DifficultyLevelText" },
+                { "data": "PONumber", "name": "PONumber" },
+                { "data": "CompanyName", "name": "CompanyName" },
+                { "data": "ProjectTypeText", "orderable": false },
+                { "data": "ScientistName", "orderable": false },
+                { "data": "SubScientistName", "orderable": false },
+                { "data": "MoveToScientistDateStr", "orderable": false },
+                { "data": "ProductName" },
+                { "data": "CASNo", "name": "CASNo", width: '150px' },
+                { "data": "CATNo", "name": "CATNo", width: '100px' },
+                { "data": "Attachment", "name": "Attachment" },
+                { "data": "RequiredQtyTxt", "name": "Ref", className: "fontbold", },
+                { "data": "EstimateCompleteDateText", "orderable": false },
+                { "data": "AdditionalBatchNoText", "name": "ProductName" },
+                //{ "data": "COARefNumber", "name": "COARefNumber" },
+                { "data": "COAText", "name": "COAText" },
+                { "data": "GetAllBatch", "name": "GetAllBatch" },
+                { "data": "ActivityStatusText", "orderable": false },
+                { "data": "ProStatusText", "orderable": false },
+                //{ "data": "ScientistStatustext", "orderable": false },
+                { "data": "ExplainationSecondText", "orderable": false },
+                { "data": "ExplainationText", "orderable": false },
+                { "data": "RemarkText", "orderable": false },
+                { "data": "ReasonText", "orderable": false },
+                { "data": "OrderRemarkText", "orderable": false },
+            ]
+        });
+    });
+
+
+    $(document).on("click", '.clsClientApproved', function () {
+        var status = false;
+        if ($(this).is(":checked")) {
+            status = true;
+        }
+        else {
+            status = false;
+        }
+        var id = $(this).val();
+        $.ajax({
+            url: '/Form/ChangeClientApproved?id=' + id + '&status=' + status,
+            data: { },
+            type: 'GET',
+            traditional: true, 
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    toastr.success("Approved Done.");
+                    // $('#example1').DataTable().ajax.reload(null, false);
+                }
+            }
+        });
+    });
+
+    function chatDetails(id) {
+        $.ajax({
+            url: '/Form/chatDetails?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+                // $("#invoiceQueryModal .modal-content").css("width", "1080px");
+            }
+        });
+    }
+</script>

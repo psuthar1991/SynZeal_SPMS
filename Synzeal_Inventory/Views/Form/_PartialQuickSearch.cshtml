@@ -1,0 +1,180 @@
+﻿@using Synzeal_Inventory.Models
+<div class="box-body form-horizontal">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div class="col-md-6" style="margin-top:6px">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="filterquickAll" id="optionsRadios1" value="quoteid" checked />
+                        Quote #
+                    </label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <label>
+                        <input type="radio" name="filterquickAll" id="optionsRadios2" value="ponumber">
+                        PO #
+                    </label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <label>
+                        <input type="radio" name="filterquickAll" id="optionsRadios2" value="company">
+                        Company
+                    </label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <label>
+                        <input type="radio" name="filterquickAll" id="optionsRadios2" value="productname">
+                        Product
+                    </label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <label>
+                        <input type="radio" name="filterquickAll" id="optionsRadios2" value="cas">
+                        CAS #
+                    </label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <label>
+                        <input type="radio" name="filterquickAll" id="optionsRadios2" value="cat">
+                        CAT #
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-6" style="margin-top:9px">
+                <div>
+                    <input class="form-control" id="allquicksearchbox" type="text" placeholder="Enter search string" style="width:300px; float:left">
+                    <a href="javascript:void(0)" style="float:left;margin-left:8px;" class="btn btn-primary" onclick="quicksearchloaded()">Search</a>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+    <table width="100%" class="table table-bordered table-striped" id="examplequicksearch">
+        <thead>
+            <tr>
+                <th>
+                    Quote #
+                </th>
+                <th>PO Number</th>
+                <th>Company Name</th>
+                <th>Product Name</th>
+                <th>
+                    CAS #
+                </th>
+                <th>CAT #</th>
+                <th>Lead Time</th>
+                <th>Price</th>
+                <th>Location</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="tblfollowupbody">
+        </tbody>
+    </table>
+
+</div>
+<script>
+    var isquicksearchloaded = false;
+    function OpenQuoteDetailPage(quoteid) {
+        window.open('http://spms.synzeal.com/Form/Quote/' + quoteid, '_blank');
+
+    }
+    function FindIntab(location, searchstring) {
+        $("#myModal").modal('hide');
+        if (location === "All") {
+            $('#tabullist a[href="#home"]').trigger('click');
+        }
+        if (location === "Pending User") {
+            $('#tabullist a[href="#tabtobe"]').trigger('click');
+        }
+        if (location === "Pending Distributor") {
+            $('#tabullist a[href="#tabtobedistributor"]').trigger('click');
+        }
+        if (location === "Approved") {
+            $('#tabullist a[href="#tabapproved"]').trigger('click');
+        }
+    }
+
+    function quicksearchloaded() {
+        var value = $("#myModal").find("#allquicksearchbox").val();
+        if (value === '') {
+            toastr.error("Please enter search string.");
+            return false;
+        }
+        if (isquicksearchloaded) {
+            $("#myModal").find('#examplequicksearch').DataTable().draw()
+        }
+        else {
+            var alltbl = $("#myModal").find('#examplequicksearch').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "ajax": {
+                    "url": "../Form/LoadQuicksearchQuotationData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.radiobuton = $("#myModal").find('input[name="filterquickAll"]:checked').val();
+                        d.searchbox = $("#myModal").find("#allquicksearchbox").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                    }
+                },
+                "fnDrawCallback": function (oSettings) {
+                    isquicksearchloaded = true;
+                    setTimeout(function () {
+                        alltbl.columns.adjust();
+                    }, 2000);
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    $(row).attr('id', 'tr_' + data.QuoteId);
+                    $(row).attr('data-location', data.ActionRow);
+                },
+                "columns": [
+                    { "data": "Ref", "autoWidth": true, "orderable": false },
+                    { "data": "PONumber", "autoWidth": true, "orderable": false },
+                    { "data": "CompanyName", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "name": "Ref", "width": "100px" },
+                    { "data": "CATNo", "name": "CompanyName", "width": "200px" },
+                    { "data": "LeadTime", "name": "CompanyName", "width": "200px" },
+                    { "data": "Price", "name": "CompanyName", "width": "200px" },
+                    { "data": "Location", "name": "PONumber", "width": "100px" },
+                    { "data": "ActionRow", "name": "PONumber", "width": "100px" }
+                ]
+            });
+        }
+    }
+
+
+    function FindIntab(location, searchValue) {
+        var tableName = "";
+        var element = '';
+        if (location === "All") {
+            tableName = "all";
+            element = 'example1';
+        }
+        if (location === "Pending User") {
+            tableName = "tobe"; element = 'tbltobe';
+        }
+        if (location === "Pending Distributor") {
+            tableName = "tobedistinutor"; element = 'tbltobedistributor';
+        }
+        if (location === "Approved") {
+            tableName = "approved"; element = 'tblapproved';
+        }
+        
+        $("#tabullist").find('a').each(function () {
+            
+            var tabname = $(this).attr("data-tabname");
+            if (tabname === tableName) {
+                $(this).click();
+                
+                $('#' + element).DataTable().search(searchValue).draw();
+            }
+        });
+    }
+</script>

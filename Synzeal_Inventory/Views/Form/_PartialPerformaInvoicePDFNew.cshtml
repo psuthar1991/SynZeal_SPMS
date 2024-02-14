@@ -1,0 +1,395 @@
+﻿@model Synzeal_Inventory.Entity.SZ_PerformaInvoice
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    var performaInvoiceDetailsData = db.SZ_PerformaInvoiceDetailsData.Where(x => x.PerformaInvoiceId == Model.Id).ToList();
+    var loop = 1;
+    var BillAddress = db.SZ_CompanyAddress.Where(x => x.Id == Model.BillAddressId).Select(x => x.Address).FirstOrDefault();
+    var ShipAddress = db.SZ_CompanyAddress.Where(x => x.Id == Model.ShipAddressId).Select(x => x.Address).FirstOrDefault();
+    decimal maintotal = 0;
+}
+@using Newtonsoft.Json
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+
+
+<table width="100%">
+    <tr>
+        <td valign="middle" width="35%">
+            <img src="http://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" width="150px" />
+        </td>
+        <td style="float:left" width="65%">
+            <b style="color: #000;font-size: 22px">Proforma Invoice</b>
+        </td>
+    </tr>
+</table>
+<table border="1">
+    <tr>
+        <td valign="top" rowspan="3" style="padding:5px;" width="40%">
+            <div style="font-size: 9px;text-align: left;color: #000">
+                <b style="text-decoration:underline;font-size: 10px">Consignor</b><br />
+                <b style="color: #000;font-size: 9.5px"> SYNZEAL RESEARCH PRIVATE LIMITED</b><br />
+                Plot No. F, Shree Ganesh Industrial Estate,<br />
+                423/24/8, Mahagujarat Industrial Estate,<br />
+                Sarkhej-Bavla Road, Moraiya, Ahmedabad-382213, Gujarat, INDIA<br />
+                Tele No: +91-75750 02050, 76980 00861<br />
+                <b>GSTIN of Supplier:-</b> 24AAVCS1383C1Z9
+            </div>
+        </td>
+        <td valign="top" style="padding:5px;" width="30%">
+            <div style="font-size: 9px;text-align: left;color: #000">
+                <b>Invoice No.: </b> @Model.PerformaInvoiceNo
+            </div>
+        </td>
+        <td valign="top" style="padding:5px;" width="30%">
+            <div style="font-size: 9px; text-align: left;color: #000">
+                <b>Invoice Date: </b> @Model.PerformaInvoiceDate.ToShortDateString()
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding:5px;" colspan="2">
+            <div style="font-size: 9px;text-align: left;color: #000">
+                <b>Customer PO No.: </b> @Model.CustomerPoNo
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding:5px;" colspan="2">
+            <div style="font-size: 9px;text-align: left;color: #000">
+                <b>Other References: </b><br />
+                <b>AWB no: </b>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" rowspan="4" style="padding:5px;">
+            <div style="font-size: 9px;text-align: left;color: #000">
+                <b style="text-decoration:underline">Bill To</b><br />
+                <b style="color: #000;font-size: 10px"> @Html.Raw(Model.BillCompanyName)</b><br />
+                @Html.Raw(BillAddress)<br />
+                @Model.BillCountry<br />
+                <span>Telp: @Model.BillTelno</span><br />
+                @if (!string.IsNullOrEmpty(Model.BillGSTNo))
+                {
+                    <span>GST: @Model.BillGSTNo</span><br />
+                }
+            <b style="text-decoration:underline">Consignee/Importer</b><br />
+                <b style="color: #000;font-size: 10px"> @Html.Raw(Model.ShipCompanyName)</b><br />
+                @Html.Raw(ShipAddress)<br />
+                @Model.ShipCountry<br />
+                <span>Telp: @Model.ShipTelno</span><br />
+                @if (!string.IsNullOrEmpty(Model.ShipGSTNo))
+                {
+                    <span>GST: @Model.ShipGSTNo</span>
+                }
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding:5px;" colspan="2">
+            <div style="font-size: 9px;float: left;text-align: left;color: #000">
+                <b>Country of Destination: </b>@Model.ShipCountry
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding:5px;" colspan="2">
+            <div style="font-size: 9px;float: left;text-align: left;color: #000">
+                <b>Country of Origin: </b>India
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding:5px;" colspan="2">
+            <div style="font-size: 9px;float: left;text-align: left;color: #000">
+                <b>Payment Terms: </b>@Model.TermsId
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td valign="middle" style="padding:5px;" colspan="3">
+            <div style="font-size: 9px;float: left;text-align: left;color: #000">
+                <b>Bank Details: </b>SynZeal Research Private Limited <br />
+                <b>Bank Name: </b>Bank of Baroda, SG Highway Branch,
+                Ahmedabad-380054, Gujarat, India
+                <br />
+                <b>Account No.: </b>30370200000920<br />
+                <b>SWIFT: </b>BARBINBBSGH <br />
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding:5px;">
+            <div style="font-size: 9px;float: left;text-align: left;color: #000">
+                <b>Carriage by Sea or Air Courier: </b> @Model.Courier
+            </div>
+        </td>
+        <td valign="middle" style="padding:5px;" colspan="2">
+            <div style="font-size: 9px;float: left;text-align: left;color: #000">
+                <b>Incoterm: </b> @Model.Incoterm
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" style="padding:5px;">
+            <div style="font-size: 9px;float: left;text-align: left;color: #000">
+                <b>Port of Discharge: </b> @Model.PortOfDischarge
+            </div>
+        </td>
+        <td valign="middle" style="padding:5px;" colspan="2">
+            <div style="font-size: 9px;float: left;text-align: left;color: #000">
+                <b>Port of Loading: </b> Ahmedabad - India
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <div style="font-size: 9px;height:20px; float: left;text-align: left;color: #000">
+            </div>
+        </td>
+    </tr>
+</table>
+<div class="clearfix"></div>
+<table border="1" style="font-size: 9px;color: #000;border: 1px solid gray;">
+    <thead>
+        <tr>
+            <th width="5%" style="text-align: center;font-weight:bold">
+                Sr.
+                No.
+            </th>
+            <th width="50%" style="text-align: center;font-weight:bold">Description of Goods</th>
+            <th width="10%" style="text-align: center;font-weight:bold">
+                Quantity
+                In mg
+            </th>
+            <th width="15%" style="text-align: center;font-weight:bold">CAT No </th>
+            <th width="10%" style="text-align: center;font-weight:bold">HSN Code </th>
+            <th width="10%" style="text-align: center;font-weight:bold">
+                Rate Per
+                Vial In @Model.Currency
+            </th>
+            <th width="13%" style="text-align: center;font-weight:bold">
+                Total
+                Value in @Model.Currency
+            </th>
+        </tr>
+    </thead>
+    @if (performaInvoiceDetailsData != null && performaInvoiceDetailsData.Count > 0)
+    {
+        foreach (var item in performaInvoiceDetailsData)
+        {
+            <tr>
+                <td valign="top" style="text-align: center; padding: 5px;">
+                    @loop
+                </td>
+                <td valign="top" style="padding:5px;">
+                    @item.ProductName
+                </td>
+                <td valign="top" style="text-align:center;padding:5px;">
+                    @item.Qty
+                </td>
+                <td valign="top" style="text-align:center;padding:5px;">
+                    @item.CATNo
+                </td>
+                <td valign="top" style="text-align:center;padding:5px;">
+                    @item.HSNCode
+                </td>
+                <td valign="top" style="text-align:center;padding:5px;">
+                    @item.Rate
+                </td>
+                <td valign="top" style="text-align:center;padding:5px;">
+                    @item.Total
+                    @{
+                        if (item.Total.HasValue)
+                        {
+                            maintotal += item.Total.Value;
+                        }
+                    }
+                </td>
+            </tr>
+            loop += 1;
+        }
+    }
+
+    @if (Model.IsIGST.HasValue)
+    {
+        if (Model.IsIGST.Value)
+        {
+            //IGST
+            <tr>
+                <td valign="top" style="text-align:center;padding:5px;">
+                </td>
+                <td valign="top" colspan="4" style="padding:5px;">
+                    <div style="float:right; font-weight:bold;">IGST (12%) </div>
+                </td>
+                <td valign="top" style="text-align:center;padding:5px;">
+                    @{
+                        var igstprice = maintotal * Convert.ToDecimal(12.00 / 100);
+
+                        maintotal += igstprice;
+
+                        @igstprice
+                    }
+                </td>
+            </tr>
+        }
+        else
+        {
+            //CGST - SGST
+
+
+            var cgstprice = maintotal * Convert.ToDecimal(6.00 / 100);
+            var sgstprice = maintotal * Convert.ToDecimal(6.00 / 100);
+            maintotal += cgstprice;
+            maintotal += sgstprice;
+            <tr>
+                <td valign="top" style="text-align:center;padding:5px;">
+                </td>
+                <td valign="top" colspan="4" style="padding:5px;">
+                    <div style="float:right; font-weight:bold;">CGST (6%) </div>
+                </td>
+                <td valign="top" style="text-align:center;padding:5px;">
+                    @cgstprice
+                </td>
+            </tr>
+            <tr>
+                <td valign="top" style="text-align:center;padding:5px;">
+                </td>
+                <td valign="top" colspan="4" style="padding:5px;">
+                    <div style="float:right; font-weight:bold;">SGST (6%) </div>
+                </td>
+                <td valign="top" style="text-align:center;padding:5px;">
+                    @sgstprice
+                </td>
+            </tr>
+        }
+    }
+
+
+    @if (Model.ShippingCost == 0)
+    {
+        <tr>
+            <td valign="top" style="text-align:center;padding:5px;">
+            </td>
+            <td valign="top" colspan="5" style="padding:5px;">
+                @*<div style="float:left; font-weight:bold;"><b>(HS Code @Model.HSNCode)</b> </div>*@
+                <div style="float:right; font-weight:bold;">Total </div>
+            </td>
+            <td valign="top" style="text-align:center;padding:5px;">
+                @maintotal
+            </td>
+        </tr>
+    }
+    else
+    {
+        <tr>
+            <td valign="top" style="text-align:center;padding:5px;">
+            </td>
+            <td valign="top" colspan="5" style="padding:5px;">
+                <table border="0">
+                    <tr>
+                        <td>
+                            @*<b>(HS Code @Model.HSNCode)</b>*@
+                        </td>
+                        <td style="text-align: right">
+                            <b>
+                                Shipping & Logistic
+                            </b>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td valign="top" style="text-align: center; padding:5px;">
+                @Model.ShippingCost
+                @{
+                    maintotal += Model.ShippingCost;
+                }
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" style="text-align:center;padding:5px;">
+            </td>
+            <td valign="top" colspan="5" style="text-align: right;padding:5px;">
+                <div style="float:right; font-weight:bold;">Total </div>
+            </td>
+            <td valign="top" style="text-align:center;padding:5px;">
+                @maintotal
+            </td>
+        </tr>
+    }
+
+    <tr>
+        <td valign="top" style="text-align:center;padding:5px;">
+        </td>
+        <td valign="top" colspan="6" style="text-align:center;padding:5px;">
+            <b> Amount In Word: @Synzeal_Inventory.Models.NumberToWords.ConvertAmount(Convert.ToDouble(maintotal))</b>
+        </td>
+    </tr>
+</table>
+<table width="100%" style="border-collapse: collapse;">
+    <tr>
+        <td style="width:70%;font-size: 10px;color: #000;padding: 5px;">
+            <b>Gross Weight:- </b> @Model.GrossWeight
+        </td>
+        <td style="width:30%;font-size: 10px;color: #000;padding: 5px;">
+            <b>Net Weight:- </b>@Model.NetWeight
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="font-size: 10px;color: #000;padding: 5px;">
+            <b>For long term storage: 2 to 8 Degree Temperature</b>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="font-size: 10px;color: #000;padding: 5px;">
+            <b style="text-decoration:underline">Comments:</b><br />
+            <ul>
+                <li>
+                    Reference standard/working standard/impurities for laboratory use only.
+                </li>
+                <li>
+                    Not for drug, household or other use.
+                </li>
+                <li>
+                    Non-hazardous for transport.
+                </li>
+                <li>
+                    Small glass vial wrapped in mailer foam box.
+                </li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="font-size: 10px;color: #000;padding: 5px;">
+            <b>
+                Declaration: We declare that this invoice shows the actual price of the goods described and all the particulars are true and correct.
+            </b>
+        </td>
+    </tr>
+</table>
+<table width="100%">
+    <tr>
+        <td style="width:70%;font-size:10px;color: #000;padding: 5px;"></td>
+        <td style="width:30%;font-size: 10px;color: #000;padding: 5px;">
+            <b>Sign & stamp</b>
+        </td>
+    </tr>
+</table>

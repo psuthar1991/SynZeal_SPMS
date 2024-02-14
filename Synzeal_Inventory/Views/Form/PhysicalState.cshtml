@@ -1,0 +1,59 @@
+﻿@{
+    ViewBag.Title = "Add Scientist Status";
+    Layout = null;
+}
+@model  Synzeal_Inventory.Entity.SZ_Physicalstate
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Add New Physical State</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Physical State</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Physical State" required value="@Model.Name">
+                    <input type="hidden" id="compid" name="compid" value="@Model.Id" />
+                </div>
+                <div class="form-group" style="text-align:right">
+                    <button type="button" onclick="addPhysicalStateDataList()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    function addPhysicalStateDataList() {
+        $(".errorcls").each(function () {
+            $(this).removeClass('errorcls');
+        });
+
+        var errorCount = 0;
+        if ($("#name").val() === "") {
+            $("#name").addClass('errorcls');
+            errorCount += 1;
+        }
+        if (errorCount !== 0) {
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/Form/PhysicalStateData?name=" + $("#name").val() + "&id=" + $("#compid").val(),
+            data: {},
+            success: function (results) {
+                if (!results.success) {
+    toastr.error(results.message);
+                    return false;
+                }
+     toastr.success( "Physical state updated.");
+                setTimeout(function () { window.location.href = "/Form/PhysicalStateList"; }, 2000);
+
+            }
+        });
+    }
+</script>

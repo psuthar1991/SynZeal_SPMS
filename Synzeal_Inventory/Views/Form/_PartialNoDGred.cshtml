@@ -1,0 +1,124 @@
+﻿@model  Synzeal_Inventory.Entity.SZ_InvoiceData
+@{
+    ViewBag.Title = "Company";
+    Layout = null;
+        var qty = 0;
+    foreach (var item in Model.SZ_InvoiceDetailsData)
+    {
+        qty += Convert.ToInt32(item.Qty);
+    }
+}
+<div class="col-md-12" style="font-family:Cambria">
+    <div class="box box-primary" style="font-size:14px;color:#000;  line-height: 1.5;">
+        <div class="box-header with-border">
+            <img title="SynZeal" alt="SynZeal" style="width:280px; height:80px;" src="https://synzeal.com/Themes/DefaultClean/Content/images/logo.png" />
+        </div>
+        <p style="text-align:right; ">
+            <br />
+            Date: @Model.InvoiceDate.ToString("dd/MM/yyyy")
+        </p>
+        <p style="text-align:center; font-size:18px">
+            <b>Shipper’s Certificate for Non-Hazardous Cargo</b>
+        </p>
+        <p style="text-align:justify;">
+            This is to certify that the articles/substance of this shipment are properly packed and described by name. They are not listed in the forbidden list in the current edition of IATA Dangerous Goods OR they do not correspond to any hazard classes appearing in the DGR, section 3 classifications of Dangerous Goods. They are known to be non-hazardous i.e. not restricted. Furthermore, the shipper confirms that the goods are in proper condition for transportation on a passenger carrying aircraft.
+        </p>
+        <p style="text-align:right; ">
+            <b>IEC: 0814025277</b>
+        </p>
+    </div>
+    <table width="100%" border="1" style="font-size:14px;line-height: 1.5; border-collapse: collapse;">
+        <tr>
+            <td valign="middle" width="20%" style="padding: 5px 10px;text-align: left; color: #000">
+                <b>AWB NO:</b>
+            </td>
+            <td width="40%" style="padding:5px 10px;">
+                <b>Origin: AHMEDABAD</b>
+            </td>
+            <td width="40%" style="padding:5px 10px;">
+                <b>Destination: @Model.Country</b>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" style="padding:5px 10px;">
+                Marks & No of Pkg.
+                One Package
+                <br /><br />
+                Shipper & Consignee
+                Address on Pkgs.
+                Written on the pkg.
+
+            </td>
+            <td valign="top" style="padding:5px 10px;">
+                Proper Description of Goods (Trade Names not permitted)Specify each article separately,
+
+                <br /><br />
+
+                @if (Model.SZ_InvoiceDetailsData != null && Model.SZ_InvoiceDetailsData.Count > 0)
+                {
+                    int loop = 1;
+                    foreach (var item in Model.SZ_InvoiceDetailsData)
+                    {
+                        <span>@loop<span>.</span> @item.ProductName<br /></span>
+                        loop += 1;
+                    }
+                }
+
+            </td>
+            <td valign="top" style="padding:5px 10px;">
+                Quantity<br /><br /><br />
+                @if (Model.SZ_InvoiceDetailsData != null && Model.SZ_InvoiceDetailsData.Count > 0)
+                {
+                    foreach (var item in Model.SZ_InvoiceDetailsData)
+                    {
+                        decimal itemqty = Convert.ToDecimal(item.Qty) / 1000;
+                        @itemqty <span>g</span> <br />
+                    }
+                }
+                Net Wt.
+                @{
+                    decimal ansqty = Convert.ToDecimal(qty) / 1000;
+                } @ansqty g
+                <br />
+                Gross Wt.     @Model.GrossWeight
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" valign="top" style="padding:5px 10px;">
+                <b>Name and Address of Shipper</b> <br />
+                AS ON AWB AND ON PKG.<br />
+                <b>
+                    SynZeal Research Private Limited <br />
+                </b>
+                Plot No: F, Ganesh industrial Estate, <br />
+                423/24/8, Mahagujarat industrial Estate, <br />
+                Sarkhej-Bavala Road, Moraiya, <br />
+                Ahmedabad-382213, Tele No:7698000861,7698000860
+            </td>
+            <td valign="top" style="padding:5px 10px;">
+                <b>
+                    Name: Ketan Malani
+                </b><br /><br />
+                <b>
+                    @*Dr Shailesh Patel*@
+                </b><br /><br /><b>
+                    Designation (Export Department)
+                </b>
+                <br />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" valign="top" style="padding:5px 10px;">
+                <div style="width:57%; float:left;">
+                    Place: Ahmedabad, India.
+                </div>
+                <div style="width:37%; float:left;">
+                    <br /><br />Authorized Signatory
+                </div>
+                <br />
+                <br />
+                <br /><br /><br />
+            </td>
+        </tr>
+    </table>
+</div>

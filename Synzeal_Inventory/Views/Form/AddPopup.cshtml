@@ -1,0 +1,95 @@
+﻿@{
+    ViewBag.Title = "Popup";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model  Synzeal_Inventory.Entity.SZ_Popup
+<!-- left column -->
+
+<section class="content-header">
+    <h1>
+        Add New Popup
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <!-- form start -->
+                <form role="form">
+                    <div class="box-body col-md-8">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Name</label>
+                            <input type="text" class="form-control" id="Name" name="Name" placeholder="Popup Name" required value="@Model.Name">
+                            <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">File</label>
+                            <input type="file" id="FilePath" name="FilePath" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Is General ?</label>
+                            <input type="checkbox" id="IsGeneral" name="IsGeneral" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Email</label>
+                            <input type="radio" id="IsEmailOrGroup" name="IsEmailOrGroup" value="Email" checked />
+
+                            <label for="exampleInputEmail1">Group</label>
+                            <input type="radio" id="IsEmailOrGroup" name="IsEmailOrGroup" value="Group" />
+                        </div>
+                        <div class="form-group" id="divuser">
+                            <label for="exampleInputEmail1">User Name</label>
+                            @Html.DropDownList("UserId", (IEnumerable<SelectListItem>)ViewBag.userList, new { @class = "form-control", @multiple = "" })
+                        </div>
+                        <div class="form-group" id="divgroup" style="display:none">
+                            <label for="exampleInputEmail1">Group Name</label>
+                            @Html.DropDownList("GroupId", (IEnumerable<SelectListItem>)ViewBag.groupList, new { @class = "form-control", @multiple = "" })
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Is Active ?</label>
+                            <input type="checkbox" id="IsActive" name="IsActive" />
+                        </div>
+                        <div class="form-group" style="text-align:right">
+                            <button type="button" onclick="Quote.addPopUpData()" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+
+                    <div class="clearfix"></div>
+                </form>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+    </div>
+</section>
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/davidstutz/bootstrap-multiselect@master/dist/js/bootstrap-multiselect.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/davidstutz/bootstrap-multiselect@master/dist/css/bootstrap-multiselect.css">
+
+<script>
+
+    $('input[type=radio][name=IsEmailOrGroup]').change(function () {
+        if (this.value == 'Email') {
+            $("#divuser").show();
+            $("#divgroup").hide();
+        }
+        else if (this.value == 'Group') {
+            $("#divuser").hide();
+            $("#divgroup").show();
+        }
+    });
+
+    jQuery('#UserId').multiselect({
+        columns: 1,
+        placeholder: 'Select User',
+        search: true
+    });
+
+    jQuery('#GroupId').multiselect({
+        columns: 1,
+        placeholder: 'Select Group',
+        search: true
+    });
+</script>

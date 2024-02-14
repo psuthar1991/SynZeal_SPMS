@@ -1,0 +1,174 @@
+﻿@model List<SZ_QuotationModel>
+@using Synzeal_Inventory.Models
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    int loopCont = 1;
+}
+<div class="box-body form-horizontal">
+    <div>
+        <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="SaveAll()">Save All</a> <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="MoveToDispatchList()">Move to Dispatch</a>
+        <div class="clear"></div>
+        <br /><br />
+    </div>
+    <table width="90%" class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>Sr No.</th>
+            <th>PO No.</th>
+            <th>Project Type</th>
+            <th>Product Name</th>
+            <th>CAS No</th>
+            <th>CAT No</th>
+            <th>Additional Batch No</th>
+            <th>Batch No</th>
+            <th>QTY. (mg)</th>
+            <th>Scientist Status</th>
+            <th>Estimate Comp. Date </th>
+        </tr>
+        </thead>
+        @foreach (var i in Model)
+        {
+            foreach (var k in i.SZ_QuotationProductModel)
+            {
+                string projectType = "";
+        <tr>
+            <td><input type="checkbox" value="@k.QuoteDetailsId" class="clsMoveDispatch" /></td>
+            <td><input type="checkbox" value="@k.QuoteDetailsId" class="clsSaveall" /></td>
+            <td>@loopCont</td>
+            <td>@i.PONumber</td>
+            <td>
+                @*<select id="projecttype_@k.Id" class="clsProjType" data-quoteDetailsId="@k.Id">
+            <option value="">--Select--</option>*@
+                @foreach (EnumList.ProjectType r in Enum.GetValues(typeof(EnumList.ProjectType)))
+                {
+                    var item = Enum.GetName(typeof(EnumList.ProjectType), r);
+                    var test = r.ToString();
+                    string text = SZ_Helper.GetEnumDescription((EnumList.ProjectType)(int)r);
+                    int val = (int)r;
+                    string selected = "";
+                    if (Convert.ToString(val) == k.ProjectType)
+                    {
+                        selected = "selected ";
+                        projectType = text;
+                    }
+                    @*<option value="@val" @selected>@text</option>*@
+                }
+                @projectType
+                @*</select>*@
+            </td>
+            <td>@k.ProductName</td>
+            <td>@k.CASNo</td>
+            <td>@k.CATNo</td>
+            <td>
+                @Html.DropDownList("additionalBatch_" + k.QuoteDetailsId, (IEnumerable<SelectListItem>)k.ListBatchNo, new { @class = "additionalbatchcls", @quotedetailsid = k.QuoteDetailsId })
+            </td>
+            <td>
+                <input type="text" id="BatchNo_@k.QuoteDetailsId" value="@k.BatchNo" class="batchNoCls" quotedetailsid="@k.QuoteDetailsId" />
+            </td>
+            <td>@k.RequiredQty</td>
+            <td>@k.AdminScientistStatus</td>
+            <td>
+                @if (k.EstimateCompleteDate.HasValue)
+                {
+                    @k.EstimateCompleteDate.Value.ToShortDateString()
+                }
+            </td>
+        </tr>
+                loopCont += 1;
+            }
+        }
+    </table>
+</div>
+
+<script type="text/javascript">
+    function MoveToDispatchList() {
+         var ids = [];
+
+        $('.clsMoveDispatch').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+                    $.ajax({
+                        url: '/Form/MoveToDispatchList',
+                        data: { id: ids },
+                        type: 'POST',
+                        traditional: true, // add this
+                        dataType: 'json',
+                        success: function (data) {
+
+                            if (data.success) {
+                                window.location.href = "/Form/Project";
+                            }
+                        }
+                    });
+
+    }
+
+
+    function SaveAll() {
+        var ids = [];
+
+        $('.clsSaveall').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+
+         var count = 1;
+        $('.clsSaveall').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                var additionalBatch = $('#additionalBatch_' + id).val();
+
+                var batchNo = $("#BatchNo_"+id).val();
+
+                $('.additionalbatchcls').each(function (i, v) {
+
+                    var attr = $(this).attr("quotedetailsid");
+                    if (attr === id) {
+                        additionalBatch = $(this).val();
+                    }
+                });
+
+                $('.batchNoCls').each(function (i, v) {
+
+                    var attr = $(this).attr("quotedetailsid");
+                    if (attr === id) {
+                        batchNo = $(this).val();
+                    }
+                });
+                $.ajax({
+                    url: '/Form/SaveInstockPurchaseAction?additionalBatch=' + additionalBatch + '&batchNo=' + batchNo + '&id=' + id, /* + '&batchno=' + batchno + '&remark=' + remark + '&additionalBatch=' + additionalBatch + '&scientistStatus=' + scientistStatus,*/
+                    data: {},
+                    type: 'POST',
+                    async: false,
+                    success: function (data) {
+                    },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function successAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product information.");
+            setTimeout(function () { window.location.reload(true); }, 2000);
+        }
+    }
+</script>

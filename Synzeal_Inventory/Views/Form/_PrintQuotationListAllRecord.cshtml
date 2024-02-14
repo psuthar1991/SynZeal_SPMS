@@ -1,0 +1,145 @@
+﻿@model List<Synzeal_Inventory.Models.QuotationListModel>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    string quoteDate = Model.Select(x => x.CreatedDate).FirstOrDefault().HasValue ?
+        Model.Select(x => x.CreatedDate).FirstOrDefault().Value.GetOrdinalDate(true) : "";
+
+    int count = 1;
+
+    bool isMailSend = false;
+    if (ViewBag.ISMailSend != null)
+    {
+        isMailSend = Convert.ToBoolean(ViewBag.ISMailSend);
+    }
+    var quoteId = Model.Select(x => x.QuoteId).FirstOrDefault();
+}
+@using Synzeal_Inventory.Models
+<div class="box-body form-horizontal">
+    @if (ViewBag.PageName == "quotedetails")
+    {
+        <p>
+            Thank you for your email.
+        </p>
+        <p>
+            We are pleased to send a quotation for the required product as below.
+        </p>
+        <table width="100%" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th colspan="2">Quotation ID : @ViewBag.QuoteRef</th>
+                    <th colspan="3">Quotation Date : @ViewBag.QuoteDate</th>
+                    <th colspan="3">Valid Till : @ViewBag.ValidTill</th>
+                </tr>
+                <tr>
+                    <td colspan="8" style="height:22px"></td>
+                </tr>
+                <tr>
+                    <th>#</th>
+                    <th>Products Name</th>
+                    <th>
+                        CAS No
+                    </th>
+                    <th>SZ Cat No</th>
+                    <th>Quotation</th>
+                    <th>Lead time</th>
+                    <th>Product Remarks</th>
+                    <th>COA & Data</th>
+                </tr>
+            </thead>
+            <tbody id="tblfollowupbody">
+                @foreach (var k in Model)
+                {
+                    <tr data-quotedetails="@k.QuoteDetailsId">
+                        <td>
+                            @count
+                        </td>
+                        <td>@k.ProductName</td>
+                        <td>@k.CASNo</td>
+                        <td>@k.CATNo</td>
+                        <td>@k.Price</td>
+                        <td>@k.LeadTime</td>
+                        <td>@k.ProductRemark</td>
+                        <td>
+                            @if (k.COAId != 0)
+                            {
+                                <a href="http://spms.synzeal.com/Form/DownloadMasterCOA/@k.COAId?isScanCopy=false" download="">Download</a>
+                            }
+                        </td>
+                    </tr>
+                    count += 1;
+                }
+            </tbody>
+        </table>
+        <ul>
+            <li>
+                Please <a href="http://spms.synzeal.com/Form/DownloadQuote/@quoteId" download="">click here </a>to download a PDF of Quote.
+            </li>
+            @*<li>
+                    Please <a href="http://spms.synzeal.com/Form/DownloadQuote/@quoteId" download="">click here </a>to download all COA & Analytical data of quoted products.
+                </li>*@
+        </ul>
+        <b>Note:</b>
+        <ul>
+            <li>We will provide IR, Mass, HPLC purity, UV and 1H NMR analysis as characterization data.</li>
+            <li>We will also report Wt loss by TGA for calculating the potency of the standards.</li>
+            <li>Quote Validity: 2 weeks</li>
+            <li>We will dispatch through FedEx courier mode if permitted, dispatched by formal flights like Emirate &Qatar Airlines.</li>
+            <li>The quoted timeline for custom synthesis products is optimistic, the actual timeline may vary depending on the outcome of synthetic efforts for research - intensive products.</li>
+        </ul>
+    }
+    else
+    {
+        <table width="100%" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>
+                        Quote ID
+                    </th>
+                    @*<th>Quotation Date</th>*@
+                    <th>Products Name</th>
+                    <th>
+                        CAS No
+                    </th>
+                    <th>SZ Cat No</th>
+                    <th>Quotation</th>
+                    <th>Lead time</th>
+                    <th>Remarks</th>
+                    <th>API Name</th>
+                    <th>Discount</th>
+                </tr>
+            </thead>
+            <tbody id="tblfollowupbody">
+                @foreach (var k in Model)
+                {
+                    <tr data-quotedetails="@k.QuoteDetailsId">
+                        <td>
+                            @count
+                        </td>
+                        <td>@k.Ref</td>
+                        @*<td>
+                                @if (k.CreatedDate.HasValue)
+                                {
+                                    @Html.Raw(k.CreatedDate.Value.GetOrdinalDate(true))
+                                }
+                            </td>*@
+                        <td>@k.ProductName</td>
+                        <td>@k.CASNo</td>
+                        <td>@k.CATNo</td>
+                        <td>@k.Price</td>
+                        <td>@k.LeadTime</td>
+                        <td>@k.Remark</td>
+                        <td>@k.APIName</td>
+                        <td>
+                            @if (k.Discount.HasValue)
+                            {
+                                @k.Discount<span>%</span>
+                            }
+                        </td>
+                    </tr>
+                    count += 1;
+                }
+            </tbody>
+        </table>
+    }
+</div>

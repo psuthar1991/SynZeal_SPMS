@@ -1,0 +1,49 @@
+﻿@{
+    ViewBag.Title = "Club Quotation";
+    Layout = null;
+}
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title">Add New Quote</h3>
+    </div>
+    <!-- /.box-header -->
+    <!-- form start -->
+    <form role="form">
+        <div class="box-body">
+            <div class="form-group">
+                <label for="exampleInputEmail1">Company Name</label>
+                <input type="hidden" id="QuoteId" name="QuoteId" value="0" />
+                <input type="hidden" id="UniqueId" name="UniqueId" value="@Guid.NewGuid()" />
+                @*<input type="text" class="form-control" id="CompanyName" name="CompanyName" placeholder="Company Name" required>*@
+                @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.listCompItems, new { @class = "form-control" })
+
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Email Address</label>
+                <input type="email" class="form-control" id="Email" name="Email" placeholder="Email Address" required>
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">PO Number</label>
+                <input type="email" class="form-control" id="PONumber" name="PONumber" placeholder="PO Number">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Is Image Attached In Pdf ?</label>
+                <input type="checkbox" style="margin-left:15px;" id="IsImageAttach" name="IsImageAttach" checked />
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Terms</label>
+                @Html.DropDownList("TermsId", (IEnumerable<SelectListItem>)ViewBag.termsList, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Remarks</label>
+                <input type="text" class="form-control" id="Remarks" name="Remarks" placeholder="Remarks">
+            </div>
+        </div>
+
+
+
+        <div class="box-footer">
+            <button type="button" class="btn btn-primary" onclick="Quote.saveClubQuote()">Save Quotation </button>
+        </div>
+    </form>
+</div>

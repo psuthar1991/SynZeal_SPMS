@@ -1,0 +1,330 @@
+﻿@model Synzeal_Inventory.Entity.SZ_QueryModule
+@using Synzeal_Inventory.Entity;
+@{
+    int loopCnt = 1;
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    var solutionData = new SZ_SolutionModule();
+    var QuoteDetailsFormData = new List<SZ_QuoteDetailForm>();
+    if (ViewBag.solutionData != null)
+    {
+        solutionData = ViewBag.solutionData as SZ_SolutionModule;
+    }
+    if (ViewBag.QuoteDetailsForm != null)
+    {
+        QuoteDetailsFormData = ViewBag.QuoteDetailsForm as List<SZ_QuoteDetailForm>;
+    }
+
+}
+<style type="text/css">
+</style>
+<div class="box-body form-horizontal" id="divaddsolution">
+    <div class="col-md-12">
+        <div class="single-form-block">
+            <div class="general-tab">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="row">
+                            <input type="hidden" id="QuoteDetailsId" name="QuoteDetailsId" value="@Model.QuoteDetailsId" />
+                            <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+                            <input type="hidden" id="SolutionId" name="SolutionId" value="@solutionData.Id" />
+                            <div class="form-group col-md-12 col-sm-12">
+                                <label>User Name: </label>
+                                @Synzeal_Inventory.Models.SessionCookieManagement.UserName
+
+                            </div>
+                            @if (solutionData == null)
+                            {
+                                <div class="form-group col-md-12 col-sm-12">
+                                    <label>Query Understanding</label>
+                                    <textarea class="form-control" id="Cause" name="Cause" rows="3"></textarea>
+                                </div>
+                                <div class="form-group col-md-12 col-sm-12">
+                                    <label>Analytic/Technical View</label>
+                                    <textarea class="form-control" id="Solution" name="Solution" rows="3"></textarea>
+                                </div>
+                                <div class="form-group col-md-12 col-sm-12">
+                                    <label>Final Solution</label>
+                                    <textarea class="form-control" id="Remark" name="Remark" rows="3"></textarea>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="form-group col-md-12 col-sm-12">
+                                    <label>Query Understanding</label>
+                                    <textarea class="form-control" id="Cause" name="Cause" rows="3"> @solutionData.Cause</textarea>
+                                </div>
+                                <div class="form-group col-md-12 col-sm-12">
+                                    <label>Analytic/Technical View</label>
+                                    <textarea class="form-control" id="Solution" name="Solution" rows="3">@solutionData.Solution</textarea>
+                                </div>
+                                <div class="form-group col-md-12 col-sm-12">
+                                    <label>Final Solution</label>
+                                    <textarea class="form-control" id="Remark" name="Remark" rows="3">@solutionData.Remark</textarea>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="row">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th style="width:50%">Product Name:</th>
+                                        <td>@Model.ProductName</td>
+                                    </tr>
+                                    <tr>
+                                        <th>CAT No:</th>
+                                        <td>@Model.CATNo</td>
+                                    </tr>
+                                    <tr>
+                                        <th>CAS No:</th>
+                                        <td>@Model.CASNo</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Batch Code:</th>
+                                        <td>@Model.BatchNo</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div>
+                                <div class="form-group col-md-12 col-sm-12">
+                                    <label>Attachment</label>
+                                    <input type="file" id="SolutionAttachment" name="SolutionAttachment" multiple />
+                                </div>
+                            </div>
+                            <div>
+                                @if (QuoteDetailsFormData != null && QuoteDetailsFormData.Count > 0)
+                                {
+                                    <table width="100%" class="table table-bordered table-striped dataTable no-footer">
+                                        <thead>
+                                            <tr>
+                                                <th>Batch No</th>
+                                                <th>Qty</th>
+                                                <th>M.F.</th>
+                                                <th>M.W.</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in QuoteDetailsFormData)
+                                            {
+                                                <tr>
+                                                    <td>@item.BatchCode</td>
+                                                    <td>@item.Qty</td>
+                                                    <td>@item.MolecularFormula</td>
+                                                    <td>@item.MolWeight</td>
+                                                    <td><a href="/Form/PrintForm/@item.Id" target="_blank">Print</a></td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                            </div>
+                            <div>
+                                <div class="form-group col-md-12 col-sm-12" style="text-align:center">
+                                    <a style="margin-top: 15%; font-size: 30px;" class="btn btn-primary" onclick="MakeaNewform(@Model.QuoteDetailsId)" href="javascript:void(0)">Make New Form</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12">
+                        <div class="submit-button">
+                            <br />
+                            <input type="button" onclick="savesolution()" value="Submit" class="btn btn-primary">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function MakeaNewform(quotationDetailsId) {
+        if (window.FormData !== undefined) {
+            // Create FormData object
+            var fileData = new FormData();
+
+            var fileUpload = $("#myModal").find("#SolutionAttachment").get(0);
+            if (fileUpload !== undefined) {
+                var files = $("#myModal").find("input[name='SolutionAttachment']")[0].files;
+
+                // Looping over all files and add it to FormData object
+                for (var i = 0; i < files.length; i++) {
+                    fileData.append(files[i].name, files[i]);
+                }
+            }
+
+            if ($("#myModal").find("textarea[name='Cause']").val() === "") {
+                toastr.error("Please enter cause.");
+                return false;
+            }
+            if ($("#myModal").find("textarea[name='Solution']").val() === "") {
+                toastr.error("Please enter solution.");
+                return false;
+            }
+            if ($("#myModal").find("textarea[name='Remark']").val() === "") {
+                toastr.error("Please enter remark.");
+                return false;
+            }
+
+            // Adding one more key to FormData object
+            fileData.append('Status', $("#myModal").find("#SolutionStatus").val());
+            fileData.append('Solution', $("#myModal").find("textarea[name='Solution']").val());
+            fileData.append('Cause', $("#myModal").find("textarea[name='Cause']").val());
+            fileData.append('Remark', $("#myModal").find("textarea[name='Remark']").val());
+            fileData.append('SolutionId', $("#myModal").find("#SolutionId").val());
+            $.ajax({
+                url: '/Form/saveSolutionData?id=@Model.Id',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                data: fileData,
+                success: function (result) {
+                    toastr.success("You have added solution.");
+                    window.open(
+                        "/Form/SubmitForm/" + quotationDetailsId + "?isprint=true", "_blank");
+                },
+                error: function (err) {
+                    alert(err.statusText);
+                }
+            });
+        } else {
+            alert("FormData is not supported.");
+        }
+    }
+
+    $("#ClosingOn").keyup(function () {
+        var createdDate = '@Model.CreatedDate.Value.ToShortDateString()'.split("/");
+        var date = new Date(createdDate[2], createdDate[1] - 1, createdDate[0]);
+        date.setDate(date.getDate() + parseInt($(this).val()));
+        $("#ClosingDate").val(convert(date));
+    });
+
+    function convert(str) {
+        var date = new Date(str),
+            mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+            day = ("0" + date.getDate()).slice(-2);
+        return [day, mnth, date.getFullYear() ].join("/");
+    }
+
+    function savesolution() {
+        if (window.FormData !== undefined) {
+            // Create FormData object
+            var fileData = new FormData();
+
+            var fileUpload = $("#myModal").find("#SolutionAttachment").get(0);
+            if (fileUpload !== undefined) {
+                var files = $("#myModal").find("input[name='SolutionAttachment']")[0].files;
+
+                // Looping over all files and add it to FormData object
+                for (var i = 0; i < files.length; i++) {
+                    fileData.append(files[i].name, files[i]);
+                }
+            }
+            // Adding one more key to FormData object
+            fileData.append('Status', $("#myModal").find("#SolutionStatus").val());
+            fileData.append('Solution', $("#myModal").find("textarea[name='Solution']").val());
+            fileData.append('Cause', $("#myModal").find("textarea[name='Cause']").val());
+            fileData.append('Remark', $("#myModal").find("textarea[name='Remark']").val());
+            fileData.append('SolutionId', $("#myModal").find("#SolutionId").val());
+            $.ajax({
+                url: '/Form/saveSolutionData?id=@Model.Id',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                data: fileData,
+                success: function (result) {
+                    toastr.success("You have added solution.");
+                    window.location.href = "/Form/QuerySolution/@Model.Id";
+                },
+                error: function (err) {
+                    alert(err.statusText);
+                }
+            });
+        } else {
+            alert("FormData is not supported.");
+        }
+    }
+
+    $("#Attachment").change(function () {
+        if (window.FormData !== undefined) {
+            var fileUpload = $("#Attachment").get(0);
+            var files = fileUpload.files;
+
+            // Create FormData object
+            var fileData = new FormData();
+
+            // Looping over all files and add it to FormData object
+            for (var i = 0; i < files.length; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+
+            // Adding one more key to FormData object
+            fileData.append('Id', '@Model.Id');
+
+            $.ajax({
+                url: '/Form/QueryModuleAttachment',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                data: fileData,
+                success: function (result) {
+                    if (!result.success) {
+                        toastr.error(result.message);
+                        return false;
+                    }
+                    else {
+                        ReloadAttachments(result.attachment);
+                    }
+                },
+                error: function (err) {
+                    alert(err.statusText);
+                }
+            });
+        } else {
+            alert("FormData is not supported.");
+        }
+    });
+
+
+    function ReloadAttachments(attachment) {
+        var listattchment = attachment.split(',');
+        var str = "<table style='width:100%' border='1' cellpadding='5'>";
+
+        $(listattchment).each(function (i, v) {
+            if (v !== "") {
+                str += "<tr><td><a href='../" + v + "' download>" + v + "</a></td><td> <a href='javascript:void(0)' onclick='deleteattchment(&apos;" + v +"&apos;)'>Delete</a></td></tr>";
+            }
+        });
+
+        str += "</table>";
+        $("#divattachment").html(str);
+    }
+
+    function deleteattchment(filename) {
+        $.ajax({
+            type: "GET",
+            url: "/Form/DeleteAttchment?filename=" + filename +"&id=@Model.Id",
+            dataType: "json",
+            traditional: true,
+            data: {},
+            success: function (result) {
+                ReloadAttachments(result);
+            }
+        });
+    }
+</script>
+@if (solutionData.Id != 0)
+{
+    <text>
+        <script type="text/javascript">
+            $("#myModal").find("#SolutionStatus").val('@solutionData.Status');
+
+        </script>
+    </text>
+}
+@*$("#myModal").find("#Cause").val('@solutionData.Cause');
+    $("#myModal").find("#Remark").val('@solutionData.Remark');
+    $("#myModal").find("#Solution").val('@solutionData.Solution');*@

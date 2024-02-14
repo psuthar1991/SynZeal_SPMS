@@ -1,0 +1,95 @@
+﻿@model List<Synzeal_Inventory.Entity.SZ_QuotationDetail>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    int loop = 1;
+
+    var customerData = db.Customers.ToList();
+    var genericData = db.GenericAttributes.Where(x => x.KeyGroup == "Customer").ToList();
+
+}
+@using Synzeal_Inventory.Models
+<div class="box-body form-horizontal">
+    <table width="100%" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Company Name</th>
+                <th>PO No.</th>
+                <th>PO Date</th>
+                <th>Project Type</th>
+                <th>Product Name</th>
+                <th>CAS No</th>
+                <th>CAT No</th>
+
+                <th>Lead Time</th>
+
+                <th>QTY. (mg)</th>
+                <th>Current Status</th>
+                <th>Sec. Exp.</th>
+                <th>Scientist Name</th>
+                <th>Estimate Comp. Date	</th>
+            </tr>
+        </thead>
+        @foreach (var k in Model)
+        {
+            <tr>
+                <td>@loop</td>
+                <td>@k.SZ_Quotation.CompanyName</td>
+                <td>@k.SZ_Quotation.PONo</td>
+                <td>
+                    @if (k.SZ_Quotation.PODate.HasValue)
+                    {
+                        @k.SZ_Quotation.PODate.Value.GetOrdinalDate()
+                    }
+                </td>
+                <td>@SZ_Helper.GetEnumDescription((EnumList.ProjectType)(Convert.ToInt32(k.ProjectType)))</td>
+                <td>@k.ProductName</td>
+                <td>@k.CASNo</td>
+                <td>@k.CATNo</td>
+                <td>@k.LeadTime</td>
+                <td>@k.RequiredQty</td>
+                <td>
+                    @foreach (EnumList.ProStatusDDL r in Enum.GetValues(typeof(EnumList.ProStatusDDL)))
+                    {
+                        var item = Enum.GetName(typeof(EnumList.ProStatusDDL), r);
+                        var test = r.ToString();
+                        string text = SZ_Helper.GetEnumDescription((EnumList.ProStatusDDL)(int)r);
+                        int val = (int)r;
+                        if (Convert.ToString(val) == k.ProStatus)
+                        {
+                            @text
+                        }
+                    }
+                </td>
+                <td>@k.ExplainationSecond</td>
+                <td>
+                    @{
+                        if (k.ScientistCustomerId.HasValue)
+                        {
+                            string customerName = string.Empty;
+                            var customer = customerData.Where(x => x.Id == k.ScientistCustomerId && x.Deleted == false && x.Active == true).FirstOrDefault();
+                            if (customer != null)
+                            {
+                                var genericAttr = genericData.Where(x => x.KeyGroup == "Customer" && x.EntityId == customer.Id).ToList();
+                                if (genericAttr.Count > 0)
+                                {
+                                    customerName = genericAttr.Where(x => x.Key == "FirstName").Select(x => x.Value).FirstOrDefault() + " " + genericAttr.Where(x => x.Key == "LastName").Select(x => x.Value).FirstOrDefault();
+                                }
+                            }
+                            @customerName;
+                        }
+                }
+            </td>
+            <td>
+
+                @if (k.EstimateCompleteDate.HasValue)
+                {
+                    @k.EstimateCompleteDate.Value.GetOrdinalDate()
+                }
+            </td>
+        </tr>
+
+        loop += 1;
+    }
+    </table>
+</div>

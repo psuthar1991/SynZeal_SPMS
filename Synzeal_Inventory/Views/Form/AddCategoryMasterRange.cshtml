@@ -1,0 +1,107 @@
+﻿@{
+    ViewBag.Title = "Company";
+    Layout = null;
+}
+@model  Synzeal_Inventory.Entity.SZ_CategoryMasterRange
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Add Category Master Range</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body">
+
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <label for="exampleInputEmail1">10</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="TenStartRange" name="TenStartRange" placeholder="10 Start Range" required value="@Model.TenStartRange">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="TenEndRange" name="TenEndRange" placeholder="10 End Range" required value="@Model.TenEndRange">
+                    </div>
+                </div> <br /> <br />
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <label for="exampleInputEmail1">25</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="TwentyfiveStartRange" name="TwentyfiveStartRange" placeholder="25 Start Range" required value="@Model.TwentyfiveStartRange">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="TwentyfiveEndRange" name="TwentyfiveEndRange" placeholder="25 End Range" required value="@Model.TwentyfiveEndRange">
+                    </div>
+                </div> <br /> <br />
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <label for="exampleInputEmail1">50</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="FiftyStartRange" name="FiftyStartRange" placeholder="50 Start Range" required value="@Model.FiftyStartRange">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="FiftyEndRange" name="FiftyEndRange" placeholder="50 End Range" required value="@Model.FiftyEndRange">
+                    </div>
+                </div> <br /> <br />
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <label for="exampleInputEmail1">100</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="OnehundredStartRange" name="OnehundredStartRange" placeholder="100 Start Range" required value="@Model.OnehundredStartRange">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="OnehundredEndRange" name="OnehundredEndRange" placeholder="100 End Range" required value="@Model.OnehundredEndRange">
+                    </div>
+                </div> <br /> <br />
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <label for="exampleInputEmail1">250</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="TwohundredFiftyStartRange" name="TwohundredFiftyStartRange" placeholder="250 Start Range" required value="@Model.TwohundredFiftyStartRange">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="TwohundredFiftyEndRange" name="TwohundredFiftyEndRange" placeholder="250 End Range" required value="@Model.TwohundredFiftyEndRange">
+                    </div>
+                </div> <br /> <br />
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <label for="exampleInputEmail1">500</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="FivehundredStartRange" name="FivehundredStartRange" placeholder="500 Start Range" required value="@Model.FivehundredStartRange">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="FivehundredEndRange" name="FivehundredEndRange" placeholder="500 End Range" required value="@Model.FivehundredEndRange">
+                    </div>
+                </div> <br /> <br />
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <label for="exampleInputEmail1">1000</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="OneThousandStartRange" name="OneThousandStartRange" placeholder="1000 Start Range" required value="@Model.OneThousandStartRange">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="OneThousandEndRange" name="OneThousandEndRange" placeholder="1000 End Range" required value="@Model.OneThousandEndRange">
+                    </div>
+                </div> <br /> <br />
+                <div class="form-group" style="text-align:right">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="button" onclick="Quote.addCategoryMasterRangeData()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<style>
+    label {
+        padding-top: 7px;
+    }
+</style>

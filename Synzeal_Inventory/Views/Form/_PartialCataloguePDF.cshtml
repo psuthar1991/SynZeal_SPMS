@@ -1,0 +1,59 @@
+﻿@model List<Synzeal_Inventory.Models.ExportCatalogueModel>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    var loop = 1;
+}
+
+<div style="margin:5% 33%;float:left;box-shadow:0 0 3px #aaa; height:auto;color:gray;">
+    <div style="width:100%; font-size:12px;color:#fff;background:#01659e">
+        @Model[0].CategoryName
+    </div>
+    <table width="100%" border="1" style="font-size: 9px;color: #000;border-collapse: collapse;border: 1px solid gray;">
+        <thead>
+            <tr>
+                <th style="text-align: center;font-weight:bold">
+                    #
+                </th>
+                <th style="text-align: center;font-weight:bold">Product Details</th>
+                <th style="text-align: center;font-weight:bold">
+                    Structure
+                </th>
+                <th style="text-align: center;font-weight:bold">CAS No.</th>
+                <th style="text-align: center;font-weight:bold">
+                    SZ CAT NO.
+                </th>
+            </tr>
+        </thead>
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td valign="top" width="5%" style="text-align: center; padding: 5px;">
+                        @loop
+                    </td>
+                    <td valign="top" width="55%" style="padding:5px;">
+                        <b>@item.ProductName</b><br />
+                        <b>Mol.F. </b>@item.MolF<span>, </span><b>Mol.Wt. </b>@item.MolW <br />
+                        <b style="color:#01659e">Inventory Status: </b><span style="color:#01659e">@item.InventoryStatus</span>
+                    </td>
+                    <td valign="top" width="25%" style="text-align:center;padding:5px;">
+                        @if (!string.IsNullOrEmpty(item.ImagePath))
+                        {
+                            <img src="@item.ImagePath" width="150px" height="80px"/>
+                        }
+                    </td>
+                    <td valign="top" width="8%" style="text-align:center;padding:5px;">
+                        @item.CASNo
+                    </td>
+                    <td valign="top" width="7%" style="text-align:center;padding:5px;">
+                        @item.CATNo
+                    </td>
+                </tr>
+                loop += 1;
+            }
+        }
+    </table>
+
+</div>
+

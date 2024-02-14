@@ -1,0 +1,120 @@
+﻿@{
+    ViewBag.Title = "UserDashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using Synzeal_Inventory.Models;
+@model List<MonthWiseUserDashboardDto>
+<section class="content-header">
+    <h1>
+        User Dashboard
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form role="form">
+
+
+                        @foreach (var mainModel in Model)
+                        {
+                            <div class="box">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">@mainModel.MonthName <span> - </span> @mainModel.Year</h3>
+
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="" data-original-title="Remove">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <table class="table table-reponsive">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Sr. No
+                                                </th>
+                                                <th>
+                                                    Teammate
+                                                </th>
+                                                <th colspan="5" style="text-align:center">
+                                                    Products Added
+                                                </th>
+                                                <th colspan="3" style="text-align:center">
+                                                    Products Error
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th></th>
+                                                <th></th>
+                                                <th>
+                                                    All details
+                                                </th>
+                                                <th>
+                                                    Without Cat No
+                                                </th>
+                                                <th>
+                                                    Without CAS No
+                                                </th>
+                                                <th>
+                                                    Without Price
+                                                </th>
+                                                <th>
+                                                    Total Added
+                                                </th>
+                                                <th>
+                                                    Cat No Revision
+                                                </th>
+                                                <th>
+                                                    CAS No revision
+                                                </th>
+                                                <th>
+                                                    Price Revision
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                int loop = 1;
+                                                foreach (var item in mainModel.UserDashboardModel)
+                                                {
+                                                    <tr>
+                                                        <td>@loop</td>
+                                                        <td>@item.Username</td>
+                                                        <td>@item.AllDetails</td>
+                                                        <td>@item.WithoutCatNo</td>
+                                                        <td>@item.WithoutCasNo</td>
+                                                        <td>@item.WithoutPrice</td>
+                                                        <td>@item.TotalAdded</td>
+                                                        <td>@item.RevisionCatNo</td>
+                                                        <td>@item.RevisionCasNo</td>
+                                                        <td>@item.RevisionPrice</td>
+                                                        <td>@item.TotalRevisionProduct</td>
+                                                    </tr>
+                                                    loop += 1;
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        }
+
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

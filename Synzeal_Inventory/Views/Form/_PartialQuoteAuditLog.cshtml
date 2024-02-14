@@ -1,0 +1,39 @@
+﻿@model  List<Synzeal_Inventory.Entity.SystemLog>
+@using Synzeal_Inventory.Entity;
+@{
+    ViewBag.Title = "Audit Log List";
+    Layout = null;
+
+    SynzealLiveEntities db = new SynzealLiveEntities();
+}
+<div class="col-md-12">
+    <div class="box">
+        <form role="form">
+            <div class="box-body">
+                <table id="tblQuotedetailslog" class="table table-bordered table-striped" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Field Name</th>
+                            <th>Before</th>
+                            <th>After</th>
+                            <th>Date</th>
+                            <th>Changed By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                        <tr>
+                            <td>@item.FieldName</td>
+                            <td>@item.Before</td>
+                            <td>@item.After</td>
+                            <td>@item.CreatedDate.ToString()</td>
+                            <td>@item.Username</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>

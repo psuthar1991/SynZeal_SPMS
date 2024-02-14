@@ -1,0 +1,77 @@
+﻿
+<div class="box-body form-horizontal">
+    <div class="form-group">
+        <label class="col-md-3" style=" margin-top: 7px;">Start Date:</label>
+        <div class="col-md-3">
+            <input type="datetime-local" id="startdate" value="" name="startdate" class="form-control" />
+        </div>
+    
+        <label class="col-md-3" style=" margin-top: 7px;">End Date:</label>
+        <div class="col-md-3">
+            <input type="datetime-local" id="enddate" value="" name="enddate" class="form-control" />
+        </div>
+    </div>
+</div>
+<div>
+    <a href="javascript:void(0)" class="btn btn-primary" onclick="projectreportpdf()">Generate</a>
+</div>
+
+<script>
+    function projectreportpdf() {
+        window.location.href = '/Form/DailyProjectReport?startdate=' + $("#startdate").val() + "&enddate=" + $("#enddate").val();
+        //$.ajax({
+        //    url: '/Form/DailyProjectReport?startdate=' + $("#startdate").val() + "&enddate=" + $("#enddate").val(),
+        //    data: {},
+        //    type: 'GET',
+        //    traditional: true, // add this
+        //    dataType: 'json',
+        //    success: function (data) {
+        //        $('#myModal').find('.modal-body').html(data.html);
+        //        $('#myModal').modal({ show: true });
+        //        $('#myModal').find(".modal-dialog").css("width", "1200px");
+        //    }
+        //});
+    }
+    $(function () {
+        var yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        var today = new Date();
+
+        var ystr = yesterday.getFullYear();
+        var ymonth = yesterday.getMonth() + 1;
+        if (ymonth.toString().length == 1) {
+            ystr += "-0" + ymonth;
+        }
+        else {
+            ystr += "-" + ymonth;
+        }
+        
+        if (yesterday.getDate().toString().length == 1) {
+            ystr += "-0" + yesterday.getDate();
+        }
+        else {
+            ystr +=  "-" + yesterday.getDate();
+        }
+        ystr += "T17:30";
+
+
+        var tstr = today.getFullYear();
+        var tmonth = today.getMonth() + 1;
+        if (tmonth.toString().length == 1) {
+            tstr += "-0" + tmonth;
+        }
+        else {
+            tstr += "-" + tmonth;
+        }
+
+        if (today.getDate().toString().length == 1) {
+            tstr += "-0" + today.getDate();
+        }
+        else {
+            tstr += "-" + today.getDate();
+        }
+        tstr += "T17:30";
+        $("#startdate").val(ystr);
+        $("#enddate").val(tstr);
+    });
+</script>

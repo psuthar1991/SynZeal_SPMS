@@ -1,0 +1,703 @@
+﻿@{
+    ViewBag.Title = "Product Master List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<SZ_QuotationModel>
+@using Synzeal_Inventory.Models
+<section class="content-header">
+    <h1>
+        Product Master List
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12" style="text-align:center">
+            @for (char c = 'A'; c <= 'Z'; c++)
+            {
+                <div class="letter " data-letter="@c" onclick="SelectInventoryChar('@c')">@c</div>
+            }
+        </div>
+        <div class="col-md-12" style="margin: 10px;">
+            <div class="form-group">
+                <label class="col-md-1" style="padding-top: 6px;">Select API :</label>
+                <div class="col-md-2">
+                    <select id="loadapiselect" class="form-control">
+                        <option value="0">--Select--</option>
+                    </select>
+                </div>
+                <div class="col-md-1" style="text-align: center;padding-top: 6px;">
+                    OR
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="txtsearch" name="txtsearch" class="form-control" />
+                </div>
+                <div class="col-md-1">
+                    <input type="button" value="Search" class="btn btn-primary" onclick="searchinventory()" />
+                </div>
+                <div class="col-md-4">
+                    <select id="filshippingConditions" class="form-control" onchange="searchinventory(true)"> <option value="">Select</option><option value="Ambient Temperature">Ambient Temperature</option><option value="Ice Pack">Ice Pack</option><option value="Cold Shipment">Cold Shipment</option></select>
+                </div>
+                <div class="col-md-1">
+                    <input type="button" value="Save All" class="btn btn-primary" onclick="saveAll()" />
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <div class="box-body" style="overflow:scroll;" id="divQuote">
+                    <div class="row " style="padding-bottom:10px">
+                        <div class="form-group">
+
+                            <div class="col-md-1">
+                                <label style="padding-top: 6px;">In-Stock:</label>
+                                <input type="checkbox" id="filterinstock" name="instock" value="Instock" checked class="filterstatus" />
+                            </div>
+                            <div class="col-md-2">
+                                <label style="padding-top: 6px;">Custom Synthesis:</label>
+                                <input type="checkbox" id="filterother" name="other" value="Custom Synthesis" checked class="filterstatus" />
+                            </div>
+                            <div class="col-md-1">
+                                <a href="javascript:void(0)" onclick="$('#example1').DataTable().draw()" class="btn btn-primary">Search</a>
+                            </div>
+                            <div class="col-md-8" style="text-align:right" >
+
+                                @*<a href="javascript:void(0)" class="btn btn-primary" onclick="LoadAllCategoryPrice()">All Category Price</a>
+                                <a href="javascript:void(0)" onclick="priceclubquote()" class="btn btn-primary">Club Quote</a>
+                                <a href="javascript:void(0)" class="btn btn-primary" onclick="OpepCategorymasterpopup()" id="btncatmaster">API Completion</a>*@
+                            </div>
+                        </div>
+                    </div>
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th width="1%"><input type="checkbox" id="selectallchk" /></th>
+                                <th>Product Name</th>
+                                <th>CAS No</th>
+                                <th>CAT No</th>
+                                @*<th width="7%">Lead Time</th>
+        <th width="7%">Status</th>*@
+                                <th>Inv. Status</th>
+                                <th>Product Remark</th>
+                                <th>Controlled Substance</th>
+                                <th>Manual Controlled Substance </th>
+                                <th>Sourcing Required</th>
+                                <th>Technical Report</th>
+                                <th>Tracebility</th>
+                                <th>Tracebility Comment</th>
+                                <th>Important</th>
+                                <th>End Use</th>
+                                <th>Batch No</th>
+                                <th></th>
+
+                                <th>
+                                    Shipping Conditions
+                                </th>
+                                <th>
+                                    Description
+                                </th>
+                                <th>
+                                    Appearance
+                                </th>
+                                <th>Country of Origin</th>
+                                <th>HSN Code</th>
+                                <th>Dangerous Goods to Ship</th>
+
+                                <th>Source</th>
+
+                                <th>Same As</th>
+                                <th>
+                                    IR
+                                </th>
+                                <th>
+                                    Mass
+                                </th>
+                                <th>
+                                    HPLC/GC/ELSD
+                                </th>
+                                <th>
+                                    1H NMR
+                                </th>
+                                <th>
+                                    qNMR
+                                </th>
+                                <th>
+                                    TGA/KF
+                                </th>
+                                <th>
+                                    13C NMR
+                                </th>
+                                <th>
+                                    DEPT
+                                </th>
+                                <th>
+                                    HRMS
+                                </th>
+                                <th>
+                                    ROI
+                                </th>
+                                <th>
+                                    Elemental
+                                </th>
+                                <th>
+                                    CMR Assign
+                                </th>
+                                <th>
+                                    MASS Assign
+                                </th>
+                                <th>
+                                    NMR Assign
+                                </th>
+                                <th>Stability – Solution</th>
+                                <th>Stability – RT</th>
+                                <th>Photostability</th>
+                                <th>Hygroscopic</th>
+                                <th>Temp Sensitive</th>
+                                <th>Lacrymatory</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<style type="text/css">
+    .clsppop:hover {
+        color: red;
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .clsppop {
+        width: 10%;
+        padding: 3px 0;
+    }
+
+    .modal-footer {
+        border: 0;
+    }
+</style>
+<script>
+
+    $(document).on("change", '.clsTechnicalReport', function () {
+        var id = $(this).attr('id').replace('IsTechnicalReport_', '');
+        if ($(this).is(":checked")) {
+            $("#productDdlStatus_" + id).val('Inquire');
+        }
+        else {
+            $("#productDdlStatus_" + id).val('');
+        }
+    });
+
+    $('#selectallchk').change(function () {
+
+        if ($(this).is(':checked')) {
+            $('.clsSaverow').each(function () {
+                $(this).prop('checked', true);
+            });
+        }
+        else {
+            $('.clsSaverow').each(function () {
+                $(this).prop('checked', false);
+            });
+        }
+    });
+
+    function searchinventory(isshipping = false) {
+        
+        var value = $('#loadapiselect').val();
+        var search = $('#txtsearch').val();
+        if (!isshipping) {
+        if (value === "0" && search === "") {
+            swal("Please select API.")
+            return false;
+            }
+        }
+        RefstockGrid(value, search);
+    }
+
+    var firsttimeload = false;
+    function RefstockGrid(val, search) {
+        if (firsttimeload) {
+            $('#example1').DataTable().clear();
+            $('#example1').DataTable().destroy();
+        }
+        firsttimeload = true;
+        $('#example1').DataTable({
+            //"fixedHeader": {
+            //    header: true
+            //},
+            "ordering": false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "orderMulti": false, // for disable multiple column at once
+            "pageLength": 25,
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "ajax": {
+                "url": "../Form/LoadProducMasterData?apiname=" + val + '&search=' + search,
+                "type": "POST",
+                "datatype": "json",
+                "data": function (d) {
+                    d.instockother = $("#filterinstock").is(":checked") + "," + $("#filterother").is(":checked");
+                    d.shippingConditions = $("#filshippingConditions").val();
+                }
+            },
+            "fnDrawCallback": function (oSettings) {
+                $(".clsDllstatus").each(function () {
+                    var val = $(this).attr('data-value');
+                    if (val !== '') {
+                        $(this).val(val);
+                    }
+                });
+                $(".clsproductDllstatus").each(function () {
+                    var val = $(this).attr('data-value');
+                    if (val !== '') {
+                        $(this).val(val);
+                    }
+                });
+                $(".clsImportant").each(function () {
+                    var val = $(this).attr('data-value');
+                    if (val !== '') {
+                        $(this).val(val);
+                    }
+                });
+                $(".clsshippingCondition").each(function () {
+                    var val = $(this).attr('data-value');
+                    if (val !== '') {
+                        $(this).val(val);
+                    }
+                    else {
+                        $(this).val('Ambient Temperature');
+                    }
+                });
+                $(".clsEndUse").each(function () {
+                    var val = $(this).attr('data-value');
+                    if (val !== '') {
+                        $(this).val(val);
+                    }
+                });
+
+                $(".clscountryorigin").each(function () {
+                    var val = $(this).val();
+                    if (val == '') {
+                        $(this).val('India');
+                    }
+                });
+                $(".clsDangGoodToShip").each(function () {
+                    var val = $(this).val();
+                    if (val == '') {
+                        $(this).val('No');
+                    }
+                });
+                $(".clshsncode").each(function () {
+                    var val = $(this).val();
+                    if (val == '') {
+                        $(this).val('38229010');
+                    }
+                });
+
+                $(".imgclshover").hover(function () {
+                    $(this).parent('tr').find('.clsimageproduct').show();
+                }, function () {
+                    $(this).parent('tr').find('.clsimageproduct').hide();
+                });
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.IsBatchAvailable) {
+                    $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                }
+                $('td:eq(2)', nRow).addClass("imgclshover");
+
+            },
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                $(row).attr('id', 'tr_' + data.Id);
+                $(row).attr('class', 'clstr');
+            },
+            "columns": [
+                { "data": "ChkRow", "autoWidth": true, "orderable": false },
+                { "data": "ProductName", "autoWidth": true, "orderable": false },
+                { "data": "casno", "autoWidth": true, "orderable": false },
+                { "data": "catNo", "autoWidth": true, "orderable": false },
+                //{ "data": "LeadTime", "autoWidth": true, "orderable": false },
+                //{ "data": "DdlStatus", "autoWidth": true, "orderable": false },
+                { "data": "ProductDdlStatus", "autoWidth": true, "orderable": false },
+                { "data": "ProductRemark", "autoWidth": true, "orderable": false },
+                { "data": "ControlledSubstance", "autoWidth": true, "orderable": false },
+                { "data": "ManualControlledSubstance", "autoWidth": true, "orderable": false },
+                
+                { "data": "SourceRequired", "autoWidth": true, "orderable": false },
+                { "data": "IsTechnicalReport", "autoWidth": true, "orderable": false },
+                { "data": "IsTracebility", "autoWidth": true, "orderable": false },
+                { "data": "TracebilityComment", "autoWidth": true, "orderable": false },
+                { "data": "Important", "autoWidth": true, "orderable": false },
+                { "data": "EndUse", "autoWidth": true, "orderable": false },
+                { "data": "AdditionalBatchNoText", "autoWidth": true, "orderable": false },
+                { "data": "BatchDataCheck", "autoWidth": true, "orderable": false },
+                
+                { "data": "ShippingCondition", "autoWidth": true, "orderable": false },
+                { "data": "Description", "autoWidth": true, "orderable": false },
+                { "data": "Appearance", "autoWidth": true, "orderable": false },
+                { "data": "CountryOrigin", "autoWidth": true, "orderable": false },
+                { "data": "HSNCode", "autoWidth": true, "orderable": false },
+                { "data": "DangGoodToShip", "autoWidth": true, "orderable": false },
+                
+                { "data": "Source", "autoWidth": true, "orderable": false },
+                { "data": "SameAs", "autoWidth": true, "orderable": false },
+                { "data": "IR", "orderable": false, "className": "clsIR" },
+                { "data": "Mass", "orderable": false, "className": "clsMass" },
+                { "data": "HPLCGCELSD", "orderable": false, "className": "clsHPLCGCELSD" },
+                { "data": "NMR", "orderable": false, "className": "clsNMR" },
+                { "data": "qNMR", "orderable": false, "className": "clsqNMR" },
+                { "data": "TGA", "orderable": false, "className": "clsTGA" },
+                { "data": "CMR", "orderable": false, "className": "clsCMR" },
+                { "data": "DEPT", "orderable": false, "className": "clsDEPT" },
+                { "data": "HRMS", "orderable": false, "className": "clsHRMS" },
+                { "data": "ROI", "orderable": false, "className": "clsROI" },
+                { "data": "Elemental", "orderable": false, "className": "clsElemental" },
+                { "data": "SER", "orderable": false, "className": "clsSER" },
+                { "data": "APCIMass", "orderable": false, "className": "clsAPCIMass" },
+                { "data": "NMRInterpretaion", "orderable": false, "className": "clsNMRInterpretaion" },
+                { "data": "StabilitySolution", "orderable": false, "className": "clsStabilitySolution" },
+                { "data": "StabilityRT", "orderable": false, "className": "clsStabilityRT" },
+                { "data": "Photostability", "orderable": false, "className": "clsPhotostability" },
+                { "data": "Hygroscopic", "orderable": false, "className": "clsHygroscopic" },
+                { "data": "TempSensitive", "orderable": false, "className": "clsTempSensitive" },
+                { "data": "Lacrymatory", "orderable": false, "className": "clsLacrymatory" }
+            ]
+        });
+    }
+
+
+    var popupNumber = "";
+    var selectedId = 0;
+    function popup(number, productid) {
+        popupNumber = number;
+        selectedId = productid;
+        $('#mypriceModal').modal('show');
+    }
+
+    function SelectInventoryChar(char) {
+        $('.letter').removeClass('letter-active');
+        $('.letter').each(function () {
+            var attr = $(this).attr('data-letter');
+            if (attr == char) {
+                $(this).addClass('letter-active');
+            }
+        })
+
+        $.ajax({
+            type: "GET",
+            url: "/Form/MainCategory/",
+            data: { 'id': char , 'isonlycategory' : true},
+            dataType: "json",
+            success: function (response) {
+                if (response.records.length > 0) {
+                    $('#loadapiselect').empty();
+                    var str = "";
+                    str += "<option value='0'>--Select--</option>";
+                    $(response.records).each(function (i, v) {
+                        //str += "<div class='span2' onclick='InventoryGrid(&#39;" + v.Name + "&#39;)'>" + v.Name + "</div>";
+                        str += "<option value='" + v.Name + "'>" + v.Name + "</option>";
+                    });
+                    $('#loadapiselect').append(str);
+                }
+            },
+            error: function (response) {
+                alert("Error:" + response);
+            }
+        });
+    }
+
+    function SaveScientistProductDetails(id) {
+        var scStatus = $("#scientistStatus_" + id).val();
+        var batchcode1 = $("#batchcode1_" + id).val();
+        var qty1 = $("#qty1_" + id).val();
+        var batchcode2 = "";
+        var qty2 = "";
+        var esticompleteDate = $("#esticompleteDate_" + id).val();
+        $.ajax({
+            url: '/Form/UpdateScientistProjectInfo',
+            data: {
+                scStatus: scStatus,
+                batchcode1: batchcode1,
+                qty1: qty1,
+                batchcode2: batchcode2,
+                qty2: qty2,
+                id: id,
+                esticompleteDate:esticompleteDate
+            },
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have updated product information.");
+
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (scStatus === readytodeliverId) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+
+    function saveAll() {
+        var ids = [];
+        $('.clsSaverow').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        var count = 1;
+        $('.clsSaverow').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                $.ajax({
+                    url: '/Form/UpdateProductMasterList?id=' + id + '&DdlStatus=' + $("#DdlStatus_" + id).val()
+                        + '&LeadTime=' + $("#LeadTime_" + id).val()
+                        + '&ReTestRequired=' + $("#ReTestRequired_" + id).val()
+                        + '&ShippingCondition=' + $("#ShippingCondition_" + id).val()
+                        + '&SourceRequired=' + $("#SourceRequired_" + id).is(":checked")
+                        + '&Source=' + $("#Source_" + id).val()
+                        + '&Appearance=' + $("#Appearance_" + id).val()
+                        + '&CountryOrigin=' + $("#CountryOrigin_" + id).val()
+                        + '&HSNCode=' + $("#HSNCode_" + id).val()
+                        + '&DangGoodToShip=' + $("#DangGoodToShip_" + id).val()
+                        + '&ShortDescription=' + $("#Description_" + id).val()
+                        + '&SameAs=' + $("#SameAs_" + id).val()
+                        + '&productDdlStatus=' + $("#productDdlStatus_" + id).val()
+                        + '&IsControlledSubstance=' + $("#IsControlledSubstance_" + id).is(":checked")
+                        + '&IsManuallyControlledSubstance=' + $("#IsManuallyControlledSubstance_" + id).is(":checked")
+                        + '&ProductRemark=' + $("#ProductRemark_" + id).val()
+                        + '&IsTracebility=' + $("#IsTracebility_" + id).is(":checked")
+                        + '&TracebilityComment=' + $("#TracebilityComment_" + id).val()
+                        + '&Important=' + $("#Important_" + id).val()
+                        + '&EndUse=' + $("#EndUse_" + id).val()
+                        + '&IsTechnicalReport=' + $("#IsTechnicalReport_" + id).is(":checked")
+                    ,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) { },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function successAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product master list..");
+            $('.clsSaverow').each(function () {
+                $(this).prop('checked', false);
+            });
+
+            $('#selectallchk').prop('checked', false);
+        }
+    }
+
+    function batchpopup(productid) {
+            $.ajax({
+                url: '/Form/GetBatch?productId=' + productid,
+                data: {},
+                type: 'GET',
+                traditional: true, // add this
+                dataType: 'json',
+                success: function (data) {
+                    if (data.Data === "Yes") {
+                        var str = '<table width="100%" class="table table-bordered table-striped"><tr><th>Batch No</th><th>Is Form Available?</th><th></th></tr>';
+                        $(data.Record).each(function (i, v) {
+                            var isformavailable = "";
+                            var aLink = "";
+                            if (v.FormId === 0) {
+                                isformavailable = "No";
+                                aLink = "<a href='/Form/GetQuoteDetailsId/" + v.ProductId + "?formid=0&newprodumastr=true'>New Form</a>";
+                            } else {
+                                isformavailable = "Yes";
+                                aLink = "<a href='/Form/SubmitForm/" + v.QuoteDetailsId + "?formid=" + v.FormId + "&newprodumastr=true'>Edit Form</a>";
+                            }
+                            str += "<tr><th>" + v.BatchNo + " </th><th>" + isformavailable + " </th><th>" + aLink +"</th></tr>";
+                        });
+                        str += "</table>";
+                        $('.modal-body').html(str);
+                        $('#myModal').modal({ show: true });
+                        $(".modal-dialog").css("width", "1200px");
+                    }
+                    else {
+                        toastr.error("No Data Available.");
+                    }
+                }
+            });
+    }
+
+    $(document).on("change", '.addbatch', function () {
+        var id = $(this).attr('id').replace('additionalBatch_', '');
+        $.ajax({
+            url: '/Form/GetFormDatafromBatchId?batchId='+ $(this).val(),
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data !== null) {
+
+                    $("#Description_" + id).val(data.State); 
+                    $("#Appearance_" + id).val(data.Apearance); 
+
+                    if (data.IRAttachment !== null && data.IRAttachment !== "") {
+                        $("#IR_" + id).attr('href', data.IRAttachment);
+                        $("#IR_" + id).html('<i class="fa fa-download"></i>');
+                    }
+
+                    
+                    if (data.MassAttachment !== null && data.MassAttachment !== "") {
+                        $("#Mass_" + id).attr('href', data.MassAttachment);
+                        $("#Mass_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.PLCAttachment !== null && data.PLCAttachment !== "") {
+                        $("#HPLCGCELSD_" + id).attr('href', data.PLCAttachment);
+                        $("#HPLCGCELSD_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.NMRAttchment !== null && data.NMRAttchment !== "") {
+                        $("#NMR_" + id).attr('href', data.NMRAttchment);
+                        $("#NMR_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.QNMRAttchment !== null && data.QNMRAttchment !== "") {
+                        $("#qNMR_" + id).attr('href', data.QNMRAttchment);
+                        $("#qNMR_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.TGAAttachment !== null && data.TGAAttachment !== "") {
+                        $("#TGA_" + id).attr('href', data.TGAAttachment);
+                        $("#TGA_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.CMRAttchment !== null && data.CMRAttchment !== "") {
+                        $("#CMR_" + id).attr('href', data.CMRAttchment);
+                        $("#CMR_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.DEPTAttachment !== null && data.DEPTAttachment !== "") {
+                        $("#DEPT_" + id).attr('href', data.DEPTAttachment);
+                        $("#DEPT_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.HRMSAttachment !== null && data.HRMSAttachment !== "") {
+                        $("#HRMS_" + id).attr('href', data.HRMSAttachment);
+                        $("#HRMS_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.ROIAttachment !== null && data.ROIAttachment !== "") {
+                        $("#ROI_" + id).attr('href', data.ROIAttachment);
+                        $("#ROI_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.ElementralAttachment !== null && data.ElementralAttachment !== "") {
+                        $("#Elemental_" + id).attr('href', data.ElementralAttachment);
+                        $("#Elemental_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.SERAttachment !== null && data.SERAttachment !== "") {
+                        $("#SER_" + id).attr('href', data.SERAttachment);
+                        $("#SER_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.Hygroscopic !== null && data.Hygroscopic !== "") {
+                        if (data.Hygroscopic === true) {
+                            $("#Hygroscopic_" + id).html('<i class="fa fa-check"></i>');
+                        }
+                        else {
+                            $("#Hygroscopic_" + id).html('<i class="fa fa-close"></i>');
+                        }
+                    }
+                    
+                    if (data.TempSensitive !== null && data.TempSensitive !== "") {
+                        if (data.TempSensitive === true) {
+                            $("#TempSensitive_" + id).html('<i class="fa fa-check"></i>');
+                        }
+                        else {
+                            $("#TempSensitive_" + id).html('<i class="fa fa-close"></i>');
+                        }
+                    }
+                    
+                    if (data.Lacrymatory !== null && data.Lacrymatory !== "") {
+                        if (data.Lacrymatory === true) {
+                            $("#Lacrymatory_" + id).html('<i class="fa fa-check"></i>');
+                        }
+                        else {
+                            $("#Lacrymatory_" + id).html('<i class="fa fa-close"></i>');
+                        }
+                    }
+
+                    if (data.Photostability !== null && data.Photostability !== "") {
+                        if (data.Photostability === true) {
+                            $("#Photostability_" + id).html('<i class="fa fa-check"></i>');
+                        }
+                        else {
+                            $("#Photostability_" + id).html('<i class="fa fa-close"></i>');
+                        }
+                    }
+                    
+                    if (data.APCIMassAttachment !== null && data.APCIMassAttachment !== "") {
+                        $("#APCIMass_" + id).attr('href', data.APCIMassAttachment);
+                        $("#APCIMass_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                    if (data.NMRInterpretaionAttachment !== null && data.NMRInterpretaionAttachment !== "") {
+                        $("#NMRInterpretaion_" + id).attr('href', data.NMRInterpretaionAttachment);
+                        $("#NMRInterpretaion_" + id).html('<i class="fa fa-download"></i>');
+                    }
+                    
+                   
+
+                }
+            }
+        });
+    });
+    
+
+
+</script>
+
+<style type="text/css">
+    .letter {
+        float: left;
+        padding: 10px 14px;
+        background: #3c8dbc;
+        margin: 5px 10px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .letter:hover, .letter-active {
+            background: #2d729a;
+        }
+
+    .clsimageproduct {
+        display: block;
+        position: absolute;
+        background: #fff;
+        padding: 10px;
+        border: 1px solid #ececec;
+        left: 7.5%;
+    }
+</style>

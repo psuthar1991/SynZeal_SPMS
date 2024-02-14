@@ -1,0 +1,69 @@
+﻿@model Synzeal_Inventory.Entity.SZ_QuotationDetail
+
+
+<style type="text/css">
+</style>
+
+<div class="box-body form-horizontal" >
+        <fieldset id="fdsaddcompany">
+            
+            <form role="form" >
+                <div class="box-body" style="padding-left:20px;">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Scientist: </label>
+                        @ViewBag.ScientistName
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Sub-Scientist: </label>
+                        @ViewBag.SubScientistName
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Lead Time: </label>
+                        @Model.LeadTime
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Sec. Exp.: </label>
+                        @Model.ExplainationSecond
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">COA: </label>
+                        @Model.COARefNumber
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Activity: </label>
+                        @Model.ActivityStatus
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Count: </label>
+                        @Model.CountEstDate
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Data Remark: </label>
+                        @if (!string.IsNullOrEmpty(Model.Remark))
+                        {
+                            @Html.Raw(Model.Remark.Trim())
+                        }
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Reason: </label>
+                        @Model.Reason
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Technical Contact: </label>
+                        @Model.TechnicalEmail
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Pack Size: </label>
+                        @Model.OrderRemark
+                    </div>
+
+
+                    
+                    
+                    
+
+                </div>
+            </form>
+        </fieldset>
+
+</div>

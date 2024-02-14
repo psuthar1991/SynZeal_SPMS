@@ -1,0 +1,116 @@
+﻿@model List<Synzeal_Inventory.Models.QuotationListModel>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+}
+
+<div class="box-body form-horizontal">
+    <div class="form-group">
+        <label class="col-md-3">To<i> (Use comma(;) for other email)</i>:</label>
+        <div class="col-md-9">
+            <input type="text" id="emailpopup" name="popuptoemail" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3">Cc<i> (Use comma(;) for other email)</i>:</label>
+        <div class="col-md-9">
+            <input type="text" id="emailccpopup" name="popupccemail" class="form-control" value="standards@synzeal.com; projects@synzeal.com; sales@synzeal.com;" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3">Invoice Pdf:</label>
+        <div class="col-md-9">
+            <input type="file" id="invoicepdf" name="invoicepdf" multiple/>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="radio">
+            <label style="padding-right:25px;">
+                <input type="radio" id="mailfrom" name="mailfrom" value="Sales" checked="checked">
+                Sales
+            </label>
+            <label>
+                <input type="radio" id="mailfrom" name="mailfrom" value="Export">
+                Export
+            </label>
+        </div>
+    </div>
+    <br />
+    <table width="100%" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>PO No.</th>
+                <th>Product Name</th>
+                <th>QTY. (mg)</th>
+                <th>Batch No.</th>
+                <th>Name of Buyer</th>
+                <th>Courier</th>
+                <th>Tracking No.</th>
+                <th>Location</th>
+                <th>Ref Name</th>
+                <th>Purpose Of Dispatch</th>
+            </tr>
+        </thead>
+        @foreach (var k in Model)
+        {
+            <tr>
+                <td>
+                    @k.PackDate
+                </td>
+                <td>@k.PONumber</td>
+                <td>@k.ProductName</td>
+                <td>@k.RequiredQty</td>
+                <td>@k.BatchNo</td>
+                <td>@k.CompanyName</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(k.Courier))
+                    {
+                        int cid = Convert.ToInt32(k.Courier);
+                        @db.SZ_Courier.Where(x => x.Id == cid).Select(x => x.Name).FirstOrDefault()
+                    }
+                </td>
+                <td>@k.TrackingNo</td>
+                <td>@k.Location</td>
+                <td>@k.RefName</td>
+                <td>@(k.PurposeDispatch != "--Select--" ? k.PurposeDispatch : string.Empty)</td>
+            </tr>
+        }
+    </table>
+</div>
+<div>
+    <a href="javascript:void(0)" class="btn btn-primary" onclick="sendemailconfirmation()">Send Email</a>
+</div>
+
+<script>
+    function sendemailconfirmation() {
+    var toEmailaddress = $("#myModal").find('#emailpopup').val();
+    var cctoEmailaddress = $("#myModal").find('#emailccpopup').val();
+    
+    var formData = new FormData();
+        var totalFiles = $("#myModal").find('#invoicepdf')[0].files.length;
+        for (var i = 0; i < totalFiles; i++) {
+            var file = $("#myModal").find('#invoicepdf')[0].files[i];
+            formData.append("invoicepdf", file);
+        }
+    var ids = JSON.parse('@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Ids))');
+
+    formData.append("id", ids);
+    formData.append("toEmail", toEmailaddress);
+    formData.append("cctoEmail", cctoEmailaddress);
+        formData.append("mailfrom", $('input[name=mailfrom]:checked').val());   
+
+        $.ajax({
+            url: '/Form/SendEmailInvoiceConfirmationAction',
+            //data: { "id": ids, "toEmail": toEmailaddress, "cctoEmail": cctoEmailaddress},
+            data: formData,
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                $('#myModal').modal('hide');
+            }
+        });
+        }
+</script>

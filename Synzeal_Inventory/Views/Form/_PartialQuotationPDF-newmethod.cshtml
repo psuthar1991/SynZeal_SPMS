@@ -1,0 +1,206 @@
+﻿@model Synzeal_Inventory.Entity.SZ_Quotation
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    string terms = db.SZ_Terms.Where(x => x.Id == Model.TermsId).Select(x => x.Value).FirstOrDefault();
+}
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+
+<div style="margin-right:33%;margin-left:33%;box-shadow:0 0 3px #aaa; height:auto;color:gray;">
+    <table width="100%">
+        <tr>
+            <td valign="top">
+                <img src="http://www.synzeal.com/Themes/DefaultClean/Content/images/logo.png" width="250px" />
+            </td>
+            <td>
+                <p style="font-size:12px;float:right;padding:10px; text-align:right;color:gray;line-height:18px;width:480px;">
+                    <b style="color:#000">Syn</b><b style="color: #00659e;">Zeal</b><b style="color:#000"> Research Pvt Ltd</b><br />
+                    Plot No. F, Shree Ganesh Industrial Estate,<br />
+                    423/24/8, Mahagujarat Industrial Estate,<br />
+                    Sarkhej-Bavla Road , Moraiya , India-382213<br />
+                    <b>Email:-</b> standards@synzeal.com<br />
+                    <b>Phone:-</b> +91-757-500-2050<br />
+                </p>
+            </td>
+        </tr>
+    </table>
+</div>
+   
+    <div style="margin-top:0px;padding-top:0px; border-bottom:1px solid rgba(0,0,0,0.2);border-top:1px solid #000;padding-bottom:5px;color:#000;line-height:18px;">
+        <table width="100%">
+            <tr>
+                <td style="font-size:12px;">
+                    <b style="color:#000;">SynZeal Quote ID :</b> @Model.Ref
+                </td>
+                <td>
+                    <p style="font-size:12px;float:right;padding:10px; text-align:right;">
+                        <b style="color:#000;">Date :</b> @Model.CreatedDate.Value.Day<sup>@GetDaySuffix(Model.CreatedDate.Value.Day)</sup> @Model.CreatedDate.Value.ToString("MMMM yy")
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size:11px;">
+                    <b style="color:#000;">Customer Name :</b> @Model.CompanyName
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+    @if (Model.IsImageAttach)
+    {
+        <div style="padding:0px; float:left;padding-top:10px;">
+            <table width="100%">
+                <thead>
+                    <tr style="font-size:12px">
+                        <th width="15%">
+                            <b>Sr. No.</b>
+                        </th>
+                        <th style="text-align:center;" >
+                            <b style="text-align:center;">Structure</b>
+                        </th>
+                        <th><b>Quotation Details</b></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int srno = 1;
+                        foreach (var item in Model.SZ_QuotationDetail.OrderBy(x => x.DisplayOrder).ToList())
+                        {
+                            string imagePath = string.Empty;
+                            if (!string.IsNullOrEmpty(item.ImagePath) && item.ImagePath.Contains("../"))
+                            {
+                                string host = Request.Url.AbsoluteUri.ToString().Substring(0, Request.Url.AbsoluteUri.ToLower().IndexOf("/form"));
+                                imagePath = item.ImagePath.Replace("..", host);
+                            }
+                            else
+                            {
+                                imagePath = item.ImagePath;
+                            }
+                            bool exists = false;
+                            if (!string.IsNullOrEmpty(imagePath))
+                            {
+                                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(imagePath);
+                                request.Method = "HEAD";
+                                try
+                                {
+                                    request.GetResponse();
+                                    exists = true;
+                                }
+                                catch
+                                {
+                                    exists = false;
+                                }
+                            }
+
+
+                            <tr style="color:#000;">
+                                <td style="font-size:12px;text-align:center;" width="15%">
+                                    @srno
+                                </td>
+                                <td style="font-size:10px;text-align:center;">
+                                    @if (!string.IsNullOrEmpty(imagePath) && exists)
+                                    {
+                                        <img src="@imagePath" width="300px" />
+                                    }
+                                    else
+                                    {
+                                        <img src="https://www.synzeal.com/content/images/thumbs/default-image_500.png" width="300px" />
+                                    }
+                                </td>
+                                <td >
+                                    <table width="100%">
+                                        <tr>
+                                            <td style="font-size:12px;line-height:18px;">
+                                                <b>Name:</b> @item.ProductName<br />
+                                                @if (!string.IsNullOrEmpty(item.CATNo))
+                                                {
+                                                    <b>CAT No:</b> @item.CATNo<br />
+                                                }
+                                                <b>CAS No:</b> @item.CASNo<br />
+                                                <b>Price:</b> @item.Price<br />
+                                                <b>Lead Time:</b> @item.LeadTime<br />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            srno += 1;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div style="padding:0px; float:left;padding-top:10px;">
+            <table width="100%">
+                <thead>
+                    <tr style="font-size:11px">
+                        <th width="5%" style="text-align:center;">
+                            <b>Sr. No.</b>
+                        </th>
+                        <th>
+                            <b>Quotation Details</b>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int srno = 1;
+                        foreach (var item in Model.SZ_QuotationDetail.OrderBy(x => x.DisplayOrder).ToList())
+                        {
+                            <tr style="color:#000;">
+                                <td style="font-size:10px;text-align:center;border-bottom:1px solid #5c5c5c" width="5%">
+                                    @srno
+                                </td>
+                                <td style="font-size:10px;text-align:left;border-bottom:1px solid #5c5c5c;padding-left:10px;" width="95%">
+                                    <b>Name:</b> @item.ProductName<br />
+                                    @if (!string.IsNullOrEmpty(item.CATNo))
+                                    {
+                                        <b>CAT No:</b> @item.CATNo<br />
+                                    }
+                                    <b>CAS No:</b> @item.CASNo<br />
+                                    <b>Price:</b> @item.Price<br />
+                                    <b>Lead Time:</b> @item.LeadTime<br />
+                                </td>
+                            </tr>
+
+                            srno += 1;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    }
+    <div style="padding:0px; padding-top:10px;">
+        <span style="text-align:left;font-size:10px;color:#000;"> @Model.Remark</span>
+    </div>
+    @if(terms != null)
+    { 
+        <div style="padding:0px; padding-top:10px;">
+            <div style="text-align:left;font-size:10px;color:#000;"> @Html.Raw(terms)</div>
+        </div>
+    }
+
+

@@ -1,0 +1,198 @@
+﻿@{
+    ViewBag.Title = "Edit Inventory";
+    //  Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+}
+@model Synzeal_Inventory.Entity.SZ_Inventory
+    <style>
+        .dropdown-menu{
+            z-index:2147483647 !important;
+        }
+    </style>
+
+<div class="row-fluid">
+    <div class="span6">
+        <div class="widget-box">
+            <div class="widget-title">
+                <span class="icon"> <i class="icon-align-justify"></i> </span>
+                <h5>Batch Info</h5>
+            </div>
+            <div style="padding:5px 30px;color:Red;font-size:15px;text-align:right" id="errorMsg">
+
+            </div>
+            <div class="widget-content nopadding">
+                @using (Html.BeginForm("EditInventory", "Form", FormMethod.Post, new { enctype = "multipart/form-data", @id = "frmEditInventory", @class = "form-horizontal" }))
+                {
+
+
+                    <div class="control-group">
+                        <label class="control-label">Batch No :</label>
+                        <div class="controls">
+                            @Html.HiddenFor(model => model.ProductId)
+                            @Html.HiddenFor(model => model.Id)
+                            <input type="text" class="span11" placeholder="Batch No" name="BatchNo" id="BatchNo" readonly value="@Model.BatchNo">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Qty :</label>
+                        <div class="controls">
+                            <input type="text" class="span11" placeholder="Qty" name="Qty" id="Qty" value="@Model.Qty">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Appearance :</label>
+                        <div class="controls">
+                            <input type="text" class="span11" placeholder="Appearance" name="Appearance" id="Appearance" value="@Model.Appearance">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">COA:</label>
+                        <div class="controls">
+                            <input type="file" class="span11" name="COA" id="COA">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Standard Data:</label>
+                        <div class="controls">
+                            <input type="file" class="span11" name="SDF" id="SDF">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Additional Data:</label>
+                        <div class="controls">
+                            <input type="file" class="span11" name="ADDFile" id="ADDFile">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label"> Re-Test Date:</label>
+                        <div class="controls">
+                            <input type="text" class="span11 datepicker" value="@Model.ReTestDate" placeholder="Re-Test Date" name="ReTestDate" id="ReTestDate">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Remarks</label>
+                        <div class="controls">
+                            <textarea class="span11" name="Remarks" id="Remarks" value="@Model.Remarks"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-success" onclick="return validation()">Save</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="span6">
+        <div class="widget-box">
+            <div class="widget-title">
+                <span class="icon"> <i class="icon-align-justify"></i> </span>
+                <h5>Product Info</h5>
+            </div>
+            <div class="widget-content nopadding">
+                @if (ViewBag.ProductModel != null)
+                {
+                    var productmodel = (Synzeal_Inventory.Models.ProductDetailsModel)ViewBag.ProductModel;
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label">Product Name :</label>
+                        <div class="controls" style="font-size: 16px;font-weight: bold;">
+                            @productmodel.Name
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Product Image :</label>
+                        <div class="controls">
+                            <img src="@productmodel.DefaultPictureModel.ImageUrl" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">CAS # :</label>
+                        <div class="controls">
+                            @productmodel.ManufacturerPartNumber
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">SZ-Catalog # :</label>
+                        <div class="controls">
+                            @productmodel.Sku
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Molecular Weigth :</label>
+                        <div class="controls">
+                            @productmodel.MolecularWeight
+                        </div>
+                    </div>
+                </form>
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#ReTestDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, });
+    $('textarea#Remarks').html('@Model.Remarks');
+    @*if ('@Model.ReTestDate.HasValue' == 'True') {
+        $("#ReTestDate").datepicker('setDate', '@Model.ReTestDate.Value.ToString("MM-dd-yyyy")');
+    }*@
+
+
+    function validation() {
+
+        //if ($('#BatchNo').val().trim() == "") {
+        //    alert('Please enter batch no.');
+        //    return false;
+        //}
+        if ($('#Qty').val().trim() == "") {
+            alert('Please enter qty.');
+            return false;
+        }
+        //if ($('#Appearance').val().trim() == "") {
+        //    alert('Please enter appearance.');
+        //    return false;
+        //}
+
+        var fd = new FormData();
+
+        fd.append('COA', $('#COA')[0].files[0]);
+        fd.append('SDF', $('#SDF')[0].files[0]);
+        fd.append('ADDFile', $('#ADDFile')[0].files[0]);
+
+
+        var other_data = $('#frmEditInventory').serializeArray();
+        $.each(other_data, function (key, input) {
+
+            fd.append(input.name, input.value);
+        });
+
+        $.ajax({
+            url: '@Url.Action("EditInventory","Form")',
+            data: fd,
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST',
+            success: function (data) {
+                if (data.type == 'success') {
+                    $("#grid").jqGrid('setGridParam', {
+                        postData: {
+                            searchString: APIName,
+                            searchField: 'MainCatName'
+                        }
+                    }).trigger('reloadGrid');
+                    closeModal();
+    toastr.success(data.msg);
+                }
+                else {
+                    $('#errorMsg').html(data.msg);
+                }
+            }
+        });
+
+    }
+
+
+</script>

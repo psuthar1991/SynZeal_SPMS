@@ -1,0 +1,198 @@
+﻿@{
+    ViewBag.Title = "Manage Project";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Newtonsoft.Json
+@model Synzeal_Inventory.Entity.SZ_Project
+
+<div class="row-fluid">
+    <div class="span12">
+        <div class="widget-box">
+            <div class="widget-title">
+                <span class="icon"> <i class="icon-align-justify"></i> </span>
+                <h5>Project Manage</h5>
+            </div>
+            <div style="padding:5px 30px;color:Red;font-size:15px;text-align:right" id="errorMsg">
+
+            </div>
+            <div class="widget-content nopadding">
+                @using (Html.BeginForm("ManageProject", "Form", FormMethod.Post, new { enctype = "multipart/form-data", @id = "addProject", @class = "form-horizontal" }))
+                {
+                    <div class="control-group">
+                        <label class="control-label">PO No :</label>
+                        <div class="controls">
+                            @Html.HiddenFor(model => model.Id)
+                            <input type="text" id="PONo" name="PONo" class="span11" value="@Model.PONo" required />
+
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">PO Date :</label>
+                        <div class="controls">
+                            <input type="text" id="PODate" name="PODate" class="span11" value="@Model.PODate" required />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Company :</label>
+                        <div class="controls">
+                            <input type="text" id="Company" name="Company" class="span11" value="@Model.Company" required />
+                        </div>
+                    </div>
+
+
+                    @*<div class="control-group">
+                            <label class="control-label">Actual Dispatch :</label>
+                            <div class="controls">
+                                <input type="text" id="ActualDispatch" name="ActualDispatch" class="span11" value="@Model.ActualDispatch" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Revised1 :</label>
+                            <div class="controls">
+                                <input type="text" id="Revised1" name="Revised1" class="span11" value="@Model.Revised1" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Revised2 :</label>
+                            <div class="controls">
+                                <input type="text" id="Revised2" name="Revised2" class="span11" value="@Model.Revised2" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Revised3 :</label>
+                            <div class="controls">
+                                <input type="text" id="Revised3" name="Revised3" class="span11" value="@Model.Revised3" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Status :</label>
+                            <div class="controls">
+                                @Model.Status
+                            </div>
+                        </div>*@
+
+                    <div class="control-group">
+                        <label class="control-label">No Of Product :</label>
+                        <div class="controls">
+                            <input type="text" pattern="[0-9.]+" id="Noofproduct" name="Noofproduct" class="span11" required value="@Model.SZ_ProjectDetail.Count" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Enter Catalog No : </label>
+                        <div class="controls" id="productdetails">
+                            @if (Model.Id > 0)
+                            {
+                                if (Model.SZ_ProjectDetail.Count > 0)
+                                {
+                                    int count = 1;
+                                    foreach (var item in Model.SZ_ProjectDetail)
+                                    {
+                                        <div>
+                                            <input name="pro_@count" style="margin: 6px 0;" type="text" class="span11 catnos" readonly="readonly" required value="@item.Product.Sku">
+                                        </div>
+                                        count += 1;
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-success" onclick="return validation()">Save</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@if (Model.Id > 0)
+{
+    <text>
+        <script type="text/javascript">
+            $('#Noofproduct').attr('readonly', true);
+        </script>
+    </text>
+}
+<Script type="text/javascript">
+    $('#PODate').datepicker({ autoclose: true, format: 'dd/mm/yyyy', });
+    $('#ActualDispatch').datepicker({ autoclose: true, format: 'dd/mm/yyyy', });
+
+    $('#Noofproduct')
+        .keyup(function (evt) {
+            var noproduct = $(this).val();
+            $('#productdetails').html("");
+            var str = "";
+            for (var i = 1; i <= noproduct; i++) {
+                str += "<div><input name='pro_" +
+                    i +
+                    "' style='margin: 6px 0;' type='text' class='span11 catnos' required></div>";
+            }
+            $('#productdetails').html(str);
+            return false;
+        });
+
+    function validateNumber(event) {
+        var key = window.event ? event.keyCode : event.which;
+
+        if (event.keyCode === 8 || event.keyCode === 46 || event.keyCode === 37 || event.keyCode === 39) {
+            return true;
+        } else if (key < 48 || key > 57) {
+            return false;
+        } else return true;
+    };
+
+
+    function validation() {
+
+        if ($('#PONo').val().trim() == "") {
+            alert('Please enter PONo.');
+            return false;
+        }
+        if ($('#PODate').val().trim() == "") {
+            alert('Please enter PODate.');
+            return false;
+        }
+        if ($('#Company').val().trim() == "") {
+            alert('Please enter Company name.');
+            return false;
+        }
+        if ($('#Noofproduct').val().trim() == "") {
+            alert('Please enter No Of Product.');
+            return false;
+        }
+        if ($('#Noofproduct').val().trim() == "0") {
+            alert('Please enter atleast one Product.');
+            return false;
+        }
+
+        //var formData = JSON.stringify($('#addProject').serialize());
+        //var data = JSON.stringify({ 'model': $('#addProject').serializeObject(), 'form': $('#addProject').serialize() });
+
+        $.ajax({
+            url: '@Url.Action("ManageProject", "Form")',
+            data: $('#addProject').serialize(),
+            type: 'POST',
+            success: function (data) {
+                if (data.type == 'success') {
+                    ProjectGrid("", false);
+                    closeModal();
+                    toastr.success(data.msg);
+                }
+                else {
+                    $('#errorMsg').html(data.msg);
+                    
+                }
+            }
+        });
+        
+        @*var url = '@Url.Action("ManageProject", "Form")';
+        var results = _Ajax(url, cc, 'POST');
+        if (results.type == 'success') {
+            ProjectGrid("", false);
+            closeModal();
+            swal("Good job!", "Your PO generate successfully!", "success")
+        } else {
+            swal("Something went wrong !!!");
+        }*@
+    }
+</Script>

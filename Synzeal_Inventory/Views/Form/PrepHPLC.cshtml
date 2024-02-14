@@ -1,0 +1,264 @@
+﻿@{
+    ViewBag.Title = "Prep HPLC";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="//cdn.datatables.net/plug-ins/1.10.22/pagination/select.js"></script>
+
+<section class="content-header">
+    <h1>
+        <div style="float:left">Prep HPLC List</div>
+    </h1>
+    <div class="clearfix"></div>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <div class="tab-content">
+
+                    <div class="box-body resizediv" style="overflow:scroll;" id="divProj">
+                        <div>
+
+                            <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAll()">Save All</a> <br />
+                        </div>
+
+                        <table id="example1" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAllclsSaverow" /></th>
+                                    @*<th>#</th>*@
+                                    @*<th>Lead Time</th>
+        <th><span title="Priority">Pty</span></th>
+        <th>Diff</th>
+        <th>Project Type</th>*@
+                                    <th>Scientist</th>
+                                    <th>Sub-Scientist</th>
+                                    <th>Sci. Assg.</th>
+                                    <th>Product Name</th>
+                                    <th>CAS No</th>
+                                    <th>CAT No</th>
+
+                                    <th>Qty (mg)</th>
+                                    <th>Est. Date</th>
+                                    <th></th>
+                                    @*<th>Batch No</th>
+        <th>COA</th>
+        <th></th>
+        <th>Activity</th>
+        <th>Status</th>*@
+                                    @*<th>Scientist Status</th>*@
+                                    <th>Sec. Exp.</th>
+                                    <th></th>
+                                    <th>Data Remark</th>
+                                    @*<th>Reason</th>
+        <th>Pack Size</th>*@
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    $(function () {
+
+        var alltbl = $('#example1').DataTable({
+            "ordering": false,
+            "scrollX": true,
+            "scrollY": "450px",
+            "sPaginationType": "listbox",
+            //"autoWidth" : false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "pageLength": 25,
+            "fnDrawCallback": function (oSettings) {
+                $("#selectAllclsMoveDispatch").click(function () {
+                    if ($(this).is(":checked")) {
+                        $('.clsMoveDispatch').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $(".clsMoveDispatch").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+
+                $("#selectAllclsSaverow").click(function () {
+                    if ($(this).is(":checked")) {
+                        $('.clsSaverow').each(function () {
+                            $(this).prop("checked", true);
+                        });
+                    }
+                    else {
+                        $(".clsSaverow").each(function () {
+                            $(this).prop("checked", false);
+                        });
+                    }
+                });
+                $('.datepicker').datepicker({
+                    format: 'dd/mm/yyyy'
+                });
+
+                $('.datepicker').each(function () {
+                    var dateValue = $(this).attr('data-value');
+                    if (dateValue !== '') {
+                        dateValue = dateValue.toString().replace(' 00:00:00', '');
+                        $(this).datepicker("setDate", dateValue);
+                    }
+                });
+
+                
+
+                alltbl.columns.adjust();
+                $('.clstooltip').tooltip();
+            },
+            "columnDefs":
+                [
+                    
+                ],
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "initComplete": function (settings, json) {
+
+            },
+            "ajax": {
+                "url": "../Form/LoadPrepHPLCData",
+                "type": "POST",
+                "datatype": "json",
+                "data": function (d) {
+
+                }
+            },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                //if (aData.SelectedProjectType === "In-Stock" && aData.MoveToDispatch != true) {
+                //    $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                //}
+                //if (aData.ReadyToDeliverScientistStatusId === aData.ScientistStatus) {
+                //    $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                //}
+                //if (aData.MoveToDispatch && (aData.DispatchedStatus == "0" || aData.DispatchedStatus == null)) {
+                //    $('td', nRow).css('background-color', '#ffe6b3');
+                //}
+                //if (aData.MoveToDispatch && aData.DispatchedStatus == "1") {
+                //    $('td', nRow).css('background-color', 'rgb(250, 209, 255)');
+                //}
+                //if (aData.MoveToInvoice) {
+                //    $('td', nRow).css('background-color', '#ff9999');
+                //}
+            },
+            "createdRow": function (row, data, dataIndex) {
+                // Set the data-status attribute, and add a class
+                $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                $(row).attr('data-email', data.EmailAddress);
+                $(row).attr('data-company', data.CompanyName);
+                $(row).attr('data-podate', data.MoveProjectDateText);
+                $(row).attr('data-pono', data.PONumber);
+                $(row).attr('data-ProductCount', data.ProductCount);
+                $(row).attr('data-PaymentTerms', data.PaymentTerms);
+                $(row).attr('data-QuoteId', data.QuoteId);
+                $(row).attr('data-IsPaymentPending', (data.IsPaymentPending == null ? false : data.IsPaymentPending));
+            },
+            "columns": [
+                { "data": "ChkSaveRow" },
+                //{ "data": "ChkFirstRow" },
+                //{ "data": "LastRowText", "autoWidth": true },
+                //{ "data": "SrPo" },
+                //{ "data": "MoveProjectDateText", "name": "MoveProjectDateText" },
+                //{ "data": "LeadTime" },
+                //{ "data": "IsPriorityText" },
+                //{ "data": "DifficultyLevelText" },
+                //{ "data": "PONumber", "name": "PONumber" },
+                //{ "data": "CompanyName", "name": "CompanyName" },
+                //{ "data": "SelectedProjectType", "orderable": false },
+                { "data": "SelectedScientistName", "orderable": false },
+                { "data": "SelectedSubScientistName", "orderable": false },
+                { "data": "MoveToScientistDateStr", "orderable": false },
+                { "data": "ProductName" },
+                { "data": "CASNo", "name": "CASNo", width: '150px' },
+                { "data": "CATNo", "name": "CATNo", width: '100px' },
+                //{ "data": "Attachment", "name": "Attachment" },
+                { "data": "RequiredQty", "name": "Ref", className: "fontbold", },
+                { "data": "EstimateCompleteDateText", "orderable": false },
+                //{ "data": "AdditionalBatchNoText", "name": "ProductName" },
+                //{ "data": "COARefNumber", "name": "COARefNumber" },
+                //{ "data": "COAText", "name": "COAText" },
+                { "data": "GetAllBatch", "name": "GetAllBatch" },
+                //{ "data": "ActivityStatusText", "orderable": false },
+                //{ "data": "ProStatusText", "orderable": false },
+                //{ "data": "ScientistStatustext", "orderable": false },
+                { "data": "ExplainationSecondText", "orderable": false },
+               { "data": "ExplainationText", "orderable": false },
+                { "data": "RemarkText", "orderable": false },
+                //{ "data": "ReasonText", "orderable": false },
+                //{ "data": "OrderRemarkText", "orderable": false },
+            ]
+        });
+    });
+    function explainationGenerate(id) {
+        $.ajax({
+            url: '/Form/Addexplaination?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+                // $("#invoiceQueryModal .modal-content").css("width", "1080px");
+            }
+        });
+    }
+    function SaveAll() {
+        var ids = [];
+        var qtyerror = 0;
+        $('#example1').find('.clsSaverow').each(function () {
+            var divid = $(this).val();
+            $('#example1').find("#qty_" + divid).css('border', '');
+            if ($(this).is(':checked')) {
+               
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+        if (qtyerror !== 0) {
+            toastr.error("Please add qty.");
+            return false;
+        }
+        var count = 1;
+        $('#example1').find('.clsSaverow').each(function () {
+            var id = $(this).val();
+            $('#example1').find("#qty_" + id).css('border', '');
+            if ($(this).is(':checked')) {
+                var estDate = $('#example1').find("#esticompleteDate_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdatePrepHPLC',
+                    data: {
+                        id: id,
+                        estDate: estDate,
+                    },
+                    type: 'POST',
+                    success: function (data) {
+                    },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+        function successAlert(count, forloopcount) {
+            if (count === forloopcount) {
+                toastr.success('You have updated product information.');
+                $('#example1').DataTable().ajax.reload(null, false);
+            }
+        }
+</script>

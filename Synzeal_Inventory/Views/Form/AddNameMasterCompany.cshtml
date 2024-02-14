@@ -1,0 +1,161 @@
+﻿@{
+    ViewBag.Title = "Company";
+    Layout = null;
+}
+@model  Synzeal_Inventory.Entity.SZ_NameMaster
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Add New Name Master</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form role="form" id="frmaddnamemaster">
+            <div class="box-body">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Catalog No.</label>
+                    <input type="text" class="form-control" id="sku" name="sku" placeholder="Catalog No." required value="@Model.Sku">
+                    <input type="hidden" id="masterid" name="masterid" value="@Model.Id" />
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">EP</label>
+                    <input type="text" class="form-control" id="ep" name="ep" placeholder="EP" required value="@Model.EP">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">USP</label>
+                    <input type="text" class="form-control" id="usp" name="usp" placeholder="USP" required value="@Model.USP">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">EP Chemical Name</label>
+                    <input type="text" class="form-control" id="epchemicalname" name="epchemicalname" placeholder="EP Chemical Name" required value="@Model.EPChemicalName">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">USP Chemical Name</label>
+                    <input type="text" class="form-control" id="uspchemicalname" name="uspchemicalname" placeholder="USP Chemical Name" required value="@Model.USPChemicalName">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Chem Draw/IUPAC</label>
+                    <input type="text" class="form-control" id="chemDraw" name="chemDraw" placeholder="ChemDraw/IUPAC" required value="@Model.ChemDraw">
+                </div>
+                @*<div class="form-group">
+                    <label for="exampleInputEmail1">Other Chemical Name</label>
+                    <input type="text" class="form-control" id="other" name="other" placeholder="Other" required value="@Model.Other">
+                </div>*@
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Other Chemical Name 1</label>
+                    <input type="text" class="form-control" id="OtherNameOne" name="OtherNameOne" placeholder="Other Chemical Name" required value="@Model.OtherNameOne">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Other Chemical Name 2</label>
+                    <input type="text" class="form-control" id="OtherNameSecond" name="OtherNameSecond" placeholder="Other Chemical Name" required value="@Model.OtherNameSecond">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Other Chemical Name 3</label>
+                    <input type="text" class="form-control" id="OtherNameThird" name="OtherNameThird" placeholder="Other Chemical Name" required value="@Model.OtherNameThird">
+                </div>
+                @*<div class="form-group">
+                    <label for="exampleInputEmail1">Other Chemical Name 4</label>
+                    <input type="text" class="form-control" id="OtherNameFour" name="OtherNameFour" placeholder="Other Chemical Name" required value="@Model.OtherNameFour">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Other Chemical Name 5</label>
+                    <input type="text" class="form-control" id="OtherNameFive" name="OtherNameFive" placeholder="Other Chemical Name" required value="@Model.OtherNameFive">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Other Chemical Name 6</label>
+                    <input type="text" class="form-control" id="OtherNameSix" name="OtherNameSix" placeholder="Other Chemical Name" required value="@Model.OtherNameSix">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Other Chemical Name 7</label>
+                    <input type="text" class="form-control" id="OtherNameSeven" name="OtherNameSeven" placeholder="Other Chemical Name" required value="@Model.OtherNameSeven">
+                </div>*@
+                <div class="form-group" style="text-align:right">
+                    <button type="button" onclick="addNameMasterDatas()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    function addNameMasterDatas() {
+        $(".errorcls").each(function () {
+            $(this).removeClass('errorcls');
+        });
+
+        var errorCount = 0;
+        if ($("#sku").val() === "") {
+            $("#sku").addClass('errorcls');
+           errorCount += 1;
+        }
+    //    if ($("#ep").val() === "") {
+    //        $("#ep").addClass('errorcls');
+     //       errorCount += 1;
+     //   }
+    //    if ($("#usp").val() === "") {
+    //        $("#usp").addClass('errorcls');
+    //        errorCount += 1;
+    //    }
+   //     if ($("#other").val() === "") {
+   //         $("#other").addClass('errorcls');
+   //         errorCount += 1;
+   //     }
+   //     if ($("#chemDraw").val() === "") {
+    //        $("#chemDraw").addClass('errorcls');
+   //         errorCount += 1;
+   //     }
+        if (errorCount !== 0) {
+            return false;
+        }
+
+        var address = ""; //$("#address").val()
+        $.ajax({
+            type: "POST",
+            url: "/Form/AddNameMasterData?sku=" + $("#sku").val() + "&ep=" + $("#ep").val()
+                + "&usp=" + $("#usp").val()
+                + "&other=" + ""
+                //+ "&other=" + $("#other").val()
+                + "&chemDraw=" + $("#chemDraw").val() + "&id=" + $("#masterid").val()
+    + "&epchemicalname=" + $("#epchemicalname").val() + "&uspchemicalname=" + $("#uspchemicalname").val()
+    + "&OtherNameOne=" + $("#OtherNameOne").val() + "&OtherNameSecond=" + $("#OtherNameSecond").val()
+     + "&OtherNameThird=" + $("#OtherNameThird").val() + "&OtherNameFour=" + ""
+    + "&OtherNameFive=" + "" + "&OtherNameSix=" + ""
+    + "&OtherNameSeven=" +"",
+   // + "&OtherNameThird=" + $("#OtherNameThird").val() + "&OtherNameFour=" + $("#OtherNameFour").val()
+   // + "&OtherNameFive=" + $("#OtherNameFive").val() + "&OtherNameSix=" + $("#OtherNameSix").val()
+   // + "&OtherNameSeven=" + $("#OtherNameSeven").val(),
+            data: {},
+            success: function (results) {
+                if (!results.success) {
+                    toastr.error(results.message);
+                    return false;
+                }
+    toastr.success("Name master updated.");
+                setTimeout(function () { window.location.href = "/Form/Namemasterlist"; }, 2000);
+
+            }
+        });
+    }
+</script>
+
+@if(Model.Id != 0)
+{
+    <text>
+<script type="text/javascript">
+    $("#sku").val('@Model.Sku');
+    $("#ep").val('@Model.EP');
+    $("#usp").val('@Model.USP');
+    $("#chemDraw").val('@Model.ChemDraw');
+    $("#other").val('@Model.Other');
+</script>
+</text>
+}
+<style type="text/css">
+    #frmaddnamemaster .form-group {
+        margin-bottom: 15px;
+        width: 48%;
+        float: left;
+        margin: 10px;
+    }
+</style>

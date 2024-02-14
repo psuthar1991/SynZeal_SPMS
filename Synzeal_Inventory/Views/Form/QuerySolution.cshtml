@@ -1,0 +1,322 @@
+﻿@{
+    ViewBag.Title = "QuerySolution";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<Synzeal_Inventory.Entity.SZ_SolutionModule> solutionList = ViewBag.Solution as List<Synzeal_Inventory.Entity.SZ_SolutionModule>;
+    Synzeal_Inventory.Entity.SZ_SolutionModule solution = ViewBag.SolutionData as Synzeal_Inventory.Entity.SZ_SolutionModule;
+    int solutionId = 0;
+}
+@model Synzeal_Inventory.Entity.SZ_QueryModule
+<section class="content-header">
+    <h1>
+        Query Solution
+        @if (Synzeal_Inventory.Models.SessionCookieManagement.IsScientist)
+        {
+            <a href="/Form/ScientistQueryModule" class="pull-right btn btn-primary">Back</a>
+        }
+        else
+        {
+            <a href="/Form/QueryModule?view=@ViewBag.pagename" class="pull-right btn btn-primary">Back</a>
+        }
+    </h1>
+</section>
+<section class="content">
+    <section class="invoice">
+        <!-- title row -->
+        <div class="row">
+            <div class="col-xs-12">
+                <h2 class="page-header">
+                    # @Model.QueryNo
+                    <small class="pull-right">Date: @Model.CreatedDate.Value.ToShortDateString()</small>
+                    @if (Model.ClosingDate.HasValue)
+                    {
+                        <br />
+                        <small class="pull-right">Closing Date: @Model.ClosingDate.Value.ToShortDateString()</small>
+                    }
+                    <div class="clearfix"></div>
+                </h2>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- info row -->
+        <div class="row invoice-info">
+            <div class="col-sm-4 invoice-col">
+                <b>Query Detail</b>
+                <address>
+                    @Html.Raw(Model.ClientRemark)
+                </address>
+            </div>
+            <!-- /.col -->
+            <div class="col-sm-4 invoice-col">
+                <div class="table-responsive">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th style="width:50%">Sub Status</th>
+                                <td>
+                                    <select class="form-control" id="SubStatus" name="SubStatus">
+                                        <option value="Invistiatgion">
+                                            Invistiatgion
+                                        </option>
+                                        <option class="Re-synthesis">Re-synthesis</option>
+                                        <option value="Re-Purification">Re-Purification</option>
+                                        <option value="Data Recording">
+                                            Data Recording
+                                        </option>
+                                        <option value="Replacement">
+                                            Replacement
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="width:50%">Team Leader</th>
+                                <td>
+                                    @Html.DropDownList("TeamLeaderId", (IEnumerable<SelectListItem>)ViewBag.TeamLeaderList, "--Select--", new { @class = "form-control clsteamleader" })
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="width:50%">Sub Scientist</th>
+                                <td>
+                                    @Html.DropDownList("SubScientist", (IEnumerable<SelectListItem>)ViewBag.ScientistList, "--Select--", new { @class = "form-control clsteamleader" })
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="width:50%">Estimated On</th>
+                                <td>
+                                    <input type="number" class="form-control" name="ClosingOn" id="ClosingOn">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="width:50%">Product Name</th>
+                                <td>@Model.ProductName</td>
+                            </tr>
+                            <tr>
+                                <th>CAT No</th>
+                                <td>@Model.CATNo</td>
+                            </tr>
+                            <tr>
+                                <th>CAS No:</th>
+                                <td>@Model.CASNo</td>
+                            </tr>
+                            <tr>
+                                <th>Batch Code:</th>
+                                <td>@Model.BatchNo</td>
+                            </tr>
+                            <tr>
+                                <th>Qty:</th>
+                                <td>@Model.Qty</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-sm-4 invoice-col">
+                <img src="@ViewBag.imageURL" width="100%" />
+                <button type="button" class="btn btn-primary pull-right" onclick="savedetails()">
+                    Save
+                </button>
+            </div>
+            <!-- /.col -->
+            <div class="clearfix"></div>
+            <div class="col-md-12">
+                <b>Synonym: </b>@ViewBag.Synonym</di>
+            </div>
+            <div class="col-md-12">
+                <br /><br />
+                @if (solution != null)
+                {
+                    solutionId = solution.Id;
+                    <div>
+                        <div class="form-group">
+                            <b>Solution # </b>@solution.Id
+                        </div>
+                        <div class="form-group">
+                            <b>Analytic/Technical View: </b>@solution.Solution
+                        </div>
+                        <div class="form-group">
+                            <b>Query Understanding: </b>@solution.Cause
+                        </div>
+                        <div class="form-group">
+                            <b>Final Solution: </b>@solution.Remark
+                        </div>
+                    </div>
+                }
+                <div class="col-xs-12 table-responsive" id="divVerbal" style="display:none">
+                    <textarea id="solutiontext" name="solutiontext" rows="6" style="width:100%"></textarea>
+                    <div class="row no-print">
+                        <button type="button" class="btn btn-success pull-right" onclick="addsolutiontext()">
+                            <i class="fa fa-credit-card"></i> Add Solution
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.row -->
+            <!-- Table row -->
+            <div class="row">
+                <br /><br />
+                <div class="col-xs-12 table-responsive" id="divTechnical">
+                    <div class="row no-print">
+                        <div class="col-xs-12">
+                            <button type="button" class="btn btn-primary pull-left" onclick="assignSolution()">
+                                <i class="fa fa-credit-card"></i> Assign
+                            </button>
+                            <button type="button" class="btn btn-success pull-right" onclick="addsolution()">
+                                <i class="fa fa-credit-card"></i> Add Solution
+                            </button>
+                        </div>
+                    </div>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>#</th>
+                                @*<th>Status</th>*@
+                                <th>Analytic/Technical View</th>
+                                <th>Query Understanding</th>
+                                <th>Final Solution</th>
+                                <th>Attachment</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in solutionList)
+                            {
+                                <tr>
+                                    @if (solutionId == item.Id)
+                                    {
+                                        <td>
+                                            <i class="fa fa-check" style="color:darkgreen"></i>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td><input type="checkbox" class="clssolution" value="@item.Id" /></td>
+                                    }
+
+                                    <td>@item.SolutionNumber</td>
+                                    @*<td>@item.Status</td>*@
+                                    <td>@item.Solution</td>
+                                    <td>@item.Cause</td>
+                                    <td>@item.Remark</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.Attachment))
+                                        {
+                                            string[] attchdata = item.Attachment.Split(',');
+                                            foreach (var attach in attchdata)
+                                            {
+                                                if (!string.IsNullOrEmpty(attach))
+                                                {
+                                                    <a href="../@attach" download> <i class="fa fa-paperclip"></i></a>
+                                                }
+                                            }
+                                        }
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-success pull-right" onclick="addsolution(@item.Id)">
+                                            <i class="fa fa-credit-card"></i> Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-xs-12 table-responsive" id="divVerbal" style="display:none">
+                    <textarea id="solutiontext" name="solutiontext" rows="6" style="width:100%"></textarea>
+                    <div class="row no-print">
+                        <button type="button" class="btn btn-success pull-right" onclick="addsolutiontext()">
+                            <i class="fa fa-credit-card"></i> Add Solution
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+
+    $("#SubStatus").val('@Model.SubStatus');
+    $("#SubScientist").val('@Model.SubScientistName');
+    $("#ClosingOn").val('@Model.ClosingOn');
+
+    $("#TeamLeaderId").val('@Model.TeamLeaderId');
+    function savedetails() {
+        $.ajax({
+            url: '/Form/SaveQueryData?id=@Model.Id&SubStatus=' + encodeURIComponent($("#SubStatus").val()) + '&TeamLeaderId=' + encodeURIComponent($("#TeamLeaderId").val()) +'&SubScientist=' + encodeURIComponent($("#SubScientist").val()) + '&ClosingOn=' + encodeURIComponent($("#ClosingOn").val()),
+            data: {},
+            type: 'GET',
+            success: function (data) {
+                toastr.success("Updated details.");
+            }
+        });
+    }
+    function addsolutiontext() {
+        var text = $("#solutiontext").val();
+        if (text === "") {
+            toastr.error("Please enter your solution.");
+            return false;
+        }
+        $.ajax({
+            url: '/Form/AssignSolutionText?id=@Model.Id&text=' + encodeURIComponent(text),
+            data: {},
+            type: 'GET',
+            success: function (data) {
+                toastr.success("Assigned solution.");
+                window.location.reload(true);
+            }
+        });
+    }
+    $('input[type=radio][name=SolutionType]').change(function () {
+        var value = $(this).val();
+        if (value === "Technical") {
+            $("#divTechnical").show();
+            $("#divVerbal").hide();
+        }
+        else {
+            $("#divTechnical").hide();
+            $("#divVerbal").show();
+        }
+    });
+
+    $('.clssolution').on('change', function () {
+        $('.clssolution').not(this).prop('checked', false);
+    });
+    function assignSolution() {
+        var solutionId = 0;
+        $('.clssolution').each(function () {
+            if ($(this).is(":checked")) {
+                solutionId = $(this).val();
+            }
+        });
+        if (solutionId === 0) {
+            toastr.error("Please checked correct solution.");
+            return false;
+        }
+        $.ajax({
+            url: '/Form/AssignSolution?id=@Model.Id&SolutionId=' + solutionId,
+            data: {},
+            type: 'GET',
+            success: function (data) {
+                toastr.success("Assigned solution.");
+                window.location.reload(true);
+            }
+        });
+    }
+    function addsolution(id = 0)
+    {
+        $.ajax({
+            url: '/Form/AddSolution?id=@Model.Id' + '&solutionId=' + id,
+            data: {},
+            type: 'GET',
+            success: function (datas) {
+                debugger;
+                $('.modal-body').html(datas);
+                $('#myModal').modal({ show: true });
+                $(".modal-dialog").css("width", "1080px");
+            }
+        });
+
+    }
+</script>

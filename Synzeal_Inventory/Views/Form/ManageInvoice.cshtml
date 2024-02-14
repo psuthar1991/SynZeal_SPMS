@@ -1,0 +1,303 @@
+﻿@{
+    ViewBag.Title = "Manage Invoice";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
+}
+
+
+@using Newtonsoft.Json
+@model Synzeal_Inventory.Entity.SZ_Invoice
+
+<div class="row-fluid">
+<div class="span6">
+    <div class="widget-box">
+        <div class="widget-title">
+            <span class="icon"> <i class="icon-align-justify"></i> </span>
+            <h5>Invoice Details</h5>
+        </div>
+        <div style="padding: 5px 30px; color: Red; font-size: 15px; text-align: right">
+            @if (TempData["Message"] != null)
+            {
+                @TempData["Message"]
+            }
+        </div>
+        <div class="widget-content nopadding">
+            @using (Html.BeginForm("ManageInvoice", "Form", FormMethod.Post, new {enctype = "multipart/form-data", @class = "form-horizontal",@Id="EditInvoice"}))
+            {
+                <div class="control-group">
+                    <label class="control-label">Invoice No :</label>
+                    <div class="controls">
+                        <input type="text" id="InvoiceNo" name="InvoiceNo" class="span11" value="@Model.InvoiceNo" required/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Basic Value :</label>
+                    <div class="controls">
+                        @Html.HiddenFor(model => model.Id)
+                        @Html.HiddenFor(model => model.ProjectId)
+                        @Html.HiddenFor(model => model.ProjectDetailsId)
+                        @Html.HiddenFor(model => model.DispatchDate)
+                        <input type="text" id="BasicValue" name="BasicValue" class="span11" value="@Model.BasicValue"/>
+
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Payment Term :</label>
+                    <div class="controls">
+                        <select id="PaymentTerm" name="PaymentTerm" class="span11">
+                            <option>--Select--</option>
+                            <option value="Advance">Advance</option>
+                            <option value="PDC 30 days">PDC 30 days</option>
+                            <option value="Net 30 days">Net 30 days</option>
+                            <option value="Net 60 days">Net 60 days</option>
+                            <option value="Net 90 days">Net 90 days</option>
+                            <option value="FCA 45 days">FCA 45 days</option>
+                            <option value="Others">Others</option>
+                            <option value="50 Perc advance Remaining against Delivery">50 % advance Remaining against Delivery</option>
+                        </select>
+                    </div>
+                </div>
+
+
+
+                <div class="control-group">
+                    <label class="control-label">Due Date :</label>
+                    <div class="controls">
+                        <input type="text" id="DueDate" name="DueDate" class="span11" value="@Model.DueDate"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Courier :</label>
+                    <div class="controls">
+                        <input type="text" id="Courier" name="Courier" class="span11" value="@Model.Courier"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Tracking No :</label>
+                    <div class="controls">
+                        <input type="text" id="TrackingNo" name="TrackingNo" class="span11" value="@Model.TrackingNo"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Dispatch Detail :</label>
+                    <div class="controls">
+                        Yes: @Html.RadioButton("DispatchDetail", "Yes")
+                        No: @Html.RadioButton("DispatchDetail", "No")
+
+                        @*<input type="text" id="DispatchDetail" name="DispatchDetail" class="span11" value="@Model.DispatchDetail" />*@
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Delivery Confirmation :</label>
+                    <div class="controls">
+                        Yes: @Html.RadioButton("DeliveryConfirmation", "Yes")
+                        No: @Html.RadioButton("DeliveryConfirmation", "No")
+                        @*<input type="text" id="DeliveryConfirmation" name="DeliveryConfirmation" class="span11" value="@Model.DeliveryConfirmation" />*@
+                    </div>
+                </div>
+
+
+                <div class="control-group">
+                    <label class="control-label">Payment FollowUp :</label>
+                    <div class="controls">
+                        Yes: @Html.RadioButton("PaymentFollowUp", "Yes")
+                        No: @Html.RadioButton("PaymentFollowUp", "No")
+                        @*<input type="text" id="PaymentFollowUp" name="PaymentFollowUp" class="span11" value="@Model.PaymentFollowUp" />*@
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Payment Details :</label>
+                    <div class="controls">
+                        Yes: @Html.RadioButton("PaymentDetail", "Yes")
+                        No: @Html.RadioButton("PaymentDetail", "No")
+                        @*<input type="text" id="PaymentFollowUp" name="PaymentFollowUp" class="span11" value="@Model.PaymentFollowUp" />*@
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">CForm :</label>
+                    <div class="controls">
+                        Yes: @Html.RadioButton("CForm", "Yes")
+                        No: @Html.RadioButton("CForm", "No")
+                        @*<input type="text" id="CForm" name="CForm" class="span11" value="@Model.CForm" />*@
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Email 1 :</label>
+                    <div class="controls">
+                        <input type="text" id="FirstEMail" name="FirstEMail" class="span11" value="@Model.FirstEMail"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Email 2 :</label>
+                    <div class="controls">
+                        <input type="text" id="SecondEmail" name="SecondEmail" class="span11" value="@Model.SecondEmail"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Contact No :</label>
+                    <div class="controls">
+                        <input type="text" id="ContactNo" name="ContactNo" class="span11" value="@Model.ContactNo"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Payment Status :</label>
+                    <div class="controls">
+                        <select id="PaymentStatus" name="PaymentStatus" class="span11" required>
+                            <option>--Select--</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Received">Received</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Courier :</label>
+                    <div class="controls">
+                        <input type="text" id="Courier" name="Courier" class="span11" value="@Model.Courier"/>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-success" onclick="return validation()">Save</button>
+                </div>
+                <div class="clear"></div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="span6">
+    <div class="widget-box">
+        <div class="widget-title">
+            <span class="icon"> <i class="icon-align-justify"></i> </span>
+            <h5>Product Info</h5>
+        </div>
+        <div class="widget-content nopadding">
+            @if (ViewBag.ProductModel != null)
+            {
+                var productmodel = (Synzeal_Inventory.Models.ProductDetailsModel) ViewBag.ProductModel;
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label">PO No :</label>
+                        <div class="controls" style="font-size: 16px; font-weight: bold;">
+                            @ViewBag.PONo
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">PO Date :</label>
+                        <div class="controls" style="font-size: 16px; font-weight: bold;">
+                            @ViewBag.PODate
+                        </div>
+                    </div>
+
+
+                    <div class="control-group">
+                        <label class="control-label">Product Name :</label>
+                        <div class="controls" style="font-size: 16px; font-weight: bold;">
+                            @productmodel.Name
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Product Image :</label>
+                        <div class="controls">
+                            <img src="@productmodel.DefaultPictureModel.ImageUrl"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">CAS # :</label>
+                        <div class="controls">
+                            @productmodel.ManufacturerPartNumber
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">SZ-Catalog # :</label>
+                        <div class="controls">
+                            @productmodel.Sku
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Molecular Weigth :</label>
+                        <div class="controls">
+                            @productmodel.MolecularWeight
+
+                        </div>
+                    </div>
+                </form>
+            }
+        </div>
+
+    </div>
+</div>
+</div>
+
+@if (Model.Id > 0)
+    {
+        <text>
+            <script type="text/javascript">
+                $('#PaymentStatus').val('@Model.PaymentStatus');
+                $('#PaymentTerm').val('@Model.PaymentTerm');
+            </script>
+        </text>
+    }
+<Script type="text/javascript">
+   
+    $('#DueDate').datepicker({ format: 'dd/mm/yyyy', autoclose: true, });
+    $('#ActualDispatch').datepicker({ format: 'dd/mm/yyyy', autoclose: true, });
+
+    $('#Noofproduct')
+        .keyup(function (evt) {
+            var noproduct = $(this).val();
+            $('#productdetails').html("");
+            var str = "";
+            for (var i = 1; i <= noproduct; i++) {
+                str += "<div><input name='pro_" +
+                    i +
+                    "' style='margin: 6px 0;' type='text' class='span11 catnos' required></div>";
+            }
+            $('#productdetails').html(str);
+            return false;
+        });
+
+    function validateNumber(event) {
+        var key = window.event ? event.keyCode : event.which;
+
+        if (event.keyCode === 8 || event.keyCode === 46 || event.keyCode === 37 || event.keyCode === 39) {
+            return true;
+        } else if (key < 48 || key > 57) {
+            return false;
+        } else return true;
+    };
+
+
+    function validation() {
+       
+        if ($('#InvoiceNo').val().trim() == "") {
+            alert('Please enter Invoice No.');
+            return false;
+        }
+        if ($('#PaymentStatus').val().trim() == "--Select--") {
+            alert('Please select Payment Status.');
+            return false;
+        }
+
+        $.ajax({
+            url: '@Url.Action("ManageInvoice", "Form")',
+            data: $('#EditInvoice').serialize(),
+            type: 'POST',
+            success: function (data) {
+                if (data.type == 'success') {
+                    InvoiceGrid("");
+                    closeModal();
+    toastr.success(data.msg);
+                }
+                else {
+                    $('#errorMsg').html(data.msg);
+
+                }
+            }
+        });
+
+        
+    }
+</Script>

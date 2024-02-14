@@ -1,0 +1,384 @@
+﻿@{
+    ViewBag.Title = "NewSampleRequest";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model SZ_SampleRequest
+@using Synzeal_Inventory.Entity
+
+
+<section class="content-header">
+    <h1>
+        New Sample Request Form
+        <a class="btn btn-primary" style="float:right" href="/Form/NewSampleRequestList">Back</a>
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <!-- form start -->
+                <form role="form" id="makeform" enctype="multipart/form-data">
+                    <div class="box-body">
+                        <div class="form-group col-md-3">
+                            <input type="hidden" id="Id" name="Id" value="@Model.Id" />
+                            <label for="exampleInputEmail1">Date :</label>
+                            <input type="text" class="form-control" id="RequestDate" name="RequestDate" placeholder="Request Date" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">Request No:</label>
+                            <input type="email" class="form-control" id="RequestNo" name="RequestNo" placeholder="Request No" value="@Model.RequestNo" readonly>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputPassword1">Name:</label>
+                            <input type="email" class="form-control" id="Name" name="Name" placeholder="Name" readonly value="@Synzeal_Inventory.Models.SessionCookieManagement.UserName">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">Department :</label>
+                            <input type="text" class="form-control" id="Department" name="Department" placeholder="Department" value="@Model.Department" required>
+                        </div>
+                        <div class="clear"></div>
+                        <hr style="width: 100%;" />
+                        @if (!Model.IsConfirm.HasValue || Model.IsConfirm != true)
+                        {
+
+                            <div class="col-md-12" style="font-size: 18px; margin-bottom: 10px;">
+                                <b>Product Details</b>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label" style="padding-top:6px;" for="exampleInputPassword1">Catelogue No. :</label>
+                                    <div class="col-sm-9" style="margin-bottom:10px;">
+                                        <input type="text" style="width:95%" class="form-control" id="CatelogueNo" name="CatelogueNo" placeholder="Catelogue No." required>
+                                        <i class="fa fa-x fa-refresh" onclick="GetInforFromCatNo()" style="position: relative;margin-top: -24px;float: right;"></i>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label" style="padding-top:6px;" for="exampleInputPassword1">Product Name :</label>
+                                    <div class="col-sm-9" style="margin-bottom:10px;">
+                                        <input type="hidden" id="ProductId" name="ProductId" />
+                                        <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Product Name">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label" style="padding-top:6px;" for="exampleInputPassword1">CAS No. :</label>
+                                    <div class="col-sm-9" style="margin-bottom:10px;">
+                                        <input type="text" class="form-control" id="CASNo" name="CASNo" placeholder="CAS No." required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <table width="100%" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Batch No</th>
+                                                <th>QTY(mg)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tblbatchnolist">
+                                            <tr>
+                                                <td colspan="3">
+                                                    No Data Found
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-primary" onclick="AddSampleData()" id="btndraft">Add</button>
+                                </div>
+                            </div>
+                            <div class="col-md-5" style="text-align:center">
+                                <img id="detFromDBImagesrc" src="https://www.synzeal.com/content/images/thumbs/default-image_350.png" width="65%" />
+                                <input type="hidden" id="detFromDBImage" name="detFromDBImage" value="https://www.synzeal.com/content/images/thumbs/default-image_350.png" />
+                            </div>
+                            <div class="clear"></div>
+                            <hr style="width:100%" />
+                        }
+                        <div class="col-md-12" style="font-size: 18px; margin-bottom: 10px;">
+                            <b>Added Product Details</b>
+                        </div>
+                        <div class="col-md-12">
+                            <table width="100%" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Product Name</th>
+                                        <th>CAT No</th>
+                                        <th>CAS No</th>
+                                        <th>Batch No</th>
+                                        <th>Qty</th>
+                                        <th>Reason</th>
+                                        <th>Handover To</th>
+                                        @if (!Model.IsConfirm.HasValue || Model.IsConfirm != true)
+                                        {
+                                            <th>Action</th>
+                                        }
+                                        else
+                                        {
+                                            <th>Approved</th>
+                                            <th>Rejected Reason</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                @if (Model.SZ_SampleRequestDetail != null && Model.SZ_SampleRequestDetail.Count > 0)
+                                {
+                                    int srNo = 1;
+                                    foreach (var item in Model.SZ_SampleRequestDetail)
+                                    {
+                                        if(string.IsNullOrEmpty(item.Handoverby))
+                                        {
+                                            item.Handoverby = "SANDIP SIR";
+                                        }
+                                        <tr>
+                                            <td>@srNo</td>
+                                            <td>@item.ProductName</td>
+                                            <td>@item.CATNo</td>
+                                            <td>@item.CASNo</td>
+                                            <td>@item.BatchCode</td>
+                                            <td><input type="number" data-sampledetailsid="@item.Id" class="clsrow clsqty_@item.Id" value="@item.Qty" /></td>
+                                            <td>
+                                                <div class="dropdown-mul-1">
+                                                    @*@Html.DropDownList("Reason", (IEnumerable<SelectListItem>)ViewBag.SampleReasonListItem, new { @multiple = "multiple", @class = "clssamplereason clsReason_" + item.Id, @datavalue = item.Reason})*@
+
+                                                    <span id="samplereason_@item.Id">@item.Reason</span>  <i class="fa fa-pencil" onclick="addsamplereason(@item.Id)"></i>
+                                                </div>
+                                            </td>
+                                            <td><input type="text" class="clshandover_@item.Id" value="@item.Handoverby" /></td>
+                                            @if (!Model.IsConfirm.HasValue || Model.IsConfirm != true)
+                                            {
+                                                <td>
+                                                    <a href="/Form/DeleteSampleRequestDetail/@item.Id">Delete</a>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:center">
+                                                    @if (item.IsApproved.HasValue && item.IsApproved.Value)
+                                                    {
+                                                        <i class="fa fa-check" style="color:green"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fa fa-times" style="color:red"></i>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @item.RejectReason
+                                                </td>
+                                            }
+                                        </tr>
+
+                                        srNo += 1;
+                                    }
+                                }
+                            </table>
+                            @if (Model.SZ_SampleRequestDetail != null && Model.SZ_SampleRequestDetail.Count > 0 && (!Model.IsConfirm.HasValue || Model.IsConfirm != true))
+                            {
+                                <button type="button" class="btn btn-primary" onclick="SaveForm(false)" id="btndraft">Save</button>
+                                <button type="button" class="btn btn-primary" onclick="SaveForm(true)" id="btndraft">Save & Submit Form</button>
+                            }
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    var samplereasonselected = '';
+    function addsamplereason(id) {
+        $.ajax({
+            url: '/Form/AddSampleReasonRequest?id=' + id + '&reason=' + $("#samplereason_" + id).text(),
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#clientremarkModal .modal-body').html(data.html);
+                $('#clientremarkModal').modal({ show: true });
+                $("#clientremarkModal .modal-content").css("width", "800px");
+            }
+        });
+    }
+
+    function SaveForm(isSave) {
+
+        var passData = [];
+        var errcnt = 0;
+        $(".clsrow").each(function () {
+            var sampledetailsid = $(this).attr('data-sampledetailsid');
+            var qty = $(".clsqty_" + sampledetailsid).val();
+            var reason = $("#samplereason_" + sampledetailsid).text();
+            var clshandover = $(".clshandover_" + sampledetailsid).val();
+            if (qty === 0 || qty === '') {
+                toastr.error("Please enter QTY.");
+                errcnt += 1;
+            }
+            if (reason === '') {
+                toastr.error("Please enter reason");
+                errcnt += 1;
+            }
+
+            if (errcnt == 0) {
+                passData.push({
+                    "Id": sampledetailsid,
+                    "Qty": qty,
+                    "Reason": reason,
+                    "Handoverby": clshandover
+                });
+            }
+        });
+        if (errcnt > 0) {
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/Form/NewProductSampleRequestData",
+            data: JSON.stringify({ 'model': passData, "isSubmit": isSave }),
+            traditional: true, // add this
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (results) {
+                if (results.success) {
+                    window.location.href = "/Form/NewSampleRequest/" + results.data;
+                }
+            }
+        });
+    }
+
+    function AddSampleData() {
+        var errcnt = 0;
+        if ($("#RequestDate").val() === '') {
+            toastr.error("Please enter request date.");
+            errcnt += 1;
+        }
+        if ($("#Department").val() === '') {
+            toastr.error("Please enter department.");
+            errcnt += 1;
+        }
+
+        if ($("#CatelogueNo").val() === '') {
+            toastr.error("Please enter CAT No.");
+            errcnt += 1;
+        }
+
+        var invdata = [];
+        $(".clsinv").each(function () {
+            if ($(this).is(":checked")) {
+                invdata.push($(this).val());
+            }
+        });
+
+        if (invdata.length == 0) {
+            toastr.error("Please select batch ");
+            errcnt += 1;
+        }
+
+        if (errcnt > 0) {
+            return false;
+        }
+
+        var passData = {
+            "Id": $("#Id").val(),
+            "RequestDate": $("#RequestDate").val(),
+            "RequestNo": $("#RequestNo").val(),
+            "Name": $("#Name").val(),
+            "Department": $("#Department").val(),
+            "CatelogueNo": $("#CatelogueNo").val(),
+            "ProductName": $("#ProductName").val(),
+            "CASNo": $("#CASNo").val(),
+            "ProductId": $("#ProductId").val(),
+            "BatchIds": invdata
+        };
+        $.ajax({
+            type: "POST",
+            url: "/Form/NewSampleRequestData",
+            data: passData,
+            traditional: true, // add this
+            success: function (results) {
+                if (results.success) {
+                    /*if (results.isNew) {*/
+                    window.location.href = "/Form/NewSampleRequest/" + results.data;
+                    /*}*/
+                }
+            }
+        });
+    }
+
+    function GetInforFromCatNo() {
+        $.ajax({
+            type: 'GET',
+            url: '/Form/ProductDetailsBySku?sku=' + $('#CatelogueNo').val(),
+            data: {},
+            success: function (results) {
+                if (!results.success) {
+                    toastr.error("No Data Found");
+                    return false;
+                }
+                if (results.data != null) {
+                    $("#ProductId").val(results.data.Id);
+                    $("#ProductName").val(results.data.Name);
+                    $("#ProjectName").val(results.data.MainCatName);
+                    $("#CASNo").val(results.data.ManufacturerPartNumber);
+                    if (results.data.PictureModels !== undefined && results.data.PictureModels !== null && results.data.PictureModels.length > 0) {
+                        $("#detFromDBImagesrc").attr('src', results.data.PictureModels[0].FullSizeImageUrl);
+                        $("#detFromDBImage").val(results.data.PictureModels[0].FullSizeImageUrl);
+                    }
+                    if (results.data.InventoryModel !== undefined && results.data.InventoryModel !== null && results.data.InventoryModel.length > 0) {
+                        var str = '';
+                        $(results.data.InventoryModel).each(function (i, v) {
+                            str += '<tr><td><input type="checkbox" class="clsinv" value="' + v.SZInventoryId + '"/></td><td>' + v.BatchNo + '</td><td>' + v.Qty + '</td> </tr>';
+                        });
+                        $("#tblbatchnolist").html(str);
+                    }
+                }
+            }
+        });
+    }
+
+    $(function () {
+        $("#RequestDate").datepicker({
+            format: 'dd/mm/yyyy'
+        });
+        $("#RequestDate").datepicker().datepicker("setDate", new Date());
+
+        $(".clssamplereason").each(function () {
+            var value = $(this).attr("datavalue");
+            $(this).val(value);
+        });
+    });
+
+    //setTimeout(function () {
+    //    document.multiselect('#Reason')
+    //        .setCheckBoxClick("checkboxAll", function (target, args) {
+    //            console.log("Checkbox 'Select All' was clicked and got value ", args.checked);
+    //        })
+    //        .setCheckBoxClick("1", function (target, args) {
+    //            console.log("Checkbox for item with value '1' was clicked and got value ", args.checked);
+    //        });
+    //}, 1500);
+    
+</script>
+<div id="clientremarkModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content" style="width:700px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal</h4>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 15px;text-align: center;color: #1d3f72;font-weight: 800;">Please wait few minutes...</p>
+                <div style="text-align:center">
+                    <img src="@Url.Content("~/images/loader.svg")" />
+                </div>
+            </div>
+            @*<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>*@
+        </div>
+
+    </div>
+</div>

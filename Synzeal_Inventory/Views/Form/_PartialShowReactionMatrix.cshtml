@@ -1,0 +1,65 @@
+﻿
+@model List<Synzeal_Inventory.Entity.SZ_ReactionMatrix>
+
+<!-- DataTables -->
+<script src="@Url.Content("~/Content/bower_components/datatables.net/js/jquery.dataTables.min.js")"></script>
+<script src="@Url.Content("~/Content/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js")"></script>
+<!-- DataTables -->
+<link rel="stylesheet" href="@Url.Content("~/Content/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css")">
+<style type="text/css">
+</style>
+
+<div class="box-body form-horizontal" style="overflow:scroll">
+    <fieldset id="fdsaddcompany">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>Name</th>
+                    <th>CAS No</th>
+                    <th>CAT No</th>
+                    <th>Exp No</th>
+                    <th>Batch Size</th>
+                    <th>Scheme Start Date</th>
+                    <th>Scheme End Date</th>
+                    <th>Scheme</th>
+                    <th>Total Step</th>
+                    <th>Step No</th>
+                    <th>No of Reaction</th>
+                    <th>Success Reaction</th>
+                    <th>No of Purification</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    int loop = 1;
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@loop</td>
+                            <td>@item.Productname</td>
+                            <td>@item.CASNo</td>
+                            <td>@item.CATNo</td>
+                            <td>@item.ExpNo</td>
+                            <td>@item.BatchSize</td>
+                            <td>@item.SchemeFromDate</td>
+                            <td>@item.SchemeEndDate</td>
+                            <td>@item.Scheme</td>
+                            <td>@item.TotalStep</td>
+                            <td>@item.StepNo</td>
+                            <td>@item.NoofReaction</td>
+                            <td>@item.SuccessReaction</td>
+                            <td>@item.NoofPurification</td>
+                        </tr>
+
+                        loop += 1;
+                    }
+                }
+            </tbody>
+        </table>
+    </fieldset>
+
+</div>

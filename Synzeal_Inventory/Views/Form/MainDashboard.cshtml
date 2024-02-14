@@ -1,0 +1,406 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.second.cshtml";
+    ViewBag.Title = "Dashboard";
+}
+@using Synzeal_Inventory.Models;
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0"> @CommonOperation.GetLocalizestring("products.quotelog")</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    @*<li class="breadcrumb-item"><a href="#">Home</a></li>*@
+                    <li class="breadcrumb-item active"><a href="/Form/Graph" class="btn btn-success pull-right" style=" margin-left: 20px;">  @CommonOperation.GetLocalizestring("products.Graph")</a></li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<script src="https://adminlte.io/themes/AdminLTE/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+<div class="row">
+    <section class="col-lg-12 connectedSortable" style="margin-left:15px;">
+        @*<label style=" float: left; padding-top: 6px;">Company: </label>@Html.DropDownList("leftcompanyId", (IEnumerable<SelectListItem>)ViewBag.companyList, new { @class = "form-control", @style = "width:200px;float: left;margin:0px 15px; " })*@
+
+        <label style=" float: left; padding-top: 6px;">@CommonOperation.GetLocalizestring("filter.startdate"):&nbsp;&nbsp;</label> <input type="text" class="form-control" id="startdate" style="width: 10%; float: left">
+        <label style=" float: left; padding-top: 6px; margin-left: 20px;">@CommonOperation.GetLocalizestring("filter.enddate"):&nbsp;&nbsp;</label> <input type="text" class="form-control" id="enddate" style="width: 10%;float: left" />
+        <input type="text" id="txtsearch" class="form-control" style=" float: left; width: 15%; margin-left: 15px;" placeholder="Enter Search Keyword..." />        <a href="javascript:void(0)" class="btn btn-primary" style=" float: left; margin-left: 20px;" onclick="$('#example1').DataTable().draw()">  @CommonOperation.GetLocalizestring("common.search")</a>
+        <a href="javascript:void(0)" class="btn btn-primary pull-right" style="margin-left:20px;" onclick="Copyrecords('example1')"> @CommonOperation.GetLocalizestring("common.Copy")</a>
+
+        <a href="javascript:void(0)" class="btn btn-primary pull-right" style=" margin-left: 20px;" onclick="saveall()">  @CommonOperation.GetLocalizestring("common.save")</a>
+
+        @*<a href="/Form/Graph" class="btn btn-success pull-right" style=" margin-left: 20px;" > Graph</a>*@
+        <div class="clearfix" style="margin-bottom: 20px;"></div>
+        <div class="col-12">
+            <div class="card">
+                <table id="example1" class="table table-bordered table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th> @CommonOperation.GetLocalizestring("common.Ref")</th>
+                            <th>@CommonOperation.GetLocalizestring("address.fields.company")</th>
+                            <th>@CommonOperation.GetLocalizestring("products.productname")</th>
+                            <th>@CommonOperation.GetLocalizestring("title.casno")</th>
+                            <th>@CommonOperation.GetLocalizestring("title.catno")</th>
+                            <th>@CommonOperation.GetLocalizestring("products.price") 1</th>
+                            <th>@CommonOperation.GetLocalizestring("products.price") 2</th>
+                            <th>@CommonOperation.GetLocalizestring("products.price") 3</th>
+                            <th>@CommonOperation.GetLocalizestring("products.price") 4</th>
+                            <th> @CommonOperation.GetLocalizestring("common.povalue")</th>
+                            <th>@CommonOperation.GetLocalizestring("common.leadtime")</th>
+                            @*<th>PO Received?</th>*@
+                            <th> @CommonOperation.GetLocalizestring("products.status")</th>
+                            <th> @CommonOperation.GetLocalizestring("common.feedback")</th>
+                        </tr>
+                    </thead>
+                </table>
+
+                <div style="text-align:center; font-weight: bold; font-size: 18px;">
+                    @CommonOperation.GetLocalizestring("Common.totalpovalue"): <span id="txtpovalue"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<link rel="stylesheet" href="https://adminlte.io/themes/v3/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css" />
+<script src="https://adminlte.io/themes/v3/plugins/datatables/jquery.dataTables.min.js"></script>
+
+<link rel="stylesheet" href="http://spms.synzeal.com/js/fixedHeader.dataTables.min.css" />
+<script src="http://spms.synzeal.com/js/dataTables.fixedHeader.min.js"></script>
+
+<script type="text/javascript">
+
+    function feedbackpopup(quotedetailsId)
+    {
+        $.ajax({
+            url: '/Form/GetQuoteDetailByID?id=' + quotedetailsId ,
+            data: {},
+            type: 'GET',
+            success: function (data) {
+                debugger;
+                var str = "<label>Feedback: </label> <textarea style='width:100%' rows='7' id='feedbackdata_" + quotedetailsId + "' ></textarea>";
+                str += "<a href='javascript:void(0)' class='btn btn-primary' onclick='updatefeedbackdata(" + quotedetailsId + ")'>Save</a>";
+                $('#myModal').find('.modal-body').html(str);
+                $('#myModal').modal({ show: true });
+                $('#myModal').find(".modal-dialog").css("width", "580px");
+
+                $("textarea#feedbackdata_" + quotedetailsId).val(data.data);
+            }
+        }); 
+        
+
+    }
+
+    function updatefeedbackdata(quotedetailsId) {
+        var model = {
+            Id: quotedetailsId,
+            Feedback: $("textarea#feedbackdata_" + quotedetailsId).val()
+        };
+        $.ajax({
+            url: '/Form/UpdateFeedbackdata',
+            data: model,
+            type: 'POST',
+            traditional: true,
+            success: function (data) {
+                if (data.success) {
+                    toastr.success("Saved successfully");
+                }
+            }
+        });
+    }
+
+    //Date picker
+    $('#startdate').datepicker({
+        autoclose: true,
+        format: 'dd/mm/yyyy'
+    })
+
+    $('#enddate').datepicker({
+        autoclose: true,
+        format: 'dd/mm/yyyy'
+    })
+    var dt = new Date();
+    dt.setMonth(dt.getMonth() - 1);
+
+    $("#startdate").datepicker("update", dt);
+    $("#enddate").datepicker("update", new Date());
+    GetAccessedCompanyList();
+
+    setTimeout(function () {
+        $('#example1').DataTable({
+            "searching": false,
+            "ordering": false,
+            "processing": true, // for show progress bar
+            "serverSide": true, // for process server side
+            "filter": true, // this is for disable filter (search box)
+            "orderMulti": false, // for disable multiple column at once
+            "pageLength": 25,
+            "scrollX": true,
+            "scrollY": "550px",
+            "fnDrawCallback": function (oSettings) {
+
+            },
+            "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+            "initComplete": function (settings, json) {
+
+            },
+            "ajax": {
+                "url": "../Form/LoadBrazilData",
+                "type": "POST",
+                "datatype": "json",
+                "data": function (d) {
+                    d.CompanyId = $("#leftcompanylist").val();
+                    d.StartDate = $('#startdate').val();
+                    d.EndDate = $('#enddate').val();
+                    d.SearchValue = $('#txtsearch').val();
+                }
+            },
+            "fnDrawCallback": function (settings) {
+                var api = this.api();
+                var rows = api.rows({ page: 'current' }).nodes();
+                var last = null;
+                var groupingCounts = [];
+                var counter = 1;
+
+                api.column(1, { page: 'current' }).data().each(function (group, i) {
+
+                    if (last !== group) {
+                        if (last !== undefined) {
+                            groupingCounts[last] = counter;
+                        }
+                        $(rows).eq(i).before(
+                            /*'<td class="group" colspan="12" style="' + (rows[i].attributes["data-pono"] != null && rows[i].attributes["data-pono"].value != "" ? "BACKGROUND-COLOR:#5d6fb1" : "BACKGROUND-COLOR:#343a40bf") +'; font-weight:700;color:#fff;padding:10px;">Quote ID # <a style="color: #fff; text-decoration: underline;" href="/Form/Quote/' + rows[i].attributes["data-QuoteId"].value + '">' + group + '</a>' + " | Date of Quote:" + rows[i].attributes["data-quotedate"].value + " | Company:" + rows[i].attributes["data-company"].value + " | Quoted to # " + rows[i].attributes["data-email"].value + " | PO No:" + rows[i].attributes["data-pono"].value + '</td>'*/
+                            '<td class="group" colspan="13" style="' + (rows[i].attributes["data-pono"] != null && rows[i].attributes["data-pono"].value != "" ? "BACKGROUND-COLOR:#5d6fb1" : "BACKGROUND-COLOR:#343a40") + '; font-weight:700;color:#fff;padding:10px;"><a style="color: #fff; text-decoration: underline;" href="/Form/Quote/' + rows[i].attributes["data-QuoteId"].value + '">' + group + '</a>' + " | " + rows[i].attributes["data-company"].value + " | " + rows[i].attributes["data-email"].value + " | " + (rows[i].attributes["data-pono"] == null || rows[i].attributes["data-pono"].value == "" ? "PO No: Not Received" : "PO No: " + rows[i].attributes["data-pono"].value) + '</td>'
+                        );
+
+                        last = group;
+                        counter = 1;
+                    } else {
+                        counter++;
+                    }
+                });
+
+                var txtpovalue = 0;
+                $("#example1 tr").each(function () {
+                    var prival = $(this).find("td").eq(7).text();
+                    if (prival !== '') {
+                        txtpovalue += parseInt(prival);
+                    }
+                });
+                $("#txtpovalue").text(txtpovalue);
+            },
+            "columnDefs": [
+                { targets: 1, visible: false },
+                { targets: 2, visible: false },
+            ],
+            "createdRow": function (row, data, dataIndex) {
+                $(row).attr('data-email', data.EmailAddress);
+                $(row).attr('data-QuoteId', data.QuoteId);
+                $(row).attr('data-company', data.CompanyName);
+                $(row).attr('data-quotedate', data.QuoteDate);
+                $(row).attr('data-pono', data.PONumber);
+            },
+            //"drawCallback": function () {
+            //    var api = this.api();
+
+            //    var txtpovalue = 0;
+            //    $("#example1 tr").each(function () {
+            //        var prival = $(this).find("td").eq(7).text();
+            //        if (prival !== '') {
+            //            txtpovalue += parseInt(prival);
+            //        }
+            //    });
+            //    $("#txtpovalue").text(txtpovalue);
+
+            //},
+            "columns": [
+                { "data": "ChkFirstRow", "autoWidth": true },
+                { "data": "Ref", "autoWidth": true },
+                { "data": "CompanyName", "autoWidth": true },
+                { "data": "ProductName", "name": "ProductName", "width": '250px', },
+                { "data": "CASNo", width: '150px' },
+                { "data": "CATNo", width: '150px' },
+                {
+                    "data": "Price",
+                    "width": '150px',
+                    "render": function (data, type, row) {
+                        var p = data;
+                        if (p !== null && p !== undefined && p !== '') {
+                            var pricedata = GetPrice(p, 1);
+                            if (pricedata.indexOf(row.RequiredQty + ' mg') != -1) {
+                                return '<span style="color:#002afa; font-weight: bold;">' + pricedata + '</span>';
+                            }
+                            return pricedata;
+                        }
+                        return '';
+                    }
+                },
+                {
+                    "data": "Price", "width": '150px',
+                    "render": function (data, type, row) {
+                        var p = data;
+                        if (p !== null && p !== undefined && p !== '') {
+                            var pricedata = GetPrice(p, 2);
+                            if (pricedata.indexOf(row.RequiredQty + ' mg') != -1) {
+                                return '<span style="color:#002afa; font-weight: bold;">' + pricedata + '</span>';
+                            }
+                            return pricedata;
+                        }
+                        return '';
+                    }
+                },
+                {
+                    "data": "Price", "width": '150px',
+                    "render": function (data, type, row) {
+                        var p = data;
+                        if (p !== null && p !== undefined && p !== '') {
+                            var pricedata = GetPrice(p, 3);
+                            if (pricedata.indexOf(row.RequiredQty + ' mg') != -1) {
+                                return '<span style="color:#002afa; font-weight: bold;">' + pricedata + '</span>';
+                            }
+                            return pricedata;
+                        }
+                        return '';
+                    }
+
+                },
+                {
+                    "data": "Price", "width": '150px',
+                    "render": function (data, type, row) {
+                        var p = data;
+                        if (p !== null && p !== undefined && p !== '') {
+                            var pricedata = GetPrice(p, 4);
+                            if (pricedata.indexOf(row.RequiredQty + ' mg') != -1) {
+                                return '<span style="color:#002afa; font-weight: bold;">' + pricedata + '</span>';
+                            }
+                            return pricedata;
+                        }
+                        return '';
+                    }
+
+                },
+                {
+                    "data": "Price", "width": '150px',
+                    "render": function (data, type, row) {
+                        var p = row.Price;
+                        var priceone = GetPrice(p, 1);
+                        if (priceone.indexOf(row.RequiredQty + ' mg') != -1) {
+                            return getpricedata(priceone);
+                        }
+                        var pricetwo = GetPrice(p, 2);
+                        if (pricetwo.indexOf(row.RequiredQty + ' mg') != -1) {
+                            return getpricedata(pricetwo);
+                        }
+                        var pricethree = GetPrice(p, 3);
+                        if (pricethree.indexOf(row.RequiredQty + ' mg') != -1) {
+                            return getpricedata(pricethree);
+                        }
+                        var pricefour = GetPrice(p, 4);
+                        if (pricefour.indexOf(row.RequiredQty + ' mg') != -1) {
+                            return getpricedata(pricefour);
+                        }
+                        return '';
+                    }
+
+                },
+                { "data": "LeadTime", "width": '150px', },
+                //{ "data": "POReceived", "width": '100px', },
+                { "data": "InternationStatusText" },
+                { "data": "Feedback", "width": '250px' },
+            ]
+        });
+    }, 1000);
+    function GetPrice(price, columnstep) {
+        if (price === "" || price === undefined || price === null) {
+            return "";
+        }
+        var splitPrice = price.split(',');
+        if (splitPrice[columnstep - 1] != null && splitPrice[columnstep - 1] != undefined) {
+            return splitPrice[columnstep - 1];
+        }
+        return "";
+    }
+
+    function saveall() {
+        var ids = [];
+        $('.clsQuote').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push({
+                    "Id": $(this).val(),
+                    "InternationalStatus": $("#internationalstatus_" + $(this).val()).val(),
+                    "Feedback": $("#Feedback_" + $(this).val()).val(),
+                });
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+        var model = ids;
+        $.ajax({
+            url: '/Form/SaveBrazildata',
+            data: JSON.stringify(model),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: 'POST',
+            traditional: true,
+            success: function (data) {
+                if (data.success) {
+                    toastr.success("Saved successfully");
+                }
+            }
+        });
+    }
+
+    function Copyrecords(tablename) {
+        var ids = []; var refNoarr = [];
+        $("#" + tablename).find('.clsQuote').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/PrintQuotationListAllRecord',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $('#myModal').find(".modal-dialog").css("max-width", "80%");
+                $('#myModal').find('.modal-body').css("max-width", "100%");
+                $('#myModal').find(".modal-footer").hide();
+            }
+        });
+    }
+</script>
+<style>
+    .paginate_button {
+        padding: 10px;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    .dataTables_info, .dataTables_length {
+        float: left;
+    }
+
+    .dataTables_filter, .dataTables_length, .dataTables_paginate {
+        margin: 10px;
+    }
+
+    .dataTables_info {
+        margin-left: 10px;
+    }
+</style>

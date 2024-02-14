@@ -1,0 +1,252 @@
+﻿
+@model  Synzeal_Inventory.Entity.SZ_QuoteDetailForm
+@{
+    ViewBag.Title = "Available change data";
+    Layout = null;
+}
+<div class="col-md-12">
+    <div class="box">
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body">
+                <div class="col-md-12">
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1" style="padding-top: 6px;">Additional Analysis :</label>
+                    </div>
+                    <div class="form-group col-md-9 checkbox">
+                        <input type="hidden" id="formId" name="formId" value="@Model.Id" />
+                        <label style="padding-right:25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="CMR">
+                            13C NMR
+                        </label>
+                        <label style="padding-right:25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="TGA">
+                            TGA
+                        </label>
+                        <label style="padding-right:25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="IR">
+                            IR
+                        </label>
+                        <label style="padding-right:25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="GC">
+                            GC
+                        </label>
+                        <label style="padding-right:25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="ELSD">
+                            ELSD
+                        </label>
+                        <label style="padding-right:25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="DEPT">
+                            DEPT
+                        </label>
+                        <label style="padding-right:25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="ROI">
+                            ROI
+                        </label>
+                        <label style="padding-right:25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="ChiralChr">
+                            Chiral Chr
+                        </label>
+                        <label style="padding-right:25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="Mass">
+                            Mass
+                        </label>
+                        <label style="padding-right:25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="HPLC/GC/ELSD">
+                            HPLC/GC/ELSD
+                        </label>
+                        <label style="padding-right:25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="NMR">
+                            1H NMR
+                        </label>
+                        <label style="padding-right:17px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="qNMR">
+                            qNMR
+                        </label>
+                        <label style="padding-right: 25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="HRMS">
+                            HRMS
+                        </label>
+                        <label style="padding-right: 32px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="Elemental">
+                            Elemental
+                        </label>
+                        <label style="padding-right:25px;">
+                            <input type="checkbox" name="radioAdditionalAnalysis" value="SER">
+                            SER
+                        </label>
+                    </div>
+                </div>
+                <br />
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            IR Attachment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="IRAttachment" name="IRAttachment" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            Mass Attachment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="MassAttachment" name="MassAttachment" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            HPLC Attachment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="PLCAttachment" name="PLCAttachment" />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            NMR Attchment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="NMRAttchment" name="NMRAttchment" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            QNMR Attchment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="QNMRAttchment" name="QNMRAttchment" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            TGA Attachment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="TGAAttachment" name="TGAAttachment" />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            CMR Attchment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="CMRAttchment" name="CMRAttchment" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            DEPT Attachment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="DEPTAttachment" name="DEPTAttachment" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            HRMS Attachment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="HRMSAttachment" name="HRMSAttachment" />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            ROI Attachment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="ROIAttachment" name="ROIAttachment" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            Element ralAttachment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="ElementralAttachment" name="ElementralAttachment" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            SER Attachment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="SERAttachment" name="SERAttachment" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            GC Attachment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="GCAttachment" name="GCAttachment" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            ELSD Attachment :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="ELSDAttachment" name="ELSDAttachment" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputPassword1">
+                            Chiral Attachmenrt :
+                        </label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <input type="file" id="ChiralAttachmenrt" name="ChiralAttachmenrt" />
+                    </div>
+                </div>
+                <div class="form-group" style="text-align: right">
+                    <button type="button" onclick="Quote.ChangeAvailableDataforForm()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.RbAdditionalAnalysis))
+{
+    <text>
+        <script type="text/javascript">
+            var splirec = '@Model.RbAdditionalAnalysis'.split(',');
+                $(splirec).each(function(i, v) {
+                    $("input[name=radioAdditionalAnalysis][value='" + v + "']").prop("checked", true);
+                });
+        </script>
+    </text>
+}

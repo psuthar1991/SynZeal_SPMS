@@ -1,0 +1,67 @@
+﻿@model List<Synzeal_Inventory.Models.QuotationListModel>
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+}
+
+<div class="box-body form-horizontal">
+    <p>Dear Sir/Madam,</p>
+    <p>
+        Greetings from SynZeal Research !
+    </p>
+    <p>This e-mail is a gentle reminder about upcoming due payment towards the following supply.</p>
+    <br />
+    <table width="100%" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>PO No.</th>
+                <th>Product Name</th>
+                <th>QTY. (mg)</th>
+                <th>Batch No.</th>
+                <th>Name of Buyer</th>
+                <th>Courier</th>
+                <th>Tracking No.</th>
+                <th>Location</th>
+                <th>Ref Name</th>
+                <th>Purpose Of Dispatch</th>
+            </tr>
+        </thead>
+        @foreach (var k in Model)
+        {
+            <tr>
+                <td>
+                    @k.PackDate
+                </td>
+                <td>@k.PONumber</td>
+                <td>@k.ProductName</td>
+                <td>@k.RequiredQty</td>
+                <td>@k.BatchNo</td>
+                <td>@k.CompanyName</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(k.Courier))
+                    {
+                        int cid = Convert.ToInt32(k.Courier);
+                        @db.SZ_Courier.Where(x => x.Id == cid).Select(x => x.Name).FirstOrDefault()
+                    }
+                </td>
+                <td>@k.TrackingNo</td>
+                <td>@k.Location</td>
+                <td>@k.RefName</td>
+                <td>@(k.PurposeDispatch != "--Select--" ? k.PurposeDispatch : string.Empty)</td>
+            </tr>
+        }
+    </table>
+    <br />
+    <p>The invoice copy and delivery challan for the above supply is already submitted during supply however we are once again sending for your reference.</p>
+    <p>
+        Let me know if you have any comments/suggestions.
+    </p>
+    <br />
+    <p>
+        Kind  Regards,
+    </p>
+    <br />
+    <p>
+        SynZeal Research
+    </p>
+</div>

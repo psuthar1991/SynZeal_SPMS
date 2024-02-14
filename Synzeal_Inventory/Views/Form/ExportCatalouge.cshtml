@@ -1,0 +1,170 @@
+﻿@{
+    ViewBag.Title = "ExportCatalouge";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Export Catalouge Report
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <form role="form">
+                    <div class="box-body">
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">API Name</label>
+                            @Html.DropDownList("API", (IEnumerable<SelectListItem>)ViewBag.listAPIs, new { @class = "form-control", @multiple = "" })
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">D-Labelled</label>
+                            <input type="checkbox" id="dlabelled" name="dlabelled" />
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">Nitroso</label>
+                            <input type="checkbox" id="Nitroso" name="Nitroso" />
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">Header</label>
+                            <input type="file" class="form-control" id="Header" name="Header" />
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="exampleInputEmail1">Footer</label>
+                            <input type="file" class="form-control" id="Footer" name="Footer" />
+                        </div>
+                        <div style="float: left;margin-top: 19px;">
+                            <div>
+                                <label for="inputPassword3" class="col-sm-10 control-label"></label>
+                                <div>
+                                    <button type="button" class="btn btn-primary" onclick="GenerateCatalogueExcelReport()">Excel</button>
+                                    <button type="button" class="btn btn-primary" onclick="GenerateCataloguePDFReport()">PDF</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+
+    function GenerateCataloguePDFReport() {
+        debugger;
+        var apistr = "";
+        var apiname = $("#API").val();
+        if (apiname.length != 0) {
+            apistr = apiname.join(",");
+        }
+
+        var formData = new FormData();
+        var files1 = $("#Header").get(0).files;
+        if (files1.length > 0) {
+            formData.append("Header", files1[0]);
+        }
+        var files2 = $("#Footer").get(0).files;
+        if (files2.length > 0) {
+            formData.append("Footer", files2[0]);
+        }
+        if ($('#dlabelled').is(':checked')) {
+            formData.append("dlabelled", "true");
+        }
+        else {
+            formData.append("dlabelled", "false");
+        }
+        if ($('#Nitroso').is(':checked')) {
+            formData.append("Nitroso", "true");
+        }
+        else {
+            formData.append("Nitroso", "false");
+        }
+        formData.append("API", apistr);
+
+        $.ajax({
+            type: 'POST',
+            url: '/Form/GenerateCataloguePDF',
+            data: formData,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            success: function (results) {
+                /*window.location.href = results.returnFilePath;*/
+                var win = window.open(results.returnFilePath, '_blank');
+                if (win) {
+                    //Browser has allowed it to be opened
+                    win.focus();
+                } else {
+                    //Browser has blocked it
+                    alert('Please allow popups for this website');
+                }
+            }
+        });
+    }
+
+    function GenerateCatalogueExcelReport() {
+        debugger;
+        var apistr = "";
+        var apiname = $("#API").val();
+        if (apiname.length != 0) {
+            apistr = apiname.join(",");
+        }
+
+        var formData = new FormData();
+        var files1 = $("#Header").get(0).files;
+        if (files1.length > 0) {
+            formData.append("Header", files1[0]);
+        }
+        var files2 = $("#Footer").get(0).files;
+        if (files2.length > 0) {
+            formData.append("Footer", files2[0]);
+        }
+        if ($('#dlabelled').is(':checked')) {
+            formData.append("dlabelled", "true");
+        }
+        else {
+            formData.append("dlabelled", "false");
+        }
+        if ($('#Nitroso').is(':checked')) {
+            formData.append("Nitroso", "true");
+        }
+        else {
+            formData.append("Nitroso", "false");
+        }
+        formData.append("API", apistr);
+
+        $.ajax({
+            type: 'POST',
+            url: '/Form/GenerateCatalogueExcel',
+            data: formData,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            success: function (results) {
+                /*window.location.href = results.returnFilePath;*/
+                var win = window.open(results.returnFilePath, '_blank');
+                if (win) {
+                    //Browser has allowed it to be opened
+                    win.focus();
+                } else {
+                    //Browser has blocked it
+                    alert('Please allow popups for this website');
+                }
+            }
+        });
+    }
+</script>
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.3/css/bootstrap.min.css" />
+<script src="https://cdn.jsdelivr.net/gh/davidstutz/bootstrap-multiselect@master/dist/js/bootstrap-multiselect.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/davidstutz/bootstrap-multiselect@master/dist/css/bootstrap-multiselect.css">
+
+<script>
+    jQuery('#API').multiselect({
+        columns: 1,
+        placeholder: 'Select APIs',
+    });
+</script>

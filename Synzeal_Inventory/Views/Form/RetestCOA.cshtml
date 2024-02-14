@@ -1,0 +1,1779 @@
+﻿@{
+    ViewBag.Title = " Re-Test List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    bool isDispatchedLogin = Convert.ToBoolean(ViewBag.IsDispatchLogin);
+}
+@model List<SZ_QuotationModel>
+@using Synzeal_Inventory.Models
+<section class="content-header">
+    <h1>
+        Re-Test List
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-xs-12">
+
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <ul class="nav nav-tabs">
+                    @if (isDispatchedLogin)
+                    {
+                        <li class="active"><a data-toggle="tab" href="#previous" data-tabname="previous" onclick="previoustab()">DUE RE-TEST</a></li>
+                        <li><a data-toggle="tab" href="#retest" data-tabname="retest" onclick="retesttab()">RE-TEST</a></li>
+                        <li><a data-toggle="tab" href="#retestlater" data-tabname="retestlater" onclick="retestlatertab()">RE-TEST LATER</a></li>
+                        <li><a data-toggle="tab" href="#complete" data-tabname="complete" onclick="completetab()">COMPLETED</a></li>
+                    }
+                    else
+                    {
+                        <li class="active"><a data-toggle="tab" href="#all" data-tabname="all">MASTER LIST</a></li>
+                        <li><a data-toggle="tab" href="#upcomming" data-tabname="upcomming" onclick="upcommingtab()">UPCOMMING</a></li>
+                        <li><a data-toggle="tab" href="#quote" data-tabname="quote" onclick="quotetab()">QUOTED</a></li>
+                        <li><a data-toggle="tab" href="#dispatch" data-tabname="dispatch" onclick="dispatchab()">DISPATCH</a></li>
+                        <li><a data-toggle="tab" href="#previous" data-tabname="previous" onclick="previoustab()">DUE RE-TEST</a></li>
+                        <li><a data-toggle="tab" href="#retest" data-tabname="retest" onclick="retesttab()">RE-TEST</a></li>
+                        <li><a data-toggle="tab" href="#retestlater" data-tabname="retestlater" onclick="retestlatertab()">RE-TEST LATER</a></li>
+                        <li><a data-toggle="tab" href="#complete" data-tabname="complete" onclick="completetab()">COMPLETED</a></li>
+                        <li><a data-toggle="tab" href="#deleted" data-tabname="deleted" onclick="deletedtab()">DELETED</a></li>
+                    }
+
+                </ul>
+
+                <div class="tab-content">
+
+                    <div id="all" class="tab-pane fade in @(isDispatchedLogin == true ? "" : "active")">
+                        <div class="box-body divQuote" style="overflow:scroll;" id="divQuote">
+                            <div class="row " style="padding-top:20px">
+                                <div class="form-group">
+                                    <div class="col-md-1">
+                                        <label style="padding-top: 6px;">API Name:</label>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select id="ddlApiName" name="ddlApiName" class="form-control ddlApiName">
+                                            <option value="">--Select--</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1" style="text-align:right; width:10%">
+                                        <label style="padding-top: 6px;">From Date:</label>
+                                    </div>
+                                    <div class="col-md-1" style="width:10%">
+                                        <input type="text" id="allfrom_Date" name="from_Date" style="width:100px" class="form-control from_Date" readonly />
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label style="padding-top: 6px;">To Date:</label>
+                                    </div>
+                                    <div class="col-md-1" style="width:10%">
+                                        <input type="text" id="allto_Date" name="to_Date" style="width:100px" class="form-control to_Date" readonly />
+                                    </div>
+
+                                    <div class="col-md-1">
+                                        @*<a href="javascript:void(0)" onclick="$('#tblall').DataTable().draw()"><i class="fa fa-search"></i></a>*@
+                                        <input type="button" class="btn btn-primary" onclick="$('#tblall').DataTable().draw()" value="Search" />
+
+                                    </div>
+                                    <div class="col-md-3" style="text-align:right">
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetest('tblall')">Move to Re-Test</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetestLater('tblall')">Move to Re-Test Later</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="Save('tblall')">Save</a>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br />
+                            <table id="tblall" class="table table-bordered table-striped" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="1%"><input type="checkbox" id="selectallchk" /></th>
+                                        <th>Product Name</th>
+                                        <th width="10%">CAS No</th>
+                                        <th width="6%">CAT No</th>
+                                        <th width="6%">Batch No</th>
+                                        <th width="6%">QTY</th>
+                                        <th width="6%">HPLC</th>
+                                        <th width="6%">TGA</th>
+                                        <th width="10%">Remark</th>
+                                        <th>Analysis Date</th>
+                                        <th>Re-Test Date</th>
+                                        <th width="2%">Diff.</th>
+                                        <th width="1%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="upcomming" class="tab-pane fade in">
+                        <div class="box-body divQuote" style="overflow:scroll;" id="divQuote">
+                            <div class="row " style="padding-top:20px">
+                                <div class="form-group">
+                                    <div class="col-md-1">
+                                        <label style="padding-top: 6px;">API Name:</label>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select id="ddlApiName" name="ddlApiName" class="form-control ddlApiName">
+                                            <option value="">--Select--</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1" style="text-align:right; width:10%">
+                                        <label style="padding-top: 6px;">From Date:</label>
+                                    </div>
+                                    <div class="col-md-1" style="width:10%">
+                                        <input type="text" id="upcommingfrom_Date" name="from_Date" style="width:100px" class="form-control from_Date" readonly />
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label style="padding-top: 6px;">To Date:</label>
+                                    </div>
+                                    <div class="col-md-1" style="width:10%">
+                                        <input type="text" id="upcommingto_Date" name="to_Date" style="width:100px" class="form-control to_Date" readonly />
+                                    </div>
+
+                                    <div class="col-md-1">
+                                        @*<a href="javascript:void(0)" onclick="$('#tblupcomming').DataTable().draw()"><i class="fa fa-search"></i></a>*@
+                                        <input type="button" class="btn btn-primary" onclick="$('#tblupcomming').DataTable().draw()" value="Search"/>
+                                    </div>
+                                    <div class="col-md-3" style="text-align:right">
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetest('tblupcomming')">Move to Re-Test</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetestLater('tblupcomming')">Move to Re-Test Later</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="Save('tblupcomming')">Save</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br />
+                            <table id="tblupcomming" class="table table-bordered table-striped" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="1%"><input type="checkbox" id="selectallchk" /></th>
+                                        <th>Product Name</th>
+
+                                        <th width="10%">CAS No</th>
+                                        <th width="6%">CAT No</th>
+                                        <th width="6%">Batch No</th>
+                                        <th width="6%">QTY</th>
+                                        <th width="6%">HPLC</th>
+                                        <th width="6%">TGA</th>
+                                        <th width="10%">Remark</th>
+                                        <th>Analysis Date</th>
+                                        <th>Re-Test Date</th>
+                                        <th width="2%">Diff.</th>
+                                        <th width="1%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="quote" class="tab-pane fade in">
+                        <div class="box-body divQuote" style="overflow:scroll;" id="divQuote">
+                            <div class="row " style="padding-top:20px">
+                                <div class="form-group">
+                                    <div class="col-md-1">
+                                        <label style="padding-top: 6px;">API Name:</label>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select id="ddlApiName" name="ddlApiName" class="form-control ddlApiName">
+                                            <option value="">--Select--</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1" style="text-align:right; width:10%">
+                                        <label style="padding-top: 6px;">From Date:</label>
+                                    </div>
+                                    <div class="col-md-1" style="width:10%">
+                                        <input type="text" id="quotefrom_Date" name="from_Date" style="width:100px" class="form-control from_Date" readonly />
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label style="padding-top: 6px;">To Date:</label>
+                                    </div>
+                                    <div class="col-md-1" style="width:10%">
+                                        <input type="text" id="quoteto_Date" name="to_Date" style="width:100px" class="form-control to_Date" readonly />
+                                    </div>
+
+                                    <div class="col-md-1">
+                                        @*<a href="javascript:void(0)" onclick="$('#tblquote').DataTable().draw()"><i class="fa fa-search"></i></a>*@
+                                        <input type="button" class="btn btn-primary" onclick="$('#tblquote').DataTable().draw()" value="Search" />
+                                    </div>
+                                    <div class="col-md-3" style="text-align:right">
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetest('tblquote')">Move to Re-Test</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetestLater('tblquote')">Move to Re-Test Later</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="Save('tblquote')">Save</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br />
+                            <table id="tblquote" class="table table-bordered table-striped" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="1%"><input type="checkbox" id="selectallchk" /></th>
+                                        <th width="10%">Quote Ref</th>
+                                        <th width="10%">Company Name</th>
+                                        <th width="10%">Quote Date</th>
+                                        <th>Product Name</th>
+                                        <th width="10%">CAS No</th>
+                                        <th width="6%">CAT No</th>
+                                        <th width="9%">Batch No</th>
+                                        <th width="6%">QTY</th>
+                                        <th width="6%">HPLC</th>
+                                        <th width="6%">TGA</th>
+                                        <th width="10%">Remark</th>
+                                        <th>Analysis Date</th>
+                                        <th>Re-Test Date</th>
+                                        <th width="2%">Diff.</th>
+                                        <th width="1%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="dispatch" class="tab-pane fade in">
+                        <div class="box-body divQuote" style="overflow:scroll;" id="divQuote">
+                            <div class="row " style="padding-top:20px">
+                                <div class="form-group">
+                                    <div class="col-md-1">
+                                        <label style="padding-top: 6px;">API Name:</label>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select id="ddlApiName" name="ddlApiName" class="form-control ddlApiName">
+                                            <option value="">--Select--</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1" style="text-align:right; width:10%">
+                                        <label style="padding-top: 6px;">From Date:</label>
+                                    </div>
+                                    <div class="col-md-1" style="width:10%">
+                                        <input type="text" id="dispatchfrom_Date" name="from_Date" style="width:100px" class="form-control from_Date" readonly />
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label style="padding-top: 6px;">To Date:</label>
+                                    </div>
+                                    <div class="col-md-1" style="width:10%">
+                                        <input type="text" id="dispatchto_Date" name="to_Date" style="width:100px" class="form-control to_Date" readonly />
+                                    </div>
+
+                                    <div class="col-md-1">
+                                        @*<a href="javascript:void(0)" onclick="$('#tbldispatch').DataTable().draw()"><i class="fa fa-search"></i></a>*@
+                                        <input type="button" class="btn btn-primary" onclick="$('#tbldispatch').DataTable().draw()" value="Search" />
+                                    </div>
+                                    <div class="col-md-3" style="text-align:right">
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetest('tbldispatch')">Move to Re-Test</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetestLater('tbldispatch')">Move to Re-Test Later</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="Save('tbldispatch')">Save</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br />
+                            <table id="tbldispatch" class="table table-bordered table-striped" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="1%"><input type="checkbox" id="selectallchk" /></th>
+                                        <th width="10%">PO No</th>
+                                        <th width="10%">Company Name</th>
+                                        <th width="10%">Quote Date</th>
+                                        <th width="12%">Quote Ref</th>
+                                        <th>Product Name</th>
+                                        <th width="10%">CAS No</th>
+                                        <th width="6%">CAT No</th>
+                                        <th width="13%">Batch No</th>
+                                        <th width="1.5%"></th>
+                                        <th width="4%">QTY</th>
+                                        <th width="5%">HPLC</th>
+                                        <th width="5%">TGA</th>
+                                        <th width="10%">Remark</th>
+                                        <th>Analysis Date</th>
+                                        <th>Re-Test Date</th>
+                                        <th width="1.5%">Diff.</th>
+                                        <th width="1%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="previous" class="tab-pane fade in @(isDispatchedLogin == true ? "active" : "")">
+                        <div class="box-body divQuote" style="overflow:scroll;" id="divQuote">
+                            <div class="row " style="padding-top:20px">
+                                <div class="form-group">
+                                    <div class="col-md-12" style="text-align:right">
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetest('tblprevious')">Move to Re-Test</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetestLater('tblprevious')">Move to Re-Test Later</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="Save('tblprevious')">Save</a>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br />
+                            <table id="tblprevious" class="table table-bordered table-striped" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="1%"><input type="checkbox" id="selectpreviouschk" /></th>
+                                        <th>Product Name</th>
+                                        <th width="10%">CAS No</th>
+                                        <th width="6%">CAT No</th>
+                                        <th width="6%">Batch No</th>
+                                        <th width="6%">QTY</th>
+                                        <th width="6%">HPLC</th>
+                                        <th width="6%">TGA</th>
+                                        <th width="10%">Remark</th>
+                                        <th>Analysis Date</th>
+                                        <th>Re-Test Date</th>
+                                        <th width="2%">Diff.</th>
+                                        <th width="1%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="retest" class="tab-pane fade in">
+                        <div class="box-body divQuote" style="overflow:scroll;" id="divQuote">
+                            <div class="row " style="padding-top:20px">
+                                <div class="form-group">
+                                    <div class="col-md-12" style="text-align:right">
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetestApproved()">Completed</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetestLaterFromRetest('tblretest')">Move to Re-Test Later</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="Save('tblretest')">Save</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br />
+                            <table id="tblretest" class="table table-bordered table-striped" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="1%"><input type="checkbox" id="selectretestchk" /></th>
+                                        <th>Product Name</th>
+                                        <th width="10%">CAS No</th>
+                                        <th width="6%">CAT No</th>
+                                        <th width="6%">QTY</th>
+                                        <th width="6%">HPLC</th>
+                                        <th width="6%">TGA</th>
+                                        <th width="10%">Remark</th>
+                                        <th>Analysis Date</th>
+                                        <th>Re-Test Date</th>
+                                        <th width="2%">Diff.</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+
+                    <div id="retestlater" class="tab-pane fade in">
+                        <div class="box-body divQuote" style="overflow:scroll;" id="divQuote">
+                            <div class="row " style="padding-top:20px">
+                                <div class="form-group">
+                                    <div class="col-md-12" style="text-align:right">
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="MovetoRetestFromLater('tblretestlater')">Move to Re-Test</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="Save('tblretestlater')">Save</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br />
+                            <table id="tblretestlater" class="table table-bordered table-striped" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="1%"><input type="checkbox" id="selectretestlaterchk" /></th>
+                                        <th>Product Name</th>
+                                        <th width="10%">CAS No</th>
+                                        <th width="6%">CAT No</th>
+                                        <th width="6%">QTY</th>
+                                        <th width="6%">HPLC</th>
+                                        <th width="6%">TGA</th>
+                                        <th width="10%">Remark</th>
+                                        <th>Analysis Date</th>
+                                        <th>Re-Test Date</th>
+                                        <th width="2%">Diff.</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="complete" class="tab-pane fade in">
+                        <div class="box-body divQuote" style="overflow:scroll;" id="divQuote">
+                            <div class="row " style="padding-top:20px">
+                                <div class="form-group">
+                                    <div class="col-md-12" style="text-align:right">
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="COAGenerate('tblcomplete')">COA Generate</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br />
+                            <table id="tblcomplete" class="table table-bordered table-striped" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="1%"><input type="checkbox" id="selectcompletechk" /></th>
+                                        <th>Product Name</th>
+                                        <th width="10%">CAS No</th>
+                                        <th width="6%">CAT No</th>
+                                        <th width="6%">Batch No</th>
+                                        <th width="6%">QTY</th>
+                                        <th width="6%">HPLC</th>
+                                        <th width="6%">TGA</th>
+                                        <th width="10%">Remark</th>
+                                        <th>Analysis Date</th>
+                                        <th>Re-Test Date</th>
+                                        <th width="2%">Diff.</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="deleted" class="tab-pane fade in">
+                        <div class="box-body divQuote" style="overflow:scroll;" id="divQuote">
+                            @*<div class="row " style="padding-top:20px">
+                                <div class="form-group">
+                                    <div class="col-md-12" style="text-align:right">
+                                        <a href="javascript:void(0)" class="btn btn-primary" style="margin-left:7px;" onclick="Resume('tbldeleted')">COA Generate</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <br />*@
+                            <table id="tbldeleted" class="table table-bordered table-striped" width="100%">
+                                <thead>
+                                    <tr>
+                                        @*<th width="1%"><input type="checkbox" id="selectdeletedchk" /></th>*@
+                                        <th>Product Name</th>
+                                        <th width="10%">CAS No</th>
+                                        <th width="6%">CAT No</th>
+                                        <th width="6%">Batch No</th>
+                                        <th width="6%">QTY</th>
+                                        <th width="6%">HPLC</th>
+                                        <th width="6%">TGA</th>
+                                        <th width="10%">Remark</th>
+                                        <th>Analysis Date</th>
+                                        <th>Re-Test Date</th>
+                                        <th width="2%">Diff.</th>
+                                        <th width="1%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- /.box-body -->
+            </div>
+        </div>
+    </div>
+</section>
+<div id="mypriceModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Select Price</h4>
+            </div>
+            <div class="modal-body">
+                @{
+                    for (int i = 1000; i < 251000; i += 1000)
+                    {
+                        <div class="col-md-1 clsppop" data-value="@i">@i</div>
+                    }
+                }
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<style type="text/css">
+    .clsppop:hover {
+        color: red;
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .clsppop {
+        width: 10%;
+        padding: 3px 0;
+    }
+
+    .modal-footer {
+        border: 0;
+    }
+</style>
+<script>
+    function monthDiff(d1, d2) {
+        var months;
+        months = (d2.getFullYear() - d1.getFullYear()) * 12;
+        months -= d1.getMonth();
+        months += d2.getMonth();
+        return months <= 0 ? 0 : months;
+    }
+    var today = new Date();
+    $('#allfrom_Date').datepicker({
+        format: 'dd/mm/yyyy',
+        todayHighlight: true,
+        onSelect: function (dateText, inst) {
+
+        }
+    })
+    $('#allto_Date').datepicker({
+        format: 'dd/mm/yyyy',todayHighlight: true,
+        onSelect: function (dateText, inst) {
+
+        }
+    })
+
+    $('#upcommingfrom_Date').datepicker({
+        format: 'dd/mm/yyyy',todayHighlight: true,
+        startDate: today
+    })
+    $('#upcommingto_Date').datepicker({
+        format: 'dd/mm/yyyy',todayHighlight: true,
+        startDate: today
+    })
+
+    $('#quotefrom_Date').datepicker({
+        format: 'dd/mm/yyyy',todayHighlight: true,
+        endDate: today
+    })
+    $('#quoteto_Date').datepicker({
+        format: 'dd/mm/yyyy',todayHighlight: true,
+        endDate: today
+    });
+
+    $('#dispatchfrom_Date').datepicker({
+        format: 'dd/mm/yyyy',todayHighlight: true,
+    })
+    $('#dispatchto_Date').datepicker({
+        format: 'dd/mm/yyyy',todayHighlight: true,
+    });
+    function diff_months(dt2, dt1) 
+     {
+
+      var diff =(dt2.getTime() - dt1.getTime()) / 1000;
+       diff /= (60 * 60 * 24 * 7 * 4);
+      return Math.abs(Math.round(diff));
+  
+     }
+    $.ajax({
+        type: "GET",
+        url: "/Form/MainCategory/",
+        data: { 'id': 'ALL' },
+        dataType: "json",
+        success: function (response) {
+            if (response.records.length > 0) {
+                $('.ddlApiName').empty();
+                var str = "";
+                str += "<option value='0'>--Select--</option>";
+                $(response.records).each(function (i, v) {
+                    str += "<option value='" + v.Name + "'>" + v.Name + "</option>";
+                });
+                $('.ddlApiName').append(str);
+            }
+        },
+        error: function (response) {
+            alert("Error:" + response);
+        }
+    });
+
+
+    var alltbl = $('#tblall').DataTable({
+        "ordering": false,
+        "processing": true, // for show progress bar
+        "serverSide": true, // for process server side
+        "filter": true, // this is for disable filter (search box)
+        "orderMulti": false, // for disable multiple column at once
+        "pageLength": 25,
+        //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+        "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+        "ajax": {
+            "url": "../Form/LoadRetestData?tabname=all",
+            "type": "POST",
+            "datatype": "json",
+            "data": function (d) {
+                d.from_Date = $('#all').find(".from_Date").val();
+                d.to_Date = $('#all').find(".to_Date").val();
+                d.ApiName = $('#all').find(".ddlApiName").val();
+                d.CasProductName = $('#all').find(".CasProductName").val();
+            }
+        },
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            //if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+            //    $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+            //}
+            var retestDate = $('td', nRow)[7].innerHTML;
+            if (retestDate !== '') {
+                var i = retestDate.split('/');
+                var date1 = new Date();
+                var date2 = new Date(i[2], i[1], i[0]);
+                //var datediff = date2 - date1;
+                var diff = diff_months(date2, date1);
+                if (diff <= 6) {
+                    $('td', nRow).css('background-color', 'rgb(245, 255, 160)');
+                }
+                else {
+                    $('td', nRow).css('background-color', 'rgb(206, 247, 188)');
+                }
+            }
+            
+            $('td', nRow)[2].innerHTML = "<b>"+$('td', nRow)[2].innerHTML+"</b>";
+        },
+        "fnDrawCallback": function (oSettings) {
+            $("#selectallchk").click(function () {
+                if ($(this).is(":checked")) {
+                    $("#tblall").find('.clsRetest').each(function () {
+                        $(this).prop("checked", true);
+                    });
+                }
+                else {
+                    $("#tblall").find('.clsRetest').each(function () {
+                        $(this).prop("checked", false);
+                    });
+                }
+            });
+
+            var api = this.api();
+            var rows = api.rows({ page: 'current' }).nodes();
+            var last = null;
+
+            api.column(3, { page: 'current' }).data().each(function (group, i) {
+                if (last !== group) {
+                    $(rows).eq(i).before(
+                        '<td class="group" colspan="15" style="BACKGROUND-COLOR:#3c8dbc;font-weight:700;color:#fff;padding:10px;">' + rows[i].attributes["data-ProductName"].value+ " | " + group + " | " + rows[i].attributes["data-casno"].value +'</td>'
+                    );
+                    last = group;
+                }
+            });
+
+            setTimeout(function () {
+                alltbl.columns.adjust();
+            }, 2000);
+
+        },
+        "columnDefs":
+            [
+                { targets: 1, visible: false },
+                { targets: 2, visible: false },
+                { targets: 3, visible: false }
+            ],
+        "createdRow": function (row, data, dataIndex) {
+            // Set the data-status attribute, and add a class
+            //$(row).attr('id', 'tr_' + data.QuoteDetailsId);
+            $(row).attr('data-casno', data.CASNo);
+             $(row).attr('data-ProductName', data.ProductName);
+            //$(row).attr('data-company', data.CompanyName);
+            //$(row).attr('data-pono', data.PONumber);
+            //$(row).attr('data-QuoteId', data.QuoteId);
+        },
+        "columns": [
+            { "data": "FirstRow", "autoWidth": true, "orderable": false },
+            { "data": "ProductName", "autoWidth": true, "orderable": false },
+            { "data": "CASNo", "autoWidth": true, "orderable": false },
+            { "data": "CATNo", "autoWidth": true, "orderable": false },
+            { "data": "BatchNo", "autoWidth": true, "orderable": false },
+            { "data": "QTY", "autoWidth": true, "orderable": false },
+            { "data": "HPLC", "autoWidth": true, "orderable": false },
+            { "data": "TGA", "autoWidth": true, "orderable": false },
+            { "data": "RetestRemarkText", "autoWidth": true, "orderable": false },
+            { "data": "AnalysisDateText", "name": "AnalysisDate", "width": "100px" },
+            { "data": "ReTestDateText", "name": "ReTestdate", "width": "100px" },
+            { "data": "Diffmonth", "name": "Diffmonth" },
+            { "data": "LastRow", "name": "LastRow" },
+        ]
+    });
+
+
+    var upcommingload = false;
+    var previousload = false;
+    var retestload = false;
+    var dispatchload = false;
+    var quoteload = false;
+    var retestlaterload = false;
+    var completeload = false;
+    var deletedload = false;
+    function upcommingtab() {
+        if (upcommingload === false) {
+            var upcommingtbl = $('#tblupcomming').DataTable({
+                //"fixedHeader": {
+                //    header: true
+                //},
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadRetestData?tabname=upcomming",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                       d.from_Date = $('#upcomming').find(".from_Date").val();
+                        d.to_Date = $('#upcomming').find(".to_Date").val();
+                        d.ApiName = $('#upcomming').find(".ddlApiName").val();
+                        d.CasProductName = $('#upcomming').find(".CasProductName").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                    }
+
+                     $('td', nRow)[2].innerHTML = "<b>"+$('td', nRow)[2].innerHTML+"</b>";
+                },
+                "fnDrawCallback": function (oSettings) {
+                    $('#tblupcomming').find("#selectallchk").click(function () {
+                        if ($(this).is(":checked")) {
+                            $("#tblupcomming").find('.clsRetest').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $("#tblupcomming").find('.clsRetest').each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+                    upcommingload = true;
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+
+                    api.column(3, { page: 'current' }).data().each(function (group, i) {
+                       
+                        last = last != null ? last.trim().toLowerCase() : null;
+                        if (last !== group.trim().toLowerCase()) {
+                            $(rows).eq(i).before(
+                                '<td class="group" colspan="15" style="BACKGROUND-COLOR:#3c8dbc;font-weight:700;color:#fff;padding:10px;">' + rows[i].attributes["data-ProductName"].value+ " | " + group + " | " + rows[i].attributes["data-casno"].value +'</td>'
+                            );
+                            last = group;
+                        }
+                    });
+
+                    setTimeout(function () {
+                        upcommingtbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                          { targets: 1, visible: false },
+                        { targets: 2, visible: false },
+                        { targets: 3, visible: false }
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                    $(row).attr('data-casno', data.CASNo);
+                    $(row).attr('data-ProductName', data.ProductName);
+                },
+                "columns": [
+                    { "data": "FirstRow", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "autoWidth": true, "orderable": false },
+                    { "data": "BatchNo", "autoWidth": true, "orderable": false },
+                    { "data": "QTY", "autoWidth": true, "orderable": false },
+                    { "data": "HPLC", "autoWidth": true, "orderable": false },
+            { "data": "TGA", "autoWidth": true, "orderable": false },
+                    { "data": "RetestRemarkText", "autoWidth": true, "orderable": false },
+                    { "data": "AnalysisDateText", "name": "AnalysisDate", "width": "100px" },
+                    { "data": "ReTestDateText", "name": "ReTestdate", "width": "100px" },
+                    { "data": "Diffmonth", "name": "Diffmonth" },
+                    { "data": "LastRow", "name": "LastRow" },
+                ]
+            });
+        }
+    }
+
+    function quotetab() {
+        if (quoteload === false) {
+            var quotetbl = $('#tblquote').DataTable({
+                //"fixedHeader": {
+                //    header: true
+                //},
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadRetestData?tabname=quote",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.from_Date = $('#quote').find(".from_Date").val();
+                        d.to_Date = $('#quote').find(".to_Date").val();
+                        d.ApiName = $('#quote').find(".ddlApiName").val();
+                        d.CasProductName = $('#quote').find(".CasProductName").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                    $('td', nRow)[5].innerHTML = "<b>"+$('td', nRow)[5].innerHTML+"</b>";
+
+                    var retestDate = $('td', nRow)[10].innerHTML;
+                    if (retestDate !== '') {
+                        var i = retestDate.split('/');
+                        var date1 = new Date();
+                        var date2 = new Date(i[2], i[1], i[0]);
+                        //var datediff = date2 - date1;
+                        var diff = diff_months(date2, date1);
+                        if (diff <= 6) {
+                            $('td', nRow).css('background-color', 'rgb(245, 255, 160)');
+                        }
+                        else {
+                            $('td', nRow).css('background-color', 'rgb(206, 247, 188)');
+                        }
+                    }
+                },
+                "fnDrawCallback": function (oSettings) {
+                    $("#selectallchk").click(function () {
+                        if ($(this).is(":checked")) {
+                            $("#tblquote").find('.clsRetest').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $("#tblquote").find('.clsRetest').each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+                    quoteload = true;
+
+                    
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+
+                    api.column(1, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+
+                            var strGroup = group;
+                            if ('@isDispatchedLogin' === 'False') {
+                                strGroup = '<a style="color:#fff" href="/Form/Quote/'+rows[i].attributes["data-QuoteId"].value+'" target="_blank">'+group+'</a>'
+                            }
+
+                            $(rows).eq(i).before(
+                                '<td class="group" colspan="15" style="BACKGROUND-COLOR:#3c8dbc;font-weight:700;color:#fff;padding:10px;">' + strGroup +  " | " + rows[i].attributes["data-CompanyName"].value+ " | " + rows[i].attributes["data-CreatedDateText"].value +'</td>'
+                            );
+                            last = group;
+                        }
+                    });
+
+                    setTimeout(function () {
+                        quotetbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                        { targets: 1, visible: false },
+                        { targets: 2, visible: false },
+                        { targets: 3, visible: false },
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                     $(row).attr('data-CreatedDateText', data.CreatedDateText);
+                    $(row).attr('data-CompanyName', data.CompanyName);
+                    $(row).attr('data-QuoteId', data.QuoteId);
+                },
+                "columns": [
+                    { "data": "FirstRow", "autoWidth": true, "orderable": false },
+                    { "data": "QuotationRef", "autoWidth": true, "orderable": false },
+                    { "data": "CompanyName", "autoWidth": true, "orderable": false },
+                    { "data": "CreatedDateText", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "autoWidth": true, "orderable": false },
+                    { "data": "BatchNo", "autoWidth": true, "orderable": false },
+                    { "data": "QTY", "autoWidth": true, "orderable": false },
+                    { "data": "HPLC", "autoWidth": true, "orderable": false },
+                    { "data": "TGA", "autoWidth": true, "orderable": false },
+                    { "data": "RetestRemarkText", "autoWidth": true, "orderable": false },
+                    { "data": "AnalysisDateText", "name": "AnalysisDate", "width": "100px" },
+                    { "data": "ReTestDateText", "name": "ReTestdate", "width": "100px" },
+                    { "data": "Diffmonth", "name": "Diffmonth" },
+                    { "data": "LastRow", "name": "LastRow" },
+                ]
+            });
+        }
+    }
+
+    function dispatchab() {
+        if (dispatchload === false) {
+            var dispatchtbl = $('#tbldispatch').DataTable({
+                //"fixedHeader": {
+                //    header: true
+                //},
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadRetestData?tabname=dispatch",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.from_Date = $('#dispatch').find(".from_Date").val();
+                        d.to_Date = $('#dispatch').find(".to_Date").val();
+                        d.ApiName = $('#dispatch').find(".ddlApiName").val();
+                        d.CasProductName = $('#dispatch').find(".CasProductName").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.ISBatchSelected) {
+                        $('td', nRow).css('background-color', 'rgb(202, 251, 217)');
+                    }
+                     $('td', nRow)[6].innerHTML = "<b>"+$('td', nRow)[6].innerHTML+"</b>";
+
+                },
+                "fnDrawCallback": function (oSettings) {
+                    $("#selectallchk").click(function () {
+                        if ($(this).is(":checked")) {
+                            $("#tblquote").find('.clsRetest').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $("#tblquote").find('.clsRetest').each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+                    dispatchload = true;
+
+                    
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+
+                    api.column(1, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+                           
+                            $(rows).eq(i).before(
+                                '<td class="group" colspan="15" style="BACKGROUND-COLOR:#3c8dbc;font-weight:700;color:#fff;padding:10px;">'  + group + " | " + rows[i].attributes["data-CompanyName"].value+ " | " + rows[i].attributes["data-CreatedDateText"].value +'</td>'
+                            );
+                            last = group;
+                        }
+                    });
+
+                    setTimeout(function () {
+                        dispatchtbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                        { targets: 1, visible: false },
+                        { targets: 2, visible: false },
+                        { targets: 3, visible: false },
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                     $(row).attr('data-CreatedDateText', data.PONumberDateText);
+                     $(row).attr('data-CompanyName', data.CompanyName);
+                    $(row).attr('data-QuoteId', data.QuoteId);
+                     var strGroup = $(row)[0].cells[1].innerText;
+                     if ('@isDispatchedLogin' === 'False') {
+                                strGroup = '<a style="color:#000" href="/Form/Quote/'+data.QuoteId+'" target="_blank">'+$(row)[0].cells[1].innerText+'</a>'
+                     }
+                    $(row)[0].cells[1].innerHTML = strGroup;
+                },
+                "columns": [
+                    { "data": "FirstRow",  "orderable": false },
+                    { "data": "PONumber",  "orderable": false },
+                    { "data": "CompanyName",  "orderable": false },
+                    { "data": "PONumberDateText",  "orderable": false },
+                    { "data": "QuotationRef",  "orderable": false },
+                    { "data": "ProductName", "orderable": false },
+                    { "data": "CASNo", "orderable": false },
+                    { "data": "CATNo", "orderable": false },
+                    { "data": "BatchNo", "orderable": false },
+                    { "data": "ChangeBatch", "orderable": false },
+                    { "data": "QTY", "orderable": false },
+                    { "data": "HPLC", "orderable": false },
+                    { "data": "TGA", "orderable": false },
+                    { "data": "RetestRemarkText",  "orderable": false },
+                    { "data": "AnalysisDateText", "name": "AnalysisDate"},
+                    { "data": "ReTestDateText", "name": "ReTestdate"},
+                    { "data": "Diffmonth", "name": "Diffmonth" },
+                    { "data": "LastRow", "name": "LastRow" },
+                ]
+            });
+        }
+    }
+
+    function previoustab() {
+        if (previousload === false) {
+            var previoustbl = $('#tblprevious').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadRetestData?tabname=previous",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.from_Date = $('#previous').find(".from_Date").val();
+                d.to_Date = $('#previous').find(".to_Date").val();
+                d.ApiName = $('#previous').find(".ddlApiName").val();
+                d.CasProductName = $('#previous').find(".CasProductName").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                    }
+
+                     $('td', nRow)[2].innerHTML = "<b>"+$('td', nRow)[2].innerHTML+"</b>";
+                },
+                "fnDrawCallback": function (oSettings) {
+                    $("#selectpreviouschk").click(function () {
+                        if ($(this).is(":checked")) {
+                            $("#tblprevious").find('.clsRetest').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $("#tblprevious").find('.clsRetest').each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+                    previousload = true;
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+
+                    api.column(3, { page: 'current' }).data().each(function (group, i) {
+                       
+                        last = last != null ? last.trim().toLowerCase() : null;
+                        if (last !== group.trim().toLowerCase()) {
+                            $(rows).eq(i).before(
+                                '<td class="group" colspan="15" style="BACKGROUND-COLOR:#3c8dbc;font-weight:700;color:#fff;padding:10px;">' + rows[i].attributes["data-ProductName"].value+ " | " + group + " | " + rows[i].attributes["data-casno"].value +'</td>'
+                            );
+                            last = group;
+                        }
+                    });
+                    setTimeout(function () {
+                        previoustbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                          { targets: 1, visible: false },
+                        { targets: 2, visible: false },
+                        { targets: 3, visible: false }
+                    ],
+               
+"createdRow": function (row, data, dataIndex) {
+                    $(row).attr('data-casno', data.CASNo);
+                    $(row).attr('data-ProductName', data.ProductName);
+                },
+                "columns": [
+                    { "data": "FirstRow", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "autoWidth": true, "orderable": false },
+                    { "data": "BatchNo", "autoWidth": true, "orderable": false },
+                    { "data": "QTY", "autoWidth": true, "orderable": false },
+                    { "data": "HPLC", "autoWidth": true, "orderable": false },
+                    { "data": "TGA", "autoWidth": true, "orderable": false },
+                    { "data": "RetestRemarkText", "autoWidth": true, "orderable": false },
+                    { "data": "AnalysisDateText", "name": "AnalysisDate", "width": "100px" },
+                    { "data": "ReTestDateText", "name": "ReTestdate", "width": "100px" },
+                    { "data": "Diffmonth", "name": "Diffmonth" },
+                    { "data": "LastRow", "name": "LastRow" },
+                ]
+            });
+        }
+    }
+
+    function retesttab() {
+        if (retestload === false) {
+            var retesttbl = $('#tblretest').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadRetestData?tabname=retest",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.from_Date = $('#retest').find(".from_Date").val();
+                        d.to_Date = $('#retest').find(".to_Date").val();
+                        d.ApiName = $('#retest').find(".ddlApiName").val();
+                        d.CasProductName = $('#retest').find(".CasProductName").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                    }
+
+                     $('td', nRow)[4].innerHTML = "<b>"+$('td', nRow)[4].innerHTML+"</b>";
+                },
+                "fnDrawCallback": function (oSettings) {
+                    $("#selectretestchk").click(function () {
+                        if ($(this).is(":checked")) {
+                            $("#tblretest").find('.clsRetest').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $("#tblretest").find('.clsRetest').each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+
+                    retestload = true;
+
+                    setTimeout(function () {
+                        retesttbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                        //{ targets: 4, visible: false },
+                        //{ targets: 5, visible: false }
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                },
+                "columns": [
+                    { "data": "FirstRow", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "autoWidth": true, "orderable": false },
+                    { "data": "QTY", "autoWidth": true, "orderable": false },
+                    { "data": "HPLC", "autoWidth": true, "orderable": false },
+                    { "data": "TGA", "autoWidth": true, "orderable": false },
+                    { "data": "RetestRemarkText", "autoWidth": true, "orderable": false },
+                    { "data": "AnalysisDateText", "name": "AnalysisDate", "width": "100px" },
+                    { "data": "ReTestDateText", "name": "ReTestdate", "width": "100px" },
+                    { "data": "Diffmonth", "name": "Diffmonth" },
+                ]
+            });
+        }
+    }
+
+    function retestlatertab() {
+        if (retestlaterload === false) {
+            var retestlatertbl = $('#tblretestlater').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadRetestData?tabname=retestlater",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.from_Date = $('#tblretestlater').find(".from_Date").val();
+                        d.to_Date = $('#tblretestlater').find(".to_Date").val();
+                        d.ApiName = $('#tblretestlater').find(".ddlApiName").val();
+                        d.CasProductName = $('#tblretestlater').find(".CasProductName").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                    }
+
+                    $('td', nRow)[4].innerHTML = "<b>"+$('td', nRow)[4].innerHTML+"</b>";
+                },
+                "fnDrawCallback": function (oSettings) {
+                    $("#selectretestlaterchk").click(function () {
+                        if ($(this).is(":checked")) {
+                            $("#tblretestlater").find('.clsRetest').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $("#tblretestlater").find('.clsRetest').each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+
+                    retestlaterload = true;
+
+                    setTimeout(function () {
+                        retestlatertbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                        //{ targets: 4, visible: false },
+                        //{ targets: 5, visible: false }
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                },
+                "columns": [
+                    { "data": "FirstRow", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "autoWidth": true, "orderable": false },
+                    { "data": "QTY", "autoWidth": true, "orderable": false },
+                    { "data": "HPLC", "autoWidth": true, "orderable": false },
+            { "data": "TGA", "autoWidth": true, "orderable": false },
+                    { "data": "RetestRemarkText", "autoWidth": true, "orderable": false },
+                    { "data": "AnalysisDateText", "name": "AnalysisDate", "width": "100px" },
+                    { "data": "ReTestDateText", "name": "ReTestdate", "width": "100px" },
+                    { "data": "Diffmonth", "name": "Diffmonth" },
+                ]
+            });
+        }
+    }
+
+    function completetab() {
+        if (completeload === false) {
+            var completetbl = $('#tblcomplete').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadRetestData?tabname=completed",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.from_Date = $('#tblcomplete').find(".from_Date").val();
+                        d.to_Date = $('#tblcomplete').find(".to_Date").val();
+                        d.ApiName = $('#tblcomplete').find(".ddlApiName").val();
+                        d.CasProductName = $('#tblcomplete').find(".CasProductName").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                    }
+
+                    $('td', nRow)[5].innerHTML = "<b>"+$('td', nRow)[5].innerHTML+"</b>";
+                },
+                "fnDrawCallback": function (oSettings) {
+                    $("#selectcompletechk").click(function () {
+                        if ($(this).is(":checked")) {
+                            $("#tblcomplete").find('.clsRetest').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $("#tblcomplete").find('.clsRetest').each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+
+                    completeload = true;
+
+                    setTimeout(function () {
+                        completetbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                        //{ targets: 4, visible: false },
+                        //{ targets: 5, visible: false }
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                },
+                "columns": [
+                    { "data": "FirstRow", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "autoWidth": true, "orderable": false },
+                    { "data": "BatchNo", "autoWidth": true, "orderable": false },
+                    { "data": "QTY", "autoWidth": true, "orderable": false },
+                    { "data": "HPLC", "autoWidth": true, "orderable": false },
+                    { "data": "TGA", "autoWidth": true, "orderable": false },
+                    { "data": "RetestRemarkText", "autoWidth": true, "orderable": false },
+                    { "data": "AnalysisDateText", "name": "AnalysisDate", "width": "100px" },
+                    { "data": "ReTestDateText", "name": "ReTestdate", "width": "100px" },
+                    { "data": "Diffmonth", "name": "Diffmonth" },
+                ]
+            });
+        }
+    }
+
+    function deletedtab() {
+        if (deletedload === false) {
+            var deletedtbl = $('#tbldeleted').DataTable({
+                "ordering": false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "orderMulti": false, // for disable multiple column at once
+                "pageLength": 25,
+                //"lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50,100, 1000, "All"]],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+
+                "ajax": {
+                    "url": "../Form/LoadRetestData?tabname=deleted",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.from_Date = $('#tblcomplete').find(".from_Date").val();
+                        d.to_Date = $('#tblcomplete').find(".to_Date").val();
+                        d.ApiName = $('#tblcomplete').find(".ddlApiName").val();
+                        d.CasProductName = $('#tblcomplete').find(".CasProductName").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.IsImportedQuote && aData.MoveToDispatch != true) {
+                        $('td', nRow).css('background-color', 'rgb(217, 237, 249)');
+                    }
+
+                    $('td', nRow)[4].innerHTML = "<b>"+$('td', nRow)[4].innerHTML+"</b>";
+                },
+                "fnDrawCallback": function (oSettings) {
+                    $("#selectcompletechk").click(function () {
+                        if ($(this).is(":checked")) {
+                            $("#tbldeleted").find('.clsRetest').each(function () {
+                                $(this).prop("checked", true);
+                            });
+                        }
+                        else {
+                            $("#tbldeleted").find('.clsRetest').each(function () {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+
+                    deletedload = true;
+
+                    setTimeout(function () {
+                        deletedtbl.columns.adjust();
+                    }, 2000);
+
+                },
+                "columnDefs":
+                    [
+                        //{ targets: 4, visible: false },
+                        //{ targets: 5, visible: false }
+                    ],
+                "createdRow": function (row, data, dataIndex) {
+                },
+                "columns": [
+                    //{ "data": "FirstRow", "autoWidth": true, "orderable": false },
+                    { "data": "ProductName", "autoWidth": true, "orderable": false },
+                    { "data": "CASNo", "autoWidth": true, "orderable": false },
+                    { "data": "CATNo", "autoWidth": true, "orderable": false },
+                    { "data": "BatchNo", "autoWidth": true, "orderable": false },
+                    { "data": "QTY", "autoWidth": true, "orderable": false },
+                    { "data": "HPLC", "autoWidth": true, "orderable": false },
+                    { "data": "TGA", "autoWidth": true, "orderable": false },
+                    { "data": "RetestRemarkText", "autoWidth": true, "orderable": false },
+                    { "data": "AnalysisDateText", "name": "AnalysisDate", "width": "100px" },
+                    { "data": "ReTestDateText", "name": "ReTestdate", "width": "100px" },
+                    { "data": "Diffmonth", "name": "Diffmonth" },
+                    { "data": "LastRow", "name": "LastRow" },
+                ]
+            });
+        }
+    }
+
+    function MovetoRetest(tablename) {
+        var ids = [];
+        $("#" + tablename).find('.clsRetest').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/MovetoRetestData',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    if (retestload) {
+                        $('#tblretest').DataTable().ajax.reload();
+                    }
+                    else {
+                        retesttab();
+                    }
+                    $('#' + tablename).DataTable().ajax.reload();
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.error(data.message);
+                }
+            }
+        });
+    }
+
+    function MovetoRetestFromLater(tablename) {
+        var ids = [];
+        $("#" + tablename).find('.clsRetest').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/MovetoRetestFromLater',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    if (retestload) {
+                        $('#tblretest').DataTable().ajax.reload();
+                    }
+                    else {
+                        retesttbl();
+                    }
+                    $('#' + tablename).DataTable().ajax.reload();
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.error(data.message);
+                }
+            }
+        });
+    }
+
+
+    function MovetoRetestLaterFromRetest(tablename) {
+        var ids = [];
+        $("#" + tablename).find('.clsRetest').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/MovetoRetestLaterFromRetest',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    if (retestlaterload) {
+                        $('#tblretestlater').DataTable().ajax.reload();
+                    }
+                    else {
+                        retestlatertbl();
+                    }
+                    $('#' + tablename).DataTable().ajax.reload();
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.error(data.message);
+                }
+            }
+        });
+    }
+
+    function MovetoRetestLater(tablename) {
+        var ids = [];
+        $("#" + tablename).find('.clsRetest').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/MovetoRetestLaterData',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    if (retestlatertab) {
+                        $('#tblretestlater').DataTable().ajax.reload();
+                    }
+                    else {
+                        retestlatertab();
+                    }
+                    $('#' + tablename).DataTable().ajax.reload();
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.error(data.message);
+                }
+            }
+        });
+    }
+
+    function Save(tablename) {
+        var ids = [];
+        var paramdata = [];
+        $("#" + tablename).find('.clsRetest').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+                if (tablename === "tblretest" || tablename === "tblretestlater") {
+                    var obj = {
+                        BatchId: $(this).attr('data-batchid'),
+                        RetestRemark: $("#" + tablename).find("#remark_" + $(this).val()).val()
+                    };
+                    paramdata.push(obj);
+                }
+                else {
+                    var obj = {
+                        BatchId: $(this).val(),
+                        RetestRemark: $("#" + tablename).find("#remark_" + $(this).val()).val()
+                    };
+                    paramdata.push(obj);
+                }
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+        paramdata = JSON.stringify({ 'paramdata': paramdata });
+
+
+        $.ajax({
+            url: '/Form/ReTestSave',
+            data: paramdata,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: 'POST',
+            success: function (data) {
+                if (data.success) {
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.error(data.message);
+                }
+            }
+        });
+    }
+
+    function COAGenerate(tablename) {
+         var ids = [];
+        $("#"+tablename).find('.clsRetest').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/MovetoComplete',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    if (completeload) {
+                        $('#tblcomplete').DataTable().ajax.reload();
+                    }
+                    else {
+                        completetab();
+                    }
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.error(data.message);
+                }
+            }
+        });
+    }
+
+    function MovetoRetestApproved() {
+        var ids = [];
+        $("#tblretest").find('.clsRetest').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/MovetoRetestApproved',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    if (completeload) {
+                        $('#tblcomplete').DataTable().ajax.reload();
+                    }
+                    else {
+                        completetab();
+                    }
+
+                    $('#tblretest').DataTable().ajax.reload();
+                    toastr.success(data.message);
+                }
+                else {
+                    toastr.error(data.message);
+                }
+            }
+        });
+    }
+
+    function GetAllBatchNo(id,quotedetailsId) {
+        $.ajax({
+            url: '/Form/GetAllBatchNo?id=' + id +'&actiontxt=retest&quoteDetailsId=' + quotedetailsId,
+            data: {},
+            type: 'GET',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+            }
+        });
+    }
+
+    function deletebatchretest(batchId) {
+        $.ajax({
+            url: '/Form/Deleteretest?id=' + batchId,
+            data: {},
+            type: 'GET',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                window.location.reload(true);
+                toastr.success("Batch number deleted successfully");
+            }
+        });
+    }
+
+    function resumedeleted(id) {
+         $.ajax({
+            url: '/Form/resumedeletedretest?id=' + id,
+            data: {},
+            type: 'GET',
+            traditional: true,
+            dataType: 'json',
+            success: function (data) {
+                window.location.reload(true);
+                toastr.success("Batch number resumed successfully");
+            }
+        });
+    }
+
+     $(".divQuote").css('height', window.innerHeight - 200);
+</script>
+
+<style type="text/css">
+    .letter {
+        float: left;
+        padding: 10px 14px;
+        background: #3c8dbc;
+        margin: 5px 10px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .letter:hover, .letter-active {
+            background: #2d729a;
+        }
+
+    .clsimageproduct {
+        display: block;
+        position: absolute;
+        background: #fff;
+        padding: 10px;
+        border: 1px solid #ececec;
+        left: 7.5%;
+    }
+</style>
+
+@if(isDispatchedLogin)
+{
+    <text>
+    <script>
+        previoustab();
+    </script>
+    </text>
+}
+

@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="b12089af8d49498da70344602bf7bd05" Name="Diagram1">
+        <EntityTypeShape EntityType="SynzealModel.AclRecord" Width="1.5" PointX="17.25" PointY="71.375" />
+        <EntityTypeShape EntityType="SynzealModel.ActivityLog" Width="1.5" PointX="12" PointY="61.875" />
+        <EntityTypeShape EntityType="SynzealModel.ActivityLogType" Width="1.5" PointX="9.75" PointY="55" />
+        <EntityTypeShape EntityType="SynzealModel.Address" Width="1.5" PointX="7.5" PointY="61.875" />
+        <EntityTypeShape EntityType="SynzealModel.AddressAttribute" Width="1.5" PointX="19.75" PointY="11" />
+        <EntityTypeShape EntityType="SynzealModel.AddressAttributeValue" Width="1.5" PointX="22" PointY="11" />
+        <EntityTypeShape EntityType="SynzealModel.Affiliate" Width="1.5" PointX="9.75" PointY="74.625" />
+        <EntityTypeShape EntityType="SynzealModel.BackInStockSubscription" Width="1.5" PointX="15" PointY="69.875" />
+        <EntityTypeShape EntityType="SynzealModel.BlogComment" Width="1.5" PointX="12" PointY="69.875" />
+        <EntityTypeShape EntityType="SynzealModel.BlogPost" Width="1.5" PointX="9.75" PointY="77.875" />
+        <EntityTypeShape EntityType="SynzealModel.Campaign" Width="1.5" PointX="5.75" PointY="7.875" />
+        <EntityTypeShape EntityType="SynzealModel.Category" Width="1.5" PointX="9.75" PointY="6.75" />
+        <EntityTypeShape EntityType="SynzealModel.CategoryTemplate" Width="1.5" PointX="11.75" PointY="0.875" />
+        <EntityTypeShape EntityType="SynzealModel.CheckoutAttribute" Width="1.5" PointX="19.75" PointY="5.125" />
+        <EntityTypeShape EntityType="SynzealModel.CheckoutAttributeValue" Width="1.5" PointX="22" PointY="5.75" />
+        <EntityTypeShape EntityType="SynzealModel.Country" Width="1.5" PointX="11.75" PointY="3.875" />
+        <EntityTypeShape EntityType="SynzealModel.Country1" Width="1.5" PointX="3" PointY="50.25" />
+        <EntityTypeShape EntityType="SynzealModel.CrossSellProduct" Width="1.5" PointX="14.75" PointY="14.875" />
+        <EntityTypeShape EntityType="SynzealModel.Currency" Width="1.5" PointX="5.75" PointY="16.875" />
+        <EntityTypeShape EntityType="SynzealModel.Customer" Width="1.5" PointX="9.75" PointY="57.75" />
+        <EntityTypeShape EntityType="SynzealModel.CustomerAttribute" Width="1.5" PointX="19.75" PointY="1" />
+        <EntityTypeShape EntityType="SynzealModel.CustomerAttributeValue" Width="1.5" PointX="22" PointY="1" />
+        <EntityTypeShape EntityType="SynzealModel.CustomerRole" Width="1.5" PointX="15" PointY="65.375" />
+        <EntityTypeShape EntityType="SynzealModel.DeliveryDate" Width="1.5" PointX="0.75" PointY="15.875" />
+        <EntityTypeShape EntityType="SynzealModel.Discount" Width="1.5" PointX="7.5" PointY="27.75" />
+        <EntityTypeShape EntityType="SynzealModel.DiscountRequirement" Width="1.5" PointX="9.75" PointY="51.75" />
+        <EntityTypeShape EntityType="SynzealModel.DiscountUsageHistory" Width="1.5" PointX="20.25" PointY="58" />
+        <EntityTypeShape EntityType="SynzealModel.Download" Width="1.5" PointX="17.75" PointY="19.875" />
+        <EntityTypeShape EntityType="SynzealModel.EmailAccount" Width="1.5" PointX="17.75" PointY="15.125" />
+        <EntityTypeShape EntityType="SynzealModel.ExternalAuthenticationRecord" Width="1.5" PointX="12" PointY="113.75" />
+        <EntityTypeShape EntityType="SynzealModel.Forums_Forum" Width="1.5" PointX="18.75" PointY="49.125" />
+        <EntityTypeShape EntityType="SynzealModel.Forums_Group" Width="1.5" PointX="16.5" PointY="50" />
+        <EntityTypeShape EntityType="SynzealModel.Forums_Post" Width="1.5" PointX="15" PointY="61.625" />
+        <EntityTypeShape EntityType="SynzealModel.Forums_PrivateMessage" Width="1.5" PointX="12" PointY="101.875" />
+        <EntityTypeShape EntityType="SynzealModel.Forums_Subscription" Width="1.5" PointX="12" PointY="92.75" />
+        <EntityTypeShape EntityType="SynzealModel.Forums_Topic" Width="1.5" PointX="21" PointY="61.125" />
+        <EntityTypeShape EntityType="SynzealModel.GenericAttribute" Width="1.5" PointX="19.75" PointY="19.875" />
+        <EntityTypeShape EntityType="SynzealModel.GiftCard" Width="1.5" PointX="25.5" PointY="56.125" />
+        <EntityTypeShape EntityType="SynzealModel.GiftCardUsageHistory" Width="1.5" PointX="20.25" PointY="65.875" />
+        <EntityTypeShape EntityType="SynzealModel.GoogleProduct" Width="1.5" PointX="5.75" PointY="20.875" />
+        <EntityTypeShape EntityType="SynzealModel.Group" Width="1.5" PointX="0.75" PointY="8.25" />
+        <EntityTypeShape EntityType="SynzealModel.Group_Newsletter_Map" Width="1.5" PointX="3" PointY="8" />
+        <EntityTypeShape EntityType="SynzealModel.InccoTerm" Width="1.5" PointX="21.75" PointY="19.875" />
+        <EntityTypeShape EntityType="SynzealModel.Language" Width="1.5" PointX="8.25" PointY="47.125" />
+        <EntityTypeShape EntityType="SynzealModel.LocaleStringResource" Width="1.5" PointX="10.5" PointY="87.5" />
+        <EntityTypeShape EntityType="SynzealModel.LocalizedProperty" Width="1.5" PointX="10.5" PointY="96.25" />
+        <EntityTypeShape EntityType="SynzealModel.Log" Width="1.5" PointX="12" PointY="52.25" />
+        <EntityTypeShape EntityType="SynzealModel.Manufacturer" Width="1.5" PointX="9.75" PointY="0.75" />
+        <EntityTypeShape EntityType="SynzealModel.ManufacturerTemplate" Width="1.5" PointX="22.75" PointY="14.875" />
+        <EntityTypeShape EntityType="SynzealModel.MeasureDimension" Width="1.5" PointX="23.75" PointY="17.875" />
+        <EntityTypeShape EntityType="SynzealModel.MeasureWeight" Width="1.5" PointX="23.75" PointY="20.875" />
+        <EntityTypeShape EntityType="SynzealModel.MessageTemplate" Width="1.5" PointX="20.75" PointY="23.875" />
+        <EntityTypeShape EntityType="SynzealModel.MessageTemplateNewsLetter" Width="1.5" PointX="22.75" PointY="23.875" />
+        <EntityTypeShape EntityType="SynzealModel.MissiveResponse" Width="1.5" PointX="24.75" PointY="0.875" />
+        <EntityTypeShape EntityType="SynzealModel.News" Width="1.5" PointX="12.75" PointY="41.875" />
+        <EntityTypeShape EntityType="SynzealModel.NewsComment" Width="1.5" PointX="15" PointY="57.75" />
+        <EntityTypeShape EntityType="SynzealModel.Newsletter" Width="1.5" PointX="0.75" PointY="10.75" />
+        <EntityTypeShape EntityType="SynzealModel.NewsLetterSubscription" Width="1.5" PointX="24.75" PointY="3.875" />
+        <EntityTypeShape EntityType="SynzealModel.Notification" Width="1.5" PointX="24.75" PointY="6.875" />
+        <EntityTypeShape EntityType="SynzealModel.Order" Width="1.5" PointX="18" PointY="56.375" />
+        <EntityTypeShape EntityType="SynzealModel.OrderItem" Width="1.5" PointX="23.25" PointY="55.25" />
+        <EntityTypeShape EntityType="SynzealModel.OrderNote" Width="1.5" PointX="20.25" PointY="74" />
+        <EntityTypeShape EntityType="SynzealModel.PaymentTerm" Width="1.5" PointX="24.75" PointY="10.875" />
+        <EntityTypeShape EntityType="SynzealModel.PermissionRecord" Width="1.5" PointX="12.75" PointY="76" />
+        <EntityTypeShape EntityType="SynzealModel.Picture" Width="1.5" PointX="15.75" PointY="19.375" />
+        <EntityTypeShape EntityType="SynzealModel.Poll" Width="1.5" PointX="10.5" PointY="47.375" />
+        <EntityTypeShape EntityType="SynzealModel.PollAnswer" Width="1.5" PointX="12.75" PointY="47.875" />
+        <EntityTypeShape EntityType="SynzealModel.PollVotingRecord" Width="1.5" PointX="15" PointY="54" />
+        <EntityTypeShape EntityType="SynzealModel.PredefinedProductAttributeValue" Width="1.5" PointX="18" PointY="37.625" />
+        <EntityTypeShape EntityType="SynzealModel.Product" Width="1.5" PointX="9.75" PointY="13.875" />
+        <EntityTypeShape EntityType="SynzealModel.Product_Category_Mapping" Width="1.5" PointX="12" PointY="25.375" />
+        <EntityTypeShape EntityType="SynzealModel.Product_Manufacturer_Mapping" Width="1.5" PointX="12" PointY="21.25" />
+        <EntityTypeShape EntityType="SynzealModel.Product_Picture_Mapping" Width="1.5" PointX="18" PointY="25" />
+        <EntityTypeShape EntityType="SynzealModel.Product_ProductAttribute_Mapping" Width="1.5" PointX="18" PointY="28.125" />
+        <EntityTypeShape EntityType="SynzealModel.Product_SpecificationAttribute_Mapping" Width="1.5" PointX="15" PointY="33.5" />
+        <EntityTypeShape EntityType="SynzealModel.ProductAttribute" Width="1.5" PointX="15.75" PointY="38" />
+        <EntityTypeShape EntityType="SynzealModel.ProductAttributeCombination" Width="1.5" PointX="12" PointY="79.375" />
+        <EntityTypeShape EntityType="SynzealModel.ProductAttributeValue" Width="1.5" PointX="20.25" PointY="28.125" />
+        <EntityTypeShape EntityType="SynzealModel.ProductReview" Width="1.5" PointX="12" PointY="65.25" />
+        <EntityTypeShape EntityType="SynzealModel.ProductReviewHelpfulness" Width="1.5" PointX="14.25" PointY="73" />
+        <EntityTypeShape EntityType="SynzealModel.ProductTag" Width="1.5" PointX="12" PointY="73" />
+        <EntityTypeShape EntityType="SynzealModel.ProductTemplate" Width="1.5" PointX="5.75" PointY="24.875" />
+        <EntityTypeShape EntityType="SynzealModel.ProductWarehouseInventory" Width="1.5" PointX="15" PointY="23.875" />
+        <EntityTypeShape EntityType="SynzealModel.QueuedEmail" Width="1.5" PointX="20" PointY="14.125" />
+        <EntityTypeShape EntityType="SynzealModel.RecurringPayment" Width="1.5" PointX="20.25" PointY="80.75" />
+        <EntityTypeShape EntityType="SynzealModel.RecurringPaymentHistory" Width="1.5" PointX="22.5" PointY="81.375" />
+        <EntityTypeShape EntityType="SynzealModel.RelatedProduct" Width="1.5" PointX="24.75" PointY="14.875" />
+        <EntityTypeShape EntityType="SynzealModel.ReturnRequest" Width="1.5" PointX="12" PointY="120.875" />
+        <EntityTypeShape EntityType="SynzealModel.RewardPointsHistory" Width="1.5" PointX="23.25" PointY="61.5" />
+        <EntityTypeShape EntityType="SynzealModel.Rfq" Width="1.5" PointX="24.75" PointY="23.875" />
+        <EntityTypeShape EntityType="SynzealModel.ScheduleTask" Width="1.5" PointX="25.75" PointY="17.875" />
+        <EntityTypeShape EntityType="SynzealModel.SearchTerm" Width="1.5" PointX="26.75" PointY="0.875" />
+        <EntityTypeShape EntityType="SynzealModel.Setting" Width="1.5" PointX="26.75" PointY="3.875" />
+        <EntityTypeShape EntityType="SynzealModel.Shipment" Width="1.5" PointX="20.25" PointY="77.125" />
+        <EntityTypeShape EntityType="SynzealModel.ShipmentItem" Width="1.5" PointX="22.5" PointY="77.5" />
+        <EntityTypeShape EntityType="SynzealModel.ShippingByWeight" Width="1.5" PointX="26.75" PointY="6.875" />
+        <EntityTypeShape EntityType="SynzealModel.ShippingMethod" Width="1.5" PointX="0.75" PointY="51.125" />
+        <EntityTypeShape EntityType="SynzealModel.ShoppingCartItem" Width="1.5" PointX="12" PointY="57.125" />
+        <EntityTypeShape EntityType="SynzealModel.SpecificationAttribute" Width="1.5" PointX="10.5" PointY="84.125" />
+        <EntityTypeShape EntityType="SynzealModel.SpecificationAttributeOption" Width="1.5" PointX="12.75" PointY="84" />
+        <EntityTypeShape EntityType="SynzealModel.StateProvince" Width="1.5" PointX="5.25" PointY="76.375" />
+        <EntityTypeShape EntityType="SynzealModel.Store" Width="1.5" PointX="14.75" PointY="10.125" />
+        <EntityTypeShape EntityType="SynzealModel.StoreMapping" Width="1.5" PointX="17" PointY="10.75" />
+        <EntityTypeShape EntityType="SynzealModel.SystemLog" Width="1.5" PointX="26.75" PointY="11.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_AdditionalTest" Width="1.5" PointX="26.75" PointY="21.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Bug" Width="1.5" PointX="22.75" PointY="27.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_CartRfq" Width="1.5" PointX="24.75" PointY="27.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_CartRFQ_Product" Width="1.5" PointX="28.75" PointY="0.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Category_Price" Width="1.5" PointX="28.75" PointY="3.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_CategoryMaster" Width="1.5" PointX="28.75" PointY="6.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_CategoryMasterRange" Width="1.5" PointX="24.75" PointY="30.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_ChildCOA" Width="1.5" PointX="3" PointY="18.375" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Clientremark" Width="1.5" PointX="34.5" PointY="22.25" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_ClubQuote" Width="1.5" PointX="34.5" PointY="25.5" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_CompanyAddress" Width="1.5" PointX="30" PointY="50" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_CompanyList" Width="1.5" PointX="27.75" PointY="25.25" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Courier" Width="1.5" PointX="0.75" PointY="5.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Currency" Width="1.5" PointX="28.75" PointY="12.875" />
+        <EntityTypeShape EntityType="SynzealModel.Sz_DatabaseBackup" Width="1.5" PointX="30.75" PointY="0.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_DeleteRetest" Width="1.5" PointX="32.75" PointY="0.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_EmailSuggestion" Width="1.5" PointX="30" PointY="54.125" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Inventory" Width="1.5" PointX="12.75" PointY="11.5" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_InventoryLog" Width="1.5" PointX="17.75" PointY="32.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Invoice" Width="1.5" PointX="20.75" PointY="32.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_InvoiceData" Width="1.5" PointX="14.75" PointY="1.25" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_InvoiceDetailsData" Width="1.5" PointX="17" PointY="2.125" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_InvoiceDocument" Width="1.5" PointX="5.75" PointY="33.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Log" Width="1.5" PointX="34.75" PointY="0.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_MasterCOA" Width="1.5" PointX="0.75" PointY="25.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Meeting" Width="1.5" PointX="26.75" PointY="35.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_NameMaster" Width="1.5" PointX="36.75" PointY="0.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Notification" Width="1.5" PointX="36.75" PointY="6.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_PerformaInvoice" Width="1.5" PointX="36.75" PointY="9.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_PerformaInvoiceDetailsData" Width="1.5" PointX="36.75" PointY="17.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Physicalstate" Width="1.5" PointX="11.75" PointY="28.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Popup" Width="1.5" PointX="5" PointY="1.25" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_PopupGroup" Width="1.5" PointX="2.75" PointY="2.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_PopupGroupEmailList" Width="1.5" PointX="5" PointY="4.75" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Price" Width="1.5" PointX="22.75" PointY="36.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_PriceList" Width="1.5" PointX="12" PointY="34.625" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_ProductScheme" Width="1.5" PointX="12" PointY="31.125" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Project" Width="1.5" PointX="12.75" PointY="7.375" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_ProjectDetail" Width="1.5" PointX="15" PointY="27.625" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_PRRequest" Width="1.5" PointX="36.75" PointY="23.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_PurchaseRFQ" Width="1.5" PointX="28.75" PointY="36.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_PurchaseSupplierCatalogue" Width="1.5" PointX="36.75" PointY="31.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Query" Width="1.5" PointX="36.75" PointY="35.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_QueryModule" Width="1.5" PointX="38.75" PointY="0.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Quotation" Width="1.5" PointX="30" PointY="17.625" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_QuotationDetail" Width="1.5" PointX="32.25" PointY="9" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_QuotationDetailLog" Width="1.5" PointX="5.75" PointY="37.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_QuotationPDF" Width="1.5" PointX="32.25" PointY="3.625" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_QuoteDetail_Correctionlog" Width="1.5" PointX="34.5" PointY="18.75" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_QuoteDetailForm" Width="1.5" PointX="34.5" PointY="28" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_QuoteDetailPrice" Width="1.5" PointX="34.5" PointY="47" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_QuoteDetails_Form" Width="1.5" PointX="38.75" PointY="10.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_QuoteDetailsComment" Width="1.5" PointX="34.5" PointY="9.625" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_QuoteDetailsControlSubstance" Width="1.5" PointX="34.5" PointY="6.5" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_QuoteSummary" Width="1.5" PointX="38.75" PointY="13.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_ReactionMatrix" Width="1.5" PointX="34.5" PointY="13.125" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Retest" Width="1.5" PointX="38.75" PointY="17.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_SampleReason" Width="1.5" PointX="30.75" PointY="6.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_SampleRequest" Width="1.5" PointX="2.75" PointY="11.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_SampleRequestDetail" Width="1.5" PointX="5" PointY="11.125" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_SAPCASNo" Width="1.5" PointX="38.75" PointY="21.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_SAPProjectNameData" Width="1.5" PointX="38.75" PointY="24.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_SAPRawMaterial" Width="1.5" PointX="38.75" PointY="27.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_ScientistStatus" Width="1.5" PointX="38.75" PointY="33.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Slogan" Width="1.5" PointX="0.75" PointY="0.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_SolutionModule" Width="1.5" PointX="38.75" PointY="36.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Survey" Width="1.5" PointX="40.75" PointY="0.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_SystemNotification" Width="1.5" PointX="40.75" PointY="11.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_TempQuickAdd" Width="1.5" PointX="14.75" PointY="40.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_TempQuotationDetail" Width="1.5" PointX="40.75" PointY="15.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_Terms" Width="1.5" PointX="40.75" PointY="21.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_UserDashboard" Width="1.5" PointX="40.75" PointY="24.875" />
+        <EntityTypeShape EntityType="SynzealModel.SZ_UserManagement" Width="1.5" PointX="12" PointY="117.25" />
+        <EntityTypeShape EntityType="SynzealModel.TaxCategory" Width="1.5" PointX="24.75" PointY="40.875" />
+        <EntityTypeShape EntityType="SynzealModel.TaxRate" Width="1.5" PointX="40.75" PointY="29.875" />
+        <EntityTypeShape EntityType="SynzealModel.TierPrice" Width="1.5" PointX="20.25" PointY="69.75" />
+        <EntityTypeShape EntityType="SynzealModel.Topic" Width="1.5" PointX="40.75" PointY="33.875" />
+        <EntityTypeShape EntityType="SynzealModel.TopicTemplate" Width="1.5" PointX="40.75" PointY="39.875" />
+        <EntityTypeShape EntityType="SynzealModel.UrlRecord" Width="1.5" PointX="5.75" PointY="41.875" />
+        <EntityTypeShape EntityType="SynzealModel.Vendor" Width="1.5" PointX="16.75" PointY="41.875" />
+        <EntityTypeShape EntityType="SynzealModel.Warehouse" Width="1.5" PointX="12.75" PointY="18" />
+        <EntityTypeShape EntityType="SynzealModel.QuotationAndDetailsView" Width="1.5" PointX="20.75" PointY="41.875" />
+        <EntityTypeShape EntityType="SynzealModel.QuoteandDetailsview" Width="1.5" PointX="36.75" PointY="41.875" />
+        <AssociationConnector Association="SynzealModel.AclRecord_CustomerRole" />
+        <AssociationConnector Association="SynzealModel.ActivityLog_ActivityLogType" />
+        <AssociationConnector Association="SynzealModel.ActivityLog_Customer" />
+        <AssociationConnector Association="SynzealModel.Address_Country" />
+        <AssociationConnector Association="SynzealModel.Address_StateProvince" />
+        <AssociationConnector Association="SynzealModel.Affiliate_Address" />
+        <AssociationConnector Association="SynzealModel.Customer_BillingAddress" />
+        <AssociationConnector Association="SynzealModel.Customer_ShippingAddress" />
+        <AssociationConnector Association="SynzealModel.Order_BillingAddress" />
+        <AssociationConnector Association="SynzealModel.Order_ShippingAddress" />
+        <AssociationConnector Association="SynzealModel.AddressAttributeValue_AddressAttribute" />
+        <AssociationConnector Association="SynzealModel.BackInStockSubscription_Customer" />
+        <AssociationConnector Association="SynzealModel.BackInStockSubscription_Product" />
+        <AssociationConnector Association="SynzealModel.BlogComment_BlogPost" />
+        <AssociationConnector Association="SynzealModel.BlogComment_Customer" />
+        <AssociationConnector Association="SynzealModel.BlogPost_Language" />
+        <AssociationConnector Association="SynzealModel.ProductCategory_Category" />
+        <AssociationConnector Association="SynzealModel.CheckoutAttributeValue_CheckoutAttribute" />
+        <AssociationConnector Association="SynzealModel.StateProvince_Country" />
+        <AssociationConnector Association="SynzealModel.ExternalAuthenticationRecord_Customer" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_UserManagement_Customer" />
+        <AssociationConnector Association="SynzealModel.ForumPost_Customer" />
+        <AssociationConnector Association="SynzealModel.ForumSubscription_Customer" />
+        <AssociationConnector Association="SynzealModel.ForumTopic_Customer" />
+        <AssociationConnector Association="SynzealModel.Log_Customer" />
+        <AssociationConnector Association="SynzealModel.NewsComment_Customer" />
+        <AssociationConnector Association="SynzealModel.Order_Customer" />
+        <AssociationConnector Association="SynzealModel.PollVotingRecord_Customer" />
+        <AssociationConnector Association="SynzealModel.PrivateMessage_FromCustomer" />
+        <AssociationConnector Association="SynzealModel.PrivateMessage_ToCustomer" />
+        <AssociationConnector Association="SynzealModel.ProductReview_Customer" />
+        <AssociationConnector Association="SynzealModel.ReturnRequest_Customer" />
+        <AssociationConnector Association="SynzealModel.RewardPointsHistory_Customer" />
+        <AssociationConnector Association="SynzealModel.ShoppingCartItem_Customer" />
+        <AssociationConnector Association="SynzealModel.CustomerAttributeValue_CustomerAttribute" />
+        <AssociationConnector Association="SynzealModel.TierPrice_CustomerRole" />
+        <AssociationConnector Association="SynzealModel.Discount_DiscountRequirements" />
+        <AssociationConnector Association="SynzealModel.DiscountUsageHistory_Discount" />
+        <AssociationConnector Association="SynzealModel.DiscountUsageHistory_Order" />
+        <AssociationConnector Association="SynzealModel.QueuedEmail_EmailAccount" />
+        <AssociationConnector Association="SynzealModel.Forum_ForumGroup" />
+        <AssociationConnector Association="SynzealModel.ForumTopic_Forum" />
+        <AssociationConnector Association="SynzealModel.ForumPost_ForumTopic" />
+        <AssociationConnector Association="SynzealModel.GiftCard_PurchasedWithOrderItem" />
+        <AssociationConnector Association="SynzealModel.GiftCardUsageHistory_GiftCard" />
+        <AssociationConnector Association="SynzealModel.GiftCardUsageHistory_UsedWithOrder" />
+        <AssociationConnector Association="SynzealModel.FK_Group_Newsletter_Map_Group" />
+        <AssociationConnector Association="SynzealModel.FK_Group_Newsletter_Map_Newsletter" />
+        <AssociationConnector Association="SynzealModel.LocaleStringResource_Language" />
+        <AssociationConnector Association="SynzealModel.LocalizedProperty_Language" />
+        <AssociationConnector Association="SynzealModel.NewsItem_Language" />
+        <AssociationConnector Association="SynzealModel.Poll_Language" />
+        <AssociationConnector Association="SynzealModel.ProductManufacturer_Manufacturer" />
+        <AssociationConnector Association="SynzealModel.NewsComment_NewsItem" />
+        <AssociationConnector Association="SynzealModel.OrderItem_Order" />
+        <AssociationConnector Association="SynzealModel.OrderNote_Order" />
+        <AssociationConnector Association="SynzealModel.RecurringPayment_InitialOrder" />
+        <AssociationConnector Association="SynzealModel.RewardPointsHistory_UsedWithOrder" />
+        <AssociationConnector Association="SynzealModel.Shipment_Order" />
+        <AssociationConnector Association="SynzealModel.OrderItem_Product" />
+        <AssociationConnector Association="SynzealModel.ProductPicture_Picture" />
+        <AssociationConnector Association="SynzealModel.PollAnswer_Poll" />
+        <AssociationConnector Association="SynzealModel.PollVotingRecord_PollAnswer" />
+        <AssociationConnector Association="SynzealModel.PredefinedProductAttributeValue_ProductAttribute" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_PriceList_Product" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_ProductScheme_Product" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_ProjectDetail_Product" />
+        <AssociationConnector Association="SynzealModel.ProductAttributeCombination_Product" />
+        <AssociationConnector Association="SynzealModel.ProductAttributeMapping_Product" />
+        <AssociationConnector Association="SynzealModel.ProductCategory_Product" />
+        <AssociationConnector Association="SynzealModel.ProductManufacturer_Product" />
+        <AssociationConnector Association="SynzealModel.ProductPicture_Product" />
+        <AssociationConnector Association="SynzealModel.ProductReview_Product" />
+        <AssociationConnector Association="SynzealModel.ProductSpecificationAttribute_Product" />
+        <AssociationConnector Association="SynzealModel.ProductWarehouseInventory_Product" />
+        <AssociationConnector Association="SynzealModel.ShoppingCartItem_Product" />
+        <AssociationConnector Association="SynzealModel.TierPrice_Product" />
+        <AssociationConnector Association="SynzealModel.ProductAttributeMapping_ProductAttribute" />
+        <AssociationConnector Association="SynzealModel.ProductAttributeValue_ProductAttributeMapping" />
+        <AssociationConnector Association="SynzealModel.ProductSpecificationAttribute_SpecificationAttributeOption" />
+        <AssociationConnector Association="SynzealModel.ProductReviewHelpfulness_ProductReview" />
+        <AssociationConnector Association="SynzealModel.ProductWarehouseInventory_Warehouse" />
+        <AssociationConnector Association="SynzealModel.RecurringPaymentHistory_RecurringPayment" />
+        <AssociationConnector Association="SynzealModel.ShipmentItem_Shipment" />
+        <AssociationConnector Association="SynzealModel.SpecificationAttributeOption_SpecificationAttribute" />
+        <AssociationConnector Association="SynzealModel.StoreMapping_Store" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_ChildCOA_SZ_MasterCOA" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_Clientremark_SZ_QuotationDetail" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_ClubQuote_SZ_QuotationDetail" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_CompanyAddress_SZ_CompanyList" />
+        <AssociationConnector Association="SynzealModel.FK__SZ_Quotat__Compa__00750D23" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_EmailSuggestion_SZ_CompanyList" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_ProjectDetail_SZ_Inventory" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_InvoiceDetailsData_SZ_InvoiceData" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_Popup_SZ_PopupGroup" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_PopupGroupEmailList_SZ_PopupGroup" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_ProjectDetail_SZ_Project" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_QuotationDetail_SZ_Quotation" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_QuotationPDF_SZ_Quotation" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_QuoteDetail_Correctionlog_SZ_QuotationDetail" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_QuoteDetailForm_SZ_QuotationDetail" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_QuoteDetailPrice_SZ_QuotationDetail" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_QuoteDetailsComment_SZ_QuotationDetail" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_QuoteDetailsControlSubstance_SZ_QuotationDetail" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_ReactionMatrix_SZ_QuotationDetail" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_SampleRequestDetail_SZ_SampleRequest" />
+        <AssociationConnector Association="SynzealModel.FK_SZ_Slogan_SZ_Slogan" />
+        <AssociationConnector Association="SynzealModel.Customer_CustomerRole_Mapping" />
+        <AssociationConnector Association="SynzealModel.CustomerAddresses" />
+        <AssociationConnector Association="SynzealModel.Discount_AppliedToCategories" />
+        <AssociationConnector Association="SynzealModel.Discount_AppliedToManufacturers" />
+        <AssociationConnector Association="SynzealModel.Discount_AppliedToProducts" />
+        <AssociationConnector Association="SynzealModel.PermissionRecord_Role_Mapping" />
+        <AssociationConnector Association="SynzealModel.Product_ProductTag_Mapping" />
+        <AssociationConnector Association="SynzealModel.ShippingMethodRestrictions" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

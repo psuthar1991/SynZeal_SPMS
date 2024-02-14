@@ -1,0 +1,312 @@
+﻿@{
+    ViewBag.Title = "ManageProjectDetails";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Newtonsoft.Json
+@model Synzeal_Inventory.Entity.SZ_ProjectDetail
+
+<div class="row-fluid">
+    <div class="span6">
+        <div class="widget-box">
+            <div class="widget-title">
+                <span class="icon"> <i class="icon-align-justify"></i> </span>
+                <h5>Edit Project Details - @Model.Product.Sku</h5>
+            </div>
+            <div style="padding:5px 30px;color:Red;font-size:15px;text-align:right" id="errorMsg">
+
+            </div>
+            <div class="widget-content nopadding">
+                @using (Html.BeginForm("ManageProjectDetails", "Form", FormMethod.Post, new { enctype = "multipart/form-data", @id = "DetailProject", @class = "form-horizontal" }))
+                {
+                    <div class="control-group">
+                        <label class="control-label">Batch No :</label>
+                        <div class="controls">
+                            @Html.DropDownListFor(x => x.BatchId, ViewBag.BatchList as List<SelectListItem>, new { @class = "span11" })
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Batch Qty :</label>
+                        <div class="controls">
+                            <div id="batchqty" style="margin-top: 6px;">@ViewBag.batchQty</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">No Of Pack :</label>
+                        <div class="controls">
+                            @Html.HiddenFor(model => model.Id)
+                            @Html.HiddenFor(model => model.ProjectId)
+                            @Html.HiddenFor(model => model.ProductId)
+                            <input type="text" id="NoOfPack" name="NoOfPack" class="span11" value="@Model.NoOfPack" required pattern="[0-9.]+" autocomplete="off" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Pack Size :</label>
+                        <div class="controls">
+                            <input type="text" id="PackSize" name="PackSize" class="span11" value="@Model.PackSize" required pattern="[0-9.]+" autocomplete="off" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Total Quantity :</label>
+                        <div class="controls">
+                            <input type="text" id="Qty" name="Qty" class="span11" value="@Model.Qty" required pattern="[0-9.]+" autocomplete="off" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Scientist :</label>
+                        <div class="controls">
+                            <input type="text" id="Scientist" name="Scientist" class="span11" value="@Model.Scientist" required />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Schedule Dispatch :</label>
+                        <div class="controls">
+                            <input type="text" id="ScheduleDispatch" name="ScheduleDispatch" class="span11" value="@Model.ScheduleDispatch" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Lead Time :</label>
+                        <div class="controls">
+                            <input type="text" id="LeadTime" name="LeadTime" class="span11" value="@Model.LeadTime" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Label Requirement :</label>
+                        <div class="controls">
+                            <input type="text" id="LabelRequirement" name="LabelRequirement" class="span11" value="@Model.LabelRequirement" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Data Required :</label>
+                        <div class="controls">
+                            <select id="DataRequired" name="DataRequired" class="span11">
+                                <option value="COA, Mass, HPLC, NMR">COA, Mass, HPLC, 1H NMR </option>
+                                <option value="COA, IR, Mass, HPLC, NMR">COA, IR, Mass, HPLC, 1H NMR</option>
+                                <option value="COA, IR, Mass, HPLC, NMR, TGA">COA, IR, Mass, HPLC, 1H NMR, TGA</option>
+                                <option value="COA, IR, Mass, HPLC, NMR, CMR">COA, IR, Mass, HPLC, 1H NMR, 13C NMR</option>
+                                <option value="COA, IR, Mass, HPLC, NMR, CMR, TGA">COA, IR, Mass, HPLC, 1H NMR, 13C NMR, TGA</option>
+                                <option value="COA, IR, Mass, HPLC, NMR, CMR, DEPT">COA, IR, Mass, HPLC, 1H NMR, 13C NMR, DEPT</option>
+                                <option value="COA, IR, Mass, HPLC, NMR, CMR, DEPT, TGA">COA, IR, Mass, HPLC, 1H NMR, 13C NMR, DEPT, TGA</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            @*<input type="text" id="DataRequired" name="DataRequired" class="span11" value="@Model.DataRequired" />*@
+                        </div>
+                    </div>
+                    <div class="control-group" id="divOthers" style="display: none">
+                        <label class="control-label">Other Value :</label>
+                        <div class="controls">
+                            <input type="text" id="Othervalue" name="Othervalue" class="span11" value="@Model.Othervalue" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Project Type :</label>
+                        <div class="controls">
+                            <select id="ProjectType" name="ProjectType" class="span11">
+                                <option value="">--Select--</option>
+                                <option value="Custom">Custom</option>
+                                <option value="Re-Synthesis">Re-Synthesis</option>
+                                <option value="Trading">Trading</option>
+                                <option value="In Stock">In Stock</option>
+                                <option value="Service">Service</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="control-group">
+                        <label class="control-label">Project Update :</label>
+                        <div class="controls">
+                            <input type="text" id="Remark" name="Remark" class="span11" value="@Model.Remark" />
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-success" onclick="return validation()">Save</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+
+    <div class="span6">
+        <div class="widget-box">
+            <div class="widget-title">
+                <span class="icon"> <i class="icon-align-justify"></i> </span>
+                <h5>Product Info</h5>
+            </div>
+            <div class="widget-content nopadding">
+                @if (ViewBag.ProductModel != null)
+                {
+                    var productmodel = (Synzeal_Inventory.Models.ProductDetailsModel)ViewBag.ProductModel;
+                    <form class="form-horizontal">
+                        <div class="control-group">
+                            <label class="control-label">Product Name :</label>
+                            <div class="controls" style="font-size: 16px;font-weight: bold;">
+                                @productmodel.Name
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Product Image :</label>
+                            <div class="controls">
+                                <img src="@productmodel.DefaultPictureModel.ImageUrl" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">CAS # :</label>
+                            <div class="controls">
+                                @productmodel.ManufacturerPartNumber
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">SZ-Catalog # :</label>
+                            <div class="controls">
+                                @productmodel.Sku
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Molecular Weigth :</label>
+                            <div class="controls">
+                                @productmodel.MolecularWeight
+                            </div>
+                        </div>
+                    </form>
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#ScheduleDispatch').datepicker({ format: 'dd/mm/yyyy', autoclose: true, });
+
+    $('#DataRequired')
+        .change(function () {
+            var value = $(this).val();
+            if (value == 'Others') {
+                $('#divOthers').show();
+            } else {
+                $('#divOthers').hide();
+            }
+        });
+
+    $('#NoOfPack,#PackSize')
+        .keyup(function (evt) {
+            var NoOfPack = $('#NoOfPack').val();
+            var PackSize = $('#PackSize').val();
+            $('#productdetails').html("");
+            $('#Qty').val(parseInt(NoOfPack) * parseInt(PackSize));
+        });
+
+    $('#ProjectType').val('@Model.ProjectType');
+
+    function validation() {
+        if ($('#NoOfPack').val().trim() == "") {
+            alert('Please enter No Of Pack.');
+            return false;
+        }
+        if ($('#PackSize').val().trim() == "") {
+            alert('Please enter PackSize.');
+            return false;
+        }
+        if ($('#Qty').val().trim() == "") {
+            alert('Please enter Total Quantity.');
+            return false;
+        }
+        if ($('#Scientist').val().trim() == "") {
+            alert('Please enter Scientist.');
+            return false;
+        }
+        //if ($('#LeadTime').val().trim() == "") {
+        //    alert('Please enter Lead Time.');
+        //    return false;
+        //}
+        //if ($('#LabelRequirement').val().trim() == "") {
+        //    alert('Please enter Label Requirement .');
+        //    return false;
+        //}
+        //if ($('#ScheduleDispatch').val().trim() == "") {
+        //    alert('Please enter Schedule Dispatch.');
+        //    return false;
+        //}
+        //if ($('#text').val().trim() == "") {
+        //    alert('Please enter Project Update.');
+        //    return false;
+        //}
+        //if ($('#ProjectType').val().trim() == "") {
+        //    alert('Please enter Project Type .');
+        //    return false;
+        //}
+        //if ($('#ProjectType').val().trim() == "--Select--") {
+        //    alert('Please select Project Type .');
+        //    return false;
+        //}
+
+        @*$('#ScheduleDispatch').datepicker({ dateFormat: 'dd/mm/yy' });
+
+        $('#DataRequired')
+            .change(function () {
+                var value = $(this).val();
+                if (value == 'Others') {
+                    $('#divOthers').show();
+                } else {
+                    $('#divOthers').hide();
+                }
+            });
+
+        $('#NoOfPack,#PackSize')
+            .keyup(function (evt) {
+                var NoOfPack = $('#NoOfPack').val();
+                var PackSize = $('#PackSize').val();
+                $('#productdetails').html("");
+                $('#Qty').val(parseInt(NoOfPack) * parseInt(PackSize));
+            });
+
+        $('#ProjectType').val('@Model.ProjectType');*@
+
+
+        var formData = JSON.stringify($('#DetailProject').serializeObject());
+        var url = '@Url.Action("ManageProjectDetails", "Form")';
+        var results = _Ajax(url, formData, 'POST');
+        if (results.type == 'success') {
+            ProjectGrid("", false);
+            closeModal();
+            toastr.success(results.msg);
+        } else {
+            //swal("Something went wrong !!!");
+            $('#errorMsg').html(results.msg);
+        }
+    }
+
+</script>
+
+@if (!string.IsNullOrEmpty(Model.DataRequired))
+{
+    <text>
+        <script type="text/javascript">
+            var DataRequired = '@Model.DataRequired';
+            $('#DataRequired').val(DataRequired);
+            if (DataRequired == 'Others') {
+                $('#divOthers').show();
+            }
+
+           
+        </script>
+    </text>
+}
+<script type="text/javascript">
+ $("#BatchId").change(function () {
+                var batchid = $(this).val();
+                if (batchid != "")
+                    {
+                var url = '@Url.Action("GetQtyByBatchId", "Form")?id=' + batchid;
+                var results = _Ajax(url, {}, 'POST');
+                if (results.type == 'success') {
+                $("#batchqty").text(results.data);
+                }
+                } else {
+                $("#batchqty").text("0");
+
+                }
+                });
+</script>

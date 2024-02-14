@@ -1,0 +1,57 @@
+﻿@{
+    ViewBag.Title = "MSDS";
+    Layout = null;
+}
+
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Add New Company</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form role="form" id="frmMSDS">
+            <div class="box-body">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Product Name</label>
+                    <input type="text" class="form-control" id="productname" name="productname" placeholder="Product Name" required value="@ViewBag.productname">
+                    <input type="hidden" id="childcoaid" name="childcoaid" value="@ViewBag.childcoaid" />
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">CAS No</label>
+                    <input type="text" class="form-control" id="casno" name="casno" placeholder="CAS No" required value="@ViewBag.casno">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Chemical Name</label>
+                    <input type="text" class="form-control" id="chemicalname" name="chemicalname" placeholder="Chemical Name" required value="@ViewBag.chemicalname">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Synonyms</label>
+                    <input type="text" class="form-control" id="Synonyms" name="Synonyms" placeholder="Synonyms" required value="@ViewBag.Synonyms">
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Molecular Weight</label>
+                    <input type="text" class="form-control" id="molweight" name="molweight" placeholder="Molecular Weight" required value="@ViewBag.molweight">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Molecular Formula</label>
+                    <input type="text" class="form-control" id="molformula" name="molformula" placeholder="Molecular Formula" required value="@ViewBag.molformula">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Appearance</label>
+                    <input type="text" class="form-control" id="Appearance" name="Appearance" placeholder="Appearance" required value="@ViewBag.Appearance">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Physical State</label>
+                    <input type="text" class="form-control" id="Physicalstate" name="Physicalstate" placeholder="Physical State" required value="@ViewBag.Physicalstate">
+                </div>
+                <div class="form-group" style="text-align:right">
+                    <button type="button" onclick="Quote.addMSDSData()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

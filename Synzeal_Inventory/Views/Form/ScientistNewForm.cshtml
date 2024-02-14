@@ -1,0 +1,2453 @@
+﻿@{
+    ViewBag.Title = "ScientistForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using Synzeal_Inventory.Entity;
+@model List<SZ_QueryModule>
+@using Synzeal_Inventory.Models
+@{
+    string inhouseProjectType = Convert.ToString((int)EnumList.ProjectType.InHouse);
+    SynzealLiveEntities db = new SynzealLiveEntities();
+    var listItems = ViewBag.scientistItems as List<SelectListItem>;
+    int loop = 1;
+    int loopcnt = 1;
+}
+<section class="content-header">
+    <h1>
+        Product List :: Scientist Page
+    </h1>
+</section>
+<script src="//cdn.datatables.net/plug-ins/1.10.22/pagination/select.js"></script>
+<input type="hidden" id="hdnloginuserid" name="hdnloginuserid" value="@SessionCookieManagement.UserId" />
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                @*<div>
+                        <a href="/Form/ScientistForm" class="btn btn-primary" style="float:right">Old Scientist Form</a>
+                    </div>*@
+                <ul class="nav nav-tabs">
+                    @if (SessionCookieManagement.IsScientist)
+                    {
+                        <li class="active"><a data-toggle="tab" href="#noaction">NO ACTION (@ViewBag.NoActionCount)</a></li>
+                    }
+                    @if (SessionCookieManagement.IsScientist)
+                    {
+                        <li><a data-toggle="tab" href="#homedata" onclick="alldataloadtab()">ALL (@ViewBag.AllRecord)</a></li>
+                    }
+                    else
+                    {
+                        <li class="active"><a data-toggle="tab" href="#homedata" onclick="alldataloadtab()">ALL (@ViewBag.AllRecord)</a></li>
+                    }
+
+                    <li><a data-toggle="tab" href="#home" onclick="allloadtab()">NEW-SYN (@ViewBag.All)</a></li>
+                    <li><a data-toggle="tab" href="#tabreprocess" onclick="reprocesstab()">REPROCESS (@ViewBag.Reprocess)</a></li>
+                    <li><a data-toggle="tab" href="#tabqcapproval" onclick="qcApprovedtab()" data-tabname="qcapproval">QC APPROVAL  @*(@ViewBag.QcApproval)*@</a></li>
+
+                    <li><a data-toggle="tab" href="#tabinprocessquery" data-tabname="query">QUERY</a></li>
+                    @*<li><a data-toggle="tab" href="#tabinprocessquery" data-tabname="query">IN PROCESS QUERY</a></li>
+                    <li><a data-toggle="tab" href="#tabsolvedquery" data-tabname="query">SOLVED QUERY</a></li>*@
+                    <li><a data-toggle="tab" href="#menu1" data-tabname="completed" onclick="completedtab()">COMPLETED @*(@ViewBag.Completed)*@</a></li>
+                    <li><a data-toggle="tab" href="#tabholdt" onclick="holdtab()">HOLD (@ViewBag.Hold)</a></li>
+                    <li><a data-toggle="tab" href="#tabhold" onclick="cancelledtab()">CANCELLED (@ViewBag.Cancelled)</a></li>
+                    @*<li><a data-toggle="tab" href="#tabquery">QUERY</a></li>*@
+                    <li><a data-toggle="tab" href="#tabsynthesislog" onclick="synthesislogtab()">SYNTHESIS LOG (@ViewBag.SynthesisLog)</a></li>
+                    <li><a data-toggle="tab" href="#tablessqty" onclick="lessqtytab()">LESS QTY</a></li>
+                    <li><a data-toggle="tab" href="#tabscalup" onclick="scaleuptab()">IN-HOUSE (@ViewBag.Scaleup)</a></li>
+
+                </ul>
+                <div class="tab-content">
+                    @{
+                        string noactioncls = "active";
+                        string allactioncls = "";
+                        if (SessionCookieManagement.IsSubScientist)
+                        {
+                            noactioncls = "";
+                            allactioncls = "active";
+                        }
+                    }
+
+                    <div id="noaction" class="tab-pane fade in @noactioncls">
+                        <div class="box-body resizediv">
+                            <div>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Copyrecords('tblnoaction')">Copy</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveNoActionScientistForm()">Save All</a> <br />
+                            </div>
+                            <table id="tblnoaction" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="chkselectllnoaction" /></th>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th></th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Syn. Start Date</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Chemist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Explanation</th>
+                                        <th>Assigned Date</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Data Remark</th>
+                                        <th>Project</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="homedata" class="tab-pane fade in @allactioncls">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <div>
+                                <label style="float: left;margin-top: 7px;margin-right: 10px;">Sci. Filter: </label>
+                                @Html.DropDownList("filallrecordsubScientistName", (IEnumerable<SelectListItem>)ViewBag.scientistItems, "--Select--", new { @class = "fltscientist form-control", @style = "width: 15%; float: left; margin-right: 10px;" })
+
+                                <label style="float: left;margin-top: 7px;margin-right: 10px;">Status: </label>
+                                @Html.DropDownList("fltallscientiststatus", (IEnumerable<SelectListItem>)ViewBag.ActivityStatusItems, "--Select--", new { @class = "fltscientiststatus form-control", @style = "width: 15%;float: left;" })
+
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Copyrecords('alltbl')">Copy</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllRecordScientistForm()">Save All</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllRecordHold()">Hold</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="ReactionMatrix('alltbl')">Reaction Matrix</a><br />
+                            </div>
+                            <div class="clearfix"></div>
+                            <table id="alltbl" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="chkselectll" /></th>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th></th>
+                                        <th>Product Name</th>
+                                        <th>Upload</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>RAW Material</th>
+                                        <th>Syn. Start Date</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Chemist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>
+                                            Project Status
+                                        </th>
+                                        <th>Explanation</th>
+                                        <th>Assigned Date</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Data Remark</th>
+                                        <th>Project</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="home" class="tab-pane fade in ">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <div>
+                                <label style="float: left;margin-top: 7px;margin-right: 10px;">Sci. Filter: </label>
+                                @Html.DropDownList("filsubScientistName", (IEnumerable<SelectListItem>)ViewBag.scientistItems, "--Select--", new { @class = "fltscientist form-control", @style = "width: 15%;" })
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Copyrecords('example1')">Copy</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllScientistForm()">Save All</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllHold()">Hold</a><br />
+                            </div>
+                            <table id="example1" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="chkselectllhome" /></th>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th></th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Syn. Start Date</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Chemist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>
+                                            Project Status
+                                        </th>
+                                        <th>Explanation</th>
+                                        <th>Assigned Date</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Data Remark</th>
+                                        <th>Project</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabqcapproval" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <table id="tblqcapproval" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Syn. Start Date</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Qty</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabinprocessquery" class="tab-pane fade in">
+
+                        <div class="form-group" style="margin:8px 25px">
+                            <input type="radio" class="clsqueryradio" name="queryradio" value="inprocess" checked /> In Process
+                            <input type="radio" class="clsqueryradio" name="queryradio" value="solved" /> Solved
+                        </div>
+                        <div class="box-body resizediv" style="overflow:scroll;">
+                            <table class="table table-bordered table-striped dataTable no-footer" id="tblinprocessquery">
+                                <thead>
+                                    <tr>
+                                        <th width="1%">
+                                            #
+                                        </th>
+                                        <th>
+                                            Query Date
+                                        </th>
+                                        <th>
+                                            Query #
+                                        </th>
+                                        <th>
+                                            Sub Status
+                                        </th>
+
+                                        <th>
+                                            Product Name
+                                        </th>
+                                        <th>
+                                            CAS #
+                                        </th>
+                                        <th>
+                                            CAT #
+                                        </th>
+                                        <th>
+                                            Qty
+                                        </th>
+                                        <th>
+                                            Batch #
+                                        </th>
+                                        <th>SynZeal Remarks</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var k in Model.Where(x => x.IsScientistResolved == false || x.IsScientistResolved == null).ToList())
+                                    {
+                                        <tr id="tr_@k.Id">
+                                            <td>@loop</td>
+                                            <td>@k.CreatedDate.Value.ToShortDateString()</td>
+                                            <td>@k.QueryNo</td>
+                                            <td>@k.SubStatus</td>
+                                            <td>@k.ProductName</td>
+                                            <td>@k.CASNo</td>
+                                            <td>@k.CATNo</td>
+                                            <td>@k.Qty</td>
+                                            <td>@k.BatchNo</td>
+                                            <td>@k.SynzealRemark</td>
+                                            <td><a href="/Form/QuerySolution/@k.Id">Action</a></td>
+                                        </tr>
+                                        loop += 1;
+                                    }
+                                </tbody>
+                            </table>
+
+
+                            <table class="table table-bordered table-striped dataTable no-footer" id="tblsolvedquery">
+                                <thead>
+                                    <tr>
+                                        <th width="1%">
+                                            #
+                                        </th>
+                                        <th>
+                                            Query Date
+                                        </th>
+                                        <th>
+                                            Query #
+                                        </th>
+                                        <th>
+                                            Sub Status
+                                        </th>
+
+                                        <th>
+                                            Product Name
+                                        </th>
+                                        <th>
+                                            CAS #
+                                        </th>
+                                        <th>
+                                            CAT #
+                                        </th>
+                                        <th>
+                                            Qty
+                                        </th>
+                                        <th>
+                                            Batch #
+                                        </th>
+                                        <th>SynZeal Remarks</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var k in Model.Where(x => x.IsScientistResolved == true).ToList())
+                                    {
+                                        <tr id="tr_@k.Id">
+                                            <td>@loop</td>
+                                            <td>@k.CreatedDate.Value.ToShortDateString()</td>
+                                            <td>@k.QueryNo</td>
+                                            <td>@k.SubStatus</td>
+                                            <td>@k.ProductName</td>
+                                            <td>@k.CASNo</td>
+                                            <td>@k.CATNo</td>
+                                            <td>@k.Qty</td>
+                                            <td>@k.BatchNo</td>
+                                            <td>@k.SynzealRemark</td>
+                                            <td><a href="/Form/QuerySolution/@k.Id">Action</a></td>
+                                        </tr>
+
+                                        loopcnt += 1;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="menu1" class="tab-pane fade in">
+
+                        @if (SessionCookieManagement.IsScientist && !SessionCookieManagement.IsSubScientist)
+                        {
+                            <a href="/Form/ExportScientistData" style="float:right;margin-right:8px;" class="btn btn-primary">Export</a>
+                        }
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <table id="example2" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Syn. Start Date</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        @*<th>Status</th>*@
+                                        @*<th>Esti. Completion Date</th>*@
+
+                                        <th>Sci. Assi. Date</th>
+                                        <th>QC Approved Date</th>
+                                        <th>Batch No</th>
+                                        <th>Qty</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabscalup" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <div>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveAllScaleupScientistForm()">Save All</a> <br />
+                            </div>
+                            <table id="tblscalup" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Syn. Start Date</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Additional Batch No</th>
+                                        <th>Qty</th>
+                                        <th>Data Remark</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabholdt" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+
+                            <table id="tblholdt" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Syn. Start Date</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Additional Batch No</th>
+                                        <th>Qty</th>
+                                        <th>Data Remark</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabhold" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <table id="tblhold" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Syn. Start Date</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Hold Date</th>
+                                        <th>Batch No</th>
+                                        <th>Additional Batch No</th>
+                                        <th>Qty</th>
+                                        <th>Data Remark</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabquery" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <table id="tblquery" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th>Product Name</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Additional Batch No</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabsynthesislog" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <table id="tblsynthesislog" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Syn. Start Date</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Additional Batch No</th>
+                                        <th>Qty</th>
+                                        <th>Data Remark</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tablessqty" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <table id="tbllessqty" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        @*<th>Diff</th>*@
+                                        <th>Product Name</th>
+                                        @*<th>Qty</th>*@
+                                        <th>Less Batch</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        @*<th>Syn. Start Date</th>*@
+                                        <th>Sub Scientist</th>
+                                        @*<th>Lead-Time</th>
+        <th>Status</th>
+        <th>Esti. Completion Date</th>*@
+                                        <th>Batch No</th>
+                                        @*<th>Qty</th>*@
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+
+                    <div id="tabreprocess" class="tab-pane fade in">
+
+                        <!-- /.box-header -->
+                        <div class="box-body resizediv">
+                            <div>
+                                @Html.DropDownList("filreprocesssubScientistName", (IEnumerable<SelectListItem>)ViewBag.scientistItems, "--Select--", new { @class = "fltreprocessscientist form-control", @style = "width: 15%; float: left;" })
+
+                                <div style="background: #ffe6b3;    font-size: 16px; height: 16px; width: 25px;float: left;    margin: 6px 10px 0 10px;"></div><div style="float: left;    font-size: 16px;margin-top: 5px;"> Drying</div>
+                                <div style="background:#fff; border:1px solid #ececec; font-size: 16px; height: 16px; width: 25px;float: left;    margin: 6px 10px 0 10px;"></div><div style="float: left;    font-size: 16px;margin-top: 5px;"> Re-Synthesis</div>
+                                <div style="background: #ff9999;    font-size: 16px; height: 16px; width: 25px;float: left;    margin: 6px 10px 0 10px;"></div><div style="float: left;    font-size: 16px;margin-top: 5px;"> Re-Purification</div>
+
+
+
+                                @*<label style="float: left;margin-top: 7px;margin-right: 10px;">Sci. Filter: </label>
+                                    @Html.DropDownList("filsubScientistName", (IEnumerable<SelectListItem>)ViewBag.scientistItems, "--Select--", new { @class = "fltscientist form-control", @style = "width: 15%;" })*@
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;" class="btn btn-primary" onclick="Copyrecords('tblreprocess')">Copy</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveReprocessScientistForm()">Save All</a>
+                                <a href="javascript:void(0)" style="float:right;margin-right:8px;margin-bottom: 10px;" class="btn btn-primary" onclick="SaveReprocessHold()">Hold</a><br />
+                            </div>
+                            <div class="clearfix"></div>
+                            <table id="tblreprocess" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="chkselectllreprocess" /></th>
+                                        <th>#</th>
+                                        <th>Diff</th>
+                                        <th></th>
+                                        <th>Product Name</th>
+                                        <th>Qty</th>
+                                        <th>CAS No</th>
+                                        <th>CAT No</th>
+                                        <th>Syn. Start Date</th>
+                                        <th>Sub Scientist</th>
+                                        <th>Chemist</th>
+                                        <th>Lead-Time</th>
+                                        <th>Status</th>
+                                        <th>
+                                            Status
+                                        </th>
+                                        <th>Explanation</th>
+                                        <th>Assigned Date</th>
+                                        <th>Esti. Completion Date</th>
+                                        <th>Batch No</th>
+                                        <th>Data Remark</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!--<div id="tabreprocess" class="tab-pane fade in">-->
+                    <!-- /.box-header -->
+                    <!--<div class="box-body resizediv">
+                        <table id="tblreprocess" class="table table-condensed table-striped table-bordered  table-hover" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Diff</th>
+                                    <th>Product Name</th>
+                                    <th>Qty</th>
+                                    <th>CAS No</th>
+                                    <th>CAT No</th>
+                                    <th>Sub Scientist</th>
+                                    <th>Lead-Time</th>
+                                    <th>Status</th>
+                                    <th>Esti. Completion Date</th>
+                                    <th>Batch No</th>
+                                    <th>Qty</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>-->
+                    <!-- /.box-body -->
+                    <!--</div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+
+    function ReactionMatrix(tblname) {
+        var ids = [];
+        $("#" + tblname).find(".clssaveall ").each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one product');
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/LoadReactionMatrixPage',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#myModal').find('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $('#myModal').find(".modal-dialog").css("width", "1200px");
+                $('#myModal').find(".modal-footer").hide();
+            }
+        });
+    }
+    function explainationGenerate(id)
+    {
+        $.ajax({
+                url: '/Form/Addexplaination?id=' + id,
+                data: {},
+                type: 'GET',
+                traditional: true, // add this
+                dataType: 'json',
+                success: function (data) {
+                    $('#invoiceQueryModal .modal-body').html(data.html);
+                    $('#invoiceQueryModal').modal({ show: true });
+                }
+            });
+    }
+
+    function queryGenerate(id) {
+        $.ajax({
+            url: '/Form/AddQuery?id=' + id + '&sectionName=scientist',
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+            }
+        });
+    }
+
+    var tblExample1;
+    var tblnoaction;
+    var tblqc;
+    var tblcomplete;
+    var tblallrecord;
+    var allload = false;
+    var allrecordload = false;
+    var qcApprovedload = false;
+    var completedload = false;
+    var scaleupload = false;
+    var holdload = false;
+    var cancelledload = false;
+    var synthesislogload = false;
+    var lessqtyload = false;
+    var reprocessload = false;
+    function reprocesstab() {
+        if (reprocessload === false) {
+            tblreprocess = $('#tblreprocess').DataTable({
+                "searching": true,
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    reprocessload = true;
+                    calledExtra('tblreprocess');
+                },
+                "columnDefs": [],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+                },
+                "ajax": {
+                    "url": "../Form/LoadReProcessScientistData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.sciname = $("#filreprocesssubScientistName").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.ProjectType === "8") { // Repurification
+                        $('td', nRow).css('background-color', '#ff9999');
+                    }
+                    if (aData.ProjectType === "6") { // Drying
+                        $('td', nRow).css('background-color', '#ffe6b3');
+                    }
+                    if (aData.ProStatus === "47") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-status', data.Status);
+                    $(row).attr('data-protype', 'tr_' + data.ProjectType);
+                    $(row).attr('data-priority', data.IsPriority);
+                    if (data.FirstRow.indexOf('redcls') != -1) {
+                        $(row).attr('class', 'clsRow redcls');
+                    }
+                },
+                "columns": [
+                    { "data": "FirstRow" },
+                    { "data": "SrNo" },
+                    { "data": "DifficultyLevel", "name": "MoveProjectDateText" },
+                    { "data": "UploadSchemeEye" },
+                    { "data": "ProductName", "class": "clsproductname" },
+                    { "data": "Qty" },
+                    { "data": "CASNo" },
+                    { "data": "CATText", "name": "PONumber" },
+                    { "data": "SynStartDate", "name": "SynStartDate" },
+                    { "data": "SubScientistNameText", "name": "CompanyName" },
+                    { "data": "ChemistText", "orderable": false },
+                    { "data": "LeadTime", "orderable": false },
+                    { "data": "StatusText", "orderable": false },
+                    { "data": "ActivityStatusText", "name": "Attachment" },
+                    { "data": "Explaination", "orderable": false },
+                    { "data": "AssignDate", "orderable": false },
+                    { "data": "EstimateCompDate" },
+                    { "data": "AdditionalBatchNoText", "name": "CASNo" },
+                    { "data": "Remark", "name": "CATNo" },
+                    { "data": "ActionRow", "name": "Attachment" }
+                ]
+            });
+        }
+    }
+
+    function allloadtab() {
+        if (allload === false) {
+            tblExample1 = $('#example1').DataTable({
+                "searching": true,
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    allload = true;
+                    calledExtra();
+                },
+                "columnDefs": [],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadAllScientistData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.sciname = $("#home").find("#filsubScientistName").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.ProStatus === "47") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-status', data.Status);
+                    $(row).attr('data-protype', 'tr_' + data.ProjectType);
+                    $(row).attr('data-priority', data.IsPriority);
+                    if (data.FirstRow.indexOf('redcls') != -1) {
+                        $(row).attr('class', 'clsRow redcls');
+                    }
+                },
+                "columns": [
+                    { "data": "FirstRow" },
+                    { "data": "SrNo" },
+                    { "data": "DifficultyLevel", "name": "MoveProjectDateText" },
+                    { "data": "UploadSchemeEye"},
+                    { "data": "ProductName", "class": "clsproductname"  },
+                    { "data": "Qty" },
+                    { "data": "CASNo" },
+                    { "data": "CATText", "name": "PONumber" },
+                    { "data": "SynStartDate", "name": "SynStartDate" },
+                    { "data": "SubScientistNameText", "name": "CompanyName" },
+                    { "data": "ChemistText", "orderable": false },
+                    { "data": "LeadTime", "orderable": false },
+                    { "data": "StatusText", "orderable": false },
+                    { "data": "ActivityStatusText", "name": "Attachment" },
+                    { "data": "Explaination", "orderable": false },
+                    { "data": "AssignDate", "orderable": false },
+                    { "data": "EstimateCompDate" },
+                    { "data": "AdditionalBatchNoText", "name": "CASNo" },
+                    { "data": "Remark", "name": "CATNo" },
+                    { "data": "APIName", "name": "Attachment" }
+                ]
+            });
+        }
+    }
+
+
+    function alldataloadtab() {
+        if (allrecordload === false) {
+            tblallrecord = $('#alltbl').DataTable({
+                "searching": true,
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    allrecordload = true;
+                    calledExtra();
+                },
+                "columnDefs": [],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadAllRecordScientistData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                        d.sciname = $("#homedata").find("#filallrecordsubScientistName").val();
+                        d.scistatus = $("#homedata").find("#fltallscientiststatus").val();
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.ProStatus === "47") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-status', data.Status);
+                    $(row).attr('data-protype', 'tr_' + data.ProjectType);
+                    $(row).attr('data-priority', data.IsPriority);
+                    if (data.FirstRow.indexOf('redcls') != -1) {
+                        $(row).attr('class', 'clsRow redcls');
+                    }
+                },
+                "columns": [
+                    { "data": "FirstRow" },
+                    { "data": "SrNo" },
+                    { "data": "DifficultyLevel", "name": "MoveProjectDateText" },
+                    { "data": "UploadSchemeEye" },
+                    { "data": "ProductName", "class": "clsproductname" },
+                    { "data": "UploadScheme" },
+                    { "data": "Qty" },
+                    { "data": "CASNo" },
+                    { "data": "CATText", "name": "PONumber" },
+                    { "data": "SAPRawMaterial", "name": "SAPRawMaterial" },
+                    { "data": "SynStartDate", "name": "SynStartDate" },
+                    { "data": "SubScientistNameText", "name": "CompanyName" },
+                    { "data": "ChemistText", "orderable": false },
+                    { "data": "LeadTime", "orderable": false },
+                    { "data": "StatusText", "orderable": false },
+                    { "data": "ActivityStatusText", "name": "Attachment" },
+                    { "data": "Explaination", "orderable": false },
+                    { "data": "AssignDate", "orderable": false },
+                    { "data": "EstimateCompDate" },
+                    { "data": "AdditionalBatchNoText", "name": "CASNo" },
+                    { "data": "Remark", "name": "CATNo" },
+                    { "data": "APIName", "name": "Attachment" }
+                ]
+            });
+        }
+    }
+
+    function qcApprovedtab() {
+        if (qcApprovedload === false) {
+            tblqc = $('#tblqcapproval').DataTable({
+                "searching": true,
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    qcApprovedload = true;
+                    calledExtra();
+                },
+                "columnDefs": [],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadQCApprovalScientistData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.ProStatus === "47") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-status', data.Status);
+                    $(row).attr('data-protype', 'tr_' + data.ProjectType);
+                    $(row).attr('data-priority', data.IsPriority);
+                    if (data.FirstRow.indexOf('yellow') != -1) {
+                        $(row).attr('class', 'clsRow yellow');
+                    }
+                    if (data.FirstRow.indexOf('skyblue') != -1) {
+                        $(row).attr('class', 'clsRow skyblue');
+                    }
+                },
+                "columns": [
+                    { "data": "SrNo" },
+                    { "data": "DifficultyLevel", "name": "MoveProjectDateText" },
+                    { "data": "ProductName", "class": "clsproductname"  },
+                    { "data": "Qty" },
+                    { "data": "CASNo" },
+                    { "data": "CATText", "name": "PONumber" },
+                    { "data": "SynStartDate", "name": "SynStartDate" },
+                    { "data": "SubScientistNameText", "name": "CompanyName" },
+                    { "data": "LeadTime", "orderable": false },
+                    { "data": "ActivityStatusText", "name": "Attachment" },
+                    { "data": "EstimateCompDate" },
+                    { "data": "BatchNo", "name": "CASNo" },
+                    { "data": "Qty1", "name": "CATNo" },
+                    { "data": "ActionRow", "name": "Attachment" }
+                ]
+            });
+        }
+    }
+
+    function querytab() {
+
+    }
+
+    function completedtab() {
+        if (completedload === false) {
+            tblcomplete = $('#example2').DataTable({
+                "searching": true,
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    completedload = true;
+                    calledExtra();
+                },
+                "columnDefs": [],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadCompletedScientistData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.ProStatus === "47") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-status', data.Status);
+                    $(row).attr('data-protype', 'tr_' + data.ProjectType);
+                    $(row).attr('data-priority', data.IsPriority);
+                    if (data.FirstRow.indexOf('yellow') != -1) {
+                        $(row).attr('class', 'clsRow yellow');
+                    }
+                    if (data.FirstRow.indexOf('skyblue') != -1) {
+                        $(row).attr('class', 'clsRow skyblue');
+                    }
+                },
+                "columns": [
+                    { "data": "SrNo" },
+                    { "data": "DifficultyLevel", "name": "MoveProjectDateText" },
+                    { "data": "ProductName", "class": "clsproductname"  },
+                    { "data": "Qty" },
+                    { "data": "CASNo" },
+                    { "data": "CATText", "name": "PONumber" },
+                    { "data": "SynStartDate", "name": "SynStartDate" },
+                    { "data": "SubScientistNameText", "name": "CompanyName" },
+                    { "data": "LeadTime", "orderable": false },
+                    //{ "data": "ActivityStatusText", "name": "Attachment" },
+                    //{ "data": "EstimateCompDate" },
+
+
+                    { "data": "AssignDate", "name": "CASNo" },
+                    { "data": "QCApprovedDate", "name": "CATNo" },
+                    { "data": "AdditionalBatchNoText", "name": "CASNo" },
+                    { "data": "Qty1", "name": "CATNo" },
+                    { "data": "ActionRow", "name": "Attachment" }
+                ]
+            });
+        }
+    }
+
+    function scaleuptab() {
+        if (scaleupload === false) {
+            tblscaleup = $('#tblscalup').DataTable({
+                "searching": true,
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    scaleupload = true;
+                    calledExtra();
+                },
+                "columnDefs": [],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadScaleuploadScientistData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.ProStatus === "47") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-status', data.Status);
+                    $(row).attr('data-protype', 'tr_' + data.ProjectType);
+                    $(row).attr('data-priority', data.IsPriority);
+                },
+                "columns": [
+                    { "data": "FirstRow", "name": "Attachment" },
+                    { "data": "SrNo" },
+                    { "data": "DifficultyLevel", "name": "MoveProjectDateText" },
+                    { "data": "ProductName", "class": "clsproductname" },
+                    { "data": "Qty" },
+                    { "data": "CASNo" },
+                    { "data": "CATText", "name": "PONumber" },
+                    { "data": "SynStartDate", "name": "SynStartDate" },
+                    { "data": "SubScientistNameText", "name": "CompanyName" },
+                    { "data": "LeadTime", "orderable": false },
+                    { "data": "StatusText", "name": "Attachment" },
+                    { "data": "ActivityStatusText", "name": "Attachment" },
+                    { "data": "EstimateCompDate" },
+                    { "data": "AdditionalBatchNoText", "name": "CASNo" },
+                    { "data": "Qty1", "name": "CATNo" },
+                    { "data": "Remark", "name": "Attachment" },
+                ]
+            });
+        }
+    }
+
+    function holdtab()  {
+            if (holdload === false) {
+               var tblholdt = $('#tblholdt').DataTable({
+                "searching": true,
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                   "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    holdload = true;
+                    calledExtra();
+                },
+                "columnDefs": [],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadHoldScientistData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                    }
+                },
+                   "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                       if (aData.ProStatus === "47") {
+                           $('td', nRow).css('color', 'blue');
+                       }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-status', data.Status);
+                    $(row).attr('data-protype', 'tr_' + data.ProjectType);
+                    $(row).attr('data-priority', data.IsPriority);
+                },
+                "columns": [
+                    { "data": "SrNo" },
+                    { "data": "DifficultyLevel", "name": "MoveProjectDateText" },
+                    { "data": "ProductName", "class": "clsproductname" },
+                    { "data": "Qty" },
+                    { "data": "CASNo" },
+                    { "data": "CATText", "name": "PONumber" },
+                    { "data": "SynStartDate", "name": "SynStartDate" },
+                    { "data": "SubScientistNameText", "name": "CompanyName" },
+                    { "data": "LeadTime", "orderable": false },
+                    { "data": "ActivityStatusText", "name": "Attachment" },
+                    { "data": "EstimateCompDate" },
+                    { "data": "BatchCode", "name": "CASNo" },
+                    { "data": "AdditionalBatchNoText", "name": "CASNo" },
+                    { "data": "Qty1", "name": "CATNo" },
+                    { "data": "Remark", "name": "Attachment" },
+                    { "data": "ActionRow", "name": "ActionRow" }
+                ]
+            });
+        }
+        }
+
+    function cancelledtab()	 {
+        if (cancelledload === false) {
+            tblcomplete = $('#tblhold').DataTable({
+                "searching": true,
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    cancelledload = true;
+                    calledExtra();
+                },
+                "columnDefs": [],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadCancelledScientistData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.ProStatus === "47") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-status', data.Status);
+                    $(row).attr('data-protype', 'tr_' + data.ProjectType);
+                    $(row).attr('data-priority', data.IsPriority);
+                },
+                "columns": [
+                    { "data": "SrNo" },
+                    { "data": "DifficultyLevel", "name": "MoveProjectDateText" },
+                    { "data": "ProductName", "class": "clsproductname"  },
+                    { "data": "Qty" },
+                    { "data": "CASNo" },
+                    { "data": "CATText", "name": "PONumber" },
+                    { "data": "SynStartDate", "name": "SynStartDate" },
+                    { "data": "SubScientistNameText", "name": "CompanyName" },
+                    { "data": "LeadTime", "orderable": false },
+                    { "data": "ActivityStatusText", "name": "Attachment" },
+                    { "data": "EstimateCompDate" },
+                    { "data": "OnHoldDateText" },
+                    { "data": "BatchCode", "name": "CASNo" },
+                    { "data": "AdditionalBatchNoText", "name": "CASNo" },
+                    { "data": "Qty1", "name": "CATNo" },
+                    { "data": "Remark", "name": "Attachment" }
+                ]
+            });
+        }
+    }
+
+    function synthesislogtab() {
+        if (synthesislogload === false) {
+           var tblsynthesislog = $('#tblsynthesislog').DataTable({
+                "searching": true,
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+               "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    synthesislogload = true;
+                    calledExtra();
+                },
+                "columnDefs": [],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadSynthesislogScientistData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                    }
+                },
+               "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                   if (aData.ProStatus === "47") {
+                       $('td', nRow).css('color', 'blue');
+                   }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-status', data.Status);
+                    $(row).attr('data-protype', 'tr_' + data.ProjectType);
+                    $(row).attr('data-priority', data.IsPriority);
+                },
+                "columns": [
+                    { "data": "SrNo" },
+                    { "data": "ProductName", "class": "clsproductname" },
+                    { "data": "Qty" },
+                    { "data": "CASNo" },
+                    { "data": "CATText", "name": "PONumber" },
+                    { "data": "SynStartDate", "name": "SynStartDate" },
+                    { "data": "SubScientistNameText", "name": "CompanyName" },
+                    { "data": "LeadTime", "orderable": false },
+                    { "data": "ActivityStatusText", "name": "Attachment" },
+                    { "data": "EstimateCompDate" },
+                    { "data": "BatchCode", "name": "CASNo" },
+                    { "data": "AdditionalBatchNoText", "name": "CASNo" },
+                    { "data": "Qty1", "name": "CATNo" },
+                    { "data": "Remark", "name": "Attachment" }
+                ]
+            });
+        }
+    }
+
+    function lessqtytab(){
+        if (lessqtyload === false) {
+            tblcomplete = $('#tbllessqty').DataTable({
+                "searching": true,
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+                "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    lessqtyload = true;
+                //    calledExtra();
+                },
+                "columnDefs": [],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadLessQtyScientistData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                    }
+                },
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    if (aData.ProStatus === "47") {
+                        $('td', nRow).css('color', 'blue');
+                    }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-status', data.Status);
+                    $(row).attr('data-protype', 'tr_' + data.ProjectType);
+                    $(row).attr('data-priority', data.IsPriority);
+                },
+                "columns": [
+                    { "data": "SrNo" },
+                    //{ "data": "DifficultyLevel", "name": "MoveProjectDateText" },
+                    { "data": "ProductName", "class": "clsproductname"  },
+                     // { "data": "Qty" },
+                    { "data": "BatchCode" },
+                    { "data": "CASNo" },
+                    { "data": "CATText", "name": "PONumber" },
+                    /*{ "data": "SynStartDate", "name": "SynStartDate" },*/
+                    { "data": "SubScientistNameText", "name": "CompanyName" },
+                     // { "data": "LeadTime", "orderable": false },
+                     // { "data": "ActivityStatusText", "name": "Attachment" },
+                     // { "data": "EstimateCompDate" },
+                    { "data": "AdditionalBatchNoText", "name": "CASNo" },
+                    //{ "data": "AdditionalBatchNoText", "name": "CASNo" },
+                    /*{ "data": "Qty1", "name": "CATNo" }*/
+                ]
+            });
+        }
+    }
+
+    $(function () {
+        tblnoaction = $('#tblnoaction').DataTable({
+                "searching": true,
+                "ordering": false,
+                "scrollX": true,
+                "scrollY": "550px",
+                "sPaginationType": "listbox",
+                //"autoWidth" : false,
+                "processing": true, // for show progress bar
+                "serverSide": true, // for process server side
+                "filter": true, // this is for disable filter (search box)
+            "pageLength": 25,
+                "fnDrawCallback": function (oSettings) {
+                    calledExtra();
+                },
+                "columnDefs": [],
+                "language": { processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> ' },
+                "initComplete": function (settings, json) {
+
+                },
+                "ajax": {
+                    "url": "../Form/LoadNoActionScientistData",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": function (d) {
+                    }
+                },
+            "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                if (aData.ProStatus === "47") {
+                    $('td', nRow).css('color', 'blue');
+                }
+                },
+                "createdRow": function (row, data, dataIndex) {
+                    // Set the data-status attribute, and add a class
+                    $(row).attr('class', 'clsRow');
+                    $(row).attr('id', 'tr_' + data.QuoteDetailsId);
+                    $(row).attr('data-status', data.Status);
+                    $(row).attr('data-protype', 'tr_' + data.ProjectType);
+                    if (data.FirstRow.indexOf('redcls') != -1) {
+                        $(row).attr('class', 'clsRow redcls');
+                    }
+                    $(row).attr('data-priority', data.IsPriority);
+                },
+                "columns": [
+                    { "data": "FirstRow" },
+                    { "data": "SrNo" },
+                    { "data": "DifficultyLevel", "name": "MoveProjectDateText" },
+                    { "data": "UploadSchemeEye" },
+                    { "data": "ProductName", "class": "clsproductname" },
+                    { "data": "Qty" },
+                    { "data": "CASNo" },
+                    { "data": "CATText", "name": "PONumber" },
+                    { "data": "SynStartDate", "name": "SynStartDate" }, 
+                    { "data": "SubScientistNameText", "name": "CompanyName" },
+                    { "data": "ChemistText", "orderable": false },
+                    { "data": "LeadTime", "orderable": false },
+                    { "data": "StatusText", "orderable": false },
+                    { "data": "Explaination", "orderable": false },
+                    { "data": "AssignDate", "orderable": false },
+                    { "data": "EstimateCompDate" },
+                    { "data": "AdditionalBatchNoText", "name": "CASNo"},
+                    { "data": "Remark", "name": "CATNo"},
+                    { "data": "APIName", "name": "Attachment" }
+                ]
+            });
+        $(document).on("change", "#chkselectll", function () {
+            if ($(this).is(":checked")) {
+                $('#alltbl').find('.clssaveall').each(function () {
+                    $(this).prop("checked", true);
+                });
+            }
+            else {
+                $('#alltbl').find(".clssaveall").each(function () {
+                    $(this).prop("checked", false);
+                });
+            }
+        });
+        $(document).on("change", "#chkselectllhome", function () {
+            if ($(this).is(":checked")) {
+                $('#example1').find('.clssaveall').each(function () {
+                    $(this).prop("checked", true);
+                });
+            }
+            else {
+                $('#example1').find(".clssaveall").each(function () {
+                    $(this).prop("checked", false);
+                });
+            }
+        }); 
+        $(document).on("change", "#chkselectllnoaction", function () {
+            if ($(this).is(":checked")) {
+                $('#tblnoaction').find('.clssaveall').each(function () {
+                    $(this).prop("checked", true);
+                });
+            }
+            else {
+                $('#tblnoaction').find(".clssaveall").each(function () {
+                    $(this).prop("checked", false);
+                });
+            }
+        });
+        $(document).on("change", "#chkselectllreprocess", function () {
+            if ($(this).is(":checked")) {
+                $('#tblreprocess').find('.clssaveall').each(function () {
+                    $(this).prop("checked", true);
+                });
+            }
+            else {
+                $('#tblreprocess').find(".clssaveall").each(function () {
+                    $(this).prop("checked", false);
+                });
+            }
+        });
+    });
+
+
+    function calledExtra(tblName = "")
+    {
+        setTimeout(function () {
+                $('.datepicker').datepicker({
+                    format: 'dd/mm/yyyy'
+                });
+
+            $(".clsRow").each(function () {
+                    var priority = $(this).attr("data-priority");
+                    var status = $(this).attr("data-status");
+                    var protype = $(this).attr("data-protype");
+                    var detailsId = $(this).attr("id").replace("tr_", "");
+
+                    if (priority == "true") {
+                        $(this).find(".clsproductname").css("color", "red");
+                    }
+
+                    $("#scientistStatus_" + detailsId).val(status);
+                    var readytodeliverId = 0;
+                    $(".scientistStatusddl option").each(function () {
+                        var text = $(this).text();
+                        if (text === 'Ready for dispatch.') {
+                            readytodeliverId = $(this).val();
+                        }
+                    });
+
+                    $(".clsreviewscistatus").each(function () {
+                        var text = $(this).attr('data-value');
+                        if (text !== '' && text !== '30' && text !== '1' && text !== '36' && text !== '37' && text !== "null") {
+                            $(this).val(text);
+                        }
+                    });
+
+                //if (status === readytodeliverId && "tblreprocess" === tblName) {
+                //        $(this).find('input[type=text]').hide();
+                //        $(this).find('select').hide();
+                //        $(this).find('label').show();
+                //        $(this).find(".clsLast").hide();
+                //        $(this).find(".clsddl").show();
+                //}
+
+                $(this).find('.datepicker').each(function () {
+                    var dateValue = $(this).attr('data-value');
+                    if (dateValue !== '') {
+                        $(this).datepicker("setDate", dateValue);
+                    }
+                })
+
+                    //var dateValue = $(this).find('.datepicker').attr('data-value');
+                    //if (dateValue !== '') {
+                    //   $(this).find('.datepicker').datepicker("setDate", dateValue);
+                    //}
+                    if (protype === '@((int)EnumList.ProjectType.InHouse)') {
+                        $(this).css('background-color','#d7f5ff');
+                    }
+                    var hdnloginuserid = $("#hdnloginuserid").val();
+                    var selecteduserid = $("#subScientistName_" + detailsId).val();
+                    var nearestTableId = $(this).closest('table').attr("id");
+                    if (selecteduserid === hdnloginuserid) {
+                        var id = $("#subScientistName_" + detailsId).attr("id").replace("subScientistName_", "");
+                        $("#" + nearestTableId).find("#chemist_" + id).attr("readonly", false);
+                    }
+                    else {
+                        var id = $(this).attr("id").replace("subScientistName_", "");
+                        $("#" + nearestTableId).find("#chemist_" + id).attr("readonly", true);
+                    }
+
+                });
+
+                $(".scientist").each(function () {
+                    var scientstname = $(this).attr('subscientistname');
+                    var elementid = $(this).attr("id");
+                    $("#" + elementid).val(scientstname);
+                });
+                //FilterSciData($("#filsubScientistName").val());
+
+
+            }, 500);
+    }
+
+    $(document).ready(function () {
+        $('.datepicker').datepicker({
+            format: 'dd/mm/yyyy'
+        });
+
+        $(".clsRow").each(function () {
+            var status = $(this).attr("data-status");
+            var protype = $(this).attr("data-protype");
+            var detailsId = $(this).attr("id").replace("tr_", "");
+            $("#scientistStatus_" + detailsId).val(status);
+            var readytodeliverId = 0;
+            $(".scientistStatusddl option").each(function () {
+                var text = $(this).text();
+                if (text === 'Ready for dispatch.') {
+                    readytodeliverId = $(this).val();
+                }
+            });
+            if (status === readytodeliverId) {
+                $(this).find('input[type=text]').hide();
+                $(this).find('select').hide();
+                $(this).find('label').show();
+                $(this).find(".clsLast").hide(); $(this).find(".clsddl").show();
+            }
+
+
+            var dateValue = $(this).find('.datepicker').attr('data-value');
+            if (dateValue !== '') {
+                dateValue = dateValue.toString().replace(' 00:00:00', '');
+                $(this).find('.datepicker').datepicker("setDate", dateValue);
+            }
+            if (protype === '@((int)EnumList.ProjectType.InHouse)') {
+                $(this).css('background-color','#d7f5ff');
+            }
+        });
+
+        $(".secclsRow").each(function () {
+            var status = $(this).attr("data-status");
+            var protype = $(this).attr("data-protype");
+            var detailsId = $(this).attr("id").replace("tr_", "");
+            $("#secscientistStatus_" + detailsId).val(status);
+            var readytodeliverId = 0;
+            $(".scientistStatusddl option").each(function () {
+                var text = $(this).text();
+                if (text === 'Ready for dispatch.') {
+                    readytodeliverId = $(this).val();
+                }
+            });
+            if (status === readytodeliverId) {
+                $(this).find('input[type=text]').hide();
+                $(this).find('select').hide();
+                $(this).find('label').show();
+                $(this).find(".clsLast").hide(); $(this).find(".clsddl").show();
+            }
+            var dateValue = $(this).find('.datepicker').attr('data-value');
+            if (dateValue !== '') {
+                dateValue = dateValue.toString().replace(' 00:00:00', '');
+                $(this).find('.datepicker').datepicker("setDate", dateValue);
+            }
+            if (protype === '@((int)EnumList.ProjectType.InHouse)') {
+                $(this).css('background-color','#d7f5ff');
+            }
+        });
+
+        $(".thirdclsRow").each(function () {
+
+            var status = $(this).attr("data-status");
+            var protype = $(this).attr("data-protype");
+            var detailsId = $(this).attr("id").replace("tr_", "");
+            $('#tblscalup').find("#scientistStatus_" + detailsId).val(status);
+            var readytodeliverId = 0;
+            $('#tblscalup').find(".scientistStatusddl option").each(function () {
+                var text = $(this).text();
+                if (text === 'Ready for dispatch.') {
+                    readytodeliverId = $(this).val();
+                }
+            });
+            if (status === readytodeliverId) {
+                $(this).find('input[type=text]').hide();
+                $(this).find('select').hide();
+                $(this).find('label').show();
+                $(this).find(".clsLast").hide();
+                $(this).find(".clsddl").show();
+            }
+            var dateValue = $(this).find('.datepicker').attr('data-value');
+            if (dateValue !== '') {
+                dateValue = dateValue.toString().replace(' 00:00:00', '');
+                $(this).find('.datepicker').datepicker("setDate", dateValue);
+            }
+
+        });
+    });
+
+    function secSaveScientistProductDetails(id) {
+        var scStatus = $("#secscientistStatus_" + id).val();
+        var batchcode1 = $("#secbatchcode1_" + id).val();
+
+        var qty1 = $("#secqty1_" + id).val();
+        var batchcode2 = "";
+        var qty2 = "";
+        var esticompleteDate = $("#secesticompleteDate_" + id).val();
+        var subscientist = $("#secsubScientistName_" + id).val();
+        $.ajax({
+            url: '/Form/UpdateScientistProjectInfo',
+            data: {
+                scStatus: scStatus,
+                batchcode1: batchcode1,
+                qty1: qty1,
+                batchcode2: batchcode2,
+                qty2: qty2,
+                id: id,
+                esticompleteDate: esticompleteDate,
+                subscientist:subscientist
+            },
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have updated product information.");
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (scStatus === readytodeliverId) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+
+    function SaveScientistProductDetails(id) {
+
+        var scStatus = $("#scientistStatus_" + id).val();
+        var batchcode1 = $("#batchcode1_" + id).val();
+        var qty1 = $("#qty1_" + id).val();
+        var remark = $("#remark_" + id).val();
+        var batchcode2 = "";
+        var qty2 = "";
+        var esticompleteDate = $("#esticompleteDate_" + id).val();
+        $.ajax({
+            url: '/Form/UpdateScientistProjectInfo',
+            data: {
+                scStatus: scStatus,
+                batchcode1: batchcode1,
+                qty1: qty1,
+                batchcode2: batchcode2,
+                qty2: qty2,
+                id: id,
+                esticompleteDate: esticompleteDate,
+                remark:remark
+            },
+            type: 'POST',
+            success: function (data) {
+                toastr.success("You have updated product information.");
+                var readytodeliverId = 0;
+                $(".scientistStatusddl option").each(function () {
+                    var text = $(this).text();
+                    if (text === 'Ready for dispatch.') {
+                        readytodeliverId = $(this).val();
+                    }
+                });
+                if (scStatus === readytodeliverId) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    }
+
+    function SaveNoActionScientistForm() {
+
+        var count = 1;
+        var ids = [];
+        $('#tblnoaction').find('.clssaveall').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        $('#tblnoaction').find('.clssaveall').each(function () {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var scStatus = $('#tblnoaction').find("#scientistStatus_" + id).val();
+                var batchcode1 = $('#tblnoaction').find("#batchcode1_" + id).val();
+                var qty1 = $('#tblnoaction').find("#qty1_" + id).val();
+                var remark = $('#tblnoaction').find("#remark_" + id).val();
+                var reason = $('#tblnoaction').find("#reason_" + id).val();
+                var batchcode2 = "";
+                var qty2 = "";
+                var chemist = $('#tblnoaction').find("#chemist_" + id).val();
+                var esticompleteDate = $('#tblnoaction').find("#esticompleteDate_" + id).val();
+                var subscientist = $('#tblnoaction').find("#subScientistName_" + id).val();
+                var SynStartDate = $('#tblnoaction').find("#SynStartDate_" + id).val();
+                if (scStatus === "") {
+                    scStatus = null;
+                }
+                $.ajax({
+                    url: '/Form/UpdateScientistProjectInfo',
+                    data: {
+                        scStatus: scStatus,
+                        batchcode1: batchcode1,
+                        qty1: qty1,
+                        batchcode2: batchcode2,
+                        qty2: qty2,
+                        id: id,
+                        esticompleteDate: esticompleteDate,
+                        remark: remark,
+                        subscientist: subscientist,
+                        reason: reason,
+                        chemist: chemist,
+                        SynStartDate: SynStartDate,
+                        tabname:'scientist-NOACTION'
+                    },
+                    type: 'POST',
+                    success: function (data) {
+                        successSavenoactionDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function successSavenoactionDispatchAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product information.");
+
+            setTimeout(function () {
+                window.location.reload(true);
+            }, 2000);
+
+        }
+    }
+
+    function SaveReprocessScientistForm() {
+
+        var count = 1;
+        var ids = [];
+        $('#tblreprocess').find('.clssaveall').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        $('#tblreprocess').find('.clssaveall').each(function () {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var scStatus = $('#tblreprocess').find("#scientistStatus_" + id).val();
+                var batchcode1 = $('#tblreprocess').find("#batchcode1_" + id).val();
+                var qty1 = $('#tblreprocess').find("#qty1_" + id).val();
+                var remark = $('#tblreprocess').find("#remark_" + id).val();
+                var reason = $('#tblreprocess').find("#reason_" + id).val();
+                var chemist = $('#tblreprocess').find("#chemist_" + id).val();
+                var batchcode2 = "";
+                var qty2 = "";
+                var esticompleteDate = $('#tblreprocess').find("#esticompleteDate_" + id).val();
+                var subscientist = $('#tblreprocess').find("#subScientistName_" + id).val();
+                var reviewscistatus = $('#tblreprocess').find("#reviewscistatus_" + id).val();
+                var SynStartDate = $('#tblreprocess').find("#SynStartDate_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateScientistProjectInfo',
+                    data: {
+                        scStatus: scStatus,
+                        batchcode1: batchcode1,
+                        qty1: qty1,
+                        batchcode2: batchcode2,
+                        qty2: qty2,
+                        id: id,
+                        esticompleteDate: esticompleteDate,
+                        remark: remark,
+                        subscientist: subscientist,
+                        reason: reason,
+                        chemist: chemist,
+                        reviewscistatus: reviewscistatus,
+                        SynStartDate: SynStartDate,
+                        tabname:'scientist-All'
+                    },
+                    type: 'POST',
+                    success: function (data) {
+                        successSaveallDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function SaveReprocessHold() {
+
+        var count = 1;
+        var errrorcnt = 0;
+        var ids = [];
+        $('#tblreprocess').find('.clssaveall').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+                if ($('#tblreprocess').find("#scientistStatus_" + $(this).val()).val() !== "17") {
+                    errrorcnt += 1;
+                }
+            }
+        });
+
+        if (errrorcnt !== 0) {
+            toastr.error("Please select proper status to move this product on HOLD.");
+            return false;
+        }
+
+        $('#tblreprocess').find('.clssaveall').each(function () {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var scStatus = $('#tblreprocess').find("#scientistStatus_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateScientistProductInfoForHold?scStatus=' + scStatus + '&id=' + id,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                        successSaveallDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+
+    function SaveAllScientistForm() {
+
+        var count = 1;
+        var ids = [];
+        $('#example1').find('.clssaveall').each(function() {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        $('#example1').find('.clssaveall').each(function() {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var scStatus = $('#example1').find("#scientistStatus_" + id).val();
+                var batchcode1 = $('#example1').find("#batchcode1_" + id).val();
+                var qty1 = $('#example1').find("#qty1_" + id).val();
+                var remark = $('#example1').find("#remark_" + id).val();
+                var reason = $('#example1').find("#reason_" + id).val();
+                var chemist = $('#example1').find("#chemist_" + id).val();
+                var batchcode2 = "";
+                var qty2 = "";
+                var esticompleteDate =$('#example1').find("#esticompleteDate_" + id).val();
+                var subscientist = $('#example1').find("#subScientistName_" + id).val();
+                var reviewscistatus = $('#example1').find("#reviewscistatus_" + id).val();
+                var SynStartDate = $('#example1').find("#SynStartDate_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateScientistProjectInfo',
+                    data: {
+                        scStatus: scStatus,
+                        batchcode1: batchcode1,
+                        qty1: qty1,
+                        batchcode2: batchcode2,
+                        qty2: qty2,
+                        id: id,
+                        esticompleteDate: esticompleteDate,
+                        remark: remark,
+                        subscientist: subscientist,
+                        reason: reason,
+                        chemist: chemist,
+                        reviewscistatus: reviewscistatus,
+                        SynStartDate: SynStartDate,
+                        tabname: 'scientist-All'
+                    },
+                    type: 'POST',
+                    success: function (data) {
+                        successSaveallDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function SaveAllHold() {
+
+        var count = 1;
+        var errrorcnt = 0;
+        var ids = [];
+        $('#example1').find('.clssaveall').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+                if ($("#scientistStatus_" + $(this).val()).val() !== "17") {
+                    errrorcnt += 1;
+                }
+            }
+        });
+
+        if (errrorcnt !== 0) {
+            toastr.error("Please select proper status to move this product on HOLD.");
+            return false;
+        }
+
+        $('#example1').find('.clssaveall').each(function () {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var scStatus = $('#example1').find("#scientistStatus_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateScientistProductInfoForHold?scStatus=' + scStatus + '&id=' + id,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                        successSaveallDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+
+    function SaveAllRecordScientistForm() {
+
+        var count = 1;
+        var ids = [];
+        $('#alltbl').find('.clssaveall').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        $('#alltbl').find('.clssaveall').each(function () {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var scStatus = $('#alltbl').find("#scientistStatus_" + id).val();
+                var batchcode1 = $('#alltbl').find("#batchcode1_" + id).val();
+                var qty1 = $('#alltbl').find("#qty1_" + id).val();
+                var remark = $('#alltbl').find("#remark_" + id).val();
+                var reason = $('#alltbl').find("#reason_" + id).val();
+                var chemist = $('#alltbl').find("#chemist_" + id).val();
+                var batchcode2 = "";
+                var qty2 = "";
+                var esticompleteDate = $('#alltbl').find("#esticompleteDate_" + id).val();
+                var subscientist = $('#alltbl').find("#subScientistName_" + id).val();
+                var reviewscistatus = $('#alltbl').find("#reviewscistatus_" + id).val();
+                var SynStartDate = $('#alltbl').find("#SynStartDate_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateScientistProjectInfo',
+                    data: {
+                        scStatus: scStatus,
+                        batchcode1: batchcode1,
+                        qty1: qty1,
+                        batchcode2: batchcode2,
+                        qty2: qty2,
+                        id: id,
+                        esticompleteDate: esticompleteDate,
+                        remark: remark,
+                        subscientist: subscientist,
+                        reason: reason,
+                        chemist: chemist,
+                        reviewscistatus: reviewscistatus,
+                        SynStartDate: SynStartDate,
+                        tabname:'scientist-All'
+                    },
+                    type: 'POST',
+                    success: function (data) {
+                        successSaveallDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function SaveAllRecordHold() {
+
+        var count = 1;
+        var errrorcnt = 0;
+        var ids = [];
+        $('#alltbl').find('.clssaveall').each(function () {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+                if ($('#alltbl').find("#scientistStatus_" + $(this).val()).val() !== "17") {
+                    errrorcnt += 1;
+                }
+            }
+        });
+
+        if (errrorcnt !== 0) {
+            toastr.error("Please select proper status to move this product on HOLD.");
+            return false;
+        }
+
+        $('#alltbl').find('.clssaveall').each(function () {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var scStatus = $('#alltbl').find("#scientistStatus_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateScientistProductInfoForHold?scStatus=' + scStatus + '&id=' + id,
+                    data: {},
+                    type: 'POST',
+                    success: function (data) {
+                        successSaveallDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+
+    function successSaveallDispatchAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product information.");
+
+            setTimeout(function(){
+                window.location.reload(true);
+            }, 2000);
+
+        }
+    }
+    //$(".resizediv").css('height', window.innerHeight - 200);
+
+    function SaveAllScaleupScientistForm() {
+
+        var count = 1;
+        var ids = [];
+        $('#tblscalup').find('.clssaveall').each(function() {
+            var divid = $(this).val();
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+        $('#tblscalup').find('.clssaveall').each(function() {
+            if ($(this).is(':checked')) {
+                var id = $(this).val();
+                var scStatus = $('#tblscalup').find("#scientistStatus_" + id).val();
+                var batchcode1 = $('#tblscalup').find("#batchcode1_" + id).val();
+                var qty1 = $('#tblscalup').find("#qty1_" + id).val();
+                var remark = $('#tblscalup').find("#remark_" + id).val();
+                var batchcode2 = "";
+                var qty2 = "";
+                var esticompleteDate = $('#tblscalup').find("#esticompleteDate_" + id).val();
+                var subscientist = $('#tblscalup').find("#subScientistName_" + id).val();
+                var SynStartDate = $('#tblscalup').find("#SynStartDate_" + id).val();
+                $.ajax({
+                    url: '/Form/UpdateScientistProjectInfo',
+                    data: {
+                        scStatus: scStatus,
+                        batchcode1: batchcode1,
+                        qty1: qty1,
+                        batchcode2: batchcode2,
+                        qty2: qty2,
+                        id: id,
+                        esticompleteDate: esticompleteDate,
+                        remark: remark,
+                        subscientist: subscientist,
+                        SynStartDate: SynStartDate
+                    },
+                    type: 'POST',
+                    success: function (data) {
+                        successScaleupSaveallDispatchAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function successScaleupSaveallDispatchAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product information.");
+
+            setTimeout(function(){
+                window.location.reload(true);
+            }, 2000);
+
+        }
+    }
+
+    //setTimeout(function () {
+    //    $(".scientist").each(function () {
+    //        var scientstname = $(this).attr('subscientistname');
+    //        var elementid = $(this).attr("id");
+    //        $("#" + elementid + " option:contains(" + scientstname + ")").attr('selected', true);
+    //        $("#" + elementid).val(scientstname);
+    //    });
+    //}, 1000);
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        $(".scientist").each(function () {
+            var scientstname = $(this).attr('subscientistname');
+            var elementid = $(this).attr("id");
+            $("#" + elementid).val(scientstname);
+        });
+
+        $("#home").find("#filsubScientistName").val("@SessionCookieManagement.UserId");
+        FilterSciData('@SessionCookieManagement.UserId');
+    }, false);
+
+
+
+    $(document).on("change", ".scientist", function () {
+        var hdnloginuserid = $("#hdnloginuserid").val();
+        var selecteduserid = $(this).val();
+        var nearestTableId = $(this).closest('table').attr("id");
+        if (selecteduserid === hdnloginuserid) {
+            var id = $(this).attr("id").replace("subScientistName_", "");
+            $("#" + nearestTableId).find("#chemist_" + id).attr("readonly", false);
+            $("#" + nearestTableId).find("#chemist_" + id).val("");
+        }
+        else {
+            var id = $(this).attr("id").replace("subScientistName_", "");
+            $("#" + nearestTableId).find("#chemist_" + id).attr("readonly", true);
+            $("#" + nearestTableId).find("#chemist_" + id).val("");
+        }
+    });
+
+    $('#tblsolvedquery').DataTable();
+    $('#tblinprocessquery').DataTable();
+
+    $(document).on("change", "#filsubScientistName", function () {
+       $('#example1').DataTable().draw();
+    });
+
+    $(document).on("change", "#filallrecordsubScientistName", function () {
+        console.log("Main change calling ");
+        $('#alltbl').DataTable().draw();
+    });
+
+    $(document).on("change", "#fltallscientiststatus", function () {
+        console.log("Main change calling ");
+        $('#alltbl').DataTable().draw();
+    });
+
+    $(document).on("change", "#filreprocesssubScientistName", function () {
+        $('#tblreprocess').DataTable().draw();
+    });
+
+    function FilterSciData(sciId) {
+        console.log(sciId);
+        //tblExample1.column(7)
+        //    .search(sciId)
+        //    .draw();
+
+    }
+
+    function Copyrecords(tablename) {
+        var ids = []; var refNoarr = [];
+        $("#" + tablename).find('.clssaveall').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error("Please select atleast one Product");
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/PrintScientistAllRecord',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#myModal').find('.modal-body').html(data.html);
+                $('#myModal').modal({ show: true });
+                $('#myModal').find(".modal-dialog").css("width", "1080px");
+                $('#myModal').find(".modal-footer").hide();
+            }
+        });
+    }
+
+    var querystring = getUrlVars();
+    if (querystring["tab"] === '' || querystring["tab"] === undefined) {
+
+    }
+    else {
+        $(".nav-tabs").find('a').each(function () {
+            if (querystring["tab"].toLowerCase() === $(this).attr("data-tabname")) {
+                $(this).click();
+            }
+        });
+    }
+
+    function LinkWithQuotedetails(quotedetailsid) {
+        $.ajax({
+            url: '/Form/OpenBatchNoFromCat?quotedetailsid=' + quotedetailsid,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                $('#invoiceQueryModal .modal-body').html(data.html);
+                $('#invoiceQueryModal').modal({ show: true });
+            }
+        });
+    }
+
+    $(document).on("click", ".clsreviewscistatus", function () {
+        $("select option[value*='6']").prop('disabled', true);
+        $("select option[value*='32']").prop('disabled', true);
+        $("select option[value*='33']").prop('disabled', true);
+    });
+
+
+    // Read a page's GET URL variables and return them as an associative array.
+    function getUrlVars() {
+        var vars = [], hash;
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        for (var i = 0; i < hashes.length; i++) {
+            hash = hashes[i].split('=');
+            vars.push(hash[0]);
+            vars[hash[0]] = hash[1];
+        }
+        return vars;
+    }
+
+    function ViewProductScheme(productid) {
+
+        $.ajax({
+            url: '/Form/ViewProductScheme?productid=' + productid,
+            data: {},
+            type: 'GET',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                var str = "";
+                $('#divimgcontainar').empty();
+                $(data).each(function (i, v) {
+                    var img = document.createElement("IMG");
+                    img.src = "http://spms.synzeal.com/" + v.replace('..', '');
+                    $('#divimgcontainar').prepend(img);
+                });
+                $(".img-container").popupLightbox({
+                    width: 1280,
+                    height: 650
+                });
+                $(".img-container").find('img:first').click();
+            }
+        });
+    }
+
+    $(".img-container").popupLightbox({
+        width: 600,
+        height: 450
+    });
+
+    function uploadSchemePage(productid) {
+        debugger;
+        var win = window.open("/Form/UploadProductScheme/" + productid, '_blank');
+        if (win) {
+            //Browser has allowed it to be opened
+            win.focus();
+        } else {
+            //Browser has blocked it
+            alert('Please allow popups for this website');
+        }
+    }
+
+    function Returnbackfromqcapproval(id) {
+        $.ajax({
+            type: "GET",
+            url: "/Form/ReturnbackfromQCApproval?id=" + id,
+            dataType: "json",
+            traditional: true,
+            data: {},
+            success: function (result) {
+                if (!result.success) {
+                    toastr.error(result.message);
+                    return false;
+                }
+                setTimeout(function () {
+                    window.location.href = "/Form/ScientistNewForm";
+                }, 2000);
+            },
+            error: function (err) {
+                alert(err.statusText);
+            }
+        });
+    }
+    $("#tblsolvedquery_wrapper").hide();
+    $(".clsqueryradio").click(function () {
+        if ($(this).val() === 'inprocess') {
+            $("#tblinprocessquery_wrapper").show();
+            $("#tblsolvedquery_wrapper").hide();
+        }
+        if ($(this).val() === 'solved') {
+            $("#tblinprocessquery_wrapper").hide();
+            $("#tblsolvedquery_wrapper").show();
+        }
+    });
+
+</script>
+<style>
+    #tblquery td label {
+        font-weight: normal;
+    }
+
+    .redcls {
+        background: #ffe0e0 !important;
+    }
+
+    .clslightgreen {
+        background: rgb(169, 230, 169) !important;
+    }
+
+    .yellow {
+        background: #f3f373 !important
+    }
+
+    .green {
+        background: #74f674 !important
+    }
+
+    .skyblue {
+        background: #b0e8ff !important
+    }
+
+    .nav > li > a {
+        position: relative;
+        display: block;
+        padding: 10px 12px;
+    }
+</style>
+@if (SessionCookieManagement.IsSubScientist)
+{
+    <script>
+        alldataloadtab();
+    </script>
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css" rel="stylesheet" />
+<!--Popup Lightbox Js-->
+<script src="/js/jquery.popup.lightbox.js"></script>
+<!--Popup Lightbox CSS-->
+<link href="/css/popup-lightbox.css" rel="stylesheet" />
+<div class="img-container" id="divimgcontainar" style="display:none">
+</div>
+<style type="text/css">
+    .lightbox {
+        z-index: 99999 !important;
+        border-radius: 5px;
+        box-shadow: 5px 5px 15px rgb(0 0 0);
+    }
+
+    .img-caption {
+        display: none;
+    }
+
+    .showSweetAlert {
+        margin-top: -20% !important;
+        overflow-y: auto;
+        max-height: 80%;
+    }
+
+    .fontbold {
+        font-weight: bold;
+    }
+
+    .img-show img {
+        position: unset;
+        max-height: 100%;
+    }
+</style>

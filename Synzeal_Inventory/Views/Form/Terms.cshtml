@@ -1,0 +1,100 @@
+﻿@{
+    ViewBag.Title = "Terms";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Terms Setting
+        <button style="float:right" type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" href="@Url.Action("AddTerm","Form")">Add</button>
+    </h1>
+</section>
+
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <!-- /.box-header -->
+                <!-- form start -->
+               
+                <form role="form" class="form-horizontal">
+                    <div class="box-body">
+                        <div id="alertsuccess" class="alert alert-success alert-dismissible">
+                            <h4><i class="icon fa fa-check"></i> Success!</h4>
+                            Terms saved successfully.
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Term Type</label>
+                            <div class="col-sm-10">
+                                @Html.DropDownList("Id", (IEnumerable<SelectListItem>)ViewBag.termsList, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Term Value</label>
+                            <div class="col-sm-10">
+                                <textarea id="editor1" name="editor1" rows="10" cols="80"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-10 control-label"></label>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-primary btn-block btn-flat" onclick="SaveData()">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="@Url.Content("~/Content/bower_components/ckeditor/ckeditor.js")"></script>
+<script>
+    $("#alertsuccess").hide();
+    $(function () {
+        CKEDITOR.replace('editor1');
+   
+    });
+
+    $("#Id").change(function () {
+        if ($("#Id").val() === "" || $("#Id").val() === undefined) {
+            CKEDITOR.instances['editor1'].setData('');
+            return false;
+        }
+        $.ajax({
+            type: "GET",
+            url: "/Form/GetTermsById?id=" + $("#Id").val(),
+            success: function (results) {
+                CKEDITOR.instances['editor1'].setData(results.data.Value);
+            }
+        });
+    });
+
+    function SaveData() {
+        $(".error-msg").hide();
+        var body = CKEDITOR.instances['editor1'].getData();
+        var id = $("#Id").val();
+        if ($("#Id").val() === "" || $("#Id").val() === undefined) {
+            return false;
+        }
+        var passData = {
+            'Id': id,
+            'Message': body,
+        };
+        $.ajax({
+            type: "POST",
+            url: "/Form/SaveTermsData",
+            data: passData,
+            success: function (results) {
+                $("#alertsuccess").show();
+                setTimeout(function () {
+                    $("#alertsuccess").fadeOut();
+                }, 3000);
+            }
+        });
+    }
+</script>

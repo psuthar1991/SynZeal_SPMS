@@ -1,0 +1,105 @@
+﻿@{
+    ViewBag.Title = "Company";
+    Layout = null;
+}
+@model  Synzeal_Inventory.Entity.SZ_CategoryMaster
+<!-- left column -->
+<div class="col-md-12">
+    <!-- general form elements -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">Add Category Master</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form role="form">
+            <div class="box-body">
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Category Master Name</label>
+                    <input type="text" class="form-control" id="Name" name="Name" placeholder="Category Master Name" required value="@Model.Name">
+                    <input type="hidden" id="categorymasterid" name="categorymasterid" value="@Model.Id" />
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Rating</label>
+                    <select id="Rating" name="Rating" class="form-control">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div class="col-md-12">
+                    <h4>INR Price</h4>
+                    <div class="form-group  col-md-3">
+                        <label for="exampleInputEmail1">10</label>
+                        <input type="text" class="form-control" id="Ten" name="Ten" placeholder="10" required value="@Model.Ten">
+                    </div>
+                    <div class="form-group  col-md-3">
+                        <label for="exampleInputEmail1">25</label>
+                        <input type="text" class="form-control" id="Twentyfive" name="Twentyfive" placeholder="25" required value="@Model.Twentyfive">
+                    </div>
+                    <div class="form-group  col-md-3">
+                        <label for="exampleInputEmail1">50</label>
+                        <input type="text" class="form-control" id="Fifty" name="Fifty" placeholder="50" required value="@Model.Fifty">
+                    </div>
+                    <div class="form-group  col-md-3">
+                        <label for="exampleInputEmail1">100</label>
+                        <input type="text" class="form-control" id="Onehundred" name="Onehundred" placeholder="100" required value="@Model.Onehundred">
+                    </div>
+                    <div class="form-group  col-md-3">
+                        <label for="exampleInputEmail1">250</label>
+                        <input type="text" class="form-control" id="TwohundredFifty" name="TwohundredFifty" placeholder="250" required value="@Model.TwohundredFifty">
+                    </div>
+                    <div class="form-group  col-md-3">
+                        <label for="exampleInputEmail1">500</label>
+                        <input type="text" class="form-control" id="Fivehundred" name="Fivehundred" placeholder="500" required value="@Model.Fivehundred">
+                    </div>
+                    <div class="form-group  col-md-3">
+                        <label for="exampleInputEmail1">1000</label>
+                        <input type="text" class="form-control" id="OneThousand" name="OneThousand" placeholder="1000" required value="@Model.OneThousand">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <h4>USD Price</h4>
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">10</label>
+                        <input type="text" class="form-control" id="TenUSD" name="TenUSD" placeholder="10" required value="@Model.TenUSD">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">25</label>
+                        <input type="text" class="form-control" id="TwentyfiveUSD" name="TwentyfiveUSD" placeholder="25" required value="@Model.TwentyfiveUSD">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">50</label>
+                        <input type="text" class="form-control" id="FiftyUSD" name="FiftyUSD" placeholder="50" required value="@Model.FiftyUSD">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">100</label>
+                        <input type="text" class="form-control" id="OnehundredUSD" name="OnehundredUSD" placeholder="100" required value="@Model.OnehundredUSD">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">250</label>
+                        <input type="text" class="form-control" id="TwohundredFiftyUSD" name="TwohundredFiftyUSD" placeholder="250" required value="@Model.TwohundredFiftyUSD">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">500</label>
+                        <input type="text" class="form-control" id="FivehundredUSD" name="FivehundredUSD" placeholder="500" required value="@Model.FivehundredUSD">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">1000</label>
+                        <input type="text" class="form-control" id="OneThousandUSD" name="OneThousandUSD" placeholder="1000" required value="@Model.OneThousandUSD">
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <div class="form-group" style="text-align:right">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+
+                    <button type="button" onclick="Quote.addCategoryMasterData()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

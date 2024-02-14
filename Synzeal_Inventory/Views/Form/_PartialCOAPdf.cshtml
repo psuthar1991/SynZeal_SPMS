@@ -1,0 +1,191 @@
+﻿@model Synzeal_Inventory.Entity.SZ_MasterCOA
+@{       
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+
+    var productsData = (Synzeal_Inventory.Models.ProductDetailsModel)ViewBag.Products;
+}
+@functions {
+    public string GetDaySuffix(int day)
+    {
+        switch (day)
+        {
+            case 1:
+            case 21:
+            case 31:
+                return "st";
+            case 2:
+            case 22:
+                return "nd";
+            case 3:
+            case 23:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+</HEAD>
+<BODY style="margin-top: 0px;margin-left: 0px;">
+    <DIV>
+
+        <table width="100%" style="line-height: 18px;">
+            <tr>
+                <td width="70%" style="padding-left:30%">
+                    <div style="text-align:center;text-decoration:underline;font-size:24px;font-family:Calibri;padding-left:150px;">Certificate of Analysis</div>
+                    <div style="text-align:center;padding-left:150px;">
+                        (Certificate No. @Model.RefNo)
+                    </div>
+                </td>
+                <td width="30%" style="text-align:right">
+                    <p style="font-size: 10px;font-family:'Calibri';">Date : @DateTime.Now.Day<sup>@GetDaySuffix(DateTime.Now.Day)</sup> @DateTime.Now.ToString("MMMM yy")</p>
+                    @if (Model.ReTestDate.HasValue)
+                    {
+                        <p style="font-size: 10px;font-family: 'Calibri';"><NOBR>Re-test</NOBR> Date : @Model.ReTestDate.Value.Day<sup>@GetDaySuffix(Model.ReTestDate.Value.Day)</sup> @Model.ReTestDate.Value.ToString("MMMM yy")</p>
+                    }
+                </td>
+            </tr>
+        </table>
+        <hrline />
+        <div style="text-align:center;line-height: 18px;padding-bottom:0;margin-bottom:0;">
+            <p>
+                <b style="padding-top:8px;">@Model.ProductName</b><br />
+                <span style="font-size:10px;">Batch No. : @Model.BatchNo</span>
+            </p>
+        </div>
+        <hrline />
+
+        <div style="text-align:center;font-size:9px;">
+            <b>
+                @productsData.Synonym
+            </b>
+        </div>
+        <table width="100%" style="font-size:9px;">
+            <tr>
+                <td width="50%">
+                    <table width="100%">
+                        <tr>
+                            <td width="29%">
+                                <b>CAT No.</b>
+                            </td>
+                            <td width="1%">:</td>
+                            <td width="70%">
+                                @productsData.Sku
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="29%">
+                                <b>CAS No.</b>
+                            </td>
+                            <td width="1%">:</td>
+                            <td width="70%">@productsData.ManufacturerPartNumber</td>
+                        </tr>
+                        <tr>
+                            <td width="29%">
+                                <b>M.F. </b>
+                            </td>
+                            <td width="1%">:</td>
+                            <td width="70%">@productsData.Gtin</td>
+                        </tr>
+                        <tr>
+                            <td width="29%">
+                                <b>M.W</b>
+                            </td>
+                            <td width="1%">:</td>
+                            <td width="70%">@productsData.MolecularWeight</td>
+                        </tr>
+                        <tr>
+                            <td width="29%">
+                                <b>Batch No. </b>
+                            </td>
+                            <td width="1%">:</td>
+                            <td width="70%">@Model.BatchNo</td>
+                        </tr>
+                        <tr>
+                            <td width="29%">
+                                <b>Storage Condition</b>
+                            </td>
+                            <td width="1%">:</td>
+                            <td width="70%">@Model.StorageCon</td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="50%" style="text-align:center;">
+                    <img width="350" src="@productsData.DefaultPictureModel.ImageUrl" />
+                </td>
+            </tr>
+        </table>
+        <div style="font-size:9px;">
+            <b>Synonyms : @productsData.Synonym</b>
+        </div>
+        <hrline />
+        <div style="font-size:10px;line-height:23px;font-family:Calibri">
+            <b>IDENTIFICATION TESTS</b>
+            <ul>
+                <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Ski_trail_rating_symbol_black_circle.png" height="6px" width="6px" />&nbsp;&nbsp;&nbsp;&nbsp;SOLUBILITY : @Model.SOLUBILITY
+                </li>
+                <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Ski_trail_rating_symbol_black_circle.png" height="6px" width="6px" />&nbsp;&nbsp;&nbsp;&nbsp;IR ANALYSIS : @Model.IR
+                </li>
+                <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Ski_trail_rating_symbol_black_circle.png" height="6px" width="6px" />&nbsp;&nbsp;&nbsp;&nbsp;MS ANALYSIS : @Model.Mass
+                </li>
+                <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Ski_trail_rating_symbol_black_circle.png" height="6px" width="6px" />&nbsp;&nbsp;&nbsp;&nbsp;DEPT ANALYSIS : @Model.Dept
+                </li>
+                <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Ski_trail_rating_symbol_black_circle.png" height="6px" width="6px" />&nbsp;&nbsp;&nbsp;&nbsp;1H NMR ANALYSIS : @Model.NMR
+                </li>
+                <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Ski_trail_rating_symbol_black_circle.png" height="6px" width="6px" />&nbsp;&nbsp;&nbsp;&nbsp;13C NMR ANALYSIS : @Model.NMR
+                </li>
+            </ul>
+        </div>
+        <br />
+        <div style="font-size:10px;line-height:23px;font-family:Calibri">
+            <b>QUANTITTATIVE TESTS</b>
+            <ul>
+                <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Ski_trail_rating_symbol_black_circle.png" height="6px" width="6px" />&nbsp;&nbsp;&nbsp;&nbsp;HPLC/GC/ELSD PURITY : @Model.HPLCGCELSD
+                </li>
+                <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Ski_trail_rating_symbol_black_circle.png" height="6px" width="6px" />&nbsp;&nbsp;&nbsp;&nbsp;WEIGHT LOSS IN TGA : @Model.TGALoss
+                </li>
+                <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Ski_trail_rating_symbol_black_circle.png" height="6px" width="6px" />&nbsp;&nbsp;&nbsp;&nbsp;RESIDUE ON IGNITION : @Model.ResidueOnIgnition
+                </li>
+            </ul>
+        </div>
+        <br />
+        <div style="font-size:10px;line-height:23px;font-family:Calibri">
+            <b>ADDITIONAL INFORMATION</b>
+            <ul>
+                <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Ski_trail_rating_symbol_black_circle.png" height="6px" width="6px" /> @Model.Remark1
+                </li>
+                <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a8/Ski_trail_rating_symbol_black_circle.png" height="6px" width="6px" /> @Model.Remark2
+                </li>
+            </ul>
+        </div>
+        <br /><br />
+
+        <table width="100%" style="text-align:center;font-size:10px;font-family:Calibri">
+            <tr>
+                <td style="width:33.33%;text-align:center;">
+                    PREPARED BY <br />
+                </td>
+                <td style="width:33.33%;text-align:center;">
+                    REVIEWED BY <br />
+                </td>
+                <td style="width:33.33%;text-align:center;">
+                    APPROVED BY <br />
+                </td>
+            </tr>
+        </table>
+    </DIV>
+</BODY>
+</HTML>

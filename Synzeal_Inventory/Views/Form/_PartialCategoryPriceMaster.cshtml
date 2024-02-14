@@ -1,0 +1,162 @@
+﻿@model List<Synzeal_Inventory.Entity.SZ_CategoryMaster>
+@using Synzeal_Inventory.Models;
+@{
+    ViewBag.Title = "Category Price Master";
+    Layout = null;
+    int? mg = ViewBag.mg != null ? Convert.ToInt32(ViewBag.mg) : 0;
+    int? value = ViewBag.value != null ? Convert.ToInt32(ViewBag.value) : 0;
+    string type = ViewBag.type;
+    var currency = "";
+
+    var selectedCategoryid = Common.GetMasterCategoryPriceId(mg, value, type, Model);
+    if (type == "Export")
+    {
+        currency = "usd";
+    }
+    if (type == "Domestic")
+    {
+        currency = "inr";
+    }
+    
+    if (mg.HasValue && mg.Value != 0 && value.HasValue && value.Value != 0 && selectedCategoryid == 0)
+    {
+        selectedCategoryid = Common.GetClosestMasterCategoryPriceId(mg, value, type, Model);
+        mg = Common.GetClosestMGValue(mg);
+    }
+}
+<div class="col-md-12">
+    <!-- general form elements -->
+    <!-- /.box-header -->
+    <div class="box">
+        <div class="col-md-12" style="margin-top:13px">
+            <div class="form-group">
+                <select id="ddlcategory">
+                    @foreach (var item in Model)
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                </select>
+                <select id="ddlmg">
+                    <option value="10 MG (INR)" data-currency="INR">10 MG (INR)</option>
+                    <option value="25 MG (INR)" data-currency="INR">25 MG (INR)</option>
+                    <option value="50 MG (INR)" data-currency="INR">50 MG (INR)</option>
+                    <option value="100 MG (INR)" data-currency="INR">100 MG (INR)</option>
+                    <option value="250 MG (INR)" data-currency="INR">250 MG (INR)</option>
+                    <option value="500 MG (INR)" data-currency="INR">500 MG (INR)</option>
+                    <option value="1000 MG (INR)" data-currency="INR">1000 MG (INR)</option>
+                    <option value="10 MG (USD)" data-currency="USD">10 MG (USD)</option>
+                    <option value="25 MG (USD)" data-currency="USD">25 MG (USD)</option>
+                    <option value="50 MG (USD)" data-currency="USD">50 MG (USD)</option>
+                    <option value="100 MG (USD)" data-currency="USD">100 MG (USD)</option>
+                    <option value="250 MG (USD)" data-currency="USD">250 MG (USD)</option>
+                    <option value="500 MG (USD)" data-currency="USD">500 MG (USD)</option>
+                    <option value="1000 MG (USD)" data-currency="USD">1000 MG (USD)</option>
+                </select>
+                <input type="number" id="txtmg" style="font-size: 14px; background-color:none;padding:0; width:10%;border: 1px solid #5c5c5c;background-color:#fff" />
+                <input type="text" readonly id="txtcalculationresult" style="font-size: 14px; background-color:none;padding:0; width:10%;border: 1px solid #5c5c5c;" />
+            </div>
+        </div>
+        <table width="100%" class="table table-bordered table-striped">
+            <thead>
+                <tr id="tr_mainhead">
+                    <th>Name</th>
+                    <th class="cls10inr">10 MG (INR)</th>
+                    <th class="cls25inr">25 MG (INR)</th>
+                    <th class="cls50inr">50 MG (INR)</th>
+                    <th class="cls100inr">100 MG (INR)</th>
+                    <th class="cls250inr">250 MG (INR)</th>
+                    <th class="cls500inr">500 MG (INR)</th>
+                    <th class="cls1000inr">1000 MG (INR)</th>
+                    <th class="cls10usd">10 MG (USD)</th>
+                    <th class="cls25usd">25 MG (USD)</th>
+                    <th class="cls50usd">50 MG (USD)</th>
+                    <th class="cls100usd">100 MG (USD)</th>
+                    <th class="cls250usd">250 MG (USD)</th>
+                    <th class="cls500usd">500 MG (USD)</th>
+                    <th class="cls1000usd">1000 MG (USD)</th>
+                </tr>
+            </thead>
+            @foreach (var k in Model)
+            {
+                if (selectedCategoryid > 0)
+                {
+                    var strcls = "";
+                    if (selectedCategoryid == k.Id)
+                    {
+                        strcls = "clsmatch";
+                    }
+                    <tr id="tr_@k.Id" class="clscategoryprice @strcls">
+                        <td>
+                            @k.Name
+                        </td>
+                        <td class="clsbgcolor cls10inr">@k.Ten</td>
+                        <td class="clsbgcolor cls25inr">@k.Twentyfive</td>
+                        <td class="clsbgcolor cls50inr">@k.Fifty</td>
+                        <td class="clsbgcolor cls100inr">@k.Onehundred</td>
+                        <td class="clsbgcolor cls250inr">@k.TwohundredFifty</td>
+                        <td class="clsbgcolor cls500inr">@k.Fivehundred</td>
+                        <td class="clsbgcolor cls1000inr">@k.OneThousand</td>
+                        <td class="cls10usd">@k.TenUSD</td>
+                        <td class="cls25usd">@k.TwentyfiveUSD</td>
+                        <td class="cls50usd">@k.FiftyUSD</td>
+                        <td class="cls100usd">@k.OnehundredUSD</td>
+                        <td class="cls250usd">@k.TwohundredFiftyUSD</td>
+                        <td class="cls500usd">@k.FivehundredUSD</td>
+                        <td class="cls1000usd">@k.OneThousandUSD</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr id="tr_@k.Id" class="clscategoryprice">
+                        <td>
+                            @k.Name
+                        </td>
+                        <td class="clsbgcolor">@k.Ten</td>
+                        <td class="clsbgcolor">@k.Twentyfive</td>
+                        <td class="clsbgcolor">@k.Fifty</td>
+                        <td class="clsbgcolor">@k.Onehundred</td>
+                        <td class="clsbgcolor">@k.TwohundredFifty</td>
+                        <td class="clsbgcolor">@k.Fivehundred</td>
+                        <td class="clsbgcolor">@k.OneThousand</td>
+                        <td>@k.TenUSD</td>
+                        <td>@k.TwentyfiveUSD</td>
+                        <td>@k.FiftyUSD</td>
+                        <td>@k.OnehundredUSD</td>
+                        <td>@k.TwohundredFiftyUSD</td>
+                        <td>@k.FivehundredUSD</td>
+                        <td>@k.OneThousandUSD</td>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+</div>
+<style type="text/css">
+    .clsbgcolor {
+        background: #e6e6e6
+    }
+
+    .clsmatch td {
+        background-color: #204d74 !important;
+        color: #fff;
+    }
+</style>
+@if (selectedCategoryid > 0)
+{
+    <text>
+        <script>
+
+            @*$(".cls" +@mg+"@currency").css('background-color', '#204d74 !important');
+            $(".cls" +@mg+"@currency").css('color', '#fff');*@
+
+             $(".cls" +@mg+"inr").css('background-color', '#204d74 !important');
+            $(".cls" +@mg+"inr").css('color', '#fff');
+            $(".cls" +@mg+"usd").css('background-color', '#204d74 !important');
+            $(".cls" +@mg+"usd").css('color', '#fff');
+
+                $("#invoiceQueryModal").find("#ddlcategory").val(@selectedCategoryid);
+                var str = @mg + ' MG (' + '@currency.ToUpper()' + ')';
+                $("#invoiceQueryModal").find("#ddlmg").val(str);
+        </script>
+    </text>
+}

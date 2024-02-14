@@ -1,0 +1,94 @@
+﻿@model List<Synzeal_Inventory.Models.ProductOverviewModel>
+<style type="text/css">
+</style>
+<div class="box-body form-horizontal" id="profrm" style="overflow:scroll">
+    @if (Model.Count > 0)
+    {
+        @*<div class="fc-title">
+                <h5><b>Added Product In Quotation</b></h5>
+            </div>*@
+        <div>
+            <button type="button" onclick="Quote.saveFindProducts()" class="btn btn-primary">Save</button>
+        </div>
+        <table class="table table-bordered table-striped dataTable no-footer">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>
+                        Product Name
+                    </th>
+                    <th width="5.5%">
+                        CAS No
+                    </th>
+                    <th width="5.5%">
+                        CAT No
+                    </th>
+                    <th>
+                        Batch / Qty
+                    </th>
+                    <th>
+                        Synonyms
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model)
+                {
+                    <tr>
+                        <td><a href="javascript:void(0)" onclick="Quote.addFindProducts(@k.Id)">Add</a> </td>
+                        <td><input type="checkbox" class="clsfindproduct" value="@k.Id" /></td>
+                        <td class="clsFindproducttr"><label>@k.Name</label> <img style="display:none" src="@k.DefaultPictureModel.ImageUrl" /></td>
+                        <td><label>@k.CasNo</label></td>
+                        <td><label>@k.Sku</label> </td>
+                        <td>
+                            <label>
+                                @*@string.Join(", ", k.InventoryModel.Select(x => x.BatchNo + " (" + x.Qty + ")"))*@
+                                <select>
+                                    @if (k.InventoryModel.Count > 0)
+                                    {
+                                        foreach (var item in k.InventoryModel)
+                                        {
+                                            <option value="@item.BatchNo"> @item.BatchNo (@item.Qty)</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option>No Data</option>
+                                    }
+                                </select>
+                            </label>
+                        </td>
+                        <td>@k.Synonym</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    }
+    else
+    {
+        <div style="text-align: center;color: lightgray;font-size: 36px;">
+            <i class="fa fa-database" style="font-size:120px;"></i> <br />No Products Found!!!
+        </div>
+    }
+</div>
+
+<style type="text/css">
+    .clsFindproducttr img {
+        position: absolute;
+        background: white;
+        border: 2px solid #ececec;
+        box-shadow: 1px 0px 3px 3px #ececec;
+        left: 4%;
+        margin-top: 20px;
+    }
+</style>
+<script type="text/javascript">
+    $(".clsFindproducttr").mouseenter(function () {
+        $(this).find("img").show();
+    });
+    $(".clsFindproducttr").mouseleave(function () {
+        $(this).find("img").hide();
+    });
+</script>

@@ -1,0 +1,324 @@
+﻿@model List<MasterCOAModel>
+@using Synzeal_Inventory.Models
+@{
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+    int loopCont = 1;
+    string productName = string.Empty;
+    string CATNO = string.Empty;
+    int productId = 0;
+    string CASNO = string.Empty;
+    if (Model.Count > 0)
+    {
+        productName = Model[0].ProductName;
+        CATNO = Model[0].CATNO;
+        CASNO = Model[0].CASNO;
+        productId = Model[0].ProductId;
+    }
+}
+@if (string.IsNullOrEmpty(productName))
+{
+    <h5>Selected Product has not batch list. Please search with another product.</h5>
+}
+else
+{
+    <div class="rows">
+        <div class="box-body form-horizontal">
+            <div class="form-group" style="margin-left: 5px;">
+                <label for="exampleInputEmail1">Product Name : </label>
+                <span>
+                    @productName
+                </span>
+            </div>
+            <div class="form-group" style="margin-left: 5px;">
+                <label for="exampleInputEmail1">CAT No : </label>
+                <span>
+                    @CATNO
+
+                    <i class="fa fa-pencil" onclick="addCoaRemarks(@productId, 'product')"></i>
+                </span>
+            </div>
+            <div class="form-group" style="margin-left: 5px;">
+                <label for="exampleInputEmail1">CAS No : </label>
+                <span>
+                    @CASNO
+                </span>
+            </div>
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Sr No.</th>
+                        <th>Batch No.</th>
+                        <th>Qty (mg)</th>
+                        <th></th>
+                        @{
+                            if (SessionCookieManagement.UserEmail != null && SessionCookieManagement.UserEmail.ToLower().Contains("karan@synzeal.com"))
+                            {
+                                <th>Action</th>
+                            }
+                        }
+                    </tr>
+                </thead>
+                @foreach (var i in Model)
+                {
+                    <tr class="clsrows" data-id="@i.Id">
+                        <td>
+                            @if (i.COAId != 0)
+                            {
+                                <a href="/Form/StabilityDocument/@i.COAId">
+                                    <i class="fa fa-file-word-o"></i>
+                                </a>
+                                <a href="javascript:void(0)" onclick="DownloadMasterCOA(@i.COAId)">
+                                    <i class="fa fa-file-pdf-o"></i>
+                                </a>
+                            }
+                        </td>
+                        <td>@loopCont</td>
+                        <td style="white-space: nowrap;"><a href="javascript:void(0)" class="firstStep" data-inventoryId="@i.Id" data-batchno="@i.BatchNo" data-mastercoaid="@i.COAId">@i.BatchNo</a></td>
+                        <td>
+                            @i.QuantityAvailable
+                        </td>
+                        <td><i class="fa fa-pencil" onclick="addCoaRemarks(@i.COAId, 'mastercoa')"></i></td>
+                        @{
+                            if (SessionCookieManagement.UserEmail != null && SessionCookieManagement.UserEmail.ToLower().Contains("karan@synzeal.com"))
+                            {
+                                if (i.COAId != 0)
+                                {
+                                    <td>
+                                        <a href="javascript:void(0)" onclick="deleteMasterRecord(@i.COAId)">Delete</a>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                }
+
+                            }
+                        }
+                    </tr>
+                    loopCont += 1;
+                }
+            </table>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    function DownloadMasterCOA(id) {
+        debugger;
+        swal({
+            title: "Which type of download you want for this COA?",
+            text: "",
+            html: "<a href='javascript:void(0)'>Reject</a>",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger",
+            confirmButtonText: "Normal",
+            cancelButtonText: "Scan Copy",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    window.location.href = "/Form/DownloadMasterCOA/" + id;
+                } else {
+                    window.location.href = "/Form/DownloadMasterCOA/" + id + "?isScanCopy=" + true;
+                }
+            });
+
+
+        $(".sweet-alert").find(".sa-button-container").append('<button class="cancel btn btn-lg btn-warning" tabindex="2" style="display: inline-block;" onclick="DownloadQACoa('+ id +')">QA COA</button>');
+
+
+    }
+
+    function DownloadQACoa(id) {
+        window.location.href = "/Form/DownloadMasterCOA/" + id + "?isScanCopy=" + true + "&isQACoa=" + true;
+    }
+
+    $('.clsrows').each(function () {
+        var id = $(this).attr('data-id');
+        var purity = $(this).attr('data-Purity');
+        if (purity !== '' && purity !== null && purity !== undefined) {
+            $("#Purity_" + id).val(purity);
+        }
+    });
+
+    $('.clssolu').each(function () {
+        var val = $(this).attr('data-value');
+        $(this).val(val);
+    });
+
+    $(document).ready(function () {
+        $(".dpm").datepicker({
+            format: 'dd/mm/yyyy'
+        });
+        $(".dpmana").datepicker({
+            format: 'dd/mm/yyyy'
+        }).on("changeDate", function (e) {
+            var id = $(this).attr('id').replace('analysisdate_', '');
+            var myDate = new Date(e.date);
+            myDate.setFullYear(myDate.getFullYear() + 3);
+            $("#ReTestDate_" + id).datepicker("setDate", formate(myDate));
+
+        });
+
+    });
+
+
+    function OpenRepresentativeMaster(id) {
+
+    }
+
+    function copyMasterRecord(id) {
+        $.ajax({
+            url: '/Form/CopyMasterCOATOChildCOA',
+            data: { id: id },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    ReloadChildMaster();
+                    toastr.success("You have copied master COA information.");
+                }
+                else {
+                    toastr.error(data.message);
+                    return false;
+                }
+            }
+        });
+    }
+
+    function ReloadChildMaster() {
+        var value = $("#txtSearch").val();
+        if (value === "") {
+            toastr.error('Please enter catalog number.');
+            return false;
+        }
+
+        $.ajax({
+            url: '/Form/ReloadChild?value=' + value,
+            data: {},
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    $("#divchildcoa").html(data.childHtml);
+                }
+            }
+        });
+    }
+    function saveMasterRecord(id) {
+        $.ajax({
+            url: '/Form/SaveMasterRecord?availablequantity=' + $("#availablequantity_" + id).val()
+                + '&analysisdate=' + $("#analysisdate_" + id).val() + '&HPLCGCELSD=' + $("#HPLCGCELSD_" + id).val()
+                + '&TGALoss=' + $("#TGALoss_" + id).val() + '&ResidueOnIgnition=' + $("#ResidueOnIgnition_" + id).val()
+                + '&Potency=' + $("#Potency_" + id).val() + '&PhysicalState=' + $("#PhysicalState_" + id).val()
+                + '&SOLUBILITY=' + $("#SOLUBILITY_" + id).val() + '&IR=' + $("#IR_" + id).val()
+                + '&Mass=' + $("#Mass_" + id).val() + '&HPLC=' + $("#HPLC_" + id).val()
+                + '&NMR=' + $("#NMR_" + id).val() + '&CMR=' + $("#CMR_" + id).val()
+                + '&Dept=' + $("#Dept_" + id).val() + '&TGA=' + $("#TGA_" + id).val()
+                + '&StorageCon=' + $("#StorageCon_" + id).val() + '&ReTestDate=' + $("#ReTestDate_" + id).val()
+                + '&SpecialInstruction=' + $("#SpecialInstruction_" + id).val() + '&Remark1=' + $("#Remark1_" + id).val()
+                + '&Remark2=' + $("#Remark2_" + id).val() + '&id=' + id + '&Purity=' + $("#Purity_" + id).val(),
+            data: {},
+            type: 'POST',
+            async: false,
+            success: function (data) {
+                SearchRecords();
+                toastr.success("You have updated master COA information.");
+            }
+        });
+    }
+
+
+    function MoveToDispatchList() {
+        var ids = [];
+
+        $('.clsMoveDispatch').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+        $.ajax({
+            url: '/Form/MoveToDispatchList',
+            data: { id: ids },
+            type: 'POST',
+            traditional: true, // add this
+            dataType: 'json',
+            success: function (data) {
+
+                if (data.success) {
+                    window.location.href = "/Form/Project";
+                }
+            }
+        });
+
+    }
+
+
+    function SaveAll() {
+        var ids = [];
+
+        $('.clsSaveall').each(function () {
+            if ($(this).is(':checked')) {
+                ids.push($(this).val());
+            }
+        });
+
+        if (ids.length === 0) {
+            toastr.error('Please select atleast one Product.');
+            return false;
+        }
+
+        var count = 1;
+        $('.clsSaveall').each(function () {
+            var id = $(this).val();
+            if ($(this).is(':checked')) {
+                var additionalBatch = $('#additionalBatch_' + id).val();
+
+                var batchNo = $("#BatchNo_" + id).val();
+
+                $('.additionalbatchcls').each(function (i, v) {
+
+                    var attr = $(this).attr("quotedetailsid");
+                    if (attr === id) {
+                        additionalBatch = $(this).val();
+                    }
+                });
+
+                $('.batchNoCls').each(function (i, v) {
+
+                    var attr = $(this).attr("quotedetailsid");
+                    if (attr === id) {
+                        batchNo = $(this).val();
+                    }
+                });
+                $.ajax({
+                    url: '/Form/SaveInstockPurchaseAction?additionalBatch=' + additionalBatch + '&batchNo=' + batchNo + '&id=' + id, /* + '&batchno=' + batchno + '&remark=' + remark + '&additionalBatch=' + additionalBatch + '&scientistStatus=' + scientistStatus,*/
+                    data: {},
+                    type: 'POST',
+                    async: false,
+                    success: function (data) {
+                    },
+                    complete: function (data) {
+                        successAlert(count, ids.length);
+                        count += 1;
+                    }
+                });
+            }
+        });
+    }
+    function successAlert(count, forloopcount) {
+        if (count === forloopcount) {
+            toastr.success("You have updated product information.");
+            setTimeout(function () { window.location.reload(true); }, 2000);
+        }
+    }
+</script>

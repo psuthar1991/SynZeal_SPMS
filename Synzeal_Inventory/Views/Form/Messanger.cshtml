@@ -1,0 +1,142 @@
+﻿@{
+    ViewBag.Title = "Price";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var customer = ViewBag.Customer as List<Synzeal_Inventory.Entity.Customer>;
+    Synzeal_Inventory.Entity.SynzealLiveEntities db = new Synzeal_Inventory.Entity.SynzealLiveEntities();
+}
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary direct-chat direct-chat-warning">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Direct Chat : <span id="selecteduser">@Synzeal_Inventory.Models.SessionCookieManagement.UserName</span></h3>
+
+                    <div class="box-tools pull-right">
+                        @*<span data-toggle="tooltip" title="" class="badge bg-yellow" data-original-title="3 New Messages">3</span>*@
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-toggle="tooltip" title="" data-widget="chat-pane-toggle" data-original-title="Contacts" id="contact">
+                            <i class="fa fa-comments"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <!-- Conversations are loaded here -->
+                    <div class="direct-chat-messages" style="height:600px;">
+
+                        <div id="discussion">
+
+                        </div>
+
+
+                    </div>
+                    <!--/.direct-chat-messages-->
+                    <!-- Contacts are loaded here -->
+                    <div class="direct-chat-contacts">
+                        <ul class="contacts-list">
+                            <li>
+                            <input type="text" />
+                                </li> @foreach (var item in customer)
+                            {
+                                string customerName = string.Empty; var genericAttr = db.GenericAttributes.Where(x => x.KeyGroup == "Customer" && x.EntityId == item.Id).ToList(); if (genericAttr.Count > 0) { customerName = genericAttr.Where(x => x.Key == "FirstName").Select(x => x.Value).FirstOrDefault() + " " + genericAttr.Where(x => x.Key == "LastName").Select(x => x.Value).FirstOrDefault(); }
+                                if (string.IsNullOrEmpty(customerName)) { customerName = item.Email; }
+                                <li>
+                                    <a href="javascript:void(0)" data-userid="@item.Id" onclick="selectuser(@item.Id, '@customerName')" data-name="@customerName">
+                                        <div class="contacts-list-info" style="margin-left:0">
+                                            <span class="contacts-list-name">
+                                                @if (!string.IsNullOrEmpty(customerName))
+                                                {
+                                                    @customerName
+                                                }
+                                                else
+                                                {
+                                                    @item.Email
+                                                }
+                                            </span>
+                                        </div>
+                                        <!-- /.contacts-list-info -->
+                                    </a>
+                                </li>
+                            }
+
+
+                            <!-- End Contact Item -->
+                        </ul>
+                        <!-- /.contatcts-list -->
+                    </div>
+                    <!-- /.direct-chat-pane -->
+                </div>
+                <!-- /.box-body -->
+                <div class="box-footer">
+                    <form action="#" method="post">
+                        <div class="input-group">
+                            <input type="text" name="message" id="message" placeholder="Type Message ..." class="form-control">
+                            <span class="input-group-btn">
+                                <button type="button" id="sendmessage" class="btn btn-primary btn-flat">Send</button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+                <input type="hidden" id="displayname" value="@Synzeal_Inventory.Models.SessionCookieManagement.UserName" />
+                <input type="hidden" id="userid" value="@Synzeal_Inventory.Models.SessionCookieManagement.UserId" />
+                <!-- /.box-footer-->
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script src="https://cdn.jsdelivr.net/npm/signalr@2.4.1/jquery.signalR.min.js"></script>
+<script src="~/signalr/hubs"></script>
+<script>
+    function selectuser(id, name) {
+        $("#userid").val(id);
+        $("#contact").click();
+        $("#selecteduser").text(name);
+    }
+    $(function () {
+        var chat = $.connection.chatHub;
+        chat.client.addNewMessageToPage = function (userId, message) {
+
+            var currentdate = new Date();
+            var datetime = currentdate.getDate() + "/"
+                + (currentdate.getMonth() + 1) + "/"
+                + currentdate.getFullYear() + "  "
+                + currentdate.getHours() + ":"
+                + currentdate.getMinutes() + ":"
+                + currentdate.getSeconds();
+
+            var str = '';
+            var ownclass = '';
+            var pullleft = 'pull-left';
+            var pullright = 'pull-right';
+            if (name === $("#displayname").val()) {
+                ownclass = 'right';
+                pullleft = 'pull-right';
+                pullright = 'pull-left'
+            }
+
+            str += '<div class="direct-chat-msg ' + ownclass + '"><div class="direct-chat-info clearfix"><span class="direct-chat-name ' + pullleft + '">' + name + '</span><span class="direct-chat-timestamp ' + pullright + '">' + datetime + '</span></div>';
+            str += '<div class="direct-chat-text">' + htmlEncode(message) + '</div></div>';
+
+            $('#discussion').append(str);
+        };
+        //$('#displayname').val(prompt('Your Good Name Please:', ''));
+        $('#message').focus();
+        $.connection.hub.start().done(function () {
+            $('#sendmessage').click(function () {
+                chat.server.sendPrivateMessage($('#userid').val(), $('#message').val());
+                $('#message').val('').focus();
+            });
+        });
+    });
+    function htmlEncode(value) {
+        var encodedValue = $('<div />').text(value).html();
+        return encodedValue;
+    }
+</script>
